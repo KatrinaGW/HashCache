@@ -1,4 +1,4 @@
-public class map {
+public class Map {
     //Much of this implementation is still unknown as of now
 
     public ArrayList<ScannableCode> getNearbyScannableCodes(Coordinate coordinates, int radius){
