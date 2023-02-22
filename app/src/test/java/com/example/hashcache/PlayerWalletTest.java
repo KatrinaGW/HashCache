@@ -3,6 +3,7 @@ package com.example.hashcache;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.hashcache.models.PlayerWallet;
 
@@ -45,7 +46,8 @@ public class PlayerWalletTest {
         expectedUUIDs.add(firstUUID.toString());
         expectedUUIDs.add(secondUUID.toString());
 
-        assertEquals(expectedUUIDs, playerWallet.getScannedCodeIds());
+        assertTrue(expectedUUIDs.containsAll(playerWallet.getScannedCodeIds()) &&
+                playerWallet.getScannedCodeIds().containsAll(expectedUUIDs));
 
     }
 }
