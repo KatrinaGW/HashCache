@@ -1,3 +1,7 @@
+package com.example.hashcache.models;
+
+import android.media.Image;
+
 public class HashInfo {
     private Image generatedImage;
     private String generatedString;

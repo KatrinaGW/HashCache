@@ -1,3 +1,5 @@
+package com.example.hashcache.models;
+
 public class PlayerPreferences {
     private boolean recordGeoLocation;
 

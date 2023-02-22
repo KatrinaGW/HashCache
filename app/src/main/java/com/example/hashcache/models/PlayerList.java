@@ -1,3 +1,7 @@
+package com.example.hashcache.models;
+
+import java.util.ArrayList;
+
 public class PlayerList {
     private ArrayList<Player> players;
 
@@ -11,6 +15,6 @@ public class PlayerList {
     }
 
     public ArrayList<Player> getFirstNPlayersSortedBy(Object filter, int n){
-        return (this.getPlayersSortedBy(filter)).sublist(0, 3);
+        return (ArrayList<Player>) (this.getPlayersSortedBy(filter)).subList(0, 3);
     }
 }

@@ -1,3 +1,9 @@
+package com.example.hashcache.models;
+
+import android.media.Image;
+
+import java.util.HashMap;
+
 public class PlayerWallet{
     private HashMap<String, Image> scannableCodes;
 

@@ -1,3 +1,7 @@
+package com.example.hashcache.models;
+
+import java.util.ArrayList;
+
 public class Map {
     //Much of this implementation is still unknown as of now
 

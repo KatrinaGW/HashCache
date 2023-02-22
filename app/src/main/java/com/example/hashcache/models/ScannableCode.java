@@ -1,3 +1,8 @@
+package com.example.hashcache.models;
+
+import java.util.ArrayList;
+import java.util.UUID;
+
 public class ScannableCode{
     private UUID scannableCodeId;
     private CodeLocation codeLocation;
@@ -17,7 +22,7 @@ public class ScannableCode{
     }
 
     public CodeLocation getCodeLocation(){
-        return this,codeLocation;
+        return this.codeLocation;
     }
 
     public HashInfo getHashInfo(){

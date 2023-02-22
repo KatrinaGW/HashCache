@@ -1,3 +1,7 @@
+package com.example.hashcache.models;
+
+import java.util.UUID;
+
 public class Player{
     private UUID playerId;
     private String username;
