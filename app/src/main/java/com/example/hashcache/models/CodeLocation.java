@@ -1,5 +1,8 @@
 package com.example.hashcache.models;
 
+/**
+ * Represents the location where a code was scanned
+ */
 public class CodeLocation {
     private String locationName;
     private Coordinate coordinates;
@@ -9,6 +12,10 @@ public class CodeLocation {
         this.coordinates = new Coordinate(x, y, z);
     }
 
+    /**
+     * Get the name of the location
+     * @return locationName The name of the location
+     */
     public String getLocationName() {
         return locationName;
     }
@@ -17,10 +24,18 @@ public class CodeLocation {
         this.locationName = locationName;
     }
 
+    /**
+     * Get the 3-point coordinates of the location
+     * @return coordinates The 3-point coordinates of the location
+     */
     public Coordinate getCoordinates() {
         return coordinates;
     }
 
+    /**
+     * Sets the 3-point coordinates of the location
+     * @param coordinates The 3-point coordinates of the location
+     */
     public void setCoordinates(Coordinate coordinates) {
         this.coordinates = coordinates;
     }

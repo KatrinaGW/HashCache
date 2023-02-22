@@ -19,7 +19,7 @@ public class Coordinate {
      *                 is altitude
      * @throws IllegalArgumentException if the position is not 0, 1, or 2
      */
-    protected void setCoordinate(double value, int position){
+    public void setCoordinates(double value, int position){
         if(position >= 0 && position < 3){
             this.coordinates[position] = value;
         }else{
@@ -32,7 +32,7 @@ public class Coordinate {
      * Get the coordinate values of this point
      * @return this.coordinates The three coordinate points represented by this object
      */
-    public double[] getCoordinate(){
+    public double[] getCoordinates(){
         return this.coordinates;
     }
 }

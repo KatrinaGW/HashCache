@@ -1,5 +1,8 @@
 package com.example.hashcache.models;
 
+/**
+ * Contains the contact information for a player
+ */
 public class ContactInfo {
     private String email;
     private String phoneNumber;
@@ -11,6 +14,12 @@ public class ContactInfo {
         this.phoneNumber = "";
     }
 
+    /**
+     * Sets the email for a player
+     *
+     * @param email The candidate email to use for the player
+     * @throws IllegalArgumentException if the candidate email does not have a valid form
+     */
     public void setEmail(String email){
         int dotPosition = email.lastIndexOf(".");
         if(dotPosition==-1){
@@ -25,6 +34,11 @@ public class ContactInfo {
         }
     }
 
+    /**
+     * Sets the phone number for a player
+     * @param phoneNumber The candidate phone number for the player
+     * @throws IllegalArgumentException if the phone number does not have a valid form
+     */
     public void setPhoneNumber(String phoneNumber){
         if(phoneNumber.matches(phoneNumberRegex)){
             this.phoneNumber = phoneNumber;
@@ -34,10 +48,18 @@ public class ContactInfo {
 
     }
 
+    /**
+     * Gets the phone number in this contact info
+     * @return phoneNumber The registered phone number
+     */
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
+    /**
+     * Gets the registered email for this contact info
+     * @return email The registered email
+     */
     public String getEmail() {
         return email;
     }
