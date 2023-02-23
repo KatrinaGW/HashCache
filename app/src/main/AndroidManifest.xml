@@ -20,6 +20,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".AppHome"/>
+        <activity android:name=".QRStats"/>
+        <activity android:name=".MyProfile"/>
+        <activity android:name=".Community"/>
+        <activity android:name=".QRByLocation"/>
+        <activity android:name=".Settings"/>
     </application>
 
 </manifest>
