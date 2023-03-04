@@ -12,6 +12,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.hashcache.AppHome;
+import com.example.hashcache.R;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
