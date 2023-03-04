@@ -8,8 +8,10 @@ import java.util.UUID;
 public class Comment {
     private String body;
     private UUID commentatorId;
+    private UUID commentId;
 
     public Comment(String body, UUID commentatorId){
+        this.commentId = UUID.randomUUID();
         this.body = body;
         this.commentatorId = commentatorId;
     }

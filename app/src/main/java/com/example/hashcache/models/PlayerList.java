@@ -38,9 +38,10 @@ public class PlayerList {
      */
     public boolean addPlayer(String username){
         boolean success = true;
+        Player newPlayer = new Player(username);
 
         try{
-            this.playersConnectionHandler.addPlayer(username);
+            this.playersConnectionHandler.addPlayer(newPlayer);
         }catch (IllegalArgumentException e){
             success = false;
         }

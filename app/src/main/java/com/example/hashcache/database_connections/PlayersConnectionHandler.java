@@ -5,7 +5,12 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.hashcache.database_connections.helpers.FireStoreHelper;
+import com.example.hashcache.database_connections.helpers.PlayerDocumentConverter;
+import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
+import com.example.hashcache.models.PlayerPreferences;
+import com.example.hashcache.models.PlayerWallet;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,6 +37,8 @@ public class PlayersConnectionHandler {
     private ArrayList<String> inAppPlayerUserNames;
     private HashMap<String, Player> cachedPlayers;
     final String TAG = "Sample";
+    private PlayerDocumentConverter playerDocumentConverter;
+    private FireStoreHelper fireStoreHelper;
 
     /**
      * Creates a new instance of the class and initializes the connection to the database
@@ -41,6 +48,8 @@ public class PlayersConnectionHandler {
     public PlayersConnectionHandler(ArrayList<String> inAppPlayerUserNames){
         this.inAppPlayerUserNames = inAppPlayerUserNames;
         this.cachedPlayers = new HashMap<>();
+        this.playerDocumentConverter = new PlayerDocumentConverter();
+        this.fireStoreHelper = new FireStoreHelper();
 
         db = FirebaseFirestore.getInstance();
 
@@ -83,8 +92,6 @@ public class PlayersConnectionHandler {
             player[0] = cachedPlayers.get(userName);
         }else {
             DocumentReference documentReference = collectionReference.document(userName);
-
-            System.out.println("LOOKY" + documentReference.getId());
             documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -93,7 +100,7 @@ public class PlayersConnectionHandler {
                         if (document.exists()) {
                             Log.d(TAG, "Document exists!");
 
-                            player[0] = new Player(document.getId());
+                            player[0] = playerDocumentConverter.getPlayerFromDocument(documentReference);
                             cachedPlayers.put(userName, player[0]);
                             Log.d(TAG, "FIND DONE");
                             getPlayerCallback.onCallback(player[0]);
@@ -114,11 +121,16 @@ public class PlayersConnectionHandler {
     /**
      * Adds a player to the database
      *
-     * @param username the username of the player to add
+     * @param player the player to add to the database
      * @throws IllegalArgumentException if the username is empty, too long, or already belongs
      * to a player
      */
-    public void addPlayer(String username){
+    public void addPlayer(Player player){
+        String username = player.getUsername();
+        ContactInfo contactInfo = player.getContactInfo();
+        PlayerPreferences playerPreferences = player.getPlayerPreferences();
+        PlayerWallet playerWallet = player.getPlayerWallet();
+
         if(username == null || username.equals("")|| username.length()>=50){
             throw new IllegalArgumentException("Username null, empty, or too long");
         }
@@ -127,22 +139,29 @@ public class PlayersConnectionHandler {
             throw new IllegalArgumentException("Username taken!");
         }
 
-        HashMap<String, String> data = new HashMap<>();
-        data.put("username", username);
-        collectionReference
-                .document(username)
-                .set(data)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Data has been added successfully!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "Data could not be added!" + e.toString());
-                    }
-                });
+        HashMap<String, String> usernameData = new HashMap<>();
+        usernameData.put("username", username);
+
+        HashMap<String, String> emailData = new HashMap<>();
+        emailData.put("email", contactInfo.getEmail());
+
+        HashMap<String, String> phoneNumberData = new HashMap<>();
+        emailData.put("phoneNumber", contactInfo.getPhoneNumber());
+
+        HashMap<String, String> recordGeoLocationdData = new HashMap<>();
+        emailData.put("recordGeoLocationdData", String.valueOf(playerPreferences
+                .getRecordGeolocationPreference())
+        );
+
+        DocumentReference contactInfoReference = collectionReference.document(username)
+                .collection("contactInfo").document("contactInfo");
+        DocumentReference playerPreferenceReference = collectionReference.document(username)
+                .collection("playerPreferences").document("playerPreferences");
+
+        fireStoreHelper.setDocumentReference(collectionReference.document(username), usernameData);
+        fireStoreHelper.setDocumentReference(contactInfoReference, usernameData);
+        fireStoreHelper.setDocumentReference(contactInfoReference, phoneNumberData);
+        fireStoreHelper.setDocumentReference(playerPreferenceReference, recordGeoLocationdData);
     }
+
 }

@@ -1,8 +1,19 @@
 package com.example.hashcache.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.example.hashcache.database_connections.GetPlayerCallback;
 import com.example.hashcache.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -13,15 +24,50 @@ import java.util.ArrayList;
 
 public class PlayerListTest {
     @Test
-    void testGetPlayer(){
+    void testAddPlayerSuccess(){
         String newPlayerUsername = "Stubby";
+        Player mockPlayer = new Player(newPlayerUsername);
+        ArrayList<String> names = new ArrayList<>();
         PlayersConnectionHandler mockPlayerConnectionHandler = Mockito.mock(PlayersConnectionHandler.class);
-        Mockito.when(mockPlayerConnectionHandler.getInAppPlayerUserNames()).thenReturn(new ArrayList<>());
-        Mockito.when(mockPlayerConnectionHandler.addPlayer(newPlayerUsername)).thenAnswer()
+
+        when(mockPlayerConnectionHandler.getInAppPlayerUserNames()).thenReturn(names);
+        doAnswer(invocation -> {
+            names.add(newPlayerUsername);
+
+            return null;
+        }).when(mockPlayerConnectionHandler).addPlayer(mockPlayer);
+
         PlayerList playerList = new PlayerList(mockPlayerConnectionHandler);
 
-        playerList.addPlayer(newPlayerUsername);
+        assertTrue(playerList.addPlayer(newPlayerUsername));
+        assertEquals(names.get(0), playerList.getPlayerUserNames().get(0));
+    }
 
-        assertEquals(playerList.getPlayerUserNames().get(0), newPlayerUsername);
+    @Test
+    void testAddPlayerFailure(){
+        String newPlayerUsername = "Stubby";
+        PlayersConnectionHandler mockPlayerConnectionHandler = Mockito.mock(PlayersConnectionHandler.class);
+
+        doThrow(new IllegalArgumentException()).when(mockPlayerConnectionHandler).addPlayer(any());
+        PlayerList playerList = new PlayerList(mockPlayerConnectionHandler);
+
+        assertFalse(playerList.addPlayer(newPlayerUsername));
+    }
+
+    @Test
+    void testGetPlayer(){
+        String mockPlayerName = "Stubby";
+        Player mockPlayer = new Player(mockPlayerName);
+        GetPlayerCallback mockGetPlayerCallback = new GetPlayerCallback() {
+            @Override
+            public void onCallback(Player player) {}
+        };
+
+        PlayersConnectionHandler mockPlayerConnectionHandler = Mockito.mock(PlayersConnectionHandler.class);
+        when(mockPlayerConnectionHandler.getPlayer(mockPlayerName, mockGetPlayerCallback)).thenReturn(mockPlayer);
+
+        PlayerList playerList = new PlayerList(mockPlayerConnectionHandler);
+
+        assertEquals(mockPlayer, playerList.getPlayer(mockPlayerName, mockGetPlayerCallback));
     }
 }
