@@ -11,16 +11,18 @@ import androidx.appcompat.widget.AppCompatButton;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 
+import com.example.hashcache.controllers.AddUserCommand;
 import com.example.hashcache.models.PlayerList;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
-import java.util.ArrayList;
-
 public class MainActivity extends AppCompatActivity {
 
     PlayerList playerList;
+    EditText usernameEditText;
+    AddUserCommand addUserCommand;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,19 +39,22 @@ public class MainActivity extends AppCompatActivity {
                 .build());
 
         playerList = new PlayerList();
-        playerList.addPlayer("Tester");
-        System.out.println("Completed add");
+        addUserCommand = new AddUserCommand();
 
         // add functionality to start button
         AppCompatButton startButton = findViewById(R.id.start_button);
+        usernameEditText = findViewById(R.id.username_edittext);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                // go to AppHome page (map view)
-                Intent goHome = new Intent(MainActivity.this, AppHome.class);
-                startActivity(goHome);
+                onStartCachingClicked();
             }
         });
+    }
+
+    private void onStartCachingClicked(){
+        addUserCommand.addUser(usernameEditText.getText().toString(), playerList);
+        Intent goHome = new Intent(MainActivity.this, AppHome.class);
+        startActivity(goHome);
     }
 }

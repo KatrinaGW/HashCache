@@ -1,11 +1,9 @@
 package com.example.hashcache.models;
 
+import com.example.hashcache.database_connections.GetPlayerCallback;
 import com.example.hashcache.database_connections.PlayersConnectionHandler;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Represents a container for all the players in game right now
@@ -19,6 +17,11 @@ public class PlayerList {
         playersConnectionHandler = new PlayersConnectionHandler(playerUserNames);
     }
 
+    /**
+     * Adds a player to the database
+     * @param username the username of the player to add
+     * @return success indicates if the user was successfully added or not
+     */
     public boolean addPlayer(String username){
         boolean success = true;
 
@@ -32,10 +35,13 @@ public class PlayerList {
     }
 
     /**
-     * Get all the players in the database right now and store them here
+     * Gets a player with a given username
+     * @param username the username of the player to find
+     * @param getPlayerCallback callback function to get username after asynchronous firestore call
+     * @return player The player with the given username
      */
-    public void retrievePlayersFromDB(){
-        //Retrive the players from the database
+    public Player getPlayer(String username, GetPlayerCallback getPlayerCallback){
+        return this.playersConnectionHandler.getPlayer(username, getPlayerCallback);
     }
 
     /**
