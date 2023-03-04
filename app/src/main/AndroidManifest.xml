@@ -26,6 +26,12 @@
         <activity android:name=".Community"/>
         <activity android:name=".QRByLocation"/>
         <activity android:name=".Settings"/>
+
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            android:authorities="${applicationId}.firebaseinitprovider"
+            tools:node="remove"
+            />
     </application>
 
 </manifest>

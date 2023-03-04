@@ -1,10 +1,6 @@
 package com.example.hashcache.controllers;
 
-import android.media.Image;
-
 import com.example.hashcache.models.HashInfo;
-
-import java.util.jar.Attributes;
 
 public class HashInfoGenerator {
 

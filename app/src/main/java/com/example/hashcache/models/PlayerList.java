@@ -1,12 +1,35 @@
 package com.example.hashcache.models;
 
+import com.example.hashcache.database_connections.PlayersConnectionHandler;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Represents a container for all the players in game right now
  */
 public class PlayerList {
-    private ArrayList<Player> players;
+    private ArrayList<String> playerUserNames;
+    private PlayersConnectionHandler playersConnectionHandler;
+
+    public PlayerList(){
+        playerUserNames = new ArrayList<>();
+        playersConnectionHandler = new PlayersConnectionHandler(playerUserNames);
+    }
+
+    public boolean addPlayer(String username){
+        boolean success = true;
+
+        try{
+            this.playersConnectionHandler.addPlayer(username);
+        }catch (IllegalArgumentException e){
+            success = false;
+        }
+
+        return success;
+    }
 
     /**
      * Get all the players in the database right now and store them here
@@ -20,9 +43,9 @@ public class PlayerList {
      * @param filter The way to sort the players
      * @return players The playerlist sorted in the specified manner
      */
-    public ArrayList<Player> getPlayersSortedBy(Object filter){
+    public ArrayList<String> getPlayersSortedBy(Object filter){
         //return the players sorted by a specific method
-        return this.players;
+        return this.playerUserNames;
     }
 
     /**
@@ -31,7 +54,7 @@ public class PlayerList {
      * @param n The top number of players to get
      * @return this.players sublist The top n players sorted in a specified manner
      */
-    public ArrayList<Player> getFirstNPlayersSortedBy(Object filter, int n){
-        return (ArrayList<Player>) (this.getPlayersSortedBy(filter)).subList(0, n);
+    public ArrayList<String> getFirstNPlayersSortedBy(Object filter, int n){
+        return (ArrayList<String>) (this.getPlayersSortedBy(filter)).subList(0, n);
     }
 }
