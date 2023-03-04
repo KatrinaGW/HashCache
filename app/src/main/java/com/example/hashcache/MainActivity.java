@@ -17,6 +17,7 @@ import com.example.hashcache.controllers.AddUserCommand;
 import com.example.hashcache.models.PlayerList;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
 

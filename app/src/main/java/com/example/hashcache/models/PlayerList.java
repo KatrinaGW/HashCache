@@ -2,6 +2,7 @@ package com.example.hashcache.models;
 
 import com.example.hashcache.database_connections.GetPlayerCallback;
 import com.example.hashcache.database_connections.PlayersConnectionHandler;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
@@ -15,6 +16,19 @@ public class PlayerList {
     public PlayerList(){
         playerUserNames = new ArrayList<>();
         playersConnectionHandler = new PlayersConnectionHandler(playerUserNames);
+    }
+
+    public PlayerList(PlayersConnectionHandler playersConnectionHandler){
+        this.playersConnectionHandler = playersConnectionHandler;
+        playerUserNames = playersConnectionHandler.getInAppPlayerUserNames();
+    }
+
+    /**
+     * Gets the usernames of all players
+     * @return playerUserNames the usernames of all players
+     */
+    public ArrayList<String> getPlayerUserNames(){
+        return this.playerUserNames;
     }
 
     /**

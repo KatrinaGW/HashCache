@@ -62,6 +62,14 @@ public class PlayersConnectionHandler {
     }
 
     /**
+     * Gets the in app player usernames
+     * @return inAppPlayerUserNames gets the usernames of all players in the app
+     */
+    public ArrayList<String> getInAppPlayerUserNames(){
+        return this.inAppPlayerUserNames;
+    }
+
+    /**
      * Gets a Player from the Players database, if the given username belongs to a player
      *
      * @param userName the username to use to pull the player with

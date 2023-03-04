@@ -1,4 +1,4 @@
-package com.example.hashcache;
+package com.example.hashcache.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
