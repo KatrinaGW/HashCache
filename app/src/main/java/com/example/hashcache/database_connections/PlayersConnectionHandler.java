@@ -1,5 +1,6 @@
 package com.example.hashcache.database_connections;
 
+import android.media.Image;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -9,10 +10,12 @@ import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.database_connections.converters.FireStoreHelper;
 import com.example.hashcache.database_connections.converters.PlayerDocumentConverter;
 import com.example.hashcache.database_connections.values.CollectionNames;
+import com.example.hashcache.database_connections.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.PlayerWallet;
+import com.example.hashcache.models.ScannableCode;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -100,10 +103,15 @@ public class PlayersConnectionHandler {
                         if (document.exists()) {
                             Log.d(TAG, "Document exists!");
 
-                            player[0] = playerDocumentConverter.getPlayerFromDocument(documentReference);
-                            cachedPlayers.put(userName, player[0]);
-                            Log.d(TAG, "FIND DONE");
-                            getPlayerCallback.onCallback(player[0]);
+                            playerDocumentConverter.getPlayerFromDocument(documentReference,
+                                    new GetPlayerCallback() {
+                                        @Override
+                                        public void onCallback(Player player) {
+                                            cachedPlayers.put(userName, player);
+                                            Log.d(TAG, "FIND DONE");
+                                            getPlayerCallback.onCallback(player);
+                                        }
+                                    });
                         } else {
                             Log.d(TAG, "Document does not exist!");
                              throw new IllegalArgumentException("Given username does not exist!");
@@ -128,7 +136,7 @@ public class PlayersConnectionHandler {
         ContactInfo contactInfo = player.getContactInfo();
         PlayerPreferences playerPreferences = player.getPlayerPreferences();
         PlayerWallet playerWallet = player.getPlayerWallet();
-        ArrayList<String> scannableCodes = playerWallet.getScannedCodeIds();
+        ArrayList<String> scannableCodeIds = playerWallet.getScannedCodeIds();
 
         if(username == null || username.equals("")|| username.length()>=50){
             throw new IllegalArgumentException("Username null, empty, or too long");
@@ -146,19 +154,23 @@ public class PlayersConnectionHandler {
         contactInfoData.put("phoneNumber", contactInfo.getPhoneNumber());
 
         HashMap<String, String> recordGeoLocationdData = new HashMap<>();
-        recordGeoLocationdData.put("recordGeoLocationdData", String.valueOf(playerPreferences
+        recordGeoLocationdData.put(FieldNames.RECORD_GEOLOCATION.fieldName, String.valueOf(playerPreferences
                 .getRecordGeolocationPreference())
         );
 
         HashMap<String, String> scannableCodeIdData = new HashMap<>();
-        //TODO: Store the image in Firestore
 
-        if(scannableCodes.size()>0){
-            for(String id : scannableCodes){
+        if(scannableCodeIds.size()>0){
+            Image scannableCodeImage;
+
+            for(String scannableCodeId : scannableCodeIds){
                 scannableCodeIdData.clear();
-                scannableCodeIdData.put("scannableCodeId", id);
+                scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
+                if(playerWallet.getScannableCodeLocationImage(scannableCodeId) != null){
+                    //TODO: insert the image
+                }
                 DocumentReference playerWalletReference = collectionReference.document(username)
-                        .collection("playerWallet").document(id);
+                        .collection(CollectionNames.PLAYER_WALLET.collectionName).document(scannableCodeId);
 
                 fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData);
             }

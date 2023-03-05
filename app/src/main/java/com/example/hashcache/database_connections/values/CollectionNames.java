@@ -5,7 +5,8 @@ public enum CollectionNames {
     CODE_LOCATIONS("codeLocations"),
     SCANNABLE_CODES("scannableCodes"),
     CONTACT_INFO("contactInfo"),
-    PLAYER_PREFERENCES("player_preferences"),
+    PLAYER_PREFERENCES("playerPreferences"),
+    PLAYER_WALLET("playerWallet"),
     COMMENTS("comments");
     public final String collectionName;
 

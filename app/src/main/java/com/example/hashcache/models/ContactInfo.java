@@ -21,6 +21,10 @@ public class ContactInfo {
      * @throws IllegalArgumentException if the candidate email does not have a valid form
      */
     public void setEmail(String email){
+        if(email.equals("")){
+            return;
+        }
+
         int dotPosition = email.lastIndexOf(".");
         if(dotPosition==-1){
             throw new IllegalArgumentException("Given email does not contain a domain");
@@ -40,6 +44,10 @@ public class ContactInfo {
      * @throws IllegalArgumentException if the phone number does not have a valid form
      */
     public void setPhoneNumber(String phoneNumber){
+        if(phoneNumber.equals("")){
+            return;
+        }
+
         if(phoneNumber.matches(phoneNumberRegex)){
             this.phoneNumber = phoneNumber;
         }else{
