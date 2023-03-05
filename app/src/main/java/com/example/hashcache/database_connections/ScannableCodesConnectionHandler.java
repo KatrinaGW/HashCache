@@ -35,7 +35,7 @@ public class ScannableCodesConnectionHandler {
     private ScannableCodeDocumentConverter scannableCodeDocumentConverter;
     private FireStoreHelper fireStoreHelper;
 
-    public ScannableCodesConnectionHandler(){
+    public ScannableCodesConnectionHandler() {
         this.cachedScannableCodes = new HashMap<>();
         this.scannableCodeDocumentConverter = new ScannableCodeDocumentConverter();
         this.fireStoreHelper = new FireStoreHelper();
@@ -48,11 +48,8 @@ public class ScannableCodesConnectionHandler {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
             FirebaseFirestoreException error) {
-                for(QueryDocumentSnapshot doc: queryDocumentSnapshots)
-                {
+                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                     //TODO: get scannable code
-//                    Log.d(TAG, String.valueOf(doc.getData().get("username")));
-//                    String username = doc.getId();
                 }
             }
         });
@@ -60,13 +57,14 @@ public class ScannableCodesConnectionHandler {
 
     /**
      * Gets a scannable code from the database with a specific id
-     * @param scannableCodeId the id of the scannable code to get
+     *
+     * @param scannableCodeId          the id of the scannable code to get
      * @param getScannableCodeCallback the callback function to be called with the found scnnablecode
      */
-    public void getScannableCode(String scannableCodeId, GetScannableCodeCallback getScannableCodeCallback){
-        if(this.cachedScannableCodes.containsKey(scannableCodeId)){
+    public void getScannableCode(String scannableCodeId, GetScannableCodeCallback getScannableCodeCallback) {
+        if (this.cachedScannableCodes.containsKey(scannableCodeId)) {
             getScannableCodeCallback.onCallback(cachedScannableCodes.get(scannableCodeId));
-        }else{
+        } else {
             DocumentReference documentReference = this.collectionReference.document(scannableCodeId);
             this.scannableCodeDocumentConverter.getScannableCodeFromDocument(documentReference, getScannableCodeCallback);
         }
@@ -74,12 +72,13 @@ public class ScannableCodesConnectionHandler {
 
     /**
      * Add a scannable code to the database
-     * @param scannableCode the scannable code to add to the database
+     *
+     * @param scannableCode   the scannable code to add to the database
      * @param booleanCallback the function to call back with once the addition has succeeded
      * @throws IllegalArgumentException when there already exists a scannable code with the given id
      */
-    public void addScannableCode(ScannableCode scannableCode, BooleanCallback booleanCallback){
-        if(this.cachedScannableCodes.containsKey(scannableCode.getScannableCodeId())){
+    public void addScannableCode(ScannableCode scannableCode, BooleanCallback booleanCallback) {
+        if (this.cachedScannableCodes.containsKey(scannableCode.getScannableCodeId())) {
             Log.d(TAG, "scannable code already exists with given id!");
             booleanCallback.onCallback(false);
             return;
@@ -89,7 +88,7 @@ public class ScannableCodesConnectionHandler {
                 new BooleanCallback() {
                     @Override
                     public void onCallback(Boolean documentExists) {
-                        if(!documentExists){
+                        if (!documentExists) {
                             HashInfo hashInfo = scannableCode.getHashInfo();
                             ArrayList<Comment> comments = scannableCode.getComments();
 
@@ -102,23 +101,53 @@ public class ScannableCodesConnectionHandler {
                             fireStoreHelper.setDocumentReference(collectionReference
                                     .document(scannableCode.getScannableCodeId()), data);
 
-                            HashMap<String, String> commentData = new HashMap<>();
-
                             for (Comment comment : comments) {
-                                commentData.clear();
-                                commentData.put(FieldNames.COMMENTATOR_ID.fieldName, comment.getCommentatorId());
-                                commentData.put(FieldNames.COMMENT_BODY.fieldName, comment.getBody());
                                 fireStoreHelper.setDocumentReference(collectionReference
                                         .document(scannableCode.getScannableCodeId())
                                         .collection(CollectionNames.COMMENTS.collectionName)
-                                        .document(comment.getCommentId()), commentData);
+                                        .document(comment.getCommentId()), getCommentData(comment));
                             }
 
                             booleanCallback.onCallback(true);
-                        }else{
+                        } else {
                             throw new IllegalArgumentException("Scannable code with id already exists!");
                         }
-                    };
+                    }
+
+                    ;
                 });
+    }
+
+    private HashMap<String, String> getCommentData(Comment comment){
+        HashMap<String, String> commentData = new HashMap<>();
+        commentData.put(FieldNames.COMMENTATOR_ID.fieldName, comment.getCommentatorId());
+        commentData.put(FieldNames.COMMENT_BODY.fieldName, comment.getBody());
+
+        return commentData;
+    }
+
+    /**
+     * Add a comment to a scannable code, if it exists
+     * @param scannableCodeId the id of the scannable code to add the comment to
+     * @param newComment the comment to add to the scannable code
+     * @param booleanCallback the callback function to call if the addition is successful
+     * @throws IllegalArgumentException when the scannable code id is not valid
+     */
+    public void addComment(String scannableCodeId, Comment newComment, BooleanCallback booleanCallback) {
+        fireStoreHelper.documentWithIDExists(this.collectionReference, scannableCodeId, new BooleanCallback() {
+            @Override
+            public void onCallback(Boolean isTrue) {
+                if (isTrue) {
+                    HashMap<String, String> commentData;
+                    collectionReference
+                            .document(scannableCodeId)
+                            .collection(CollectionNames.COMMENTS.collectionName)
+                            .add(getCommentData(newComment));
+                    booleanCallback.onCallback(true);
+                } else {
+                    throw new IllegalArgumentException("ScannableCode does not exist!");
+                }
+            }
+        });
     }
 }

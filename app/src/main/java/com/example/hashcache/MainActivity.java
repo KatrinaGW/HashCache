@@ -14,6 +14,9 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.example.hashcache.controllers.AddUserCommand;
+import com.example.hashcache.database_connections.ScannableCodesConnectionHandler;
+import com.example.hashcache.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.PlayerList;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -57,5 +60,6 @@ public class MainActivity extends AppCompatActivity {
         addUserCommand.addUser(usernameEditText.getText().toString(), playerList);
         Intent goHome = new Intent(MainActivity.this, AppHome.class);
         startActivity(goHome);
+
     }
 }
