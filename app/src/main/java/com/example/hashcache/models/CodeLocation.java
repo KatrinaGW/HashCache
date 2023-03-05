@@ -1,5 +1,7 @@
 package com.example.hashcache.models;
 
+import java.lang.reflect.Array;
+
 /**
  * Represents the location where a code was scanned
  */
@@ -38,5 +40,18 @@ public class CodeLocation {
      */
     public void setCoordinates(Coordinate coordinates) {
         this.coordinates = coordinates;
+    }
+
+    /**
+     * Gets the id of a codelocation based on the concatenation of its coordinates
+     * @return the concatenation of its coordinates
+     */
+    public String getId(){
+        double[] coordinates = this.coordinates.getCoordinates();
+        String x = Double.toString((Double) Array.get(coordinates, 0));
+        String y = Double.toString((Double) Array.get(coordinates, 1));
+        String z = Double.toString((Double) Array.get(coordinates, 2));
+
+        return x + y + z;
     }
 }

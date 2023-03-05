@@ -1,10 +1,12 @@
 package com.example.hashcache.database_connections;
 
+import android.media.AudioTrack;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.hashcache.database_connections.helpers.CodeLocationDocumentConverter;
 import com.example.hashcache.database_connections.helpers.FireStoreHelper;
 import com.example.hashcache.database_connections.helpers.PlayerDocumentConverter;
 import com.example.hashcache.models.CodeLocation;
@@ -44,11 +46,16 @@ public class CodeLocationConnectionHandler {
     final String TAG = "Sample";
     private PlayerDocumentConverter playerDocumentConverter;
     private FireStoreHelper fireStoreHelper;
+    private CodeLocationDocumentConverter codeLocationDocumentConverter;
 
+    /**
+     * Creates a connection to the CodeLocation collection in the database and keeps a cache
+     * of the locations
+     */
     public CodeLocationConnectionHandler(){
         this.cachedCodeLocations = new HashMap<>();
-        this.playerDocumentConverter = new PlayerDocumentConverter();
         this.fireStoreHelper = new FireStoreHelper();
+        this.codeLocationDocumentConverter = new CodeLocationDocumentConverter();
 
         db = FirebaseFirestore.getInstance();
 
@@ -73,24 +80,33 @@ public class CodeLocationConnectionHandler {
         });
     }
 
+    /**
+     * Adds a code location to the database
+     * @param codeLocation the codelocation to add to the database
+     * @param booleanCallback the callback function to call once the asynchronous database calls are done
+     *
+     * @throws IllegalArgumentException when the code location already exists in the database
+     */
     public void addCodeLocation(CodeLocation codeLocation, BooleanCallback booleanCallback){
         String name = codeLocation.getLocationName();
         double[] coordinates = codeLocation.getCoordinates().getCoordinates();
         String x = Double.toString((double)Array.get(coordinates, 0));
         String y = Double.toString((double)Array.get(coordinates, 1));
         String z = Double.toString((double)Array.get(coordinates, 2));
-        String id = x + y + z;
+        String id = codeLocation.getId();
 
         final boolean[] codeLocationExists = new boolean[1];
 
-        System.out.println("ID IS " + id);
+        if(cachedCodeLocations.containsKey(id)){
+            return;
+        }
 
         fireStoreHelper.documentWithIDExists(collectionReference, id, new BooleanCallback() {
             @Override
             public void onCallback(Boolean isTrue) {
                 codeLocationExists[0] = isTrue;
 
-                if(!codeLocationExists[0] && !cachedCodeLocations.containsKey(id)){
+                if(!codeLocationExists[0]){
 
                     HashMap<String, String> data = new HashMap<>();
                     data.put("name", name);
@@ -109,5 +125,23 @@ public class CodeLocationConnectionHandler {
         });
 
         booleanCallback.onCallback(true);
+    }
+
+    /**
+     * Gets a code location from the database
+     * @param id the id of the code location to get
+     * @param getCodeLocationCallback the callback function to call once the code location has been found
+     */
+    public void getCodeLocation(String id, GetCodeLocationCallback getCodeLocationCallback){
+        CodeLocation codeLocation;
+
+        if(cachedCodeLocations.containsKey(id)){
+            codeLocation = cachedCodeLocations.get(id);
+            getCodeLocationCallback.onCallback(codeLocation);
+        }else {
+            DocumentReference documentReference = collectionReference.document(id);
+            codeLocationDocumentConverter.getCodeLocationFromDocument(documentReference,
+                    getCodeLocationCallback);
+        }
     }
 }
