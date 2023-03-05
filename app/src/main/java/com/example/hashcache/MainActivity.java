@@ -17,14 +17,21 @@ import com.example.hashcache.controllers.AddUserCommand;
 import com.example.hashcache.database_connections.BooleanCallback;
 import com.example.hashcache.database_connections.CodeLocationConnectionHandler;
 import com.example.hashcache.database_connections.GetCodeLocationCallback;
+import com.example.hashcache.database_connections.GetScannableCodeCallback;
+import com.example.hashcache.database_connections.ScannableCodesConnectionHandler;
 import com.example.hashcache.database_connections.helpers.CodeLocationDocumentConverter;
 import com.example.hashcache.models.CodeLocation;
+import com.example.hashcache.models.Comment;
+import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.PlayerList;
+import com.example.hashcache.models.ScannableCode;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.checkerframework.checker.units.qual.C;
+
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         // add functionality to start button
         AppCompatButton startButton = findViewById(R.id.start_button);
         usernameEditText = findViewById(R.id.username_edittext);
+
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
