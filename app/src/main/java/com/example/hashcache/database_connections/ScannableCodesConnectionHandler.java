@@ -2,6 +2,7 @@ package com.example.hashcache.database_connections;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.hashcache.database_connections.callbacks.BooleanCallback;
@@ -13,6 +14,8 @@ import com.example.hashcache.database_connections.values.FieldNames;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
@@ -142,10 +145,48 @@ public class ScannableCodesConnectionHandler {
                     collectionReference
                             .document(scannableCodeId)
                             .collection(CollectionNames.COMMENTS.collectionName)
-                            .add(getCommentData(newComment));
+                            .document(newComment.getCommentId())
+                            .set(getCommentData(newComment));
                     booleanCallback.onCallback(true);
                 } else {
                     throw new IllegalArgumentException("ScannableCode does not exist!");
+                }
+            }
+        });
+    }
+
+    public void deleteComment(String scannableCodeId, String commentId, BooleanCallback booleanCallback){
+        fireStoreHelper.documentWithIDExists(collectionReference, scannableCodeId, new BooleanCallback() {
+            @Override
+            public void onCallback(Boolean isTrue) {
+                if(isTrue){
+                    CollectionReference commentCollection = collectionReference
+                                                            .document(scannableCodeId)
+                                                            .collection(CollectionNames.COMMENTS.collectionName);
+                    fireStoreHelper.documentWithIDExists(commentCollection,commentId,
+                            new BooleanCallback() {
+                                @Override
+                                public void onCallback(Boolean isTrue) {
+                                    if(isTrue){
+                                        commentCollection.document(commentId)
+                                                .delete()
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                                        booleanCallback.onCallback(true);
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.w(TAG, "Error deleting document", e);
+                                                        booleanCallback.onCallback(false);
+                                                    }
+                                                });
+                                    }
+                                }
+                            });
                 }
             }
         });
