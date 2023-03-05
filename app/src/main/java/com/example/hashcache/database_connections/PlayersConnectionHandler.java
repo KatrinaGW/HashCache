@@ -54,7 +54,7 @@ public class PlayersConnectionHandler {
 
         db = FirebaseFirestore.getInstance();
 
-        collectionReference = db.collection("players");
+        collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
 
         collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -83,10 +83,11 @@ public class PlayersConnectionHandler {
      * Gets a Player from the Players database, if the given username belongs to a player
      *
      * @param userName the username to use to pull the player with
-     * @return player the player in the database with that username
+     * @param getPlayerCallback the callback function to call with the player once it has
+     *                          been found
      * @throws IllegalArgumentException if the given username does not belong to a player
      */
-    public Player getPlayer(String userName, GetPlayerCallback getPlayerCallback){
+    public void getPlayer(String userName, GetPlayerCallback getPlayerCallback){
         final Player[] player = new Player[1];
 
         if(cachedPlayers.keySet().contains(userName)){
@@ -115,8 +116,6 @@ public class PlayersConnectionHandler {
                 }
             });
         }
-
-        return player[0];
     }
 
     /**

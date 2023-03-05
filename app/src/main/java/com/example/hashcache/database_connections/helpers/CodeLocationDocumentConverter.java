@@ -30,7 +30,6 @@ public class CodeLocationDocumentConverter {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         try{
                             locationName[0] = (String) document.getData().get("name");
-                            System.out.println("C " + locationName[0]);
                             Array.set(coordinates, 0,
                                     Double.parseDouble((String) document.getData().get("x")));
                             Array.set(coordinates, 1,

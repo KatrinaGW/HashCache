@@ -59,7 +59,7 @@ public class CodeLocationConnectionHandler {
 
         db = FirebaseFirestore.getInstance();
 
-        collectionReference = db.collection("codeLocations");
+        collectionReference = db.collection(CollectionNames.CODE_LOCATIONS.collectionName);
 
         collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -117,20 +117,20 @@ public class CodeLocationConnectionHandler {
                     DocumentReference documentReference = collectionReference.document(id);
 
                     fireStoreHelper.setDocumentReference(documentReference, data);
+                    booleanCallback.onCallback(true);
                 }else{
                     Log.e(TAG, "Code Location already exists!");
                     throw new IllegalArgumentException("Code location already exists!");
                 }
             }
         });
-
-        booleanCallback.onCallback(true);
     }
 
     /**
      * Gets a code location from the database
      * @param id the id of the code location to get
-     * @param getCodeLocationCallback the callback function to call once the code location has been found
+     * @param getCodeLocationCallback the callback function to call with the location once it
+     *                                has been found
      */
     public void getCodeLocation(String id, GetCodeLocationCallback getCodeLocationCallback){
         CodeLocation codeLocation;
@@ -141,7 +141,13 @@ public class CodeLocationConnectionHandler {
         }else {
             DocumentReference documentReference = collectionReference.document(id);
             codeLocationDocumentConverter.getCodeLocationFromDocument(documentReference,
-                    getCodeLocationCallback);
+                    new GetCodeLocationCallback() {
+                        @Override
+                        public void onCallback(CodeLocation codeLocation) {
+                            cachedCodeLocations.put(codeLocation.getId(), codeLocation);
+                            getCodeLocationCallback.onCallback(codeLocation);
+                        }
+                    });
         }
     }
 }

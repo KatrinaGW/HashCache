@@ -7,8 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.database_connections.GetPlayerCallback;
@@ -58,16 +61,15 @@ public class PlayerListTest {
     void testGetPlayer(){
         String mockPlayerName = "Stubby";
         Player mockPlayer = new Player(mockPlayerName);
-        GetPlayerCallback mockGetPlayerCallback = new GetPlayerCallback() {
-            @Override
-            public void onCallback(Player player) {}
-        };
+        GetPlayerCallback mockGetPlayerCallback = Mockito.mock(GetPlayerCallback.class);
 
         PlayersConnectionHandler mockPlayerConnectionHandler = Mockito.mock(PlayersConnectionHandler.class);
-        when(mockPlayerConnectionHandler.getPlayer(mockPlayerName, mockGetPlayerCallback)).thenReturn(mockPlayer);
+        doNothing().when(mockPlayerConnectionHandler).getPlayer(mockPlayerName, mockGetPlayerCallback);
 
         PlayerList playerList = new PlayerList(mockPlayerConnectionHandler);
+        playerList.getPlayer(mockPlayerName, mockGetPlayerCallback);
 
-        assertEquals(mockPlayer, playerList.getPlayer(mockPlayerName, mockGetPlayerCallback));
+        verify(mockPlayerConnectionHandler, times(1))
+                .getPlayer(mockPlayerName, mockGetPlayerCallback);
     }
 }

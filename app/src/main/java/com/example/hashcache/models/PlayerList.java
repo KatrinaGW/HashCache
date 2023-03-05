@@ -55,8 +55,8 @@ public class PlayerList {
      * @param getPlayerCallback callback function to get username after asynchronous firestore call
      * @return player The player with the given username
      */
-    public Player getPlayer(String username, GetPlayerCallback getPlayerCallback){
-        return this.playersConnectionHandler.getPlayer(username, getPlayerCallback);
+    public void getPlayer(String username, GetPlayerCallback getPlayerCallback){
+        this.playersConnectionHandler.getPlayer(username, getPlayerCallback);
     }
 
     /**
