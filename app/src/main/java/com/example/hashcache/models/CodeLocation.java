@@ -7,7 +7,7 @@ public class CodeLocation {
     private String locationName;
     private Coordinate coordinates;
 
-    public CodeLocation(String locationName, int x, int y, int z){
+    public CodeLocation(String locationName, double x, double y, double z){
         this.locationName = locationName;
         this.coordinates = new Coordinate(x, y, z);
     }

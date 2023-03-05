@@ -11,6 +11,7 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.PlayerWallet;
+import com.example.hashcache.models.ScannableCode;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -130,6 +131,7 @@ public class PlayersConnectionHandler {
         ContactInfo contactInfo = player.getContactInfo();
         PlayerPreferences playerPreferences = player.getPlayerPreferences();
         PlayerWallet playerWallet = player.getPlayerWallet();
+        ArrayList<String> scannableCodes = playerWallet.getScannedCodeIds();
 
         if(username == null || username.equals("")|| username.length()>=50){
             throw new IllegalArgumentException("Username null, empty, or too long");
@@ -152,6 +154,20 @@ public class PlayersConnectionHandler {
         emailData.put("recordGeoLocationdData", String.valueOf(playerPreferences
                 .getRecordGeolocationPreference())
         );
+
+        HashMap<String, String> scannableCodeIdData = new HashMap<>();
+        //TODO: Store the image in Firestore
+
+        if(scannableCodes.size()>0){
+            for(String id : scannableCodes){
+                scannableCodeIdData.clear();
+                scannableCodeIdData.put("scannableCodeId", id);
+                DocumentReference playerWalletReference = collectionReference.document(username)
+                        .collection("playerWallet").document(id);
+
+                fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData);
+            }
+        }
 
         DocumentReference contactInfoReference = collectionReference.document(username)
                 .collection("contactInfo").document("contactInfo");

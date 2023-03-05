@@ -14,10 +14,15 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.example.hashcache.controllers.AddUserCommand;
+import com.example.hashcache.database_connections.BooleanCallback;
+import com.example.hashcache.database_connections.CodeLocationConnectionHandler;
+import com.example.hashcache.models.CodeLocation;
 import com.example.hashcache.models.PlayerList;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.checkerframework.checker.units.qual.C;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,5 +62,6 @@ public class MainActivity extends AppCompatActivity {
         addUserCommand.addUser(usernameEditText.getText().toString(), playerList);
         Intent goHome = new Intent(MainActivity.this, AppHome.class);
         startActivity(goHome);
+
     }
 }
