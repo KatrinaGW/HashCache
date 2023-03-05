@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.hashcache.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.database_connections.converters.FireStoreHelper;
 import com.example.hashcache.database_connections.converters.PlayerDocumentConverter;
@@ -17,6 +18,8 @@ import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -131,12 +134,10 @@ public class PlayersConnectionHandler {
      * @throws IllegalArgumentException if the username is empty, too long, or already belongs
      * to a player
      */
-    public void addPlayer(Player player){
+    public void addPlayer(Player player, BooleanCallback booleanCallback){
         String username = player.getUsername();
         ContactInfo contactInfo = player.getContactInfo();
         PlayerPreferences playerPreferences = player.getPlayerPreferences();
-        PlayerWallet playerWallet = player.getPlayerWallet();
-        ArrayList<String> scannableCodeIds = playerWallet.getScannedCodeIds();
 
         if(username == null || username.equals("")|| username.length()>=50){
             throw new IllegalArgumentException("Username null, empty, or too long");
@@ -158,36 +159,139 @@ public class PlayersConnectionHandler {
                 .getRecordGeolocationPreference())
         );
 
+        setPlayerWallet(player, collectionReference.document(username), new BooleanCallback() {
+            @Override
+            public void onCallback(Boolean isTrue) {
+                DocumentReference contactInfoReference = collectionReference
+                        .document(username)
+                        .collection(CollectionNames.CONTACT_INFO.collectionName)
+                        .document("contactInfo");
+                DocumentReference playerPreferenceReference = collectionReference
+                        .document(username)
+                        .collection(CollectionNames.PLAYER_PREFERENCES.collectionName)
+                        .document("playerPreferences");
+
+                fireStoreHelper.setDocumentReference(collectionReference.document(username), usernameData);
+                fireStoreHelper.setDocumentReference(contactInfoReference, contactInfoData);
+                fireStoreHelper.setDocumentReference(playerPreferenceReference, recordGeoLocationdData);
+
+                booleanCallback.onCallback(true);
+            }
+        });
+
+
+    }
+
+    public void playerScannedCodeAdded(String username, ScannableCode scannableCode,
+                                         BooleanCallback booleanCallback){
+        if(!this.cachedPlayers.containsKey(username)){
+            throw new IllegalArgumentException("Given username does not exist!");
+        }
+
+        CollectionReference scannedCodeCollection = collectionReference
+                .document(username)
+                .collection(CollectionNames.PLAYER_WALLET.collectionName);
+
+        fireStoreHelper.documentWithIDExists(scannedCodeCollection, scannableCode.getScannableCodeId(),
+                new BooleanCallback() {
+                    @Override
+                    public void onCallback(Boolean isTrue) {
+                        if(!isTrue){
+                            scannedCodeCollection.document(scannableCodeId).delete()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                            booleanCallback.onCallback(true);
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w(TAG, "Error deleting document", e);
+                                            booleanCallback.onCallback(false);
+                                        }
+                                    });
+                        }else{
+                            throw new IllegalArgumentException("Scannable code already exists!");
+                        }
+                    }
+                });
+    }
+
+    public void playerScannedCodeDeleted(String username, String scannableCodeId,
+                                         BooleanCallback booleanCallback){
+        if(!this.cachedPlayers.containsKey(username)){
+            throw new IllegalArgumentException("Given username does not exist!");
+        }
+
+        CollectionReference scannedCodeCollection = collectionReference
+                .document(username)
+                .collection(CollectionNames.PLAYER_WALLET.collectionName);
+
+        fireStoreHelper.documentWithIDExists(scannedCodeCollection, scannableCodeId,
+                new BooleanCallback() {
+                    @Override
+                    public void onCallback(Boolean isTrue) {
+                        if(isTrue){
+                            scannedCodeCollection.document(scannableCodeId).delete()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                            booleanCallback.onCallback(true);
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w(TAG, "Error deleting document", e);
+                                            booleanCallback.onCallback(false);
+                                        }
+                                    });
+                        }
+                    }
+                });
+    }
+
+    private void addScannableCode(CollectionReference playerWalletCollection, String scannableCodeId,
+                                  Image locationImage){
+        HashMap<String, String> scannableCodeIdData = new HashMap<>();
+        scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
+        if(locationImage != null){
+            //TODO: insert the image
+        }
+        DocumentReference playerWalletReference = playerWalletCollection.document(scannableCodeId);
+
+        fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData);
+    }
+
+    private void setPlayerWallet(Player player, DocumentReference playerDocumentReference,
+                                 BooleanCallback booleanCallback){
+        PlayerWallet playerWallet = player.getPlayerWallet();
+        ArrayList<String> scannableCodeIds = playerWallet.getScannedCodeIds();
+
         HashMap<String, String> scannableCodeIdData = new HashMap<>();
 
         if(scannableCodeIds.size()>0){
             Image scannableCodeImage;
 
             for(String scannableCodeId : scannableCodeIds){
-                scannableCodeIdData.clear();
-                scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
-                if(playerWallet.getScannableCodeLocationImage(scannableCodeId) != null){
-                    //TODO: insert the image
-                }
-                DocumentReference playerWalletReference = collectionReference.document(username)
-                        .collection(CollectionNames.PLAYER_WALLET.collectionName).document(scannableCodeId);
-
-                fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData);
+                addScannableCode(playerDocumentReference.collection(CollectionNames.PLAYER_WALLET.collectionName),
+                        scannableCodeId, scannableCodeImage);
+//                scannableCodeIdData.clear();
+//                scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
+//                if(playerWallet.getScannableCodeLocationImage(scannableCodeId) != null){
+//                    //TODO: insert the image
+//                }
+//                DocumentReference playerWalletReference = collectionReference.document(player.getUsername())
+//                        .collection(CollectionNames.PLAYER_WALLET.collectionName).document(scannableCodeId);
+//
+//                fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData);
             }
         }
 
-        DocumentReference contactInfoReference = collectionReference
-                .document(username)
-                .collection(CollectionNames.CONTACT_INFO.collectionName)
-                .document("contactInfo");
-        DocumentReference playerPreferenceReference = collectionReference
-                .document(username)
-                .collection(CollectionNames.PLAYER_PREFERENCES.collectionName)
-                .document("playerPreferences");
-
-        fireStoreHelper.setDocumentReference(collectionReference.document(username), usernameData);
-        fireStoreHelper.setDocumentReference(contactInfoReference, contactInfoData);
-        fireStoreHelper.setDocumentReference(playerPreferenceReference, recordGeoLocationdData);
+        booleanCallback.onCallback(true);
     }
 
 }

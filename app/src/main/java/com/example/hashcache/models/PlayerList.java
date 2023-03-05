@@ -1,5 +1,6 @@
 package com.example.hashcache.models;
 
+import com.example.hashcache.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.database_connections.PlayersConnectionHandler;
 
@@ -35,12 +36,12 @@ public class PlayerList {
      * @param username the username of the player to add
      * @return success indicates if the user was successfully added or not
      */
-    public boolean addPlayer(String username){
+    public boolean addPlayer(String username, BooleanCallback booleanCallback){
         boolean success = true;
         Player newPlayer = new Player(username);
 
         try{
-            this.playersConnectionHandler.addPlayer(newPlayer);
+            this.playersConnectionHandler.addPlayer(newPlayer, booleanCallback);
         }catch (IllegalArgumentException e){
             success = false;
         }

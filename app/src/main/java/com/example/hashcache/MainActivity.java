@@ -57,9 +57,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onStartCachingClicked(){
-        addUserCommand.addUser(usernameEditText.getText().toString(), playerList);
-        Intent goHome = new Intent(MainActivity.this, AppHome.class);
-        startActivity(goHome);
+        addUserCommand.addUser(usernameEditText.getText().toString(), playerList, new BooleanCallback() {
+            @Override
+            public void onCallback(Boolean isTrue) {
+                if(!isTrue){
+                    throw new IllegalArgumentException("Something went wrong while adding player");
+                }
+                Intent goHome = new Intent(MainActivity.this, AppHome.class);
+                startActivity(goHome);
+            }
+        });
+
 
     }
 }
