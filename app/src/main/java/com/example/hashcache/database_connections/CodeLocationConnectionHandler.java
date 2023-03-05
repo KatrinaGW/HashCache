@@ -1,40 +1,26 @@
 package com.example.hashcache.database_connections;
 
-import android.media.AudioTrack;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.hashcache.database_connections.helpers.CodeLocationDocumentConverter;
-import com.example.hashcache.database_connections.helpers.FireStoreHelper;
-import com.example.hashcache.database_connections.helpers.PlayerDocumentConverter;
+import com.example.hashcache.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.database_connections.callbacks.GetCodeLocationCallback;
+import com.example.hashcache.database_connections.converters.CodeLocationDocumentConverter;
+import com.example.hashcache.database_connections.converters.FireStoreHelper;
+import com.example.hashcache.database_connections.converters.PlayerDocumentConverter;
+import com.example.hashcache.database_connections.values.CollectionNames;
 import com.example.hashcache.models.CodeLocation;
-import com.example.hashcache.models.ContactInfo;
-import com.example.hashcache.models.Coordinate;
-import com.example.hashcache.models.Player;
-import com.example.hashcache.models.PlayerPreferences;
-import com.example.hashcache.models.PlayerWallet;
-import com.example.hashcache.models.ScannableCode;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.checkerframework.checker.units.qual.C;
-
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Handles all calls to the Firebase ScannableCodes database

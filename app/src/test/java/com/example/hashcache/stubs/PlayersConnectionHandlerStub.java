@@ -1,7 +1,6 @@
 package com.example.hashcache.stubs;
 
-import com.example.hashcache.database_connections.GetPlayerCallback;
-import com.example.hashcache.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.Player;
 
 import java.util.ArrayList;

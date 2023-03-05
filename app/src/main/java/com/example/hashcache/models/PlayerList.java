@@ -1,8 +1,7 @@
 package com.example.hashcache.models;
 
-import com.example.hashcache.database_connections.GetPlayerCallback;
+import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.database_connections.PlayersConnectionHandler;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 

@@ -1,12 +1,12 @@
-package com.example.hashcache.database_connections.helpers;
+package com.example.hashcache.database_connections.converters;
 
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.database_connections.CollectionNames;
-import com.example.hashcache.database_connections.GetCommentsCallback;
-import com.example.hashcache.database_connections.GetScannableCodeCallback;
+import com.example.hashcache.database_connections.values.CollectionNames;
+import com.example.hashcache.database_connections.callbacks.GetCommentsCallback;
+import com.example.hashcache.database_connections.callbacks.GetScannableCodeCallback;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;

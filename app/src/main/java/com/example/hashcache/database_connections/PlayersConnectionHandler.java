@@ -5,16 +5,15 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.hashcache.database_connections.helpers.FireStoreHelper;
-import com.example.hashcache.database_connections.helpers.PlayerDocumentConverter;
+import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.database_connections.converters.FireStoreHelper;
+import com.example.hashcache.database_connections.converters.PlayerDocumentConverter;
+import com.example.hashcache.database_connections.values.CollectionNames;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.PlayerWallet;
-import com.example.hashcache.models.ScannableCode;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -27,7 +26,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Handles all calls to the Firebase Players database
@@ -143,14 +141,12 @@ public class PlayersConnectionHandler {
         HashMap<String, String> usernameData = new HashMap<>();
         usernameData.put("username", username);
 
-        HashMap<String, String> emailData = new HashMap<>();
-        emailData.put("email", contactInfo.getEmail());
-
-        HashMap<String, String> phoneNumberData = new HashMap<>();
-        emailData.put("phoneNumber", contactInfo.getPhoneNumber());
+        HashMap<String, String> contactInfoData = new HashMap<>();
+        contactInfoData.put("email", contactInfo.getEmail());
+        contactInfoData.put("phoneNumber", contactInfo.getPhoneNumber());
 
         HashMap<String, String> recordGeoLocationdData = new HashMap<>();
-        emailData.put("recordGeoLocationdData", String.valueOf(playerPreferences
+        recordGeoLocationdData.put("recordGeoLocationdData", String.valueOf(playerPreferences
                 .getRecordGeolocationPreference())
         );
 
@@ -168,14 +164,17 @@ public class PlayersConnectionHandler {
             }
         }
 
-        DocumentReference contactInfoReference = collectionReference.document(username)
-                .collection("contactInfo").document("contactInfo");
-        DocumentReference playerPreferenceReference = collectionReference.document(username)
-                .collection("playerPreferences").document("playerPreferences");
+        DocumentReference contactInfoReference = collectionReference
+                .document(username)
+                .collection(CollectionNames.CONTACT_INFO.collectionName)
+                .document("contactInfo");
+        DocumentReference playerPreferenceReference = collectionReference
+                .document(username)
+                .collection(CollectionNames.PLAYER_PREFERENCES.collectionName)
+                .document("playerPreferences");
 
         fireStoreHelper.setDocumentReference(collectionReference.document(username), usernameData);
-        fireStoreHelper.setDocumentReference(contactInfoReference, usernameData);
-        fireStoreHelper.setDocumentReference(contactInfoReference, phoneNumberData);
+        fireStoreHelper.setDocumentReference(contactInfoReference, contactInfoData);
         fireStoreHelper.setDocumentReference(playerPreferenceReference, recordGeoLocationdData);
     }
 

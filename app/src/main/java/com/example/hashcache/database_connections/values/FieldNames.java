@@ -1,4 +1,4 @@
-package com.example.hashcache.database_connections;
+package com.example.hashcache.database_connections.values;
 
 public enum FieldNames {
     GENERATED_NAME("generatedName"),
