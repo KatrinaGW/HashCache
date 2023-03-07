@@ -1,23 +1,16 @@
-package com.example.hashcache.models;
+//package com.example.hashcache.models;
 
-package com.example.hashcache.models;
+//package com.example.hashcache.models;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
-
-import javax.imageio.ImageIO;
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.Random;
 
 import javax.imageio.ImageIO;
 
 public class ImageGenerator {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
         // example 64-bit binary string
         long binaryString = 0b1101100101010110001001101111101110010100100111110101101100001000L;
 
@@ -34,21 +27,33 @@ public class ImageGenerator {
         BufferedImage earsImg = ImageIO.read(new File("ears" + ears + ".png"));
 
         // create a new image of appropriate size
-        int width = headImg.getWidth();
-        int height = headImg.getHeight() + eyesImg.getHeight() + bodyImg.getHeight() + earsImg.getHeight();
+        int width = Math.max(headImg.getWidth(), earsImg.getWidth());
+        int height = headImg.getHeight() + eyesImg.getHeight() + bodyImg.getHeight();
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
-        // combine different parts into the final image
+        // draw different parts onto the final image
+        int x = (width - headImg.getWidth()) / 2; // center the head image horizontally
         int y = 0;
-        image.createGraphics().drawImage(headImg, 0, y, null);
-        y += headImg.getHeight();
-        image.createGraphics().drawImage(eyesImg, 0, y, null);
-        y += eyesImg.getHeight();
-        image.createGraphics().drawImage(bodyImg, 0, y, null);
-        y += bodyImg.getHeight();
-        image.createGraphics().drawImage(earsImg, 0, y, null);
+        image.createGraphics().drawImage(headImg, x, y, null);
+
+        x = (width - eyesImg.getWidth()) / 2; // center the eyes image horizontally
+        y = headImg.getHeight() - eyesImg.getHeight() / 2;
+        image.createGraphics().drawImage(eyesImg, x, y, null);
+
+        x = (width - bodyImg.getWidth()) / 2; // center the body image horizontally
+        y = headImg.getHeight() + eyesImg.getHeight();
+        image.createGraphics().drawImage(bodyImg, x, y, null);
+
+        x = 0; // align the left ear image to the left edge of the image
+        y = 0; // align the left ear image to the top edge of the image
+        image.createGraphics().drawImage(earsImg, x, y, null);
+
+        x = width - earsImg.getWidth(); // align the right ear image to the right edge of the image
+        y = 0; // align the right ear image to the top edge of the image
+        image.createGraphics().drawImage(earsImg, x, y, null);
 
         // save the final image to file
         ImageIO.write(image, "png", new File("generated_image.png"));
     }
+
 }
