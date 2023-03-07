@@ -13,61 +13,67 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.hashcache.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.database_connections.PlayersConnectionHandler;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
 
 public class PlayerListTest {
+    private String newPlayerUsername;
+    private Player mockPlayer;
+    private ArrayList<String> names;
+    private PlayersConnectionHandler mockPlayerConnectionHandler;
+    private BooleanCallback mockBooleanCallback;
+
+    @BeforeEach
+    void resetMocks(){
+        newPlayerUsername = "Stubby";
+        mockPlayer = new Player(newPlayerUsername);
+        names = new ArrayList<>();
+        mockPlayerConnectionHandler = Mockito.mock(PlayersConnectionHandler.class);
+        mockBooleanCallback = Mockito.mock(BooleanCallback.class);
+        PlayerList.resetInstance();
+    }
     @Test
     void testAddPlayerSuccess(){
-        String newPlayerUsername = "Stubby";
-        Player mockPlayer = new Player(newPlayerUsername);
-        ArrayList<String> names = new ArrayList<>();
-        PlayersConnectionHandler mockPlayerConnectionHandler = Mockito.mock(PlayersConnectionHandler.class);
-
         when(mockPlayerConnectionHandler.getInAppPlayerUserNames()).thenReturn(names);
         doAnswer(invocation -> {
-            names.add(newPlayerUsername);
-
             return null;
-        }).when(mockPlayerConnectionHandler).addPlayer(mockPlayer);
+        }).when(mockPlayerConnectionHandler).addPlayer(mockPlayer, mockBooleanCallback);
 
-        PlayerList playerList = new PlayerList(mockPlayerConnectionHandler);
+        PlayerList playerList = PlayerList.getInstance(mockPlayerConnectionHandler);
 
-        assertTrue(playerList.addPlayer(newPlayerUsername));
+        assertTrue(playerList.addPlayer(newPlayerUsername, mockBooleanCallback));
         assertEquals(names.get(0), playerList.getPlayerUserNames().get(0));
     }
 
     @Test
     void testAddPlayerFailure(){
-        String newPlayerUsername = "Stubby";
-        PlayersConnectionHandler mockPlayerConnectionHandler = Mockito.mock(PlayersConnectionHandler.class);
+        doThrow(new IllegalArgumentException()).when(mockPlayerConnectionHandler).addPlayer(
+                any(), any());
 
-        doThrow(new IllegalArgumentException()).when(mockPlayerConnectionHandler).addPlayer(any());
-        PlayerList playerList = new PlayerList(mockPlayerConnectionHandler);
+        PlayerList playerList = PlayerList.getInstance(mockPlayerConnectionHandler);
 
-        assertFalse(playerList.addPlayer(newPlayerUsername));
+        assertFalse(playerList.addPlayer(newPlayerUsername, mockBooleanCallback));
     }
 
     @Test
     void testGetPlayer(){
-        String mockPlayerName = "Stubby";
-        Player mockPlayer = new Player(mockPlayerName);
         GetPlayerCallback mockGetPlayerCallback = Mockito.mock(GetPlayerCallback.class);
 
-        PlayersConnectionHandler mockPlayerConnectionHandler = Mockito.mock(PlayersConnectionHandler.class);
-        doNothing().when(mockPlayerConnectionHandler).getPlayer(mockPlayerName, mockGetPlayerCallback);
+        doNothing().when(mockPlayerConnectionHandler).getPlayer(newPlayerUsername, mockGetPlayerCallback);
 
-        PlayerList playerList = new PlayerList(mockPlayerConnectionHandler);
-        playerList.getPlayer(mockPlayerName, mockGetPlayerCallback);
+        PlayerList playerList = PlayerList.getInstance(mockPlayerConnectionHandler);
+        playerList.getPlayer(newPlayerUsername, mockGetPlayerCallback);
 
         verify(mockPlayerConnectionHandler, times(1))
-                .getPlayer(mockPlayerName, mockGetPlayerCallback);
+                .getPlayer(newPlayerUsername, mockGetPlayerCallback);
     }
 }

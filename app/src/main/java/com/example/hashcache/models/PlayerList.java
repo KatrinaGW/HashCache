@@ -4,6 +4,8 @@ import com.example.hashcache.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.database_connections.PlayersConnectionHandler;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.util.ArrayList;
 
 /**
@@ -32,6 +34,18 @@ public class PlayerList {
         return INSTANCE;
     }
 
+    public static PlayerList getInstance(PlayersConnectionHandler playersConnectionHandler) {
+        if(INSTANCE == null) {
+            INSTANCE = new PlayerList(playersConnectionHandler);
+        }
+
+        return INSTANCE;
+    }
+
+    public static void resetInstance(){
+        INSTANCE = null;
+    }
+
     /**
      * Gets the usernames of all players
      * @return playerUserNames the usernames of all players
@@ -47,12 +61,19 @@ public class PlayerList {
      */
     public boolean addPlayer(String username, BooleanCallback booleanCallback){
         boolean success = true;
-        Player newPlayer = new Player(username);
 
-        try{
-            this.playersConnectionHandler.addPlayer(newPlayer, booleanCallback);
-        }catch (IllegalArgumentException e){
-            success = false;
+        if(!this.playerUserNames.contains(username)){
+            Player newPlayer = new Player(username);
+
+            this.playerUserNames.add(username);
+
+            try{
+                this.playersConnectionHandler.addPlayer(newPlayer, booleanCallback);
+            }catch (IllegalArgumentException e){
+                success = false;
+            }
+        }else{
+            throw new IllegalArgumentException("Given username already exists!");
         }
 
         return success;
