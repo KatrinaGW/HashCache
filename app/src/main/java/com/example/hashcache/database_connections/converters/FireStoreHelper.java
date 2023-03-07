@@ -18,17 +18,20 @@ import java.util.HashMap;
 public class FireStoreHelper {
     final String TAG = "Sample";
 
-    public void setDocumentReference(DocumentReference documentReference, HashMap<String, String> data){
+    public void setDocumentReference(DocumentReference documentReference,
+                                     HashMap<String, String> data, BooleanCallback booleanCallback){
         documentReference.set(data)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        booleanCallback.onCallback(true);
                         Log.d(TAG, "Data has been added successfully!");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        booleanCallback.onCallback(false);
                         Log.d(TAG, "Data could not be added!" + e.toString());
                     }
                 });
@@ -50,7 +53,7 @@ public class FireStoreHelper {
                         exists[0] = true;
                         booleanCallback.onCallback(exists[0]);
                     } else {
-                        Log.d(TAG, "Document does not exist!");
+                        Log.d(TAG, "Document does not exist! " + id);
                         exists[0] = false;
                         booleanCallback.onCallback(exists[0]);
                     }

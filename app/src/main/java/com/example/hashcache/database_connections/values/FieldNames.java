@@ -6,6 +6,9 @@ public enum FieldNames {
     CODE_LOCATION_ID("codeLocationId"),
     SCANNABLE_CODE_ID("scannableCodeId"),
     COMMENT_BODY("body"),
+    USERNAME("username"),
+    EMAIL("email"),
+    PHONE_NUMBER("phoneNumber"),
     RECORD_GEOLOCATION("recordGeoLocation"),
     COMMENTATOR_ID("commentatorId");
 

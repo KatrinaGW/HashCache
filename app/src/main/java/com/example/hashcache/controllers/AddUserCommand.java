@@ -10,8 +10,8 @@ import java.util.HashMap;
 public class AddUserCommand {
     FirebaseFirestore db;
 
-    public boolean addUser(String userName, PlayerList playerList, BooleanCallback booleanCallback){
-        boolean success = playerList.addPlayer(userName, booleanCallback);
+    public boolean addUser(String userName, BooleanCallback booleanCallback){
+        boolean success = PlayerList.getInstance().addPlayer(userName, booleanCallback);
 
         return success;
     }

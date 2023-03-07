@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.hashcache.controllers.PlayerWalletCommander;
 import com.example.hashcache.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.database_connections.converters.FireStoreHelper;
@@ -13,6 +14,7 @@ import com.example.hashcache.database_connections.converters.PlayerDocumentConve
 import com.example.hashcache.database_connections.values.CollectionNames;
 import com.example.hashcache.database_connections.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;
+import com.example.hashcache.models.Coordinate;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.PlayerWallet;
@@ -44,13 +46,14 @@ public class PlayersConnectionHandler {
     final String TAG = "Sample";
     private PlayerDocumentConverter playerDocumentConverter;
     private FireStoreHelper fireStoreHelper;
+    private static PlayersConnectionHandler INSTANCE;
 
     /**
      * Creates a new instance of the class and initializes the connection to the database
      * @param inAppPlayerUserNames used to keep the app up to date on the current usernames
      *                             in the database
      */
-    public PlayersConnectionHandler(ArrayList<String> inAppPlayerUserNames){
+    private PlayersConnectionHandler(ArrayList<String> inAppPlayerUserNames){
         this.inAppPlayerUserNames = inAppPlayerUserNames;
         this.cachedPlayers = new HashMap<>();
         this.playerDocumentConverter = new PlayerDocumentConverter();
@@ -73,6 +76,22 @@ public class PlayersConnectionHandler {
                 }
             }
         });
+    }
+    
+    public static PlayersConnectionHandler getInstance(){
+        if(INSTANCE == null){
+            throw new IllegalArgumentException("No instance of PlayersConnectionHandler currently exists!");
+        }
+        
+        return INSTANCE;
+    }
+
+    public static PlayersConnectionHandler makeInstance(ArrayList<String> inAppPlayerUserNames){
+        if(INSTANCE != null){
+            throw new IllegalArgumentException("Instance of PlayersConnectionHandler already exists!");
+        }
+        INSTANCE = new PlayersConnectionHandler(inAppPlayerUserNames);
+        return INSTANCE;
     }
 
     /**
@@ -147,44 +166,113 @@ public class PlayersConnectionHandler {
             throw new IllegalArgumentException("Username taken!");
         }
 
-        HashMap<String, String> usernameData = new HashMap<>();
-        usernameData.put("username", username);
-
-        HashMap<String, String> contactInfoData = new HashMap<>();
-        contactInfoData.put("email", contactInfo.getEmail());
-        contactInfoData.put("phoneNumber", contactInfo.getPhoneNumber());
-
-        HashMap<String, String> recordGeoLocationdData = new HashMap<>();
-        recordGeoLocationdData.put(FieldNames.RECORD_GEOLOCATION.fieldName, String.valueOf(playerPreferences
-                .getRecordGeolocationPreference())
-        );
-
         setPlayerWallet(player, collectionReference.document(username), new BooleanCallback() {
             @Override
             public void onCallback(Boolean isTrue) {
-                DocumentReference contactInfoReference = collectionReference
-                        .document(username)
-                        .collection(CollectionNames.CONTACT_INFO.collectionName)
-                        .document("contactInfo");
-                DocumentReference playerPreferenceReference = collectionReference
-                        .document(username)
-                        .collection(CollectionNames.PLAYER_PREFERENCES.collectionName)
-                        .document("playerPreferences");
-
-                fireStoreHelper.setDocumentReference(collectionReference.document(username), usernameData);
-                fireStoreHelper.setDocumentReference(contactInfoReference, contactInfoData);
-                fireStoreHelper.setDocumentReference(playerPreferenceReference, recordGeoLocationdData);
-
-                booleanCallback.onCallback(true);
+                setUserName(username, new BooleanCallback() {
+                    @Override
+                    public void onCallback(Boolean isTrue) {
+                        if(isTrue){
+                            DocumentReference playerDocument = collectionReference.document(username);
+                            setContactInfo(playerDocument, contactInfo, new BooleanCallback() {
+                                @Override
+                                public void onCallback(Boolean isTrue) {
+                                    if(isTrue){
+                                        setPlayerPreferences(playerDocument, playerPreferences, new BooleanCallback() {
+                                            @Override
+                                            public void onCallback(Boolean isTrue) {
+                                                booleanCallback.onCallback(true);
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
             }
         });
 
 
     }
 
-    public void playerScannedCodeAdded(String username, ScannableCode scannableCode,
+    public void updatePlayerPreferences(String username, PlayerPreferences playerPreferences,
+                                        BooleanCallback booleanCallback){
+        DocumentReference documentReference = collectionReference.document(username);
+        setPlayerPreferences(documentReference, playerPreferences, booleanCallback);
+    }
+
+    private void setPlayerPreferences(DocumentReference playerDocument, PlayerPreferences playerPreferences,
+                                      BooleanCallback booleanCallback){
+        HashMap<String, String> recordGeoLocationdData = new HashMap<>();
+        recordGeoLocationdData.put(FieldNames.RECORD_GEOLOCATION.fieldName, String.valueOf(playerPreferences
+                .getRecordGeolocationPreference())
+        );
+
+        DocumentReference playerPreferencesDocument = playerDocument.collection(CollectionNames.PLAYER_PREFERENCES.collectionName)
+                .document(CollectionNames.PLAYER_PREFERENCES.collectionName);
+
+        fireStoreHelper.setDocumentReference(playerPreferencesDocument, recordGeoLocationdData,
+                new BooleanCallback() {
+                    @Override
+                    public void onCallback(Boolean isTrue) {
+                        if(isTrue){
+                            booleanCallback.onCallback(true);
+                        }else{
+                            throw new RuntimeException("Something went wrong");
+                        }
+                    }
+                });
+    }
+
+    public void updateContactInfo(String username, ContactInfo contactInfo,
+                                        BooleanCallback booleanCallback){
+        DocumentReference documentReference = collectionReference.document(username);
+        setContactInfo(documentReference, contactInfo, booleanCallback);
+    }
+
+    private void setContactInfo(DocumentReference playerDocument, ContactInfo contactInfo,
+                                BooleanCallback booleanCallback){
+        HashMap<String, String> contactInfoData = new HashMap<>();
+        contactInfoData.put(FieldNames.EMAIL.fieldName, contactInfo.getEmail());
+        contactInfoData.put(FieldNames.PHONE_NUMBER.fieldName, contactInfo.getPhoneNumber());
+
+        DocumentReference contactInfoReference = playerDocument.collection(CollectionNames.CONTACT_INFO.collectionName)
+                .document(CollectionNames.CONTACT_INFO.collectionName);
+
+        fireStoreHelper.setDocumentReference(contactInfoReference, contactInfoData,
+                new BooleanCallback() {
+                    @Override
+                    public void onCallback(Boolean isTrue) {
+                        if(isTrue){
+                            booleanCallback.onCallback(true);
+                        }else{
+                            throw new RuntimeException("Something went wrong");
+                        }
+                    }
+                });
+    }
+
+    public void setUserName(String username, BooleanCallback booleanCallback){
+        HashMap<String, String> usernameData = new HashMap<>();
+        usernameData.put(FieldNames.USERNAME.fieldName, username);
+
+        fireStoreHelper.setDocumentReference(collectionReference.document(username),
+                usernameData, new BooleanCallback() {
+                    @Override
+                    public void onCallback(Boolean isTrue) {
+                        if(isTrue){
+                            booleanCallback.onCallback(true);
+                        }else{
+                            throw new RuntimeException("Something went wrong");
+                        }
+                    }
+                });
+    }
+
+    public void playerScannedCodeAdded(String username, String scannableCodeId, Image locationImage,
                                          BooleanCallback booleanCallback){
-        if(!this.cachedPlayers.containsKey(username)){
+        if(!this.inAppPlayerUserNames.contains(username)){
             throw new IllegalArgumentException("Given username does not exist!");
         }
 
@@ -192,26 +280,13 @@ public class PlayersConnectionHandler {
                 .document(username)
                 .collection(CollectionNames.PLAYER_WALLET.collectionName);
 
-        fireStoreHelper.documentWithIDExists(scannedCodeCollection, scannableCode.getScannableCodeId(),
+        fireStoreHelper.documentWithIDExists(scannedCodeCollection, scannableCodeId,
                 new BooleanCallback() {
                     @Override
                     public void onCallback(Boolean isTrue) {
                         if(!isTrue){
-                            scannedCodeCollection.document(scannableCodeId).delete()
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                                            booleanCallback.onCallback(true);
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w(TAG, "Error deleting document", e);
-                                            booleanCallback.onCallback(false);
-                                        }
-                                    });
+                            addScannableCodeDocument(scannedCodeCollection, scannableCodeId,
+                                    locationImage, booleanCallback);
                         }else{
                             throw new IllegalArgumentException("Scannable code already exists!");
                         }
@@ -221,7 +296,7 @@ public class PlayersConnectionHandler {
 
     public void playerScannedCodeDeleted(String username, String scannableCodeId,
                                          BooleanCallback booleanCallback){
-        if(!this.cachedPlayers.containsKey(username)){
+        if(!this.inAppPlayerUserNames.contains(username)){
             throw new IllegalArgumentException("Given username does not exist!");
         }
 
@@ -254,8 +329,8 @@ public class PlayersConnectionHandler {
                 });
     }
 
-    private void addScannableCode(CollectionReference playerWalletCollection, String scannableCodeId,
-                                  Image locationImage){
+    private void addScannableCodeDocument(CollectionReference playerWalletCollection, String scannableCodeId,
+                                  Image locationImage, BooleanCallback booleanCallback){
         HashMap<String, String> scannableCodeIdData = new HashMap<>();
         scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
         if(locationImage != null){
@@ -263,7 +338,31 @@ public class PlayersConnectionHandler {
         }
         DocumentReference playerWalletReference = playerWalletCollection.document(scannableCodeId);
 
-        fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData);
+        fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData,
+                booleanCallback);
+    }
+
+    private void addCodeToWallet(DocumentReference playerDocumentReference,
+                                          PlayerWallet playerWallet, int index, BooleanCallback
+                                          booleanCallback){
+        if(index == playerWallet.getSize()){
+            booleanCallback.onCallback(true);
+        }else{
+            String scannableCodeId = playerWallet.getScannedCodeIds().get(index);
+            Image scannableCodeImage = playerWallet.getScannableCodeLocationImage(scannableCodeId);
+
+            addScannableCodeDocument(playerDocumentReference.collection(CollectionNames
+                            .PLAYER_WALLET
+                            .collectionName
+                    ),
+                    scannableCodeId, scannableCodeImage, new BooleanCallback() {
+                        @Override
+                        public void onCallback(Boolean isTrue) {
+                            addCodeToWallet(playerDocumentReference, playerWallet,
+                                    index+1, booleanCallback);
+                        }
+                    });
+        }
     }
 
     private void setPlayerWallet(Player player, DocumentReference playerDocumentReference,
@@ -271,27 +370,16 @@ public class PlayersConnectionHandler {
         PlayerWallet playerWallet = player.getPlayerWallet();
         ArrayList<String> scannableCodeIds = playerWallet.getScannedCodeIds();
 
-        HashMap<String, String> scannableCodeIdData = new HashMap<>();
-
         if(scannableCodeIds.size()>0){
-            Image scannableCodeImage;
-
-            for(String scannableCodeId : scannableCodeIds){
-                addScannableCode(playerDocumentReference.collection(CollectionNames.PLAYER_WALLET.collectionName),
-                        scannableCodeId, scannableCodeImage);
-//                scannableCodeIdData.clear();
-//                scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
-//                if(playerWallet.getScannableCodeLocationImage(scannableCodeId) != null){
-//                    //TODO: insert the image
-//                }
-//                DocumentReference playerWalletReference = collectionReference.document(player.getUsername())
-//                        .collection(CollectionNames.PLAYER_WALLET.collectionName).document(scannableCodeId);
-//
-//                fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData);
-            }
+            addCodeToWallet(playerDocumentReference, playerWallet, 0, new BooleanCallback() {
+                @Override
+                public void onCallback(Boolean isTrue) {
+                    if(isTrue){
+                        booleanCallback.onCallback(true);
+                    }
+                }
+            });
         }
-
-        booleanCallback.onCallback(true);
     }
 
 }

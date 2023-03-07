@@ -33,12 +33,13 @@ public class CodeLocationConnectionHandler {
     private PlayerDocumentConverter playerDocumentConverter;
     private FireStoreHelper fireStoreHelper;
     private CodeLocationDocumentConverter codeLocationDocumentConverter;
+    private static CodeLocationConnectionHandler INSTANCE;
 
     /**
      * Creates a connection to the CodeLocation collection in the database and keeps a cache
      * of the locations
      */
-    public CodeLocationConnectionHandler(){
+    private CodeLocationConnectionHandler(){
         this.cachedCodeLocations = new HashMap<>();
         this.fireStoreHelper = new FireStoreHelper();
         this.codeLocationDocumentConverter = new CodeLocationDocumentConverter();
@@ -64,6 +65,18 @@ public class CodeLocationConnectionHandler {
                 }
             }
         });
+    }
+
+    /**
+     * Get the singleton instance of the CodeLocationConnectionHandler
+     * @return INSTANCE the singleton instance of the CodeLocationConnectionHandler
+     */
+    public CodeLocationConnectionHandler getInstance(){
+        if(INSTANCE == null){
+            INSTANCE = new CodeLocationConnectionHandler();
+        }
+
+        return INSTANCE;
     }
 
     /**
@@ -102,8 +115,7 @@ public class CodeLocationConnectionHandler {
 
                     DocumentReference documentReference = collectionReference.document(id);
 
-                    fireStoreHelper.setDocumentReference(documentReference, data);
-                    booleanCallback.onCallback(true);
+                    fireStoreHelper.setDocumentReference(documentReference, data, booleanCallback);
                 }else{
                     Log.e(TAG, "Code Location already exists!");
                     throw new IllegalArgumentException("Code location already exists!");

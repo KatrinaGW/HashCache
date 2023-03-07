@@ -37,8 +37,9 @@ public class ScannableCodesConnectionHandler {
     final String TAG = "Sample";
     private ScannableCodeDocumentConverter scannableCodeDocumentConverter;
     private FireStoreHelper fireStoreHelper;
+    private static ScannableCodesConnectionHandler INSTANCE;
 
-    public ScannableCodesConnectionHandler() {
+    private ScannableCodesConnectionHandler() {
         this.cachedScannableCodes = new HashMap<>();
         this.scannableCodeDocumentConverter = new ScannableCodeDocumentConverter();
         this.fireStoreHelper = new FireStoreHelper();
@@ -56,6 +57,18 @@ public class ScannableCodesConnectionHandler {
                 }
             }
         });
+    }
+
+    /**
+     * Gets the instance of the ScannableCodesConnectionHandler
+     * @return
+     */
+    public static ScannableCodesConnectionHandler getInstance(){
+        if(INSTANCE == null){
+            INSTANCE = new ScannableCodesConnectionHandler();
+        }
+
+        return INSTANCE;
     }
 
     /**
@@ -81,6 +94,7 @@ public class ScannableCodesConnectionHandler {
      * @throws IllegalArgumentException when there already exists a scannable code with the given id
      */
     public void addScannableCode(ScannableCode scannableCode, BooleanCallback booleanCallback) {
+        System.out.println("B");
         if (this.cachedScannableCodes.containsKey(scannableCode.getScannableCodeId())) {
             Log.d(TAG, "scannable code already exists with given id!");
             booleanCallback.onCallback(false);
@@ -102,16 +116,27 @@ public class ScannableCodesConnectionHandler {
                             data.put(FieldNames.GENERATED_SCORE.fieldName, Integer.toString(hashInfo.getGeneratedScore()));
 
                             fireStoreHelper.setDocumentReference(collectionReference
-                                    .document(scannableCode.getScannableCodeId()), data);
-
-                            for (Comment comment : comments) {
-                                fireStoreHelper.setDocumentReference(collectionReference
-                                        .document(scannableCode.getScannableCodeId())
-                                        .collection(CollectionNames.COMMENTS.collectionName)
-                                        .document(comment.getCommentId()), getCommentData(comment));
-                            }
-
-                            booleanCallback.onCallback(true);
+                                    .document(scannableCode.getScannableCodeId()), data, new BooleanCallback() {
+                                @Override
+                                public void onCallback(Boolean isTrue) {
+                                    if(isTrue){
+                                        if(comments.size()>0){
+                                            //Assume that scannable codes only have up to 1 comment
+                                            //when being initialized
+                                            addComment(scannableCode.getScannableCodeId(), comments.get(0), new BooleanCallback() {
+                                                @Override
+                                                public void onCallback(Boolean isTrue) {
+                                                    if(isTrue){
+                                                        booleanCallback.onCallback(true);
+                                                    }else{
+                                                        booleanCallback.onCallback(false);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            });
                         } else {
                             throw new IllegalArgumentException("Scannable code with id already exists!");
                         }

@@ -10,17 +10,26 @@ import java.util.ArrayList;
  * Represents a container for all the players in game right now
  */
 public class PlayerList {
+    private static PlayerList INSTANCE;
     private ArrayList<String> playerUserNames;
     private PlayersConnectionHandler playersConnectionHandler;
 
-    public PlayerList(){
+    private PlayerList(){
         playerUserNames = new ArrayList<>();
-        playersConnectionHandler = new PlayersConnectionHandler(playerUserNames);
+        playersConnectionHandler = PlayersConnectionHandler.makeInstance(playerUserNames);
     }
 
-    public PlayerList(PlayersConnectionHandler playersConnectionHandler){
+    private PlayerList(PlayersConnectionHandler playersConnectionHandler){
         this.playersConnectionHandler = playersConnectionHandler;
         playerUserNames = playersConnectionHandler.getInAppPlayerUserNames();
+    }
+
+    public static PlayerList getInstance() {
+        if(INSTANCE == null) {
+            INSTANCE = new PlayerList();
+        }
+
+        return INSTANCE;
     }
 
     /**
