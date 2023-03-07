@@ -7,11 +7,26 @@ import java.util.UUID;
  */
 public class Comment {
     private String body;
-    private UUID commentatorId;
-
-    public Comment(String body, UUID commentatorId){
+    private String commentatorId;
+    private String commentId;
+    public Comment(String body, String commentatorId){
+        this.commentId = UUID.randomUUID().toString();
         this.body = body;
         this.commentatorId = commentatorId;
+    }
+
+    public Comment(String commentId, String body, String commentatorId){
+        this.commentId = commentId;
+        this.body = body;
+        this.commentatorId = commentatorId;
+    }
+
+    /**
+     * Gets the comment's unique id
+     * @return commentId The comment's unique Id
+     */
+    public String getCommentId(){
+        return this.commentId;
     }
 
     /**
@@ -35,7 +50,7 @@ public class Comment {
      * Gets the id for the player who made the comment
      * @return commentatorId The id of the player who made the comment
      */
-    public UUID getCommentatorId(){
+    public String getCommentatorId(){
         return this.commentatorId;
     }
 }
