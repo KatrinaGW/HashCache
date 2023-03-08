@@ -379,6 +379,8 @@ public class PlayersConnectionHandler {
                     }
                 }
             });
+        }else{
+            booleanCallback.onCallback(true);
         }
     }
 
