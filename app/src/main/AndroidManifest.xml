@@ -31,7 +31,11 @@
         <activity android:name=".QRByLocation"/>
         <activity android:name=".Settings"/>
         <activity android:name=".QRScanActivity"/>
-
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            android:authorities="${applicationId}.firebaseinitprovider"
+            tools:node="remove"
+            />
     </application>
 
 
