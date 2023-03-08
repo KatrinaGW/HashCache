@@ -5,6 +5,7 @@ import com.example.hashcache.models.database_connections.callbacks.GetPlayerCall
 import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Represents a container for all the players in game right now
@@ -12,11 +13,13 @@ import java.util.ArrayList;
 public class PlayerList {
     private static PlayerList INSTANCE;
     private ArrayList<String> playerUserNames;
+    private HashMap<String, String> playerIdsNamesMapping;
     private PlayersConnectionHandler playersConnectionHandler;
 
     private PlayerList(){
         playerUserNames = new ArrayList<>();
-        playersConnectionHandler = PlayersConnectionHandler.makeInstance(playerUserNames);
+        playerIdsNamesMapping = new HashMap<>();
+        playersConnectionHandler = PlayersConnectionHandler.makeInstance(playerIdsNamesMapping);
     }
 
     private PlayerList(PlayersConnectionHandler playersConnectionHandler){
@@ -62,9 +65,18 @@ public class PlayerList {
 
         if(!this.playerUserNames.contains(username)){
             Player newPlayer = new Player(username);
+            newPlayer.getPlayerWallet().addScannableCode("first", null);
+            newPlayer.getContactInfo().setEmail("deeznutz@gmail.com");
             
             try{
                 this.playersConnectionHandler.addPlayer(newPlayer, booleanCallback);
+//                this.playersConnectionHandler.updateUserName("g",
+//                        "new new", new BooleanCallback() {
+//                            @Override
+//                            public void onCallback(Boolean isTrue) {
+//                                System.out.println("success");
+//                            }
+//                        });
             }catch (IllegalArgumentException e){
                 success = false;
             }

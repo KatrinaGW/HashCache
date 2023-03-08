@@ -9,7 +9,8 @@ public class PlayerWalletCommander {
 
     public void addScannableCodeToWallet(String scannableCodeId, Image codeImage, String playerId,
                                           BooleanCallback booleanCallback){
-        PlayersConnectionHandler.getInstance().playerScannedCodeAdded(playerId, scannableCodeId, codeImage, booleanCallback);
+        PlayersConnectionHandler.getInstance().playerScannedCodeAdded(playerId, scannableCodeId,
+                codeImage, booleanCallback);
     }
 
     public void deleteScannableCodeFromWallet(String scannableCodeId, String playerId,

@@ -9,6 +9,7 @@ import com.example.hashcache.models.database_connections.callbacks.GetContactInf
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerPreferencesCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerWalletCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
 import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.models.database_connections.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;
@@ -27,7 +28,7 @@ public class PlayerDocumentConverter {
     final String TAG = "Sample";
 
     public void getPlayerFromDocument(DocumentReference documentReference, GetPlayerCallback getPlayerCallback){
-        String username = documentReference.getId();
+        String userId = documentReference.getId();
         getContactInfo(documentReference, new GetContactInfoCallback() {
             @Override
             public void onGetContactInfoCallback(ContactInfo contactInfo) {
@@ -38,9 +39,16 @@ public class PlayerDocumentConverter {
                                 new GetPlayerWalletCallback() {
                                     @Override
                                     public void onCallback(PlayerWallet playerWallet) {
-                                        getPlayerCallback.onCallback(
-                                                new Player(username, contactInfo, playerPreferences,
-                                                        playerWallet));
+                                        getUserName(documentReference, new GetStringCallback() {
+                                            @Override
+                                            public void onCallback(String username) {
+                                                getPlayerCallback.onCallback(
+                                                        new Player(userId, username, contactInfo,
+                                                                playerPreferences, playerWallet));
+                                            }
+                                        });
+
+
                                     }
                                 });
                     }
@@ -48,6 +56,35 @@ public class PlayerDocumentConverter {
             }
         });
 
+    }
+
+    private void getUserName(DocumentReference documentReference, GetStringCallback
+                             getStringCallback){
+        String[] username = new String[1];
+
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        try{
+                            username[0] = (String) document.getData().get(FieldNames.USERNAME.fieldName);
+
+                            getStringCallback.onCallback(username[0]);
+                        }catch (NullPointerException e){
+                            Log.e(TAG, "User does not have a username!");
+                            getStringCallback.onCallback(username[0]);
+                        }
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 
     private void getPlayerWallet(CollectionReference collectionReference,

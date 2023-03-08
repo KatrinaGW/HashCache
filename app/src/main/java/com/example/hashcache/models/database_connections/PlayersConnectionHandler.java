@@ -28,6 +28,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -37,7 +39,7 @@ import java.util.HashMap;
 public class PlayersConnectionHandler {
     private FirebaseFirestore db;
     private CollectionReference collectionReference;
-    private ArrayList<String> inAppPlayerUserNames;
+    private HashMap<String, String> inAppUsernamesIds;
     private HashMap<String, Player> cachedPlayers;
     final String TAG = "Sample";
     private PlayerDocumentConverter playerDocumentConverter;
@@ -47,11 +49,11 @@ public class PlayersConnectionHandler {
 
     /**
      * Creates a new instance of the class and initializes the connection to the database
-     * @param inAppPlayerUserNames used to keep the app up to date on the current usernames
-     *                             in the database
+     * @param userNamesIds used to keep the app up to date on the current usernames
+     *                             and their ids
      */
-    private PlayersConnectionHandler(ArrayList<String> inAppPlayerUserNames){
-        this.inAppPlayerUserNames = inAppPlayerUserNames;
+    private PlayersConnectionHandler(HashMap<String, String> userNamesIds){
+        this.inAppUsernamesIds = userNamesIds;
         this.cachedPlayers = new HashMap<>();
         this.playerDocumentConverter = new PlayerDocumentConverter();
         this.fireStoreHelper = new FireStoreHelper();
@@ -65,12 +67,13 @@ public class PlayersConnectionHandler {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
             FirebaseFirestoreException error) {
-                inAppPlayerUserNames.clear();
                 for(QueryDocumentSnapshot doc: queryDocumentSnapshots)
                 {
-                    Log.d(TAG, String.valueOf(doc.getData().get("username")));
-                    String username = doc.getId();
-                    inAppPlayerUserNames.add(username);
+                    String username = doc.getData().get(FieldNames.USERNAME.fieldName).toString();
+                    Log.d(TAG, username);
+                    inAppUsernamesIds.put(username, doc.getId());
+
+
                 }
             }
         });
@@ -84,11 +87,11 @@ public class PlayersConnectionHandler {
         return INSTANCE;
     }
 
-    public static PlayersConnectionHandler makeInstance(ArrayList<String> inAppPlayerUserNames){
+    public static PlayersConnectionHandler makeInstance(HashMap<String, String> inAppNamesIds){
         if(INSTANCE != null){
             throw new IllegalArgumentException("Instance of PlayersConnectionHandler already exists!");
         }
-        INSTANCE = new PlayersConnectionHandler(inAppPlayerUserNames);
+        INSTANCE = new PlayersConnectionHandler(inAppNamesIds);
         return INSTANCE;
     }
 
@@ -97,7 +100,11 @@ public class PlayersConnectionHandler {
      * @return inAppPlayerUserNames gets the usernames of all players in the app
      */
     public ArrayList<String> getInAppPlayerUserNames(){
-        return this.inAppPlayerUserNames;
+        ArrayList<String> inAppUserNames = new ArrayList<>();
+        for(String username : inAppUsernamesIds.keySet()){
+            inAppUserNames.add(username);
+        }
+        return inAppUserNames;
     }
 
     /**
@@ -114,7 +121,9 @@ public class PlayersConnectionHandler {
         if(cachedPlayers.keySet().contains(userName)){
             player[0] = cachedPlayers.get(userName);
         }else {
-            DocumentReference documentReference = collectionReference.document(userName);
+            DocumentReference documentReference = collectionReference.document(
+                    inAppUsernamesIds.get(userName)
+            );
             documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -152,6 +161,7 @@ public class PlayersConnectionHandler {
      * to a player
      */
     public void addPlayer(Player player, BooleanCallback booleanCallback){
+        String userId = player.getUserId();
         String username = player.getUsername();
         ContactInfo contactInfo = player.getContactInfo();
         PlayerPreferences playerPreferences = player.getPlayerPreferences();
@@ -160,19 +170,19 @@ public class PlayersConnectionHandler {
             throw new IllegalArgumentException("Username null, empty, or too long");
         }
 
-        if(inAppPlayerUserNames.contains(username)){
+        if(inAppUsernamesIds.keySet().contains(username)){
             throw new IllegalArgumentException("Username taken!");
         }
 
         playerWalletConnectionHandler.setPlayerWallet(player.getPlayerWallet(),
-                collectionReference.document(username), new BooleanCallback() {
+                collectionReference.document(userId), new BooleanCallback() {
             @Override
             public void onCallback(Boolean isTrue) {
-                setUserName(username, new BooleanCallback() {
+                setUserName(collectionReference.document(userId), userId, username, new BooleanCallback() {
                     @Override
                     public void onCallback(Boolean isTrue) {
                         if(isTrue){
-                            DocumentReference playerDocument = collectionReference.document(username);
+                            DocumentReference playerDocument = collectionReference.document(userId);
                             setContactInfo(playerDocument, contactInfo, new BooleanCallback() {
                                 @Override
                                 public void onCallback(Boolean isTrue) {
@@ -195,9 +205,9 @@ public class PlayersConnectionHandler {
 
     }
 
-    public void updatePlayerPreferences(String username, PlayerPreferences playerPreferences,
+    public void updatePlayerPreferences(String userId, PlayerPreferences playerPreferences,
                                         BooleanCallback booleanCallback){
-        DocumentReference documentReference = collectionReference.document(username);
+        DocumentReference documentReference = collectionReference.document(userId);
         setPlayerPreferences(documentReference, playerPreferences, booleanCallback);
     }
 
@@ -217,9 +227,9 @@ public class PlayersConnectionHandler {
                 });
     }
 
-    public void updateContactInfo(String username, ContactInfo contactInfo,
+    public void updateContactInfo(String userId, ContactInfo contactInfo,
                                         BooleanCallback booleanCallback){
-        DocumentReference documentReference = collectionReference.document(username);
+        DocumentReference documentReference = collectionReference.document(userId);
         setContactInfo(documentReference, contactInfo, booleanCallback);
     }
 
@@ -247,59 +257,60 @@ public class PlayersConnectionHandler {
                 });
     }
 
-    public void setUserName(String username, BooleanCallback booleanCallback){
-        HashMap<String, String> usernameData = new HashMap<>();
-        usernameData.put(FieldNames.USERNAME.fieldName, username);
+//    public void updateUserName(String oldUsername, String newUsername, BooleanCallback booleanCallback){
+//        this.setUserName(inAppUsernamesIds.get(oldUsername), newUsername, booleanCallback);
+//    }
 
-        fireStoreHelper.setDocumentReference(collectionReference.document(username),
-                usernameData, new BooleanCallback() {
-                    @Override
-                    public void onCallback(Boolean isTrue) {
-                        if(isTrue){
-                            booleanCallback.onCallback(true);
-                        }else{
-                            throw new RuntimeException("Something went wrong");
-                        }
-                    }
-                });
+    private void setUserName(DocumentReference playerDocument, String userId, String username,
+                             BooleanCallback booleanCallback){
+        HashMap<String, String> data = new HashMap<>();
+        data.put(FieldNames.USERNAME.fieldName, username);
+        fireStoreHelper.setDocumentReference(playerDocument, data, booleanCallback);
     }
 
-    public void playerScannedCodeAdded(String username, String scannableCodeId, Image locationImage,
-                                         BooleanCallback booleanCallback){
-        if(!this.inAppPlayerUserNames.contains(username)){
+    private void setUserId(String userId, BooleanCallback booleanCallback){
+        HashMap<String, String> userIdData = new HashMap<>();
+        userIdData.put("userId", userId);
+        if(this.inAppUsernamesIds.containsValue(userId)){
+            throw new IllegalArgumentException("There already exists a user with the given id!");
+        } else{
+            fireStoreHelper.setDocumentReference(collectionReference.document(userId),
+                    userIdData, new BooleanCallback() {
+                        @Override
+                        public void onCallback(Boolean isTrue) {
+                            if(isTrue){
+                                booleanCallback.onCallback(true);
+                            }else{
+                                throw new RuntimeException("Something went wrong while creating" +
+                                        "the new user document");
+                            }
+                        }
+                    });
+        }
+    }
+
+    public void playerScannedCodeAdded(String userId, String scannableCodeId,
+                                       Image locationImage, BooleanCallback booleanCallback){
+        if(!this.inAppUsernamesIds.keySet().contains(userId)){
             throw new IllegalArgumentException("Given username does not exist!");
         }
 
         CollectionReference scannedCodeCollection = collectionReference
-                .document(username)
+                .document(userId)
                 .collection(CollectionNames.PLAYER_WALLET.collectionName);
 
         playerWalletConnectionHandler.addScannableCodeDocument(scannedCodeCollection,
                 scannableCodeId, locationImage, booleanCallback);
-
-//        fireStoreHelper.documentWithIDExists(scannedCodeCollection, scannableCodeId,
-//                new BooleanCallback() {
-//                    @Override
-//                    public void onCallback(Boolean isTrue) {
-//                        if(!isTrue){
-//                            playerWalletConnectionHandler.addScannableCodeDocument(
-//                                    scannedCodeCollection, scannableCodeId, locationImage,
-//                                    booleanCallback);
-//                        }else{
-//                            throw new IllegalArgumentException("Scannable code already exists!");
-//                        }
-//                    }
-//                });
     }
 
-    public void playerScannedCodeDeleted(String username, String scannableCodeId,
+    public void playerScannedCodeDeleted(String userId, String scannableCodeId,
                                          BooleanCallback booleanCallback){
-        if(!this.inAppPlayerUserNames.contains(username)){
+        if(!this.inAppUsernamesIds.keySet().contains(userId)){
             throw new IllegalArgumentException("Given username does not exist!");
         }
 
         CollectionReference scannedCodeCollection = collectionReference
-                .document(username)
+                .document(userId)
                 .collection(CollectionNames.PLAYER_WALLET.collectionName);
 
         playerWalletConnectionHandler.deleteScannableCodeFromWallet(scannedCodeCollection,

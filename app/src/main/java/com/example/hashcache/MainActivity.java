@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
                 .build());
 
         addUserCommand = new AddUserCommand();
-        PlayerList.getInstance();
 
         // add functionality to start button
         AppCompatButton startButton = findViewById(R.id.start_button);

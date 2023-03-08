@@ -7,6 +7,7 @@ import java.util.UUID;
  */
 public class Player{
     private String username;
+    private String userId;
     private ContactInfo contactInfo;
     private PlayerPreferences playerPreferences;
     private PlayerWallet playerWallet;
@@ -16,6 +17,7 @@ public class Player{
      * @param username the username for the new player
      */
     public Player(String username){
+        this.userId = UUID.randomUUID().toString();
         this.username = username;
         this.contactInfo = new ContactInfo();
         this.playerPreferences = new PlayerPreferences();
@@ -29,12 +31,21 @@ public class Player{
      * @param playerPreferences the preferences for the player
      * @param playerWallet the player's wallet of scannable codes
      */
-    public Player(String username, ContactInfo contactInfo, PlayerPreferences playerPreferences,
-                  PlayerWallet playerWallet){
+    public Player(String userId, String username, ContactInfo contactInfo,
+                  PlayerPreferences playerPreferences, PlayerWallet playerWallet){
+        this.userId = userId;
         this.username = username;
         this.contactInfo = contactInfo;
         this.playerPreferences = playerPreferences;
         this.playerWallet = playerWallet;
+    }
+
+    /**
+     * Gets the userId for the user
+     * @return userId the user's id
+     */
+    public String getUserId(){
+        return this.userId;
     }
 
     /**
