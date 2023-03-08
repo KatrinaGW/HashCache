@@ -64,9 +64,7 @@ public class PlayerList {
 
         if(!this.playerUserNames.contains(username)){
             Player newPlayer = new Player(username);
-
-            this.playerUserNames.add(username);
-
+            
             try{
                 this.playersConnectionHandler.addPlayer(newPlayer, booleanCallback);
             }catch (IllegalArgumentException e){
