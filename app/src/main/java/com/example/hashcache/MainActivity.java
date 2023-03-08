@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Intent goHome = new Intent(MainActivity.this, AppHome.class);
                 startActivity(goHome);
-
             }
         });
 

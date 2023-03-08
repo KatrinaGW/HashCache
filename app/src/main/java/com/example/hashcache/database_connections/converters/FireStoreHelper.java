@@ -18,6 +18,46 @@ import java.util.HashMap;
 public class FireStoreHelper {
     final String TAG = "Sample";
 
+    public void addBooleanFieldToDocument(DocumentReference documentReference, String key, boolean value,
+                                   BooleanCallback booleanCallback){
+        documentReference
+                .update(key, value)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                        booleanCallback.onCallback(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating document", e);
+                        booleanCallback.onCallback(false);
+                    }
+                });
+    }
+
+    public void addStringFieldToDocument(DocumentReference documentReference, String key, String value,
+                                          BooleanCallback booleanCallback){
+        documentReference
+                .update(key, value)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                        booleanCallback.onCallback(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating document", e);
+                        booleanCallback.onCallback(false);
+                    }
+                });
+    }
+
     public void setDocumentReference(DocumentReference documentReference,
                                      HashMap<String, String> data, BooleanCallback booleanCallback){
         documentReference.set(data)

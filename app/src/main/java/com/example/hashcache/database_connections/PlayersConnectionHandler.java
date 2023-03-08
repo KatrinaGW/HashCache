@@ -204,15 +204,8 @@ public class PlayersConnectionHandler {
 
     private void setPlayerPreferences(DocumentReference playerDocument, PlayerPreferences playerPreferences,
                                       BooleanCallback booleanCallback){
-        HashMap<String, String> recordGeoLocationdData = new HashMap<>();
-        recordGeoLocationdData.put(FieldNames.RECORD_GEOLOCATION.fieldName, String.valueOf(playerPreferences
-                .getRecordGeolocationPreference())
-        );
-
-        DocumentReference playerPreferencesDocument = playerDocument.collection(CollectionNames.PLAYER_PREFERENCES.collectionName)
-                .document(CollectionNames.PLAYER_PREFERENCES.collectionName);
-
-        fireStoreHelper.setDocumentReference(playerPreferencesDocument, recordGeoLocationdData,
+        fireStoreHelper.addBooleanFieldToDocument(playerDocument, FieldNames.RECORD_GEOLOCATION.fieldName,
+                playerPreferences.getRecordGeolocationPreference(),
                 new BooleanCallback() {
                     @Override
                     public void onCallback(Boolean isTrue) {
@@ -233,19 +226,21 @@ public class PlayersConnectionHandler {
 
     private void setContactInfo(DocumentReference playerDocument, ContactInfo contactInfo,
                                 BooleanCallback booleanCallback){
-        HashMap<String, String> contactInfoData = new HashMap<>();
-        contactInfoData.put(FieldNames.EMAIL.fieldName, contactInfo.getEmail());
-        contactInfoData.put(FieldNames.PHONE_NUMBER.fieldName, contactInfo.getPhoneNumber());
-
-        DocumentReference contactInfoReference = playerDocument.collection(CollectionNames.CONTACT_INFO.collectionName)
-                .document(CollectionNames.CONTACT_INFO.collectionName);
-
-        fireStoreHelper.setDocumentReference(contactInfoReference, contactInfoData,
+        fireStoreHelper.addStringFieldToDocument(playerDocument, FieldNames.EMAIL.fieldName,
+                contactInfo.getEmail(),
                 new BooleanCallback() {
                     @Override
                     public void onCallback(Boolean isTrue) {
                         if(isTrue){
-                            booleanCallback.onCallback(true);
+                            fireStoreHelper.addStringFieldToDocument(playerDocument, FieldNames.PHONE_NUMBER.fieldName,
+                                    contactInfo.getPhoneNumber(), new BooleanCallback() {
+                                        @Override
+                                        public void onCallback(Boolean isTrue) {
+                                            if(isTrue){
+                                                booleanCallback.onCallback(true);
+                                            }
+                                        }
+                                    });
                         }else{
                             throw new RuntimeException("Something went wrong");
                         }
