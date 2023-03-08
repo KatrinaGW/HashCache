@@ -1,12 +1,17 @@
 package com.example.hashcache.models.database_connections;
 
 import android.media.Image;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.models.database_connections.values.FieldNames;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -24,15 +29,27 @@ public class PlayerWalletConnectionHandler {
     protected void addScannableCodeDocument(CollectionReference playerWalletCollection,
                                             String scannableCodeId, Image locationImage,
                                             BooleanCallback booleanCallback){
-        HashMap<String, String> scannableCodeIdData = new HashMap<>();
-        scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
-        if(locationImage != null){
-            //TODO: insert the image
-        }
-        DocumentReference playerWalletReference = playerWalletCollection.document(scannableCodeId);
 
-        fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData,
-                booleanCallback);
+        fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId,
+                new BooleanCallback() {
+                    @Override
+                    public void onCallback(Boolean isTrue) {
+                        if(isTrue){
+                            throw new IllegalArgumentException("User has already scanned code" +
+                                    "with given ID!");
+                        }
+                        HashMap<String, String> scannableCodeIdData = new HashMap<>();
+                        scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
+                        if(locationImage != null){
+                            //TODO: insert the image
+                        }
+                        DocumentReference playerWalletReference = playerWalletCollection.document(scannableCodeId);
+
+                        fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData,
+                                booleanCallback);
+
+                    }
+                });
     }
 
     private void addCodeToWallet(DocumentReference playerDocumentReference,
@@ -74,6 +91,33 @@ public class PlayerWalletConnectionHandler {
         }else{
             booleanCallback.onCallback(true);
         }
+    }
+
+    protected void deleteScannableCodeFromWallet(CollectionReference playerWalletCollection,
+                                                 String scannableCodeId, BooleanCallback booleanCallback){
+        fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId,
+                new BooleanCallback() {
+                    @Override
+                    public void onCallback(Boolean isTrue) {
+                        if(isTrue){
+                            playerWalletCollection.document(scannableCodeId).delete()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                            booleanCallback.onCallback(true);
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w(TAG, "Error deleting document", e);
+                                            booleanCallback.onCallback(false);
+                                        }
+                                    });
+                        }
+                    }
+                });
     }
 
 

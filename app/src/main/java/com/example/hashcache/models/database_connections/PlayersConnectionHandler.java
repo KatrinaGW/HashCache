@@ -274,19 +274,22 @@ public class PlayersConnectionHandler {
                 .document(username)
                 .collection(CollectionNames.PLAYER_WALLET.collectionName);
 
-        fireStoreHelper.documentWithIDExists(scannedCodeCollection, scannableCodeId,
-                new BooleanCallback() {
-                    @Override
-                    public void onCallback(Boolean isTrue) {
-                        if(!isTrue){
-                            playerWalletConnectionHandler.addScannableCodeDocument(
-                                    scannedCodeCollection, scannableCodeId, locationImage,
-                                    booleanCallback);
-                        }else{
-                            throw new IllegalArgumentException("Scannable code already exists!");
-                        }
-                    }
-                });
+        playerWalletConnectionHandler.addScannableCodeDocument(scannedCodeCollection,
+                scannableCodeId, locationImage, booleanCallback);
+
+//        fireStoreHelper.documentWithIDExists(scannedCodeCollection, scannableCodeId,
+//                new BooleanCallback() {
+//                    @Override
+//                    public void onCallback(Boolean isTrue) {
+//                        if(!isTrue){
+//                            playerWalletConnectionHandler.addScannableCodeDocument(
+//                                    scannedCodeCollection, scannableCodeId, locationImage,
+//                                    booleanCallback);
+//                        }else{
+//                            throw new IllegalArgumentException("Scannable code already exists!");
+//                        }
+//                    }
+//                });
     }
 
     public void playerScannedCodeDeleted(String username, String scannableCodeId,
@@ -299,28 +302,7 @@ public class PlayersConnectionHandler {
                 .document(username)
                 .collection(CollectionNames.PLAYER_WALLET.collectionName);
 
-        fireStoreHelper.documentWithIDExists(scannedCodeCollection, scannableCodeId,
-                new BooleanCallback() {
-                    @Override
-                    public void onCallback(Boolean isTrue) {
-                        if(isTrue){
-                            scannedCodeCollection.document(scannableCodeId).delete()
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                                            booleanCallback.onCallback(true);
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w(TAG, "Error deleting document", e);
-                                            booleanCallback.onCallback(false);
-                                        }
-                                    });
-                        }
-                    }
-                });
+        playerWalletConnectionHandler.deleteScannableCodeFromWallet(scannedCodeCollection,
+                scannableCodeId, booleanCallback);
     }
 }

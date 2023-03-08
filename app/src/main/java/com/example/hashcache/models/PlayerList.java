@@ -62,8 +62,6 @@ public class PlayerList {
 
         if(!this.playerUserNames.contains(username)){
             Player newPlayer = new Player(username);
-            newPlayer.getPlayerWallet().addScannableCode("first", null);
-            newPlayer.getPlayerWallet().addScannableCode("Second", null);
             
             try{
                 this.playersConnectionHandler.addPlayer(newPlayer, booleanCallback);
