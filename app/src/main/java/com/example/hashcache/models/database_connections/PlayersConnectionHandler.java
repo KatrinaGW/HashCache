@@ -67,13 +67,14 @@ public class PlayersConnectionHandler {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
             FirebaseFirestoreException error) {
+                String username;
                 for(QueryDocumentSnapshot doc: queryDocumentSnapshots)
                 {
-                    String username = doc.getData().get(FieldNames.USERNAME.fieldName).toString();
-                    Log.d(TAG, username);
-                    inAppUsernamesIds.put(username, doc.getId());
-
-
+                    if(doc.getData().get(FieldNames.USERNAME.fieldName) != null){
+                        username = doc.getData().get("username").toString();
+                        Log.d(TAG, username);
+                        inAppUsernamesIds.put(username, doc.getId());
+                    }
                 }
             }
         });
@@ -264,8 +265,13 @@ public class PlayersConnectionHandler {
     private void setUserName(DocumentReference playerDocument, String userId, String username,
                              BooleanCallback booleanCallback){
         HashMap<String, String> data = new HashMap<>();
-        data.put(FieldNames.USERNAME.fieldName, username);
-        fireStoreHelper.setDocumentReference(playerDocument, data, booleanCallback);
+        data.put("userId", userId);
+        fireStoreHelper.setDocumentReference(playerDocument, data, new BooleanCallback() {
+            @Override
+            public void onCallback(Boolean isTrue) {
+                fireStoreHelper.addStringFieldToDocument(playerDocument, "username", username, booleanCallback);
+            }
+        });
     }
 
     private void setUserId(String userId, BooleanCallback booleanCallback){
