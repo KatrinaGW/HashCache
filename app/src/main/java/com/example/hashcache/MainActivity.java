@@ -14,13 +14,8 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.example.hashcache.controllers.AddUserCommand;
-import com.example.hashcache.controllers.PlayerWalletCommander;
-import com.example.hashcache.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.Comment;
-import com.example.hashcache.models.HashInfo;
+import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.models.ScannableCode;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
@@ -34,15 +29,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        FirebaseApp.initializeApp(this, new FirebaseOptions.Builder()
-//                .setApplicationId("1:343583306337:android:d5e9ae9095f25cb5b4f020")
-//                .setApiKey("AIzaSyD25aeFyGGaQ9nSNs5QFSJXLfQm6gFb9kM")
-//                .setDatabaseUrl("https://hashcache-78ec8.firebaseio.com/")
-//                .setGcmSenderId("343583306337")
-//                .setStorageBucket("hashcache-78ec8.appspot.com")
-//                .setProjectId("hashcache-78ec8")
-//                .build());
 
         FirebaseApp.initializeApp(this, new FirebaseOptions.Builder()
                 .setApplicationId("1:901109849854:android:59c5ab124b7d20ef1d4faf")

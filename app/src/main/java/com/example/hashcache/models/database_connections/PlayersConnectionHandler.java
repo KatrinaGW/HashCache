@@ -1,4 +1,4 @@
-package com.example.hashcache.database_connections;
+package com.example.hashcache.models.database_connections;
 
 import android.media.Image;
 import android.util.Log;
@@ -6,19 +6,15 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.hashcache.controllers.PlayerWalletCommander;
-import com.example.hashcache.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.database_connections.converters.FireStoreHelper;
-import com.example.hashcache.database_connections.converters.PlayerDocumentConverter;
-import com.example.hashcache.database_connections.values.CollectionNames;
-import com.example.hashcache.database_connections.values.FieldNames;
+import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter;
+import com.example.hashcache.models.database_connections.values.CollectionNames;
+import com.example.hashcache.models.database_connections.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;
-import com.example.hashcache.models.Coordinate;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.PlayerWallet;
-import com.example.hashcache.models.ScannableCode;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -46,6 +42,7 @@ public class PlayersConnectionHandler {
     final String TAG = "Sample";
     private PlayerDocumentConverter playerDocumentConverter;
     private FireStoreHelper fireStoreHelper;
+    private PlayerWalletConnectionHandler playerWalletConnectionHandler;
     private static PlayersConnectionHandler INSTANCE;
 
     /**
@@ -58,6 +55,7 @@ public class PlayersConnectionHandler {
         this.cachedPlayers = new HashMap<>();
         this.playerDocumentConverter = new PlayerDocumentConverter();
         this.fireStoreHelper = new FireStoreHelper();
+        this.playerWalletConnectionHandler = new PlayerWalletConnectionHandler();
 
         db = FirebaseFirestore.getInstance();
 
@@ -166,7 +164,8 @@ public class PlayersConnectionHandler {
             throw new IllegalArgumentException("Username taken!");
         }
 
-        setPlayerWallet(player, collectionReference.document(username), new BooleanCallback() {
+        playerWalletConnectionHandler.setPlayerWallet(player.getPlayerWallet(),
+                collectionReference.document(username), new BooleanCallback() {
             @Override
             public void onCallback(Boolean isTrue) {
                 setUserName(username, new BooleanCallback() {
@@ -280,8 +279,9 @@ public class PlayersConnectionHandler {
                     @Override
                     public void onCallback(Boolean isTrue) {
                         if(!isTrue){
-                            addScannableCodeDocument(scannedCodeCollection, scannableCodeId,
-                                    locationImage, booleanCallback);
+                            playerWalletConnectionHandler.addScannableCodeDocument(
+                                    scannedCodeCollection, scannableCodeId, locationImage,
+                                    booleanCallback);
                         }else{
                             throw new IllegalArgumentException("Scannable code already exists!");
                         }
@@ -323,60 +323,4 @@ public class PlayersConnectionHandler {
                     }
                 });
     }
-
-    private void addScannableCodeDocument(CollectionReference playerWalletCollection, String scannableCodeId,
-                                  Image locationImage, BooleanCallback booleanCallback){
-        HashMap<String, String> scannableCodeIdData = new HashMap<>();
-        scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
-        if(locationImage != null){
-            //TODO: insert the image
-        }
-        DocumentReference playerWalletReference = playerWalletCollection.document(scannableCodeId);
-
-        fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData,
-                booleanCallback);
-    }
-
-    private void addCodeToWallet(DocumentReference playerDocumentReference,
-                                          PlayerWallet playerWallet, int index, BooleanCallback
-                                          booleanCallback){
-        if(index == playerWallet.getSize()){
-            booleanCallback.onCallback(true);
-        }else{
-            String scannableCodeId = playerWallet.getScannedCodeIds().get(index);
-            Image scannableCodeImage = playerWallet.getScannableCodeLocationImage(scannableCodeId);
-
-            addScannableCodeDocument(playerDocumentReference.collection(CollectionNames
-                            .PLAYER_WALLET
-                            .collectionName
-                    ),
-                    scannableCodeId, scannableCodeImage, new BooleanCallback() {
-                        @Override
-                        public void onCallback(Boolean isTrue) {
-                            addCodeToWallet(playerDocumentReference, playerWallet,
-                                    index+1, booleanCallback);
-                        }
-                    });
-        }
-    }
-
-    private void setPlayerWallet(Player player, DocumentReference playerDocumentReference,
-                                 BooleanCallback booleanCallback){
-        PlayerWallet playerWallet = player.getPlayerWallet();
-        ArrayList<String> scannableCodeIds = playerWallet.getScannedCodeIds();
-
-        if(scannableCodeIds.size()>0){
-            addCodeToWallet(playerDocumentReference, playerWallet, 0, new BooleanCallback() {
-                @Override
-                public void onCallback(Boolean isTrue) {
-                    if(isTrue){
-                        booleanCallback.onCallback(true);
-                    }
-                }
-            });
-        }else{
-            booleanCallback.onCallback(true);
-        }
-    }
-
 }

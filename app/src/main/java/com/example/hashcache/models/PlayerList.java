@@ -1,10 +1,8 @@
 package com.example.hashcache.models;
 
-import com.example.hashcache.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.database_connections.PlayersConnectionHandler;
-
-import org.checkerframework.checker.units.qual.A;
+import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
 
 import java.util.ArrayList;
 
@@ -64,6 +62,8 @@ public class PlayerList {
 
         if(!this.playerUserNames.contains(username)){
             Player newPlayer = new Player(username);
+            newPlayer.getPlayerWallet().addScannableCode("first", null);
+            newPlayer.getPlayerWallet().addScannableCode("Second", null);
             
             try{
                 this.playersConnectionHandler.addPlayer(newPlayer, booleanCallback);

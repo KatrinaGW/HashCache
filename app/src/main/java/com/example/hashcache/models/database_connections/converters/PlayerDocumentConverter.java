@@ -1,17 +1,16 @@
-package com.example.hashcache.database_connections.converters;
+package com.example.hashcache.models.database_connections.converters;
 
 import android.media.Image;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.database_connections.callbacks.GetContactInfoCallback;
-import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.database_connections.callbacks.GetPlayerPreferencesCallback;
-import com.example.hashcache.database_connections.callbacks.GetPlayerWalletCallback;
-import com.example.hashcache.database_connections.values.CollectionNames;
-import com.example.hashcache.database_connections.values.FieldNames;
-import com.example.hashcache.models.Comment;
+import com.example.hashcache.models.database_connections.callbacks.GetContactInfoCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerPreferencesCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerWalletCallback;
+import com.example.hashcache.models.database_connections.values.CollectionNames;
+import com.example.hashcache.models.database_connections.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
@@ -23,8 +22,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
 
 public class PlayerDocumentConverter {
     final String TAG = "Sample";

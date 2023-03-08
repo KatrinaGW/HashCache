@@ -13,9 +13,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.hashcache.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
 

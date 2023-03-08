@@ -2,12 +2,8 @@ package com.example.hashcache.controllers;
 
 import android.media.Image;
 
-import com.example.hashcache.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.Player;
-
-import java.util.ArrayList;
+import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 
 public class PlayerWalletCommander {
 
