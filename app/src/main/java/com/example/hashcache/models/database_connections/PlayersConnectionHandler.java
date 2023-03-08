@@ -271,14 +271,14 @@ public class PlayersConnectionHandler {
         if(!this.inAppUsernamesIds.containsKey(oldUsername)){
             throw new IllegalArgumentException("Old username does not exist!");
         }
-        
+
         this.setUserName(this.collectionReference.document(inAppUsernamesIds.get(oldUsername)),
                 newUsername, booleanCallback);
     }
 
     private void setUserId(DocumentReference playerDocument, String userId, BooleanCallback booleanCallback){
         HashMap<String, String> data = new HashMap<>();
-        data.put("userId", userId);
+        data.put(FieldNames.USER_ID.fieldName, userId);
         fireStoreHelper.setDocumentReference(playerDocument, data, booleanCallback);
     }
 

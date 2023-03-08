@@ -65,8 +65,6 @@ public class PlayerList {
 
         if(!this.playerUserNames.contains(username)){
             Player newPlayer = new Player(username);
-            newPlayer.getPlayerWallet().addScannableCode("first", null);
-            newPlayer.getContactInfo().setEmail("deeznutz@gmail.com");
             
             try{
                 this.playersConnectionHandler.addPlayer(newPlayer, booleanCallback);
