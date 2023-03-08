@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.example.hashcache.controllers.AddUserCommand;
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.PlayerList;
 import com.google.firebase.FirebaseApp;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
                 .build());
 
         addUserCommand = new AddUserCommand();
+        playerList = PlayerList.getInstance();
 
         // add functionality to start button
         AppCompatButton startButton = findViewById(R.id.start_button);

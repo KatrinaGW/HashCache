@@ -70,13 +70,6 @@ public class PlayerList {
             
             try{
                 this.playersConnectionHandler.addPlayer(newPlayer, booleanCallback);
-//                this.playersConnectionHandler.updateUserName("g",
-//                        "new new", new BooleanCallback() {
-//                            @Override
-//                            public void onCallback(Boolean isTrue) {
-//                                System.out.println("success");
-//                            }
-//                        });
             }catch (IllegalArgumentException e){
                 success = false;
             }

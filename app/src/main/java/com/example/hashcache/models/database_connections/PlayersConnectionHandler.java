@@ -68,10 +68,12 @@ public class PlayersConnectionHandler {
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
             FirebaseFirestoreException error) {
                 String username;
+                inAppUsernamesIds.clear();
+
                 for(QueryDocumentSnapshot doc: queryDocumentSnapshots)
                 {
                     if(doc.getData().get(FieldNames.USERNAME.fieldName) != null){
-                        username = doc.getData().get("username").toString();
+                        username = doc.getData().get(FieldNames.USERNAME.fieldName).toString();
                         Log.d(TAG, username);
                         inAppUsernamesIds.put(username, doc.getId());
                     }
@@ -179,27 +181,34 @@ public class PlayersConnectionHandler {
                 collectionReference.document(userId), new BooleanCallback() {
             @Override
             public void onCallback(Boolean isTrue) {
-                setUserName(collectionReference.document(userId), userId, username, new BooleanCallback() {
+                setUserId(userId, new BooleanCallback() {
                     @Override
-                    public void onCallback(Boolean isTrue) {
-                        if(isTrue){
-                            DocumentReference playerDocument = collectionReference.document(userId);
-                            setContactInfo(playerDocument, contactInfo, new BooleanCallback() {
-                                @Override
-                                public void onCallback(Boolean isTrue) {
-                                    if(isTrue){
-                                        setPlayerPreferences(playerDocument, playerPreferences, new BooleanCallback() {
-                                            @Override
-                                            public void onCallback(Boolean isTrue) {
-                                                booleanCallback.onCallback(true);
+                    public void onCallback(Boolean isTrue)
+                    {
+                        setUserName(collectionReference.document(userId),username, new BooleanCallback() {
+                            @Override
+                            public void onCallback(Boolean isTrue) {
+                                if (isTrue) {
+                                    DocumentReference playerDocument = collectionReference.document(userId);
+                                    setContactInfo(playerDocument, contactInfo, new BooleanCallback() {
+                                        @Override
+                                        public void onCallback(Boolean isTrue) {
+                                            if (isTrue) {
+                                                setPlayerPreferences(playerDocument, playerPreferences, new BooleanCallback() {
+                                                    @Override
+                                                    public void onCallback(Boolean isTrue) {
+                                                        booleanCallback.onCallback(true);
+                                                    }
+                                                });
                                             }
-                                        });
-                                    }
+                                        }
+                                    });
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
                 });
+
             }
         });
 
@@ -258,20 +267,29 @@ public class PlayersConnectionHandler {
                 });
     }
 
-//    public void updateUserName(String oldUsername, String newUsername, BooleanCallback booleanCallback){
-//        this.setUserName(inAppUsernamesIds.get(oldUsername), newUsername, booleanCallback);
-//    }
+    public void updateUserName(String oldUsername, String newUsername, BooleanCallback booleanCallback){
+        if(!this.inAppUsernamesIds.containsKey(oldUsername)){
+            throw new IllegalArgumentException("Old username does not exist!");
+        }
+        
+        this.setUserName(this.collectionReference.document(inAppUsernamesIds.get(oldUsername)),
+                newUsername, booleanCallback);
+    }
 
-    private void setUserName(DocumentReference playerDocument, String userId, String username,
-                             BooleanCallback booleanCallback){
+    private void setUserId(DocumentReference playerDocument, String userId, BooleanCallback booleanCallback){
         HashMap<String, String> data = new HashMap<>();
         data.put("userId", userId);
-        fireStoreHelper.setDocumentReference(playerDocument, data, new BooleanCallback() {
-            @Override
-            public void onCallback(Boolean isTrue) {
-                fireStoreHelper.addStringFieldToDocument(playerDocument, "username", username, booleanCallback);
-            }
-        });
+        fireStoreHelper.setDocumentReference(playerDocument, data, booleanCallback);
+    }
+
+    private void setUserName(DocumentReference playerDocument, String username,
+                             BooleanCallback booleanCallback){
+        if(this.inAppUsernamesIds.keySet().contains(username)){
+            throw new IllegalArgumentException("Given username already exists!");
+        }
+
+        this.fireStoreHelper.addStringFieldToDocument(playerDocument, FieldNames.USERNAME.fieldName,
+                username, booleanCallback);
     }
 
     private void setUserId(String userId, BooleanCallback booleanCallback){
