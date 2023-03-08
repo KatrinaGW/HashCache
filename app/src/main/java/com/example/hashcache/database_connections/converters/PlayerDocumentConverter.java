@@ -31,12 +31,10 @@ public class PlayerDocumentConverter {
 
     public void getPlayerFromDocument(DocumentReference documentReference, GetPlayerCallback getPlayerCallback){
         String username = documentReference.getId();
-        CollectionReference contactInfoReference = documentReference.collection(CollectionNames.CONTACT_INFO.collectionName);
-        getContactInfo(contactInfoReference, new GetContactInfoCallback() {
+        getContactInfo(documentReference, new GetContactInfoCallback() {
             @Override
             public void onGetContactInfoCallback(ContactInfo contactInfo) {
-                getPlayerPreferences(documentReference
-                        .collection(CollectionNames.PLAYER_PREFERENCES.collectionName), new GetPlayerPreferencesCallback() {
+                getPlayerPreferences(documentReference, new GetPlayerPreferencesCallback() {
                     @Override
                     public void onCallback(PlayerPreferences playerPreferences) {
                         getPlayerWallet(documentReference.collection(CollectionNames.PLAYER_WALLET.collectionName),
@@ -82,14 +80,11 @@ public class PlayerDocumentConverter {
                 });
     }
 
-    private void getPlayerPreferences(CollectionReference collectionReference,
+    private void getPlayerPreferences(DocumentReference documentReference,
                                       GetPlayerPreferencesCallback getPlayerPreferencesCallback){
         PlayerPreferences playerPreferences = new PlayerPreferences();
 
-        DocumentReference docRef = collectionReference.document(
-                CollectionNames.PLAYER_PREFERENCES.collectionName
-        );
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -116,12 +111,10 @@ public class PlayerDocumentConverter {
         });
     }
 
-    private void getContactInfo(CollectionReference collectionReference,
+    private void getContactInfo(DocumentReference playerDocument,
                                 GetContactInfoCallback getContactInfoCallback){
         ContactInfo contactInfo = new ContactInfo();
-
-        DocumentReference docRef = collectionReference.document("contactInfo");
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        playerDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -129,14 +122,14 @@ public class PlayerDocumentConverter {
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         try{
-                            String email = (String) document.getData().get("email");
+                            String email = (String) document.getData().get(FieldNames.EMAIL.fieldName);
                             contactInfo.setEmail(email);
                         }catch(NullPointerException e){
                             Log.d(TAG, "The contact info does not have an email");
                         }
 
                         try{
-                            String phoneNumber = (String) document.getData().get("phoneNumber");
+                            String phoneNumber = (String) document.getData().get(FieldNames.PHONE_NUMBER.fieldName);
                             contactInfo.setPhoneNumber(phoneNumber);
                         }catch(NullPointerException e){
                             Log.d(TAG, "The contact info does not have an email");
