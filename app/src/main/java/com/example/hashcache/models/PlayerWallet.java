@@ -12,13 +12,16 @@ import java.util.HashMap;
  * Represents a list of the player's current scanned codes
  */
 public class PlayerWallet{
+    private static PlayerWallet INSTANCE;
     private HashMap<String, Image> scannableCodes;
     private int size;
+    private PlayersConnectionHandler playersConnectionHandler;
 
     public PlayerWallet(){
         this.size = 0;
         this.scannableCodes = new HashMap<String, Image>();
     }
+
 
     /**
      * Adds a scannable code to the player's collection without an image
@@ -27,6 +30,8 @@ public class PlayerWallet{
     public void addScannableCode(String scannableCodeId){
         this.scannableCodes.put(scannableCodeId, null);
     }
+
+
 
     /**
      * Adds a scannable code and its image to the player's collection

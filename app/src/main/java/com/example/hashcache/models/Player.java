@@ -6,6 +6,7 @@ import java.util.UUID;
  * Represents a user with an id, username, contact info, preferences, and scannable codes
  */
 public class Player{
+    private static Player INSTANCE;
     private String username;
     private ContactInfo contactInfo;
     private PlayerPreferences playerPreferences;
@@ -21,6 +22,7 @@ public class Player{
         this.playerPreferences = new PlayerPreferences();
         this.playerWallet = new PlayerWallet();
     }
+
 
     /**
      * Creates an object for an existing player
