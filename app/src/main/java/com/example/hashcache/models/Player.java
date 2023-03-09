@@ -1,7 +1,6 @@
 package com.example.hashcache.models;
 
 import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 
 import java.util.UUID;
 
@@ -43,34 +42,6 @@ public class Player{
         this.contactInfo = contactInfo;
         this.playerPreferences = playerPreferences;
         this.playerWallet = playerWallet;
-    }
-
-    /**
-     *
-     * @param username: the user name of the user.
-     */
-    public static boolean createInstance(String username) {
-       if(!PlayersConnectionHandler.getInstance().getInAppPlayerUserNames().contains(username)) {
-           INSTANCE = new Player(username);
-           return true;
-       } else {
-           // Put code to fetch from the database the user information
-           PlayersConnectionHandler.getInstance().getPlayer(username, new GetPlayerCallback() {
-               @Override
-               public void onCallback(Player player) {
-                   INSTANCE = player;
-               }
-           });
-           return true;
-       }
-    }
-
-    public static Player getInstance() {
-        if(INSTANCE == null) {
-            throw new IllegalArgumentException("INSTANCE is not defined");
-        }
-
-        return INSTANCE;
     }
 
     /**
