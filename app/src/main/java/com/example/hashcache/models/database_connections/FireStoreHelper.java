@@ -1,10 +1,10 @@
-package com.example.hashcache.database_connections.converters;
+package com.example.hashcache.models.database_connections;
 
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -17,6 +17,46 @@ import java.util.HashMap;
 
 public class FireStoreHelper {
     final String TAG = "Sample";
+
+    public void addBooleanFieldToDocument(DocumentReference documentReference, String key, boolean value,
+                                   BooleanCallback booleanCallback){
+        documentReference
+                .update(key, value)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                        booleanCallback.onCallback(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating document", e);
+                        booleanCallback.onCallback(false);
+                    }
+                });
+    }
+
+    public void addStringFieldToDocument(DocumentReference documentReference, String key, String value,
+                                          BooleanCallback booleanCallback){
+        documentReference
+                .update(key, value)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                        booleanCallback.onCallback(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating document", e);
+                        booleanCallback.onCallback(false);
+                    }
+                });
+    }
 
     public void setDocumentReference(DocumentReference documentReference,
                                      HashMap<String, String> data, BooleanCallback booleanCallback){

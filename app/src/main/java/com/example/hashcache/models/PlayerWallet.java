@@ -2,9 +2,6 @@ package com.example.hashcache.models;
 
 import android.media.Image;
 
-import com.example.hashcache.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.database_connections.callbacks.BooleanCallback;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 

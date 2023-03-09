@@ -1,4 +1,4 @@
-package com.example.hashcache.database_connections.values;
+package com.example.hashcache.models.database_connections.values;
 
 public enum FieldNames {
     GENERATED_NAME("generatedName"),
@@ -10,6 +10,7 @@ public enum FieldNames {
     EMAIL("email"),
     PHONE_NUMBER("phoneNumber"),
     RECORD_GEOLOCATION("recordGeoLocation"),
+    USER_ID("userId"),
     COMMENTATOR_ID("commentatorId");
 
     public final String fieldName;
