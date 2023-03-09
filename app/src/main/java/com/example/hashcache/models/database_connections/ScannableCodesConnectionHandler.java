@@ -38,6 +38,16 @@ public class ScannableCodesConnectionHandler {
     private FireStoreHelper fireStoreHelper;
     private static ScannableCodesConnectionHandler INSTANCE;
 
+    /**
+     * Constructor for the ScannableCodeConnectionHandler class which takes in dependencies
+     * @param scannableCodeDocumentConverter the instance of the ScannableCodeDocumentConverter
+     *                                       to use to convert documents to ScannableCode objects
+     * @param fireStoreHelper the instance of the FireStoreHelper class to use to perform
+     *                        common FireStore actions
+     * @param db the instance of the database to use to connect to the ScannableCodes collection
+     * @return ScannableCodesConnectionHandler.INSTANCE the newly created static instance of the
+     *          ScannableCodesConnectionHandler class
+     */
     private ScannableCodesConnectionHandler(ScannableCodeDocumentConverter
                                                     scannableCodeDocumentConverter, FireStoreHelper
                                                 fireStoreHelper, FirebaseFirestore db) {
@@ -59,9 +69,19 @@ public class ScannableCodesConnectionHandler {
         });
     }
 
-    /**
-     * Makes and gets the instance of the ScannableCodesConnectionHandler
-     * @return
+    /**\
+     * Makes and gets the static instance of the ScannableCodesConnectionHandler class with specific
+     * dependencies
+     * @param scannableCodeDocumentConverter the instance of the ScannableCodeDocumentConverter
+     *                                       to use to convert documents to ScannableCode objects
+     * @param fireStoreHelper the instance of the FireStoreHelper class to use to perform
+     *                        common FireStore actions
+     * @param db the instance of the database to use to connect to the ScannableCodes collection
+     * @return ScannableCodesConnectionHandler.INSTANCE the newly created static instance of the
+     *          ScannableCodesConnectionHandler class
+     *
+     * @throws IllegalArgumentException if the static instance of the ScannableCodesConnectionHandler
+     *                                  class has already been initialized
      */
     public static ScannableCodesConnectionHandler makeInstance(ScannableCodeDocumentConverter
                                                               scannableCodeDocumentConverter,
@@ -106,7 +126,7 @@ public class ScannableCodesConnectionHandler {
     }
 
     /**
-     * Add a scannable code to the database
+     * Add a scannable code to the scannableCodes collection in the Firestore database
      *
      * @param scannableCode   the scannable code to add to the database
      * @param booleanCallback the function to call back with once the addition has succeeded
@@ -120,6 +140,10 @@ public class ScannableCodesConnectionHandler {
             return;
         }
 
+        /**
+         * If a document with the id doesn't already exist, add it to the collection. Otherwise,
+         * throw an error
+         */
         fireStoreHelper.documentWithIDExists(collectionReference, scannableCode.getScannableCodeId(),
                 new BooleanCallback() {
                     @Override
@@ -134,6 +158,10 @@ public class ScannableCodesConnectionHandler {
                             data.put(FieldNames.GENERATED_NAME.fieldName, hashInfo.getGeneratedName());
                             data.put(FieldNames.GENERATED_SCORE.fieldName, Integer.toString(hashInfo.getGeneratedScore()));
 
+                            /**
+                             * Create a new document with the ScannableCode data and whose id is the
+                             * scannableCodeId, and put the document into the scannableCodes collection
+                             */
                             fireStoreHelper.setDocumentReference(collectionReference
                                     .document(scannableCode.getScannableCodeId()), data, new BooleanCallback() {
                                 @Override
@@ -165,6 +193,12 @@ public class ScannableCodesConnectionHandler {
                 });
     }
 
+    /**
+     * Creates the data map to put onto a scannableCode document
+     * @param comment the comment to convert into fields for a document
+     * @return commentData a HashMap which maps the comment values to field names that
+     * match the variable names
+     */
     private HashMap<String, String> getCommentData(Comment comment){
         HashMap<String, String> commentData = new HashMap<>();
         commentData.put(FieldNames.COMMENTATOR_ID.fieldName, comment.getCommentatorId());
@@ -199,7 +233,18 @@ public class ScannableCodesConnectionHandler {
         });
     }
 
+    /**
+     * Delete a comment from the database
+     * @param scannableCodeId the id of the scannable code that the comment belongs to
+     * @param commentId the id of the comment to delete
+     * @param booleanCallback the callback function to call once the operation is finished. Calls with
+     *                        true if the operation was successful, and false otherwise
+     * @throws IllegalArgumentException if no scannableCode exists with the given id
+     */
     public void deleteComment(String scannableCodeId, String commentId, BooleanCallback booleanCallback){
+        /**
+         * If the scananbleCode exists, then try to delete the comment from the collection
+         */
         fireStoreHelper.documentWithIDExists(collectionReference, scannableCodeId, new BooleanCallback() {
             @Override
             public void onCallback(Boolean isTrue) {
@@ -207,6 +252,10 @@ public class ScannableCodesConnectionHandler {
                     CollectionReference commentCollection = collectionReference
                                                             .document(scannableCodeId)
                                                             .collection(CollectionNames.COMMENTS.collectionName);
+
+                    /**
+                     * If a comment with the commentId exists, delete it from the collection
+                     */
                     fireStoreHelper.documentWithIDExists(commentCollection,commentId,
                             new BooleanCallback() {
                                 @Override
@@ -231,6 +280,8 @@ public class ScannableCodesConnectionHandler {
                                     }
                                 }
                             });
+                }else{
+                    throw new IllegalArgumentException("No such document with the given scannableCodeId exists!");
                 }
             }
         });
