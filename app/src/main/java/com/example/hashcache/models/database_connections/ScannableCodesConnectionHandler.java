@@ -38,12 +38,13 @@ public class ScannableCodesConnectionHandler {
     private FireStoreHelper fireStoreHelper;
     private static ScannableCodesConnectionHandler INSTANCE;
 
-    private ScannableCodesConnectionHandler() {
+    private ScannableCodesConnectionHandler(ScannableCodeDocumentConverter
+                                                    scannableCodeDocumentConverter, FireStoreHelper
+                                                fireStoreHelper, FirebaseFirestore db) {
         this.cachedScannableCodes = new HashMap<>();
-        this.scannableCodeDocumentConverter = new ScannableCodeDocumentConverter();
-        this.fireStoreHelper = new FireStoreHelper();
-
-        db = FirebaseFirestore.getInstance();
+        this.scannableCodeDocumentConverter = scannableCodeDocumentConverter;
+        this.fireStoreHelper = fireStoreHelper;
+        this.db = db;
 
         collectionReference = db.collection(CollectionNames.SCANNABLE_CODES.collectionName);
 
@@ -59,14 +60,33 @@ public class ScannableCodesConnectionHandler {
     }
 
     /**
-     * Gets the instance of the ScannableCodesConnectionHandler
+     * Makes and gets the instance of the ScannableCodesConnectionHandler
      * @return
+     */
+    public static ScannableCodesConnectionHandler makeInstance(ScannableCodeDocumentConverter
+                                                              scannableCodeDocumentConverter,
+                                                               FireStoreHelper fireStoreHelper,
+                                                               FirebaseFirestore db){
+        if(INSTANCE != null){
+            throw new IllegalArgumentException("ScannableCodesConnectionHandler INSTANCE" +
+                    "already exists!");
+        }
+
+        INSTANCE = new ScannableCodesConnectionHandler(scannableCodeDocumentConverter,
+                fireStoreHelper, db);
+        return INSTANCE;
+    }
+
+    /**
+     * Gets the current instance of the ScannableCodesConnectionHandler
+     * @return INSTANCE the current instance of the ScannableCodesConnectionHandler
+     * @throws IllegalArgumentException if the current INSTANCE hasn't been initialized
      */
     public static ScannableCodesConnectionHandler getInstance(){
         if(INSTANCE == null){
-            INSTANCE = new ScannableCodesConnectionHandler();
+            throw new IllegalArgumentException("ScannableCodesConnectionHandler INSTANCE does" +
+                    "not exist!");
         }
-
         return INSTANCE;
     }
 

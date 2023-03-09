@@ -52,14 +52,17 @@ public class PlayersConnectionHandler {
      * @param userNamesIds used to keep the app up to date on the current usernames
      *                             and their ids
      */
-    private PlayersConnectionHandler(HashMap<String, String> userNamesIds){
-        this.inAppUsernamesIds = userNamesIds;
+    private PlayersConnectionHandler(HashMap<String, String> inAppNamesIds,
+                                     PlayerDocumentConverter playerDocumentConverter,
+                                     FireStoreHelper fireStoreHelper,
+                                     FirebaseFirestore db, PlayerWalletConnectionHandler
+                                     playerWalletConnectionHandler){
+        this.inAppUsernamesIds = inAppNamesIds;
         this.cachedPlayers = new HashMap<>();
-        this.playerDocumentConverter = new PlayerDocumentConverter();
-        this.fireStoreHelper = new FireStoreHelper();
-        this.playerWalletConnectionHandler = new PlayerWalletConnectionHandler();
-
-        db = FirebaseFirestore.getInstance();
+        this.playerDocumentConverter = playerDocumentConverter;
+        this.fireStoreHelper = fireStoreHelper;
+        this.playerWalletConnectionHandler = playerWalletConnectionHandler;
+        this.db = db;
 
         collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
 
@@ -90,11 +93,16 @@ public class PlayersConnectionHandler {
         return INSTANCE;
     }
 
-    public static PlayersConnectionHandler makeInstance(HashMap<String, String> inAppNamesIds){
+    public static PlayersConnectionHandler makeInstance(HashMap<String, String> inAppNamesIds,
+                                                        PlayerDocumentConverter playerDocumentConverter,
+                                                        FireStoreHelper fireStoreHelper,
+                                                        FirebaseFirestore db, PlayerWalletConnectionHandler
+                                                        playerWalletConnectionHandler){
         if(INSTANCE != null){
             throw new IllegalArgumentException("Instance of PlayersConnectionHandler already exists!");
         }
-        INSTANCE = new PlayersConnectionHandler(inAppNamesIds);
+        INSTANCE = new PlayersConnectionHandler(inAppNamesIds, playerDocumentConverter,
+                fireStoreHelper, db, playerWalletConnectionHandler);
         return INSTANCE;
     }
 
@@ -197,6 +205,7 @@ public class PlayersConnectionHandler {
                                                 setPlayerPreferences(playerDocument, playerPreferences, new BooleanCallback() {
                                                     @Override
                                                     public void onCallback(Boolean isTrue) {
+                                                        cachedPlayers.put(player.getUsername(), player);
                                                         booleanCallback.onCallback(true);
                                                     }
                                                 });
@@ -273,7 +282,20 @@ public class PlayersConnectionHandler {
         }
 
         this.setUserName(this.collectionReference.document(inAppUsernamesIds.get(oldUsername)),
-                newUsername, booleanCallback);
+                newUsername, new BooleanCallback() {
+                    @Override
+                    public void onCallback(Boolean isTrue) {
+                        if(isTrue){
+                            if(cachedPlayers.containsKey(oldUsername)){
+                                cachedPlayers.put(newUsername, cachedPlayers.get(oldUsername));
+                                cachedPlayers.remove(oldUsername);
+                            }
+                            booleanCallback.onCallback(true);
+                        }else{
+                            booleanCallback.onCallback(false);
+                        }
+                    }
+                });
     }
 
     private void setUserId(DocumentReference playerDocument, String userId, BooleanCallback booleanCallback){

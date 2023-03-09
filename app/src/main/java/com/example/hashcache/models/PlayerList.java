@@ -1,5 +1,6 @@
 package com.example.hashcache.models;
 
+import com.example.hashcache.controllers.DependencyInjector;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
@@ -19,7 +20,8 @@ public class PlayerList {
     private PlayerList(){
         playerUserNames = new ArrayList<>();
         playerIdsNamesMapping = new HashMap<>();
-        playersConnectionHandler = PlayersConnectionHandler.makeInstance(playerIdsNamesMapping);
+        playersConnectionHandler = DependencyInjector
+                .makePlayersConnectionHandler(playerIdsNamesMapping);
     }
 
     private PlayerList(PlayersConnectionHandler playersConnectionHandler){

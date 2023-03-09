@@ -29,7 +29,6 @@ public class CodeLocationConnectionHandler {
     private CollectionReference collectionReference;
     private HashMap<String, CodeLocation> cachedCodeLocations;
     final String TAG = "Sample";
-    private PlayerDocumentConverter playerDocumentConverter;
     private FireStoreHelper fireStoreHelper;
     private CodeLocationDocumentConverter codeLocationDocumentConverter;
     private static CodeLocationConnectionHandler INSTANCE;
@@ -38,12 +37,13 @@ public class CodeLocationConnectionHandler {
      * Creates a connection to the CodeLocation collection in the database and keeps a cache
      * of the locations
      */
-    private CodeLocationConnectionHandler(){
+    private CodeLocationConnectionHandler(FireStoreHelper fireStoreHelper,
+                                          CodeLocationDocumentConverter codeLocationDocumentConverter,
+                                          FirebaseFirestore db){
         this.cachedCodeLocations = new HashMap<>();
-        this.fireStoreHelper = new FireStoreHelper();
-        this.codeLocationDocumentConverter = new CodeLocationDocumentConverter();
-
-        db = FirebaseFirestore.getInstance();
+        this.fireStoreHelper = fireStoreHelper;
+        this.codeLocationDocumentConverter = codeLocationDocumentConverter;
+        this.db = db;
 
         collectionReference = db.collection(CollectionNames.CODE_LOCATIONS.collectionName);
 
@@ -66,13 +66,28 @@ public class CodeLocationConnectionHandler {
         });
     }
 
+    public static CodeLocationConnectionHandler makeInstance(FireStoreHelper fireStoreHelper,
+                                                      CodeLocationDocumentConverter codeLocationDocumentConverter,
+                                                      FirebaseFirestore db){
+        if(INSTANCE != null){
+            throw new IllegalArgumentException("CodeLocationConnectionHandler INSTANCE already " +
+                    "exists!");
+        }
+
+        INSTANCE = new CodeLocationConnectionHandler(fireStoreHelper, codeLocationDocumentConverter,
+                db);
+
+        return INSTANCE;
+    }
+
     /**
      * Get the singleton instance of the CodeLocationConnectionHandler
      * @return INSTANCE the singleton instance of the CodeLocationConnectionHandler
      */
     public CodeLocationConnectionHandler getInstance(){
         if(INSTANCE == null){
-            INSTANCE = new CodeLocationConnectionHandler();
+            throw new IllegalArgumentException("CodeLocationConnectionHandler INSTANCE does" +
+                    "not exist!");
         }
 
         return INSTANCE;
@@ -96,6 +111,7 @@ public class CodeLocationConnectionHandler {
         final boolean[] codeLocationExists = new boolean[1];
 
         if(cachedCodeLocations.containsKey(id)){
+            booleanCallback.onCallback(false);
             return;
         }
 
@@ -114,7 +130,17 @@ public class CodeLocationConnectionHandler {
 
                     DocumentReference documentReference = collectionReference.document(id);
 
-                    fireStoreHelper.setDocumentReference(documentReference, data, booleanCallback);
+                    fireStoreHelper.setDocumentReference(documentReference, data, new BooleanCallback() {
+                        @Override
+                        public void onCallback(Boolean isTrue) {
+                            if(isTrue){
+                                cachedCodeLocations.put(codeLocation.getId(), codeLocation);
+                                booleanCallback.onCallback(true);
+                            }else{
+                                booleanCallback.onCallback(false);
+                            }
+                        }
+                    });
                 }else{
                     Log.e(TAG, "Code Location already exists!");
                     throw new IllegalArgumentException("Code location already exists!");

@@ -22,7 +22,7 @@ public class PlayerWalletConnectionHandler {
     final String TAG = "Sample";
     private FireStoreHelper fireStoreHelper;
 
-    protected PlayerWalletConnectionHandler(){
+    public PlayerWalletConnectionHandler(){
         this.fireStoreHelper = new FireStoreHelper();
     }
 
