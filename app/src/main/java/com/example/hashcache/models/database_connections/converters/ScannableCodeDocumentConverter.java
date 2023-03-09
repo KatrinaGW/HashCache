@@ -19,6 +19,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
+/**
+ * Handles the conversion between a DocumentReference and a ScannableCode object
+ */
 public class ScannableCodeDocumentConverter {
     final String TAG = "Sample";
 
