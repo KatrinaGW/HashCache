@@ -1,12 +1,11 @@
 package com.example.hashcache.models;
 
-import com.example.hashcache.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.database_connections.PlayersConnectionHandler;
-
-import org.checkerframework.checker.units.qual.A;
+import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Represents a container for all the players in game right now
@@ -14,11 +13,13 @@ import java.util.ArrayList;
 public class PlayerList {
     private static PlayerList INSTANCE;
     private ArrayList<String> playerUserNames;
+    private HashMap<String, String> playerIdsNamesMapping;
     private PlayersConnectionHandler playersConnectionHandler;
 
     private PlayerList(){
         playerUserNames = new ArrayList<>();
-        playersConnectionHandler = PlayersConnectionHandler.makeInstance(playerUserNames);
+        playerIdsNamesMapping = new HashMap<>();
+        playersConnectionHandler = PlayersConnectionHandler.makeInstance(playerIdsNamesMapping);
     }
 
     private PlayerList(PlayersConnectionHandler playersConnectionHandler){

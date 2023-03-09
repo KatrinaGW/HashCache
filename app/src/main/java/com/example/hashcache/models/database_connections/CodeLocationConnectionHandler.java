@@ -1,15 +1,14 @@
-package com.example.hashcache.database_connections;
+package com.example.hashcache.models.database_connections;
 
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.hashcache.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.database_connections.callbacks.GetCodeLocationCallback;
-import com.example.hashcache.database_connections.converters.CodeLocationDocumentConverter;
-import com.example.hashcache.database_connections.converters.FireStoreHelper;
-import com.example.hashcache.database_connections.converters.PlayerDocumentConverter;
-import com.example.hashcache.database_connections.values.CollectionNames;
+import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetCodeLocationCallback;
+import com.example.hashcache.models.database_connections.converters.CodeLocationDocumentConverter;
+import com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter;
+import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.models.CodeLocation;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;

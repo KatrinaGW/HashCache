@@ -1,17 +1,17 @@
-package com.example.hashcache.database_connections.converters;
+package com.example.hashcache.models.database_connections.converters;
 
 import android.media.Image;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.database_connections.callbacks.GetContactInfoCallback;
-import com.example.hashcache.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.database_connections.callbacks.GetPlayerPreferencesCallback;
-import com.example.hashcache.database_connections.callbacks.GetPlayerWalletCallback;
-import com.example.hashcache.database_connections.values.CollectionNames;
-import com.example.hashcache.database_connections.values.FieldNames;
-import com.example.hashcache.models.Comment;
+import com.example.hashcache.models.database_connections.callbacks.GetContactInfoCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerPreferencesCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerWalletCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
+import com.example.hashcache.models.database_connections.values.CollectionNames;
+import com.example.hashcache.models.database_connections.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
@@ -24,28 +24,31 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
-
 public class PlayerDocumentConverter {
     final String TAG = "Sample";
 
     public void getPlayerFromDocument(DocumentReference documentReference, GetPlayerCallback getPlayerCallback){
-        String username = documentReference.getId();
-        CollectionReference contactInfoReference = documentReference.collection(CollectionNames.CONTACT_INFO.collectionName);
-        getContactInfo(contactInfoReference, new GetContactInfoCallback() {
+        String userId = documentReference.getId();
+        getContactInfo(documentReference, new GetContactInfoCallback() {
             @Override
             public void onGetContactInfoCallback(ContactInfo contactInfo) {
-                getPlayerPreferences(documentReference
-                        .collection(CollectionNames.PLAYER_PREFERENCES.collectionName), new GetPlayerPreferencesCallback() {
+                getPlayerPreferences(documentReference, new GetPlayerPreferencesCallback() {
                     @Override
                     public void onCallback(PlayerPreferences playerPreferences) {
                         getPlayerWallet(documentReference.collection(CollectionNames.PLAYER_WALLET.collectionName),
                                 new GetPlayerWalletCallback() {
                                     @Override
                                     public void onCallback(PlayerWallet playerWallet) {
-                                        getPlayerCallback.onCallback(
-                                                new Player(username, contactInfo, playerPreferences,
-                                                        playerWallet));
+                                        getUserName(documentReference, new GetStringCallback() {
+                                            @Override
+                                            public void onCallback(String username) {
+                                                getPlayerCallback.onCallback(
+                                                        new Player(userId, username, contactInfo,
+                                                                playerPreferences, playerWallet));
+                                            }
+                                        });
+
+
                                     }
                                 });
                     }
@@ -53,6 +56,35 @@ public class PlayerDocumentConverter {
             }
         });
 
+    }
+
+    private void getUserName(DocumentReference documentReference, GetStringCallback
+                             getStringCallback){
+        String[] username = new String[1];
+
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        try{
+                            username[0] = (String) document.getData().get(FieldNames.USERNAME.fieldName);
+
+                            getStringCallback.onCallback(username[0]);
+                        }catch (NullPointerException e){
+                            Log.e(TAG, "User does not have a username!");
+                            getStringCallback.onCallback(username[0]);
+                        }
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 
     private void getPlayerWallet(CollectionReference collectionReference,
@@ -82,14 +114,11 @@ public class PlayerDocumentConverter {
                 });
     }
 
-    private void getPlayerPreferences(CollectionReference collectionReference,
+    private void getPlayerPreferences(DocumentReference documentReference,
                                       GetPlayerPreferencesCallback getPlayerPreferencesCallback){
         PlayerPreferences playerPreferences = new PlayerPreferences();
 
-        DocumentReference docRef = collectionReference.document(
-                CollectionNames.PLAYER_PREFERENCES.collectionName
-        );
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -116,12 +145,10 @@ public class PlayerDocumentConverter {
         });
     }
 
-    private void getContactInfo(CollectionReference collectionReference,
+    private void getContactInfo(DocumentReference playerDocument,
                                 GetContactInfoCallback getContactInfoCallback){
         ContactInfo contactInfo = new ContactInfo();
-
-        DocumentReference docRef = collectionReference.document("contactInfo");
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        playerDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -129,14 +156,14 @@ public class PlayerDocumentConverter {
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         try{
-                            String email = (String) document.getData().get("email");
+                            String email = (String) document.getData().get(FieldNames.EMAIL.fieldName);
                             contactInfo.setEmail(email);
                         }catch(NullPointerException e){
                             Log.d(TAG, "The contact info does not have an email");
                         }
 
                         try{
-                            String phoneNumber = (String) document.getData().get("phoneNumber");
+                            String phoneNumber = (String) document.getData().get(FieldNames.PHONE_NUMBER.fieldName);
                             contactInfo.setPhoneNumber(phoneNumber);
                         }catch(NullPointerException e){
                             Log.d(TAG, "The contact info does not have an email");
