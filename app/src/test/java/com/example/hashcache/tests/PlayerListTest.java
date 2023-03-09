@@ -45,13 +45,16 @@ public class PlayerListTest {
     void testAddPlayerSuccess(){
         when(mockPlayerConnectionHandler.getInAppPlayerUserNames()).thenReturn(names);
         doAnswer(invocation -> {
+            names.add(newPlayerUsername);
             return null;
-        }).when(mockPlayerConnectionHandler).addPlayer(mockPlayer, mockBooleanCallback);
+        }).when(mockPlayerConnectionHandler).addPlayer(any(Player.class), any(BooleanCallback.class));
 
         PlayerList playerList = PlayerList.getInstance(mockPlayerConnectionHandler);
 
         assertTrue(playerList.addPlayer(newPlayerUsername, mockBooleanCallback));
-        assertEquals(names.get(0), playerList.getPlayerUserNames().get(0));
+        verify(mockPlayerConnectionHandler, times(1)).addPlayer(any(Player.class),
+                any(BooleanCallback.class));
+        assertEquals(playerList.getPlayerUserNames().get(0), names.get(0));
     }
 
     @Test
