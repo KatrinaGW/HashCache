@@ -1,5 +1,7 @@
 package com.example.hashcache.models;
 
+import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
+
 import java.util.UUID;
 
 /**
