@@ -12,7 +12,6 @@ public class PlayerWallet{
     private static PlayerWallet INSTANCE;
     private HashMap<String, Image> scannableCodes;
     private int size;
-    private PlayersConnectionHandler playersConnectionHandler;
 
     public PlayerWallet(){
         this.size = 0;
