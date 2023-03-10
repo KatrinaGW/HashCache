@@ -2,74 +2,60 @@ package com.example.hashcache.tests;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.hashcache.models.Player;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter;
+import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database_connections.converters.ScannableCodeDocumentConverter;
 import com.example.hashcache.models.database_connections.values.CollectionNames;
-import com.example.hashcache.models.database_connections.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class PlayerDocumentConverterTest {
+public class ScannableCodeDocumentConverterTest {
 
-    private PlayerDocumentConverter getPlayerDocumentConverter(){
-        return new PlayerDocumentConverter();
+    private ScannableCodeDocumentConverter getScannableCodeDocumentConverter(){
+        return new ScannableCodeDocumentConverter();
     }
 
     @Test
-    void getPlayerFromDocumentTest(){
+    void getScannableCodeFromDocumentTest(){
         DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
         CollectionReference mockCollectionReference = Mockito.mock(CollectionReference.class);
-        String mockUserId = "123";
-        String mockEmail = "fakeEmail";
-        String mockPhoneNumber = "fakePhoneNumber";
-        String mockUsername = "name";
-        String mockGeolocationPreference = "true";
-        String mockScannableCodeId = "321";
-        Map<String, Object> mockData = new HashMap<>();
-        Map<String, Object> mockWalletData = new HashMap<>();
+        GetScannableCodeCallback mockGetScannableCodeCallback = Mockito.mock(GetScannableCodeCallback.class);
         Task<DocumentSnapshot> mockTask = Mockito.mock(Task.class);
-        Task<QuerySnapshot> mockQueryTask = Mockito.mock(Task.class);
         DocumentSnapshot mockDocumentSnapshot = Mockito.mock(DocumentSnapshot.class);
-        GetPlayerCallback mockGetPlayerCallback = Mockito.mock(GetPlayerCallback.class);
+        Task<QuerySnapshot> mockQueryTask = Mockito.mock(Task.class);
+        Map<String, Object> mockData = new HashMap<>();
 
         QuerySnapshot mockQuerySnapshot = Mockito.mock(QuerySnapshot.class);
         when(mockQuerySnapshot.size()).thenReturn(0);
 
-        mockData.put(FieldNames.EMAIL.fieldName, mockEmail);
-        mockData.put(FieldNames.PHONE_NUMBER.fieldName, mockPhoneNumber);
-        mockData.put(FieldNames.RECORD_GEOLOCATION.fieldName, mockGeolocationPreference);
-        mockData.put(FieldNames.USERNAME.fieldName, mockUsername);
-        mockWalletData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, mockScannableCodeId);
+        mockData.put("generatedScore", "123");
+        mockData.put("codeLocationId", "123");
+        mockData.put("generatedName", "codename");
 
-        when(mockDocumentReference.getId()).thenReturn(mockUserId);
         when(mockDocumentReference.get()).thenReturn(mockTask);
+        when(mockTask.isSuccessful()).thenReturn(true);
         when(mockTask.getResult()).thenReturn(mockDocumentSnapshot);
+        when(mockDocumentSnapshot.exists()).thenReturn(true);
         when(mockDocumentSnapshot.getData()).thenReturn(mockData);
-        when(mockDocumentReference.collection(CollectionNames.PLAYER_WALLET.collectionName))
-                .thenReturn(mockCollectionReference);
+        when(mockDocumentReference.getId()).thenReturn("222");
         when(mockCollectionReference.get()).thenReturn(mockQueryTask);
-        when(mockQueryTask.isSuccessful()).thenReturn(false);
+        when(mockQueryTask.isSuccessful()).thenReturn(true);
         when(mockQueryTask.getResult()).thenReturn(mockQuerySnapshot);
+        when(mockDocumentReference.collection(CollectionNames.COMMENTS.collectionName)).thenReturn(mockCollectionReference);
         doAnswer(invocation -> {
             OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
             onCompleteListener.onComplete(mockTask);
@@ -81,10 +67,9 @@ public class PlayerDocumentConverterTest {
             return mockQueryTask;
         }).when(mockQueryTask).addOnCompleteListener(any(OnCompleteListener.class));
 
-        PlayerDocumentConverter playerDocumentConverter = getPlayerDocumentConverter();
+        ScannableCodeDocumentConverter scannableCodeDocumentConverter = getScannableCodeDocumentConverter();
+        scannableCodeDocumentConverter.getScannableCodeFromDocument(mockDocumentReference, mockGetScannableCodeCallback);
 
-        playerDocumentConverter.getPlayerFromDocument(mockDocumentReference, mockGetPlayerCallback);
-
-        verify(mockGetPlayerCallback, times(1)).onCallback(any(Player.class));
+        verify(mockGetScannableCodeCallback, times(1)).onCallback(any(ScannableCode.class));
     }
 }

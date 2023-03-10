@@ -37,7 +37,6 @@ public class ScannableCodeDocumentConverter {
         String[] codeLocationId  = new String[1];
         String[] generatedName = new String[1];
         int[] generatedScore = new int[1];
-        final ArrayList<Comment> comments = new ArrayList<>();
 
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -45,7 +44,6 @@ public class ScannableCodeDocumentConverter {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         try{
                             scannableCodeId[0] = document.getId();
                             codeLocationId[0] = (String) document.getData().get("codeLocationId");
@@ -92,11 +90,14 @@ public class ScannableCodeDocumentConverter {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " => " + document.getData());
-                                comments.add(new Comment((String) document.getData().get("body"),
-                                        (String) document.getData().get("commentatorId")));
+                            if(task.getResult().size()>0){
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d(TAG, document.getId() + " => " + document.getData());
+                                    comments.add(new Comment((String) document.getData().get("body"),
+                                            (String) document.getData().get("commentatorId")));
+                                }
                             }
+
                             getCommentsCallback.onCallback(comments);
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());

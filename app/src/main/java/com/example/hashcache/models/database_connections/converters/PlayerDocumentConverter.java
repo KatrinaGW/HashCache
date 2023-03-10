@@ -36,7 +36,6 @@ public class PlayerDocumentConverter {
      * @param getPlayerCallback
      */
     public void getPlayerFromDocument(DocumentReference documentReference, GetPlayerCallback getPlayerCallback){
-        String userId = documentReference.getId();
         /**
          * Gets a player with everything but their PlayerWallet object
          */
@@ -51,9 +50,14 @@ public class PlayerDocumentConverter {
                     new GetPlayerWalletCallback() {
                         @Override
                         public void onCallback(PlayerWallet playerWallet) {
-                            getPlayerCallback.onCallback(new Player(player.getUserId(), player.getUsername(),
-                                    player.getContactInfo(), player.getPlayerPreferences(),
-                                    playerWallet));
+                            if(playerWallet != null){
+                                getPlayerCallback.onCallback(new Player(player.getUserId(), player.getUsername(),
+                                        player.getContactInfo(), player.getPlayerPreferences(),
+                                        playerWallet));
+                            }else{
+                                getPlayerCallback.onCallback(player);
+                            }
+
                         }
                     });
             }
@@ -71,26 +75,25 @@ public class PlayerDocumentConverter {
     private void getPlayerWallet(CollectionReference collectionReference,
                                  GetPlayerWalletCallback getPlayerWalletCallback){
         PlayerWallet playerWallet = new PlayerWallet();
-        collectionReference
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             String scannableCodeId;
                             Image scannableCodeImage;
 
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " => " + document.getData());
-                                scannableCodeId = (String) document.getData()
-                                        .get(FieldNames.SCANNABLE_CODE_ID.fieldName);
-                                //TODO: check for empty image and then add if it exists
-                                playerWallet.addScannableCode(scannableCodeId);
+                            if(task.getResult().size()>0){
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    scannableCodeId = (String) document.getData()
+                                            .get(FieldNames.SCANNABLE_CODE_ID.fieldName);
+                                    //TODO: check for empty image and then add if it exists
+                                    playerWallet.addScannableCode(scannableCodeId);
+                                }
                             }
+
                             getPlayerWalletCallback.onCallback(playerWallet);
                         } else {
                             getPlayerWalletCallback.onCallback(null);
-                            Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
                 });
@@ -112,7 +115,6 @@ public class PlayerDocumentConverter {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         try{
                             String email = (String) document.getData().get(FieldNames.EMAIL.fieldName);
                             contactInfo.setEmail(email);
@@ -151,7 +153,6 @@ public class PlayerDocumentConverter {
                     }
                 } else {
                     getPlayerCallback.onCallback(null);
-                    Log.d(TAG, "get failed with ", task.getException());
                 }
             }
         });

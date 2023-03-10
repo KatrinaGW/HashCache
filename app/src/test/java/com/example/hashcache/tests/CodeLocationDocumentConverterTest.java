@@ -83,7 +83,8 @@ public class CodeLocationDocumentConverterTest {
             OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
             onCompleteListener.onComplete(mockTask);
             return null;
-        }).when(mockTask).addOnCompleteListener(any(OnCompleteListener.class));        when(mockTask.isSuccessful()).thenReturn(true);
+        }).when(mockTask).addOnCompleteListener(any(OnCompleteListener.class));
+        when(mockTask.isSuccessful()).thenReturn(true);
         when(mockTask.getResult()).thenReturn(mockDocumentSnapshot);
         when(mockDocumentSnapshot.exists()).thenReturn(false);
 
