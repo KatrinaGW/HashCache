@@ -6,7 +6,7 @@ package com.example.hashcache.models;
 public class Coordinate {
     private double[] coordinates = new double[3];
 
-    public Coordinate(int x, int y, int z){
+    public Coordinate(double x, double y, double z){
         this.coordinates[0] = x;
         this.coordinates[1] = y;
         this.coordinates[2] = z;

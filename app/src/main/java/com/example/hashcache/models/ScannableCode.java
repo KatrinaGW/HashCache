@@ -7,17 +7,28 @@ import java.util.UUID;
  * Represents a QR or Hashcode that was scanned
  */
 public class ScannableCode{
-    private UUID scannableCodeId;
-    private CodeLocation codeLocation;
+    private String scannableCodeId;
+    private String codeLocationId;
     private HashInfo hashInfo;
     private ArrayList<Comment> comments;
 
-    public ScannableCode(CodeLocation codeLocation, HashInfo hashInfo){
-        this.codeLocation = codeLocation;
+    public ScannableCode(String codeLocationId, HashInfo hashInfo){
+        this.codeLocationId = codeLocationId;
         this.hashInfo = hashInfo;
-        this.scannableCodeId = UUID.randomUUID();
+        this.scannableCodeId = UUID.randomUUID().toString();
 
         this.comments = new ArrayList<>();
+    }
+
+    public ScannableCode(String id, String codeLocationId, HashInfo hashInfo, ArrayList<Comment> comments){
+        this.scannableCodeId = id;
+        this.codeLocationId = codeLocationId;
+        this.hashInfo = hashInfo;
+        this.comments = comments;
+    }
+
+    public ArrayList<Comment> getComments(){
+        return this.comments;
     }
 
     /**
@@ -30,10 +41,10 @@ public class ScannableCode{
 
     /**
      * Gets the location information from where the code was scanned
-     * @return codeLocation The object containing the information on where the code was scanned
+     * @return codeLocationId The id of the codelocation where this code was scanned
      */
-    public CodeLocation getCodeLocation(){
-        return this.codeLocation;
+    public String getCodeLocationId(){
+        return this.codeLocationId;
     }
 
     /**
@@ -44,4 +55,7 @@ public class ScannableCode{
         return this.hashInfo;
     }
 
+    public String getScannableCodeId() {
+        return scannableCodeId;
+    }
 }

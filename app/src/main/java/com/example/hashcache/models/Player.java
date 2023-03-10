@@ -6,19 +6,46 @@ import java.util.UUID;
  * Represents a user with an id, username, contact info, preferences, and scannable codes
  */
 public class Player{
-    private UUID playerId;
     private String username;
+    private String userId;
     private ContactInfo contactInfo;
     private PlayerPreferences playerPreferences;
     private PlayerWallet playerWallet;
 
-    //Constructor for new players only
+    /**
+     * Create a brand new player
+     * @param username the username for the new player
+     */
     public Player(String username){
-        this.playerId = UUID.randomUUID();
+        this.userId = UUID.randomUUID().toString();
         this.username = username;
         this.contactInfo = new ContactInfo();
         this.playerPreferences = new PlayerPreferences();
         this.playerWallet = new PlayerWallet();
+    }
+
+    /**
+     * Creates an object for an existing player
+     * @param username the username for the player
+     * @param contactInfo the contact information for the player
+     * @param playerPreferences the preferences for the player
+     * @param playerWallet the player's wallet of scannable codes
+     */
+    public Player(String userId, String username, ContactInfo contactInfo,
+                  PlayerPreferences playerPreferences, PlayerWallet playerWallet){
+        this.userId = userId;
+        this.username = username;
+        this.contactInfo = contactInfo;
+        this.playerPreferences = playerPreferences;
+        this.playerWallet = playerWallet;
+    }
+
+    /**
+     * Gets the userId for the user
+     * @return userId the user's id
+     */
+    public String getUserId(){
+        return this.userId;
     }
 
     /**
@@ -27,14 +54,6 @@ public class Player{
      */
     public void updateUserName(String newUserName){
         this.username = newUserName;
-    }
-
-    /**
-     * Gets the player's unique id
-     * @return playerId The player's unique id
-     */
-    public UUID getPlayerId(){
-        return this.playerId;
     }
 
     /**
