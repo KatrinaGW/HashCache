@@ -38,9 +38,9 @@ public class PlayerWalletConnectionHandler {
      *                        with true if the operation was successful, and false otherwise
      * @throws IllegalArgumentException if the PlayerWallet already has a scananbleCode with the given id
      */
-    protected void addScannableCodeDocument(CollectionReference playerWalletCollection,
-                                            String scannableCodeId, Image locationImage,
-                                            BooleanCallback booleanCallback){
+    public void addScannableCodeDocument(CollectionReference playerWalletCollection,
+                                         String scannableCodeId, Image locationImage,
+                                         BooleanCallback booleanCallback){
 
         fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId,
                 new BooleanCallback() {
@@ -102,7 +102,7 @@ public class PlayerWalletConnectionHandler {
      * @param booleanCallback the callback function to call once the operation has finished. Calls with
      *                        true if the operation was successful, and false otherwise
      */
-    protected void setPlayerWallet(PlayerWallet playerWallet, DocumentReference playerDocumentReference,
+    public void setPlayerWallet(PlayerWallet playerWallet, DocumentReference playerDocumentReference,
                                  BooleanCallback booleanCallback){
         ArrayList<String> scannableCodeIds = playerWallet.getScannedCodeIds();
 
@@ -127,8 +127,8 @@ public class PlayerWalletConnectionHandler {
      * @param booleanCallback the callback function to call once the operation has finished. Calls
      *                        with true if the operation was successful, and false otherwise
      */
-    protected void deleteScannableCodeFromWallet(CollectionReference playerWalletCollection,
-                                                 String scannableCodeId, BooleanCallback booleanCallback){
+    public void deleteScannableCodeFromWallet(CollectionReference playerWalletCollection,
+                                              String scannableCodeId, BooleanCallback booleanCallback){
         fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId,
                 new BooleanCallback() {
                     @Override

@@ -14,10 +14,7 @@ import com.example.hashcache.models.database_connections.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
-import com.example.hashcache.models.PlayerWallet;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -132,6 +129,14 @@ public class PlayersConnectionHandler {
         INSTANCE = new PlayersConnectionHandler(inAppNamesIds, playerDocumentConverter,
                 fireStoreHelper, db, playerWalletConnectionHandler);
         return INSTANCE;
+    }
+
+    /**
+     * Resets the static INSTANCE to null.
+     * Should only be used for test purposes
+     */
+    public static void resetInstance(){
+        INSTANCE = null;
     }
 
     /**
@@ -467,8 +472,8 @@ public class PlayersConnectionHandler {
      */
     public void playerScannedCodeAdded(String userId, String scannableCodeId,
                                        Image locationImage, BooleanCallback booleanCallback){
-        if(!this.inAppUsernamesIds.keySet().contains(userId)){
-            throw new IllegalArgumentException("Given username does not exist!");
+        if(!this.inAppUsernamesIds.containsValue(userId)){
+            throw new IllegalArgumentException("Given userId does not exist!");
         }
 
         CollectionReference scannedCodeCollection = collectionReference
@@ -490,8 +495,8 @@ public class PlayersConnectionHandler {
      */
     public void playerScannedCodeDeleted(String userId, String scannableCodeId,
                                          BooleanCallback booleanCallback){
-        if(!this.inAppUsernamesIds.keySet().contains(userId)){
-            throw new IllegalArgumentException("Given username does not exist!");
+        if(!this.inAppUsernamesIds.containsValue(userId)){
+            throw new IllegalArgumentException("Given userId does not exist!");
         }
 
         CollectionReference scannedCodeCollection = collectionReference
