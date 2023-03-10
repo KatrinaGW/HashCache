@@ -18,25 +18,37 @@ import com.google.firebase.firestore.DocumentReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Handles the database operations on a player's PlayerWallet collection
+ */
 public class PlayerWalletConnectionHandler {
     final String TAG = "Sample";
     private FireStoreHelper fireStoreHelper;
 
-    protected PlayerWalletConnectionHandler(){
+    public PlayerWalletConnectionHandler(){
         this.fireStoreHelper = new FireStoreHelper();
     }
 
-    protected void addScannableCodeDocument(CollectionReference playerWalletCollection,
-                                            String scannableCodeId, Image locationImage,
-                                            BooleanCallback booleanCallback){
+    /**
+     * Adds a scannableCode to an existing PlayerWallet collection
+     * @param playerWalletCollection the collection which contains a player's scananble codes
+     * @param scannableCodeId the id of the scannable code to add to the PlayerWallet collection
+     * @param locationImage the image of where the user scanned the code
+     * @param booleanCallback the callback function to call once the operation has finished. Calls
+     *                        with true if the operation was successful, and false otherwise
+     * @throws IllegalArgumentException if the PlayerWallet already has a scananbleCode with the given id
+     */
+    public void addScannableCodeDocument(CollectionReference playerWalletCollection,
+                                         String scannableCodeId, Image locationImage,
+                                         BooleanCallback booleanCallback){
 
         fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId,
                 new BooleanCallback() {
                     @Override
                     public void onCallback(Boolean isTrue) {
                         if(isTrue){
-                            throw new IllegalArgumentException("User has already scanned code" +
-                                    "with given ID!");
+                            throw new IllegalArgumentException("A document already exists in the " +
+                                    "PlayerWallet with the given scananbleCodeId!");
                         }
                         HashMap<String, String> scannableCodeIdData = new HashMap<>();
                         scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
@@ -52,6 +64,14 @@ public class PlayerWalletConnectionHandler {
                 });
     }
 
+    /**
+     * Recursively adds each scannableCode to a Player's PlayerWallet collection
+     * @param playerDocumentReference the DocumentReference of the player to add the ScannableCodes to
+     * @param playerWallet the PlayerWallet to pull the scannable codes from
+     * @param index the counter of how many of the scannable codes from the wallet have been added so far
+     * @param booleanCallback the callback function to call once all the scannable codes have been added.
+     *                        Only calls with true once all the codes have been added to the wallet
+     */
     private void addCodeToWallet(DocumentReference playerDocumentReference,
                                  PlayerWallet playerWallet, int index, BooleanCallback
                                          booleanCallback){
@@ -75,7 +95,14 @@ public class PlayerWalletConnectionHandler {
         }
     }
 
-    protected void setPlayerWallet(PlayerWallet playerWallet, DocumentReference playerDocumentReference,
+    /**
+     * Creates a PlayerWallet collection on a player's DocumentReference
+     * @param playerWallet the wallet of scannable codes to add to a new Collection on the DocumentReference
+     * @param playerDocumentReference the DocumentReference of the player to add the scannableCodes to
+     * @param booleanCallback the callback function to call once the operation has finished. Calls with
+     *                        true if the operation was successful, and false otherwise
+     */
+    public void setPlayerWallet(PlayerWallet playerWallet, DocumentReference playerDocumentReference,
                                  BooleanCallback booleanCallback){
         ArrayList<String> scannableCodeIds = playerWallet.getScannedCodeIds();
 
@@ -93,8 +120,15 @@ public class PlayerWalletConnectionHandler {
         }
     }
 
-    protected void deleteScannableCodeFromWallet(CollectionReference playerWalletCollection,
-                                                 String scannableCodeId, BooleanCallback booleanCallback){
+    /**
+     * Deletes a scannableCode from an existing PlayerWallet collection
+     * @param playerWalletCollection the collection which contains a player's scananble codes
+     * @param scannableCodeId the id of the scannable code to delete from the PlayerWallet collection
+     * @param booleanCallback the callback function to call once the operation has finished. Calls
+     *                        with true if the operation was successful, and false otherwise
+     */
+    public void deleteScannableCodeFromWallet(CollectionReference playerWalletCollection,
+                                              String scannableCodeId, BooleanCallback booleanCallback){
         fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId,
                 new BooleanCallback() {
                     @Override
@@ -119,8 +153,4 @@ public class PlayerWalletConnectionHandler {
                     }
                 });
     }
-
-
-
-
 }

@@ -14,7 +14,11 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.example.hashcache.controllers.AddUserCommand;
+import com.example.hashcache.controllers.DependencyInjector;
+import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.PlayerWallet;
+import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.PlayerList;
 import com.google.firebase.FirebaseApp;
@@ -63,10 +67,9 @@ public class MainActivity extends AppCompatActivity {
                     throw new IllegalArgumentException("Something went wrong while adding player");
                 }
                 Intent goHome = new Intent(MainActivity.this, AppHome.class);
+
                 startActivity(goHome);
             }
         });
-
-
     }
 }

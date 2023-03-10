@@ -1,5 +1,8 @@
 package com.example.hashcache.models.database_connections.values;
 
+/**
+ * Names of all the collections in the FireStore database
+ */
 public enum CollectionNames {
     PLAYERS("players"),
     CODE_LOCATIONS("codeLocations"),

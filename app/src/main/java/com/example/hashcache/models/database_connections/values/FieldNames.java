@@ -1,5 +1,8 @@
 package com.example.hashcache.models.database_connections.values;
 
+/**
+ * Names of all the fields in the Firestore database
+ */
 public enum FieldNames {
     GENERATED_NAME("generatedName"),
     GENERATED_SCORE("generatedScore"),

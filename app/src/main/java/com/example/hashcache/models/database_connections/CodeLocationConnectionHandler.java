@@ -22,28 +22,35 @@ import java.lang.reflect.Array;
 import java.util.HashMap;
 
 /**
- * Handles all calls to the Firebase ScannableCodes database
+ * Handles all calls to the Firebase CodeLocations database
  */
 public class CodeLocationConnectionHandler {
     private FirebaseFirestore db;
     private CollectionReference collectionReference;
     private HashMap<String, CodeLocation> cachedCodeLocations;
     final String TAG = "Sample";
-    private PlayerDocumentConverter playerDocumentConverter;
     private FireStoreHelper fireStoreHelper;
     private CodeLocationDocumentConverter codeLocationDocumentConverter;
     private static CodeLocationConnectionHandler INSTANCE;
 
     /**
      * Creates a connection to the CodeLocation collection in the database and keeps a cache
-     * of the locations
+     * of the recently accessed CodeLocations
+     *
+     * @param fireStoreHelper the instance of the FireStoreHelper class to call upon to perform
+     *                        common firestore actions
+     * @param codeLocationDocumentConverter the instance of the CodeLocationDocumentConverter to
+     *                                      use when converting a document to a CodeLocation object
+     * @param db the instance of the database to use to get connections to the CodeLocation collection
+     *           and its documents
      */
-    private CodeLocationConnectionHandler(){
+    private CodeLocationConnectionHandler(FireStoreHelper fireStoreHelper,
+                                          CodeLocationDocumentConverter codeLocationDocumentConverter,
+                                          FirebaseFirestore db){
         this.cachedCodeLocations = new HashMap<>();
-        this.fireStoreHelper = new FireStoreHelper();
-        this.codeLocationDocumentConverter = new CodeLocationDocumentConverter();
-
-        db = FirebaseFirestore.getInstance();
+        this.fireStoreHelper = fireStoreHelper;
+        this.codeLocationDocumentConverter = codeLocationDocumentConverter;
+        this.db = db;
 
         collectionReference = db.collection(CollectionNames.CODE_LOCATIONS.collectionName);
 
@@ -67,12 +74,42 @@ public class CodeLocationConnectionHandler {
     }
 
     /**
+     * Create the static instance of the CodeLocationConnectionHandler class
+     * @param fireStoreHelper the instance of the FireStoreHelper class to call upon to perform
+     *                        common firestore actions
+     * @param codeLocationDocumentConverter the instance of the CodeLocationDocumentConverter to
+     *                                      use when converting a document to a CodeLocation object
+     * @param db the instance of the database to use to get connections to the CodeLocation collection
+     *           and its documents
+     * @return CodeLocationConnectionHandler.INSTANCE the static instance of the CodeLocationConnectionHandler
+     * class to use for all actions concerning the CodeLocation database collection
+     *
+     * @throws IllegalArgumentException if the INSTANCE has already been initialized
+     */
+    public static CodeLocationConnectionHandler makeInstance(FireStoreHelper fireStoreHelper,
+                                                      CodeLocationDocumentConverter codeLocationDocumentConverter,
+                                                      FirebaseFirestore db){
+        if(INSTANCE != null){
+            throw new IllegalArgumentException("CodeLocationConnectionHandler INSTANCE already " +
+                    "exists!");
+        }
+
+        INSTANCE = new CodeLocationConnectionHandler(fireStoreHelper, codeLocationDocumentConverter,
+                db);
+
+        return INSTANCE;
+    }
+
+    /**
      * Get the singleton instance of the CodeLocationConnectionHandler
      * @return INSTANCE the singleton instance of the CodeLocationConnectionHandler
+     * @throws IllegalArgumentException if the CodeLocationConnectionHandler instance hasn't
+     * been initialized yet
      */
     public CodeLocationConnectionHandler getInstance(){
         if(INSTANCE == null){
-            INSTANCE = new CodeLocationConnectionHandler();
+            throw new IllegalArgumentException("CodeLocationConnectionHandler INSTANCE does" +
+                    "not exist!");
         }
 
         return INSTANCE;
@@ -96,9 +133,14 @@ public class CodeLocationConnectionHandler {
         final boolean[] codeLocationExists = new boolean[1];
 
         if(cachedCodeLocations.containsKey(id)){
+            booleanCallback.onCallback(false);
             return;
         }
 
+        /**
+         * Check if the a codeLocation document already exists with the given id, and add it
+         * to the collection if it doesn't
+         */
         fireStoreHelper.documentWithIDExists(collectionReference, id, new BooleanCallback() {
             @Override
             public void onCallback(Boolean isTrue) {
@@ -114,7 +156,22 @@ public class CodeLocationConnectionHandler {
 
                     DocumentReference documentReference = collectionReference.document(id);
 
-                    fireStoreHelper.setDocumentReference(documentReference, data, booleanCallback);
+                    /**
+                     * Add the document to the collection. If the operation is successful, cache
+                     * the codeLocation and call the callback function with a true value,
+                     * otherwise call the callback function with false.
+                     */
+                    fireStoreHelper.setDocumentReference(documentReference, data, new BooleanCallback() {
+                        @Override
+                        public void onCallback(Boolean isTrue) {
+                            if(isTrue){
+                                cachedCodeLocations.put(codeLocation.getId(), codeLocation);
+                                booleanCallback.onCallback(true);
+                            }else{
+                                booleanCallback.onCallback(false);
+                            }
+                        }
+                    });
                 }else{
                     Log.e(TAG, "Code Location already exists!");
                     throw new IllegalArgumentException("Code location already exists!");
@@ -137,6 +194,11 @@ public class CodeLocationConnectionHandler {
             getCodeLocationCallback.onCallback(codeLocation);
         }else {
             DocumentReference documentReference = collectionReference.document(id);
+
+            /**
+             * Get and cache a CodeLocation object from the document, and then call the
+             * callback function with it
+             */
             codeLocationDocumentConverter.getCodeLocationFromDocument(documentReference,
                     new GetCodeLocationCallback() {
                         @Override

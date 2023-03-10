@@ -24,21 +24,46 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+/**
+ * Handles the conversion between a DocumentReference and a PlayerObject
+ */
 public class PlayerDocumentConverter {
     final String TAG = "Sample";
 
+    /**
+     * Converts a DocumentReference into a PlayerObject
+     * @param documentReference
+     * @param getPlayerCallback
+     */
     public void getPlayerFromDocument(DocumentReference documentReference, GetPlayerCallback getPlayerCallback){
         String userId = documentReference.getId();
+        /**
+         * Get the ContactInfo object from the DocumentReference
+         */
         getContactInfo(documentReference, new GetContactInfoCallback() {
             @Override
             public void onGetContactInfoCallback(ContactInfo contactInfo) {
+                /**
+                 * Get the PlayerPreferences object from the DocumentReference after the previous
+                 * callback has finished
+                 */
                 getPlayerPreferences(documentReference, new GetPlayerPreferencesCallback() {
                     @Override
                     public void onCallback(PlayerPreferences playerPreferences) {
+                        /**
+                         * Get the PlayerWallet object from the Document reference, after the
+                         * previous callback has finished
+                         */
                         getPlayerWallet(documentReference.collection(CollectionNames.PLAYER_WALLET.collectionName),
                                 new GetPlayerWalletCallback() {
                                     @Override
                                     public void onCallback(PlayerWallet playerWallet) {
+                                        /**
+                                         * Get the username from the DocumentReference after the
+                                         * previous callback has finished, and then call the
+                                         * given callback function with the completed
+                                         * Player object
+                                         */
                                         getUserName(documentReference, new GetStringCallback() {
                                             @Override
                                             public void onCallback(String username) {
@@ -58,6 +83,12 @@ public class PlayerDocumentConverter {
 
     }
 
+    /**
+     * Get the username for a Player from a DocumentReference
+     * @param documentReference the DocumentReference to pull the username value from
+     * @param getStringCallback the callback function to call with the username. Calls with
+     *                          null if the username couldn't be found
+     */
     private void getUserName(DocumentReference documentReference, GetStringCallback
                              getStringCallback){
         String[] username = new String[1];
@@ -78,15 +109,24 @@ public class PlayerDocumentConverter {
                             getStringCallback.onCallback(username[0]);
                         }
                     } else {
+                        getStringCallback.onCallback(null);
                         Log.d(TAG, "No such document");
                     }
                 } else {
+                    getStringCallback.onCallback(null);
                     Log.d(TAG, "get failed with ", task.getException());
                 }
             }
         });
     }
 
+    /**
+     * Get the PlayerWallet object from the player's PlayerWallet collection
+     * @param collectionReference the PlayerWallet collection with the scannable code ids and their
+     *                            images in it
+     * @param getPlayerWalletCallback the callback function to call with the PlayerWallet object. Calls
+     *                                with null if the extraction is not successful
+     */
     private void getPlayerWallet(CollectionReference collectionReference,
                                  GetPlayerWalletCallback getPlayerWalletCallback){
         PlayerWallet playerWallet = new PlayerWallet();
@@ -108,12 +148,20 @@ public class PlayerDocumentConverter {
                             }
                             getPlayerWalletCallback.onCallback(playerWallet);
                         } else {
+                            getPlayerWalletCallback.onCallback(null);
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
                 });
     }
 
+    /**
+     * Get the PlayerPreferences object from the Player's DocumentReference
+     * @param documentReference the DocumentReference to get the PlayerPreferences from
+     * @param getPlayerPreferencesCallback the callback function to call with the created
+     *                                     PlayerPreferences object once it's been extracted. Calls
+     *                                     with null if the extraction is not successful
+     */
     private void getPlayerPreferences(DocumentReference documentReference,
                                       GetPlayerPreferencesCallback getPlayerPreferencesCallback){
         PlayerPreferences playerPreferences = new PlayerPreferences();
@@ -133,18 +181,28 @@ public class PlayerDocumentConverter {
 
                             getPlayerPreferencesCallback.onCallback(playerPreferences);
                         }catch (NullPointerException e){
+                            getPlayerPreferencesCallback.onCallback(null);
                             Log.e(TAG, "User does not have a recordGeolocation preference!");
                         }
                     } else {
+                        getPlayerPreferencesCallback.onCallback(null);
                         Log.d(TAG, "No such document");
                     }
                 } else {
+                    getPlayerPreferencesCallback.onCallback(null);
                     Log.d(TAG, "get failed with ", task.getException());
                 }
             }
         });
     }
 
+    /**
+     * Gets the ContactInfo object from the Player's DocumentReference
+     * @param playerDocument the DocumentReference of the player to extract the ContactInfo
+     *                       from
+     * @param getContactInfoCallback the callback function to call with the extracted ContactInfo
+     *                               object. Calls with null if the extraction is not successful
+     */
     private void getContactInfo(DocumentReference playerDocument,
                                 GetContactInfoCallback getContactInfoCallback){
         ContactInfo contactInfo = new ContactInfo();
@@ -171,9 +229,11 @@ public class PlayerDocumentConverter {
 
                         getContactInfoCallback.onGetContactInfoCallback(contactInfo);
                     } else {
+                        getContactInfoCallback.onGetContactInfoCallback(null);
                         Log.d(TAG, "No such document");
                     }
                 } else {
+                    getContactInfoCallback.onGetContactInfoCallback(null);
                     Log.d(TAG, "get failed with ", task.getException());
                 }
             }

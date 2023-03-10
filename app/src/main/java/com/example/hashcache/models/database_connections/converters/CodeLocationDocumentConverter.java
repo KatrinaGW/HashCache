@@ -13,14 +13,26 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.lang.reflect.Array;
 
+/**
+ * Handles the conversion between a DocumentReference and a CodeLocation
+ */
 public class CodeLocationDocumentConverter {
     final String TAG = "Sample";
 
+    /**
+     * Converts a DocumentReference into a CodeLocation object
+     * @param documentReference the DocumentReference to convert into a CodeLocation object
+     * @param getCodeLocationCallback the callback function to call with the created CodeLocation object
+     * @throws IllegalArgumentException if the document does not exist
+     */
     public void getCodeLocationFromDocument(DocumentReference documentReference,
                                                     GetCodeLocationCallback getCodeLocationCallback){
         double[] coordinates = new double[3];
         String[] locationName = new String[1];
 
+        /**
+         * If the document exists, convert it into a CodeLocation object
+         */
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -43,6 +55,7 @@ public class CodeLocationDocumentConverter {
                                     (Double) Array.get(coordinates, 2)));
                         }catch (NullPointerException e){
                             Log.e(TAG, "Code location missing fields!");
+                            getCodeLocationCallback.onCallback(null);
                         }
                     } else {
                         Log.d(TAG, "No such document");
@@ -50,6 +63,7 @@ public class CodeLocationDocumentConverter {
                     }
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
+                    getCodeLocationCallback.onCallback(null);
                 }
             }
         });
