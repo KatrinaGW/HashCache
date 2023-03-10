@@ -37,8 +37,10 @@ public class DependencyInjector {
      */
     public static PlayersConnectionHandler makePlayersConnectionHandler(HashMap<String,
             String> inAppUsernamesIds){
+        FireStoreHelper fireStoreHelper = new FireStoreHelper();
+
         return PlayersConnectionHandler.makeInstance(inAppUsernamesIds, new PlayerDocumentConverter(),
-                new FireStoreHelper(), FirebaseFirestore.getInstance(), new PlayerWalletConnectionHandler());
+                fireStoreHelper, FirebaseFirestore.getInstance(), new PlayerWalletConnectionHandler(fireStoreHelper));
     }
 
     /**

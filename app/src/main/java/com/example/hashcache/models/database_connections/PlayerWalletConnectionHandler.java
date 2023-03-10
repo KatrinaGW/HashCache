@@ -25,8 +25,8 @@ public class PlayerWalletConnectionHandler {
     final String TAG = "Sample";
     private FireStoreHelper fireStoreHelper;
 
-    public PlayerWalletConnectionHandler(){
-        this.fireStoreHelper = new FireStoreHelper();
+    public PlayerWalletConnectionHandler(FireStoreHelper fireStoreHelper){
+        this.fireStoreHelper = fireStoreHelper;
     }
 
     /**
