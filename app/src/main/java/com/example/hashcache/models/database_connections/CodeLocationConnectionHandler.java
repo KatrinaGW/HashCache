@@ -101,6 +101,14 @@ public class CodeLocationConnectionHandler {
     }
 
     /**
+     * Resets the static instance
+     * Should only be used for testing purposes
+     */
+    public static void resetInstance(){
+        INSTANCE = null;
+    }
+
+    /**
      * Get the singleton instance of the CodeLocationConnectionHandler
      * @return INSTANCE the singleton instance of the CodeLocationConnectionHandler
      * @throws IllegalArgumentException if the CodeLocationConnectionHandler instance hasn't
