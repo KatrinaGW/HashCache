@@ -35,11 +35,14 @@ public class FireStoreHelperTest {
         String mockKey = "key";
         boolean mockValue = true;
         Task<Void> mockTask = Mockito.mock(Task.class);
+        BooleanCallback mockBooleanCallback = Mockito.mock(BooleanCallback.class);
 
         doAnswer(invocation -> {
             return mockTask;
         }).when(mockDocumentReference).update(mockKey, mockValue);
         doAnswer(invocation -> {
+            OnSuccessListener onSuccessListener = invocation.getArgumentAt(0, OnSuccessListener.class);
+            onSuccessListener.onSuccess(any());
             return mockTask;
         }).when(mockTask).addOnSuccessListener(any(OnSuccessListener.class));
         doAnswer(invocation -> {
@@ -47,13 +50,11 @@ public class FireStoreHelperTest {
         }).when(mockTask).addOnFailureListener(any(OnFailureListener.class));
 
         FireStoreHelper fireStoreHelper = getFireStoreHelper();
-        fireStoreHelper.addBooleanFieldToDocument(mockDocumentReference, mockKey, mockValue,
-                new BooleanCallback() {
-                    @Override
-                    public void onCallback(Boolean isTrue) {
-                        assertTrue(isTrue);
-                    }
-                });
+        fireStoreHelper.addBooleanFieldToDocument(mockDocumentReference, mockKey, mockValue, mockBooleanCallback);
+
+        verify(mockTask, times(1)).addOnSuccessListener(any(OnSuccessListener.class));
+        verify(mockTask, times(1)).addOnFailureListener(any(OnFailureListener.class));
+        verify(mockBooleanCallback, times(1)).onCallback(true);
     }
 
     @Test
@@ -62,11 +63,14 @@ public class FireStoreHelperTest {
         String mockKey = "key";
         String mockValue = "StringValue";
         Task<Void> mockTask = Mockito.mock(Task.class);
+        BooleanCallback mockBooleanCallback = Mockito.mock(BooleanCallback.class);
 
         doAnswer(invocation -> {
             return mockTask;
         }).when(mockDocumentReference).update(mockKey, mockValue);
         doAnswer(invocation -> {
+            OnSuccessListener onSuccessListener = invocation.getArgumentAt(0, OnSuccessListener.class);
+            onSuccessListener.onSuccess(any());
             return mockTask;
         }).when(mockTask).addOnSuccessListener(any(OnSuccessListener.class));
         doAnswer(invocation -> {
@@ -74,24 +78,20 @@ public class FireStoreHelperTest {
         }).when(mockTask).addOnFailureListener(any(OnFailureListener.class));
 
         FireStoreHelper fireStoreHelper = getFireStoreHelper();
-        fireStoreHelper.addStringFieldToDocument(mockDocumentReference, mockKey, mockValue,
-                new BooleanCallback() {
-                    @Override
-                    public void onCallback(Boolean isTrue) {
-                        assertTrue(isTrue);
-                        verify(mockDocumentReference, times(1)).update(
-                                mockKey, mockValue
-                        );
-                    }
-                });
+        fireStoreHelper.addStringFieldToDocument(mockDocumentReference, mockKey, mockValue, mockBooleanCallback);
+
+        verify(mockTask, times(1)).addOnSuccessListener(any(OnSuccessListener.class));
+        verify(mockTask, times(1)).addOnFailureListener(any(OnFailureListener.class));
+        verify(mockBooleanCallback, times(1)).onCallback(true);
     }
 
     @Test
-    void setDocumentReferenceTest(){
+    void setDocumentReferenceFailureTest(){
         DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
         HashMap<String, String> mockData = new HashMap<>();
         mockData.put("A", "B");
         Task<Void> mockTask = Mockito.mock(Task.class);
+        BooleanCallback mockBooleanCallback = Mockito.mock(BooleanCallback.class);
 
         doAnswer(invocation -> {
             return mockTask;
@@ -100,18 +100,45 @@ public class FireStoreHelperTest {
             return mockTask;
         }).when(mockTask).addOnSuccessListener(any(OnSuccessListener.class));
         doAnswer(invocation -> {
+            OnFailureListener onFailureListener = invocation.getArgumentAt(0, OnFailureListener.class);
+            onFailureListener.onFailure(any(Exception.class));
             return null;
         }).when(mockTask).addOnFailureListener(any(OnFailureListener.class));
 
         FireStoreHelper fireStoreHelper = getFireStoreHelper();
-        fireStoreHelper.setDocumentReference(mockDocumentReference, mockData, new BooleanCallback() {
-            @Override
-            public void onCallback(Boolean isTrue) {
-                assertTrue(isTrue);
-                verify(mockDocumentReference, times(1)).set(mockData);
-            }
-        });
+        fireStoreHelper.setDocumentReference(mockDocumentReference, mockData, mockBooleanCallback);
 
+        verify(mockTask, times(1)).addOnSuccessListener(any(OnSuccessListener.class));
+        verify(mockTask, times(1)).addOnFailureListener(any(OnFailureListener.class));
+        verify(mockBooleanCallback, times(1)).onCallback(false);
+    }
+
+    @Test
+    void setDocumentReferenceSuccessTest(){
+        DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
+        HashMap<String, String> mockData = new HashMap<>();
+        mockData.put("A", "B");
+        Task<Void> mockTask = Mockito.mock(Task.class);
+        BooleanCallback mockBooleanCallback = Mockito.mock(BooleanCallback.class);
+
+        doAnswer(invocation -> {
+            return mockTask;
+        }).when(mockDocumentReference).set(mockData);
+        doAnswer(invocation -> {
+            return mockTask;
+        }).when(mockTask).addOnFailureListener(any(OnFailureListener.class));
+        doAnswer(invocation -> {
+            OnSuccessListener onSuccessListener = invocation.getArgumentAt(0, OnSuccessListener.class);
+            onSuccessListener.onSuccess(any());
+            return mockTask;
+        }).when(mockTask).addOnSuccessListener(any(OnSuccessListener.class));
+
+        FireStoreHelper fireStoreHelper = getFireStoreHelper();
+        fireStoreHelper.setDocumentReference(mockDocumentReference, mockData, mockBooleanCallback);
+
+        verify(mockTask, times(1)).addOnSuccessListener(any(OnSuccessListener.class));
+        verify(mockTask, times(1)).addOnFailureListener(any(OnFailureListener.class));
+        verify(mockBooleanCallback, times(1)).onCallback(true);
     }
 
     @Test
@@ -121,23 +148,23 @@ public class FireStoreHelperTest {
         DocumentSnapshot mockDocumentSnapshot = Mockito.mock(DocumentSnapshot.class);
         String mockId = "1";
         Task<DocumentSnapshot> mockTask = Mockito.mock(Task.class);
+        BooleanCallback mockBooleanCallback = Mockito.mock(BooleanCallback.class);
 
         when(mockTask.getResult()).thenReturn(mockDocumentSnapshot);
+        when(mockTask.isSuccessful()).thenReturn(true);
         when(mockDocumentSnapshot.exists()).thenReturn(true);
         when(mockCollectionReference.document(mockId)).thenReturn(mockDocumentReference);
         when(mockDocumentReference.get()).thenReturn(mockTask);
         doAnswer(invocation -> {
+            OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
+            onCompleteListener.onComplete(mockTask);
             return null;
         }).when(mockTask).addOnCompleteListener(any(OnCompleteListener.class));
 
         FireStoreHelper fireStoreHelper = getFireStoreHelper();
-        fireStoreHelper.documentWithIDExists(mockCollectionReference, mockId, new BooleanCallback() {
-            @Override
-            public void onCallback(Boolean isTrue) {
-                assertTrue(isTrue);
-                verify(mockDocumentSnapshot, times(1)).exists();
-            }
-        });
+        fireStoreHelper.documentWithIDExists(mockCollectionReference, mockId, mockBooleanCallback);
+
+        verify(mockBooleanCallback, times(1)).onCallback(true);
     }
 
     @Test
@@ -147,23 +174,23 @@ public class FireStoreHelperTest {
         DocumentSnapshot mockDocumentSnapshot = Mockito.mock(DocumentSnapshot.class);
         String mockId = "1";
         Task<DocumentSnapshot> mockTask = Mockito.mock(Task.class);
+        BooleanCallback mockBooleanCallback = Mockito.mock(BooleanCallback.class);
 
         when(mockTask.getResult()).thenReturn(mockDocumentSnapshot);
         when(mockDocumentSnapshot.exists()).thenReturn(false);
+        when(mockTask.isSuccessful()).thenReturn(false);
         when(mockCollectionReference.document(mockId)).thenReturn(mockDocumentReference);
         when(mockDocumentReference.get()).thenReturn(mockTask);
         doAnswer(invocation -> {
+            OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
+            onCompleteListener.onComplete(mockTask);
             return null;
         }).when(mockTask).addOnCompleteListener(any(OnCompleteListener.class));
 
         FireStoreHelper fireStoreHelper = getFireStoreHelper();
-        fireStoreHelper.documentWithIDExists(mockCollectionReference, mockId, new BooleanCallback() {
-            @Override
-            public void onCallback(Boolean isTrue) {
-                assertTrue(!isTrue);
-                verify(mockDocumentSnapshot, times(1)).exists();
-            }
-        });
+        fireStoreHelper.documentWithIDExists(mockCollectionReference, mockId, mockBooleanCallback);
+
+        verify(mockBooleanCallback, times(1)).onCallback(false);
     }
 }
 
