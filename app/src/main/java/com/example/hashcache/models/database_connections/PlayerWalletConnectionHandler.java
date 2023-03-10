@@ -93,6 +93,8 @@ public class PlayerWalletConnectionHandler {
                                             booleanCallback.onCallback(false);
                                         }
                                     });
+                        }else{
+                            throw new IllegalArgumentException("No scannable code exists with the given id!");
                         }
                     }
                 });

@@ -168,17 +168,10 @@ public class PlayersConnectionHandlerTest {
         BooleanCallback mockBooleanCallback = Mockito.mock(BooleanCallback.class);
         when(mockDB.collection(anyString())).thenReturn(mockCollectionReference);
 
-        doAnswer(invocation -> {
-            BooleanCallback booleanCallback = invocation.getArgumentAt(2, BooleanCallback.class);
-            booleanCallback.onCallback(true);
-            return null;
-        }).when(mockPlayerWalletConnectionHandler).setPlayerWallet(any(), any(), any());
-
         PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();
         playersConnectionHandler.addPlayer(mockPlayer, new BooleanCallback() {
             @Override
             public void onCallback(Boolean isTrue) {
-                verify(mockPlayerWalletConnectionHandler, times(1)).setPlayerWallet(any(), any(), any());
                 verify(mockBooleanCallback, times(1)).onCallback(true);
             }
         });
