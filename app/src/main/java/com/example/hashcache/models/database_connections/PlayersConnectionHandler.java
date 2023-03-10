@@ -141,7 +141,6 @@ public class PlayersConnectionHandler {
                                         public void onCallback(Player player) {
                                             cachedPlayers.put(userName, player);
                                             Log.d(TAG, "FIND DONE");
-                                            // Here they pass us the player
                                             getPlayerCallback.onCallback(player);
                                         }
                                     });
