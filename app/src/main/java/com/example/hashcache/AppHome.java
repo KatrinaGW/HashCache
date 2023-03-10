@@ -15,9 +15,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
+
+import com.example.hashcache.models.Player;
 
 public class AppHome extends AppCompatActivity {
 
@@ -26,6 +29,8 @@ public class AppHome extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_home);
 
+        TextView playerName = findViewById(R.id.username_textview);
+        playerName.setText(Player.getInstance().getUsername());
         // add functionality to logo button
         ImageButton logoButton = findViewById(R.id.logo_button);
         logoButton.setOnClickListener(new View.OnClickListener() {
