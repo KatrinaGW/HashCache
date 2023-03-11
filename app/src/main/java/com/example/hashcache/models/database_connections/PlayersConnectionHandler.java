@@ -152,6 +152,28 @@ public class PlayersConnectionHandler {
     }
 
     /**
+     * Returns a boolean CompletableFuture indicating if the username exists or not.
+     *
+     * @param username the username to use to pull the player with
+     */
+
+    public CompletableFuture<Boolean> usernameExists(String username){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            Query docRef = collectionReference.whereEqualTo(FieldNames.USERNAME.fieldName, username).limit(1);
+            docRef.get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    QuerySnapshot document = task.getResult();
+                        cf.complete(!document.isEmpty());
+                }
+                else{
+                    cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+                }
+            });
+        });
+        return cf;
+    }
+    /**
      * Gets a Player with a given username from the Players database
      *
      * @param userName the username to use to pull the player with
