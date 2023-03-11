@@ -173,6 +173,29 @@ public class PlayersConnectionHandler {
         });
         return cf;
     }
+    public CompletableFuture<String> getPlayerIdByUsername(String username){
+        CompletableFuture<String> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            Query docRef = collectionReference.whereEqualTo(FieldNames.USERNAME.fieldName, username).limit(1);
+            docRef.get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    QuerySnapshot document = task.getResult();
+                    if(!document.isEmpty()){
+                        DocumentSnapshot doc = document.getDocuments().get(0);
+                        String id = (String) doc.getData().get(FieldNames.USER_ID.fieldName);
+                        cf.complete(id);
+                    }
+                    else{
+                        cf.completeExceptionally(new Exception("Username does not exist."));
+                    }
+                }
+                else{
+                    cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+                }
+            });
+        });
+        return cf;
+    }
     /**
      * Gets a Player with a given username from the Players database
      *
