@@ -6,8 +6,10 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerWalletCallback;
 import com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter;
 import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.models.database_connections.values.FieldNames;
@@ -22,6 +24,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -29,6 +32,8 @@ import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * Handles all calls to the Firebase Players database
