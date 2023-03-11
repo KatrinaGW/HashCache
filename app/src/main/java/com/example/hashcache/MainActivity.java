@@ -9,12 +9,14 @@ package com.example.hashcache;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
 import com.example.hashcache.controllers.AddUserCommand;
 import com.example.hashcache.controllers.DependencyInjector;
+import com.example.hashcache.controllers.HashInfoGenerator;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
@@ -23,6 +25,9 @@ import com.example.hashcache.models.database_connections.callbacks.BooleanCallba
 import com.example.hashcache.models.PlayerList;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+
+import java.io.InputStream;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,12 +56,19 @@ public class MainActivity extends AppCompatActivity {
         AppCompatButton startButton = findViewById(R.id.start_button);
         usernameEditText = findViewById(R.id.username_edittext);
 
+        // Gets input stream to names.csv which is used for name generation
+        InputStream is;
+        is = getResources().openRawResource(R.raw.names);
+        HashInfoGenerator.NameGenerator.getNames(is);
+
+
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onStartCachingClicked();
             }
         });
+
     }
 
     private void onStartCachingClicked(){
