@@ -1,6 +1,7 @@
 package com.example.hashcache.controllers;
 
 import com.example.hashcache.models.Player;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database.PlayerDatabase;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.PlayerList;
@@ -15,12 +16,12 @@ public class AddUserCommand {
 
     public CompletableFuture<Void> loginUser(String userName){
         CompletableFuture<Void> cf = new CompletableFuture<>();
-        PlayerDatabase.getInstance().usernameExists(userName).thenAccept(exists -> {
+        Database.getInstance().usernameExists(userName).thenAccept(exists -> {
             if(exists){
                 setupUser(userName, cf);
             }
             else{
-                PlayerDatabase.getInstance().createPlayer(userName).thenAccept(result -> {
+                Database.getInstance().createPlayer(userName).thenAccept(result -> {
                     setupUser(userName, cf);
                 }).exceptionally(new Function<Throwable, Void>() {
                     @Override
@@ -35,8 +36,8 @@ public class AddUserCommand {
     }
 
     private void setupUser(String userName, CompletableFuture<Void> cf) {
-        PlayerDatabase.getInstance().getIdByUsername(userName).thenAccept(userId -> {
-            PlayerDatabase.getInstance().getPlayer(userId).thenAccept(player -> {
+        Database.getInstance().getIdByUsername(userName).thenAccept(userId -> {
+            Database.getInstance().getPlayer(userId).thenAccept(player -> {
                 AppStore.get().setCurrentPlayer(player);
                 cf.complete(null);
             }).exceptionally(new Function<Throwable, Void>() {

@@ -5,21 +5,22 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.IPlayerDatabase;
-import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.store.AppStore;
 
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-public class PlayerDatabase implements IPlayerDatabase {
+public class TestPlayerDatabase implements IPlayerDatabase {
 
     private static PlayerDatabase instance;
     private HashMap<String, Player> players;
     private HashMap<String, String> userNameToIdMapper;
     private HashMap<String, ScannableCode> scannableCodeHashMap;
 
+    public TestPlayerDatabase(){
+        userNameToIdMapper = new HashMap<>();
+        players = new HashMap<>();
+        scannableCodeHashMap = new HashMap<>();
+    }
     @Override
     public CompletableFuture<Boolean> usernameExists(String username) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
@@ -52,7 +53,7 @@ public class PlayerDatabase implements IPlayerDatabase {
     public CompletableFuture<Void> createPlayer(String username) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            if(!instance.userNameToIdMapper.containsKey(username)){
+            if(!userNameToIdMapper.containsKey(username)){
                 Player p = new Player(username);
                 userNameToIdMapper.put(username, p.getUserId());
                 players.put(p.getUserId(), p);

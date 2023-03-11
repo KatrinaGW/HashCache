@@ -20,6 +20,8 @@ public interface IPlayerDatabase {
     CompletableFuture<Player> getPlayer(String userId);
     CompletableFuture<HashMap<String, String>> getPlayers();
 
+    CompletableFuture<Integer> getTotalScore(String userId);
+
     CompletableFuture<Void> addComment(String scannableCodeId, Comment comment);
 
     CompletableFuture<Void> updatePlayerPreferences(String userId, PlayerPreferences playerPreferences);
