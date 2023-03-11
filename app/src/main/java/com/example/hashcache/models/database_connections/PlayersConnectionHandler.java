@@ -425,7 +425,7 @@ public class PlayersConnectionHandler {
      *                        with the userId if the operation was successful, and null otherwise
      * @throws IllegalArgumentException if there already is a document with the given userId
      */
-    private void createPlayer(String username, GetStringCallback getStringCallback){
+    public void createPlayer(String username, GetStringCallback getStringCallback){
         HashMap<String, String> usernameData = new HashMap<>();
         usernameData.put(FieldNames.USERNAME.fieldName, username);
         String userId = UUID.randomUUID().toString();

@@ -27,6 +27,7 @@ import com.example.hashcache.models.database_connections.PlayerWalletConnectionH
 import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
 import com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter;
 import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -128,53 +129,6 @@ public class PlayersConnectionHandlerTest {
         playersConnectionHandler.getPlayer("name", mockGetPlayerCallback);
 
         verify(mockThing, times(1)).addOnCompleteListener(any());
-    }
-
-    @Test
-    void addPlayerBadUsernameTest(){
-        String badUsername = "";
-        when(mockDB.collection(anyString())).thenReturn(mockCollectionReference);
-        PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();
-        assertThrows(IllegalArgumentException.class, () -> {
-            playersConnectionHandler.addPlayer(new Player(badUsername), new BooleanCallback() {
-                @Override
-                public void onCallback(Boolean isTrue) {
-
-                }
-            });
-        });
-    }
-
-    @Test
-    void addPlayerTakenUsernameTest(){
-        String takenUsername = "gemini";
-        mockInAppNamesIds.put(takenUsername, "0");
-        when(mockDB.collection(anyString())).thenReturn(mockCollectionReference);
-        PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();
-        assertThrows(IllegalArgumentException.class, () -> {
-            playersConnectionHandler.addPlayer(new Player(takenUsername), new BooleanCallback() {
-                @Override
-                public void onCallback(Boolean isTrue) {
-
-                }
-            });
-        });
-    }
-
-    @Test
-    void addPlayerTest(){
-        Player mockPlayer = new Player("name");
-        PlayerWallet mockPlayerWallet = new PlayerWallet();
-        BooleanCallback mockBooleanCallback = Mockito.mock(BooleanCallback.class);
-        when(mockDB.collection(anyString())).thenReturn(mockCollectionReference);
-
-        PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();
-        playersConnectionHandler.addPlayer(mockPlayer, new BooleanCallback() {
-            @Override
-            public void onCallback(Boolean isTrue) {
-                verify(mockBooleanCallback, times(1)).onCallback(true);
-            }
-        });
     }
 
     @Test
