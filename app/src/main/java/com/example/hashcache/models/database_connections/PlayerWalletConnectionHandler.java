@@ -25,8 +25,8 @@ public class PlayerWalletConnectionHandler {
     final String TAG = "Sample";
     private FireStoreHelper fireStoreHelper;
 
-    public PlayerWalletConnectionHandler(){
-        this.fireStoreHelper = new FireStoreHelper();
+    public PlayerWalletConnectionHandler(FireStoreHelper fireStoreHelper){
+        this.fireStoreHelper = fireStoreHelper;
     }
 
     /**
@@ -65,62 +65,6 @@ public class PlayerWalletConnectionHandler {
     }
 
     /**
-     * Recursively adds each scannableCode to a Player's PlayerWallet collection
-     * @param playerDocumentReference the DocumentReference of the player to add the ScannableCodes to
-     * @param playerWallet the PlayerWallet to pull the scannable codes from
-     * @param index the counter of how many of the scannable codes from the wallet have been added so far
-     * @param booleanCallback the callback function to call once all the scannable codes have been added.
-     *                        Only calls with true once all the codes have been added to the wallet
-     */
-    private void addCodeToWallet(DocumentReference playerDocumentReference,
-                                 PlayerWallet playerWallet, int index, BooleanCallback
-                                         booleanCallback){
-        if(index == playerWallet.getSize()){
-            booleanCallback.onCallback(true);
-        }else{
-            String scannableCodeId = playerWallet.getScannedCodeIds().get(index);
-            Image scannableCodeImage = playerWallet.getScannableCodeLocationImage(scannableCodeId);
-
-            addScannableCodeDocument(playerDocumentReference.collection(CollectionNames
-                            .PLAYER_WALLET
-                            .collectionName
-                    ),
-                    scannableCodeId, scannableCodeImage, new BooleanCallback() {
-                        @Override
-                        public void onCallback(Boolean isTrue) {
-                            addCodeToWallet(playerDocumentReference, playerWallet,
-                                    index+1, booleanCallback);
-                        }
-                    });
-        }
-    }
-
-    /**
-     * Creates a PlayerWallet collection on a player's DocumentReference
-     * @param playerWallet the wallet of scannable codes to add to a new Collection on the DocumentReference
-     * @param playerDocumentReference the DocumentReference of the player to add the scannableCodes to
-     * @param booleanCallback the callback function to call once the operation has finished. Calls with
-     *                        true if the operation was successful, and false otherwise
-     */
-    public void setPlayerWallet(PlayerWallet playerWallet, DocumentReference playerDocumentReference,
-                                 BooleanCallback booleanCallback){
-        ArrayList<String> scannableCodeIds = playerWallet.getScannedCodeIds();
-
-        if(scannableCodeIds.size()>0){
-            addCodeToWallet(playerDocumentReference, playerWallet, 0, new BooleanCallback() {
-                @Override
-                public void onCallback(Boolean isTrue) {
-                    if(isTrue){
-                        booleanCallback.onCallback(true);
-                    }
-                }
-            });
-        }else{
-            booleanCallback.onCallback(true);
-        }
-    }
-
-    /**
      * Deletes a scannableCode from an existing PlayerWallet collection
      * @param playerWalletCollection the collection which contains a player's scananble codes
      * @param scannableCodeId the id of the scannable code to delete from the PlayerWallet collection
@@ -149,6 +93,8 @@ public class PlayerWalletConnectionHandler {
                                             booleanCallback.onCallback(false);
                                         }
                                     });
+                        }else{
+                            throw new IllegalArgumentException("No scannable code exists with the given id!");
                         }
                     }
                 });

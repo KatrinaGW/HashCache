@@ -228,70 +228,57 @@ public class PlayersConnectionHandler {
         if(inAppUsernamesIds.keySet().contains(username)){
             throw new IllegalArgumentException("Username taken!");
         }
-
         /**
-         * Creates the PlayerWallet collection for the document
+         * Sets the id on the document as the userId
+         * @param isTrue indicates if setting the PlayerWallet was successful
          */
-        playerWalletConnectionHandler.setPlayerWallet(player.getPlayerWallet(),
-                collectionReference.document(userId), new BooleanCallback() {
+        setUserId(userId, new BooleanCallback() {
             /**
-             * Sets the id on the document as the userId
-             * @param isTrue indicates if setting the PlayerWallet was successful
+             * Sets the username on the document
+             * @param isTrue indicates if setting the userId was successful
              */
             @Override
-            public void onCallback(Boolean isTrue) {
-                setUserId(userId, new BooleanCallback() {
+            public void onCallback(Boolean isTrue)
+            {
+                setUserName(collectionReference.document(userId),username, new BooleanCallback() {
+
                     /**
-                     * Sets the username on the document
-                     * @param isTrue indicates if setting the userId was successful
+                     * Sets the contact information on the document
+                     * @param isTrue indicates if setting the username was successful
                      */
                     @Override
-                    public void onCallback(Boolean isTrue)
-                    {
-                        setUserName(collectionReference.document(userId),username, new BooleanCallback() {
-
-                            /**
-                             * Sets the contact information on the document
-                             * @param isTrue indicates if setting the username was successful
-                             */
-                            @Override
-                            public void onCallback(Boolean isTrue) {
-                                if (isTrue) {
-                                    DocumentReference playerDocument = collectionReference.document(userId);
-                                    setContactInfo(playerDocument, contactInfo, new BooleanCallback() {
-                                        /**
-                                         * Sets the player preferences on the document
-                                         * @param isTrue indicates if setting the contact information
-                                         *               was successful
-                                         */
-                                        @Override
-                                        public void onCallback(Boolean isTrue) {
-                                            if (isTrue) {
-                                                setPlayerPreferences(playerDocument, playerPreferences, new BooleanCallback() {
-                                                    /**
-                                                     * Caches the created player and calls the given callback function with
-                                                     * the success of the player creation
-                                                     * @param isTrue indicates if setting the player preferences was successful
-                                                     */
-                                                    @Override
-                                                    public void onCallback(Boolean isTrue) {
-                                                        cachedPlayers.put(player.getUsername(), player);
-                                                        booleanCallback.onCallback(isTrue);
-                                                    }
-                                                });
+                    public void onCallback(Boolean isTrue) {
+                        if (isTrue) {
+                            DocumentReference playerDocument = collectionReference.document(userId);
+                            setContactInfo(playerDocument, contactInfo, new BooleanCallback() {
+                                /**
+                                 * Sets the player preferences on the document
+                                 * @param isTrue indicates if setting the contact information
+                                 *               was successful
+                                 */
+                                @Override
+                                public void onCallback(Boolean isTrue) {
+                                    if (isTrue) {
+                                        setPlayerPreferences(playerDocument, playerPreferences, new BooleanCallback() {
+                                            /**
+                                             * Caches the created player and calls the given callback function with
+                                             * the success of the player creation
+                                             * @param isTrue indicates if setting the player preferences was successful
+                                             */
+                                            @Override
+                                            public void onCallback(Boolean isTrue) {
+                                                cachedPlayers.put(player.getUsername(), player);
+                                                booleanCallback.onCallback(isTrue);
                                             }
-                                        }
-                                    });
+                                        });
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 });
-
             }
         });
-
-
     }
 
     /**

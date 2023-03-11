@@ -39,7 +39,6 @@ public class CodeLocationDocumentConverter {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         try{
                             locationName[0] = (String) document.getData().get("name");
                             Array.set(coordinates, 0,
@@ -54,15 +53,12 @@ public class CodeLocationDocumentConverter {
                                     (Double) Array.get(coordinates, 1),
                                     (Double) Array.get(coordinates, 2)));
                         }catch (NullPointerException e){
-                            Log.e(TAG, "Code location missing fields!");
                             getCodeLocationCallback.onCallback(null);
                         }
                     } else {
-                        Log.d(TAG, "No such document");
                         throw new IllegalArgumentException("Codelocation does not exist");
                     }
                 } else {
-                    Log.d(TAG, "get failed with ", task.getException());
                     getCodeLocationCallback.onCallback(null);
                 }
             }

@@ -36,14 +36,12 @@ public class FireStoreHelper {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "DocumentSnapshot successfully updated!");
                         booleanCallback.onCallback(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error updating document", e);
                         booleanCallback.onCallback(false);
                     }
                 });
@@ -64,14 +62,12 @@ public class FireStoreHelper {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "DocumentSnapshot successfully updated!");
                         booleanCallback.onCallback(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error updating document", e);
                         booleanCallback.onCallback(false);
                     }
                 });
@@ -91,14 +87,12 @@ public class FireStoreHelper {
                     @Override
                     public void onSuccess(Void aVoid) {
                         booleanCallback.onCallback(true);
-                        Log.d(TAG, "Data has been added successfully!");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         booleanCallback.onCallback(false);
-                        Log.d(TAG, "Data could not be added!" + e.toString());
                     }
                 });
     }
@@ -121,17 +115,14 @@ public class FireStoreHelper {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Log.d(TAG, "Document exists!");
-
                         exists[0] = true;
                         booleanCallback.onCallback(exists[0]);
                     } else {
-                        Log.d(TAG, "Document does not exist! " + id);
                         exists[0] = false;
                         booleanCallback.onCallback(exists[0]);
                     }
                 } else {
-                    Log.d(TAG, "Failed with: ", task.getException());
+                    booleanCallback.onCallback(false);
                 }
             }
         });

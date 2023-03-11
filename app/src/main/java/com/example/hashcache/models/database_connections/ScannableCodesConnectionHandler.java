@@ -111,6 +111,13 @@ public class ScannableCodesConnectionHandler {
     }
 
     /**
+     * Resets the static instance - should only be used for testing purposes
+     */
+    public static void resetInstance(){
+        INSTANCE = null;
+    }
+
+    /**
      * Gets a scannable code from the database with a specific id
      *
      * @param scannableCodeId          the id of the scannable code to get
@@ -133,7 +140,6 @@ public class ScannableCodesConnectionHandler {
      * @throws IllegalArgumentException when there already exists a scannable code with the given id
      */
     public void addScannableCode(ScannableCode scannableCode, BooleanCallback booleanCallback) {
-        System.out.println("B");
         if (this.cachedScannableCodes.containsKey(scannableCode.getScannableCodeId())) {
             Log.d(TAG, "scannable code already exists with given id!");
             booleanCallback.onCallback(false);
@@ -187,9 +193,7 @@ public class ScannableCodesConnectionHandler {
                         } else {
                             throw new IllegalArgumentException("Scannable code with id already exists!");
                         }
-                    }
-
-                    ;
+                    };
                 });
     }
 
@@ -277,6 +281,9 @@ public class ScannableCodesConnectionHandler {
                                                         booleanCallback.onCallback(false);
                                                     }
                                                 });
+                                    }else{
+                                        throw new IllegalArgumentException("No such comment with the" +
+                                                "given id exists!");
                                     }
                                 }
                             });
