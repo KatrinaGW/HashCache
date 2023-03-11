@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.models.Player;
+import com.example.hashcache.store.AppStore;
 
 public class AppHome extends AppCompatActivity {
 
@@ -30,7 +31,7 @@ public class AppHome extends AppCompatActivity {
         setContentView(R.layout.app_home);
 
         TextView playerName = findViewById(R.id.username_textview);
-        playerName.setText(Player.getInstance().getUsername());
+        playerName.setText(AppStore.get().getCurrentPlayer().getUsername());
         // add functionality to logo button
         ImageButton logoButton = findViewById(R.id.logo_button);
         logoButton.setOnClickListener(new View.OnClickListener() {
@@ -58,7 +59,6 @@ public class AppHome extends AppCompatActivity {
         communityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 // go to community page
                 startActivity(new Intent(AppHome.this, Community.class));
             }
