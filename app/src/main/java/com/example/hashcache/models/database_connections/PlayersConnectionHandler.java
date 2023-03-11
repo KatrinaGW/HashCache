@@ -180,6 +180,74 @@ public class PlayersConnectionHandler {
         });
         return cf;
     }
+    public CompletableFuture<PlayerWallet> getPlayerWalletAsync(String userId) {
+        DocumentReference documentReference = collectionReference.document(userId);
+        CompletableFuture<String> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            getPlayerWallet(documentReference.collection(CollectionNames.PLAYER_WALLET.collectionName),
+                    new GetPlayerWalletCallback() {
+                        @Override
+                        public void onCallback(PlayerWallet playerWallet) {
+                            if (playerWallet != null) {
+                                cf.complete(playerWallet);
+                            } else {
+                                cf.completeExceptionally(new Exception("[getPlayerScannableCodes] Null wallet"));
+                            }
+
+                        }
+                    });
+        });
+    }
+
+    public CompletableFuture<Player> getPlayerAsync(String userId) {
+        DocumentReference documentReference = collectionReference.document(userId);
+        CompletableFuture<Player> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            documentReference.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        playerDocumentConverter.getPlayerFromDocument(documentReference,
+                                player -> cf.complete(player));
+                    } else {
+                        cf.completeExceptionally(new IllegalArgumentException("Given username does not exist!"));
+                    }
+                } else {
+                    Log.d(TAG, "Failed with: ", task.getException());
+                    cf.completeExceptionally(task.getException());
+                }
+            });
+        });
+        return cf;
+    }
+
+    public CompletableFuture<Void> createPlayer(String username) {
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            usernameExistsAsync(username).thenAccept(val -> {
+                if (val) {
+                    cf.completeExceptionally(new IllegalArgumentException("Given username already exists!"));
+                } else {
+                    Player p = new Player(username);
+                    addPlayer(player, (success) -> {
+                        if (success) {
+                            cf.complete();
+                        } else {
+                            cf.completeExceptionally(new Exception("Could not create user."));
+                        }
+                    });
+                }
+            }).exceptionally(new Function<Throwable, Void>() {
+                @Override
+                public Void apply(Throwable throwable) {
+                    cf.completeExceptionally(throwable);
+                    return null;
+                }
+            });
+        });
+        return cf;
+
+    }
     /**
      * Gets a Player with a given username from the Players database
      *
