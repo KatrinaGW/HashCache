@@ -73,27 +73,6 @@ public class PlayersConnectionHandler {
         this.db = db;
 
         collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
-
-        /**
-         * When the collection is updated, update the userId and username mapping accordingly
-         */
-        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
-            FirebaseFirestoreException error) {
-                String username;
-                inAppUsernamesIds.clear();
-
-                for(QueryDocumentSnapshot doc: queryDocumentSnapshots)
-                {
-                    if(doc.getData().get(FieldNames.USERNAME.fieldName) != null){
-                        username = doc.getData().get(FieldNames.USERNAME.fieldName).toString();
-                        Log.d(TAG, username);
-                        inAppUsernamesIds.put(username, doc.getId());
-                    }
-                }
-            }
-        });
     }
 
     /**
