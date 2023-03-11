@@ -2,14 +2,21 @@ package com.example.hashcache.models;
 
 import android.media.Image;
 
+import com.example.hashcache.controllers.DependencyInjector;
+import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
+import com.example.hashcache.models.database_connections.callbacks.GetIntegerCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
+
+import org.checkerframework.checker.units.qual.A;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Represents a list of the player's current scanned codes
  */
 public class PlayerWallet{
-    private static PlayerWallet INSTANCE;
     private HashMap<String, Image> scannableCodes;
     private int size;
 
@@ -17,7 +24,6 @@ public class PlayerWallet{
         this.size = 0;
         this.scannableCodes = new HashMap<String, Image>();
     }
-
 
     /**
      * Adds a scannable code to the player's collection without an image

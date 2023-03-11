@@ -5,8 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.Player;
-import com.example.hashcache.models.PlayerWallet;
+import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.models.database_connections.values.FieldNames;
@@ -14,19 +13,29 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Handles the database operations on a player's PlayerWallet collection
  */
 public class PlayerWalletConnectionHandler {
     final String TAG = "Sample";
+    private FirebaseFirestore db;
     private FireStoreHelper fireStoreHelper;
 
     public PlayerWalletConnectionHandler(FireStoreHelper fireStoreHelper){
         this.fireStoreHelper = fireStoreHelper;
+    }
+
+    public PlayerWalletConnectionHandler(FirebaseFirestore db){
+        this.db = db;
     }
 
     /**
@@ -98,5 +107,28 @@ public class PlayerWalletConnectionHandler {
                         }
                     }
                 });
+    }
+
+    public CompletableFuture<Integer> getPlayerWalletTotalScore(String userId){
+        CompletableFuture<Integer> cf = new CompletableFuture<>();
+        AtomicInteger totalScore = new AtomicInteger(-1);
+
+        CompletableFuture.runAsync(() -> {
+            Query docRef = db.collection(CollectionNames.PLAYERS.collectionName).document(userId)
+                            .collection(CollectionNames.PLAYER_WALLET.collectionName);
+            docRef.get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot document : task.getResult()){
+                        totalScore.addAndGet(Integer.parseInt(document.getData().get(FieldNames.GENERATED_SCORE.fieldName)
+                                .toString()));
+                    }
+                    cf.complete(totalScore.intValue());
+                }
+                else{
+                    cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+                }
+            });
+        });
+        return cf;
     }
 }
