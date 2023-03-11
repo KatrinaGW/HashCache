@@ -31,6 +31,10 @@
         <activity android:name=".QRByLocation"/>
         <activity android:name=".Settings"/>
         <activity android:name=".QRScanActivity"/>
+        <activity android:name=".LeaderboardScoreActivity"/>
+        <activity android:name=".LeaderboardRegionActivity"/>
+        <activity android:name=".LeaderboardNumQRActivity"/>
+        <activity android:name=".LeaderboardTopQRActivity"/>
         <provider
             android:name="com.google.firebase.provider.FirebaseInitProvider"
             android:authorities="${applicationId}.firebaseinitprovider"
