@@ -4,6 +4,7 @@ package com.example.hashcache;
 import androidx.test.core.app.ActivityScenario;
 
 import com.example.hashcache.controllers.HashInfoGenerator;
+import com.example.hashcache.views.MainActivity;
 
 import org.junit.Test;
 

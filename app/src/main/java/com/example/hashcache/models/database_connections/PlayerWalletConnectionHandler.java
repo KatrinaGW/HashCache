@@ -29,6 +29,7 @@ public class PlayerWalletConnectionHandler {
     final String TAG = "Sample";
     private FirebaseFirestore db;
     private FireStoreHelper fireStoreHelper;
+    private static PlayerWalletConnectionHandler INSTANCE;
 
     public PlayerWalletConnectionHandler(FireStoreHelper fireStoreHelper){
         this.fireStoreHelper = fireStoreHelper;
@@ -36,6 +37,27 @@ public class PlayerWalletConnectionHandler {
 
     public PlayerWalletConnectionHandler(FirebaseFirestore db){
         this.db = db;
+    }
+
+    public static PlayerWalletConnectionHandler getInstance(FireStoreHelper fireStoreHelper){
+        if(INSTANCE == null){
+            INSTANCE = new PlayerWalletConnectionHandler(fireStoreHelper);
+        }
+        return INSTANCE;
+    }
+
+    public static PlayerWalletConnectionHandler getInstance(FirebaseFirestore db){
+        if(INSTANCE == null){
+            INSTANCE = new PlayerWalletConnectionHandler(db);
+        }
+        return INSTANCE;
+    }
+
+    public static PlayerWalletConnectionHandler getInstance(){
+        if(INSTANCE == null){
+            INSTANCE = new PlayerWalletConnectionHandler(FirebaseFirestore.getInstance());
+        }
+        return INSTANCE;
     }
 
     /**
@@ -109,18 +131,24 @@ public class PlayerWalletConnectionHandler {
                 });
     }
 
-    public CompletableFuture<Integer> getPlayerWalletTotalScore(String userId){
+    /**
+     * Gets the total score of all scannableCodeIds in a list
+     * @param scannableCodeIds the ids of codes to sum
+     * @return cf the CompletableFuture that contains the total score
+     */
+    public CompletableFuture<Integer> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds){
         CompletableFuture<Integer> cf = new CompletableFuture<>();
-        AtomicInteger totalScore = new AtomicInteger(-1);
+        AtomicInteger totalScore = new AtomicInteger(0);
 
         CompletableFuture.runAsync(() -> {
-            Query docRef = db.collection(CollectionNames.PLAYERS.collectionName).document(userId)
-                            .collection(CollectionNames.PLAYER_WALLET.collectionName);
+            Query docRef = db.collection(CollectionNames.SCANNABLE_CODES.collectionName);
             docRef.get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     for(QueryDocumentSnapshot document : task.getResult()){
-                        totalScore.addAndGet(Integer.parseInt(document.getData().get(FieldNames.GENERATED_SCORE.fieldName)
-                                .toString()));
+                        if(scannableCodeIds.contains(document.getId())){
+                            totalScore.addAndGet(Integer.parseInt(document.getData().get(FieldNames.GENERATED_SCORE.fieldName)
+                                    .toString()));
+                        }
                     }
                     cf.complete(totalScore.intValue());
                 }
