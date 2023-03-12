@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,6 +29,9 @@ import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
+
+import java.util.ArrayList;
+
 /**
  * MyProfile
  *
@@ -61,6 +65,7 @@ public class MyProfile extends AppCompatActivity {
     private ScannableCodesArrayAdapter scannableCodesArrayAdapter;
     private Player playerInfo;
     private boolean afterOnCreate;
+    private ArrayList<ScannableCode> scannableCodes;
     @Override
     /**
      * Called when the activity is created.
@@ -146,19 +151,18 @@ public class MyProfile extends AppCompatActivity {
                 menu.show();
             }
         });
+
+        mScannableCodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                onScannableCodeItemClicked(i);
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        Database.getInstance()
-                .getScannableCodesByIdInList(playerInfo.getPlayerWallet().getScannedCodeIds())
-                .thenAccept(scannableCodes -> {
-                    scannableCodesArrayAdapter = new ScannableCodesArrayAdapter(this,
-                            scannableCodes);
-                    mScannableCodesList.setAdapter(scannableCodesArrayAdapter);
-                });
 
         if(!afterOnCreate){
             setValues();
@@ -167,10 +171,28 @@ public class MyProfile extends AppCompatActivity {
         }
     }
 
+    private void setAdapterValues(){
+        Database.getInstance()
+                .getScannableCodesByIdInList(playerInfo.getPlayerWallet().getScannedCodeIds())
+                .thenAccept(scannableCodes -> {
+                    this.scannableCodes = scannableCodes;
+                    scannableCodesArrayAdapter = new ScannableCodesArrayAdapter(this,
+                            scannableCodes);
+                    mScannableCodesList.setAdapter(scannableCodesArrayAdapter);
+                });
+    }
+
     private void setValues(){
         mUsernameTextView = findViewById(R.id.username_textview);
         mScoreTextView = findViewById(R.id.score_textview);
         mScannableCodesList = findViewById(R.id.scannable_codes_list);
+        setAdapterValues();
+    }
+
+    private void onScannableCodeItemClicked(int i){
+        ScannableCode clickedScannableCode = scannableCodes.get(i);
+
+        //TODO: Show page with the scannableCodeInformation
     }
 
     /**
