@@ -206,7 +206,7 @@ public class TestPlayerDatabase implements IPlayerDatabase {
                 Player p = players.get(userId);
                 String scanId = scannableCode.getScannableCodeId();
                 scannableCodeHashMap.put(scanId, scannableCode);
-                p.getPlayerWallet().addScannableCode(scanId);
+                p.getPlayerWallet().addScannableCode(scanId, scannableCode.getHashInfo().getGeneratedScore());
                 cf.complete(null);
             }
             else{
@@ -230,8 +230,9 @@ public class TestPlayerDatabase implements IPlayerDatabase {
             if(players.containsKey(userId)){
                 Player p = players.get(userId);
                 String scanId = scannableCodeId;
+                ScannableCode scannableCode = scannableCodeHashMap.get(scannableCodeId);
                 scannableCodeHashMap.remove(scanId);
-                p.getPlayerWallet().deleteScannableCode(scanId);
+                p.getPlayerWallet().deleteScannableCode(scanId, scannableCode.getHashInfo().getGeneratedScore());
                 cf.complete(null);
             }
             else{
