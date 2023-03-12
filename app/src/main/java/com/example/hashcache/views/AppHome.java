@@ -25,7 +25,12 @@ import androidx.appcompat.widget.PopupMenu;
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.store.AppStore;
+/**
 
+ Represents the main landing page of the app.
+
+ Displays a map centered on the user's location, with pins indicating QR codes scanned by the user and others.
+ */
 public class AppHome extends AppCompatActivity {
 
     private ImageButton mLogoButton;
@@ -136,44 +141,84 @@ public class AppHome extends AppCompatActivity {
         mTempMap = findViewById(R.id.temp_map);
         mScanQrButton = findViewById(R.id.scan_qr_button);
     }
+    /**
 
+     Sets the listener for the logo button.
+     @param listener the listener to set
+     */
     public void setLogoButtonListener(View.OnClickListener listener) {
         mLogoButton.setOnClickListener(listener);
     }
+    /**
 
+     Sets the listener for the menu button.
+     @param listener the listener to set
+     */
     public void setMenuButtonListener(View.OnClickListener listener) {
         mMenuButton.setOnClickListener(listener);
     }
+    /**
 
+     Sets the listener for the map button.
+     @param listener the listener to set
+     */
     public void setMapButtonListener(View.OnClickListener listener) {
         mMapButton.setOnClickListener(listener);
     }
+    /**
 
+     Sets the listener for the community button.
+     @param listener the listener to set
+     */
     public void setCommunityButtonListener(View.OnClickListener listener) {
         mCommunityButton.setOnClickListener(listener);
     }
+    /**
 
+     Sets the listener for the QR scan button.
+     @param listener the listener to set
+     */
     public void setScanQrButtonListener(View.OnClickListener listener) {
         mScanQrButton.setOnClickListener(listener);
     }
+    /**
 
+     Gets the username of the player.
+     @return the username of the player
+     */
     public String getUsername() {
         return mUsernameTextView.getText().toString();
     }
+    /**
 
+     Sets the username of the player.
+     @param username the username of the player
+     */
     public void setUsername(String username) {
         mUsernameTextView.setText(username);
     }
+    /**
 
+     Gets the score of the player.
+     @return the score of the player
+     */
     public int getScore() {
         String scoreStr = mScoreTextView.getText().toString().replace("Score: ", "");
         return Integer.parseInt(scoreStr);
     }
+    /**
 
+     Sets the score of the player.
+     @param score the score of the player
+     */
     public void setScore(int score) {
         mScoreTextView.setText("Score: " + score);
     }
+    /**
 
+     Sets the listener for the temporary map view.
+     @param listener the listener to set
+     */
     public void setMapTempViewClickListener(OnClickListener listener) {
         mTempMap.setOnClickListener(listener);
     }

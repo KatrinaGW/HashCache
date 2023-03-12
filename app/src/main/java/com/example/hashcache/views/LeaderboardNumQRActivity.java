@@ -11,8 +11,16 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
-
+/**
+ * The LeaderboardNumQRActivity class extends the AppCompatActivity and is used to display the
+ * leaderboard based on the number of QR codes scanned.
+ */
 public class LeaderboardNumQRActivity extends AppCompatActivity {
+    /**
+     * onCreate method is used to initialize the activity and is called when the activity is first created.
+     *
+     * @param savedInstanceState A Bundle object containing the activity's previously saved state.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,6 +28,11 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
+        /**
+         * onCreate method is used to initialize the activity and is called when the activity is first created.
+         *
+         * @param savedInstanceState A Bundle object containing the activity's previously saved state.
+         */
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,6 +72,10 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
 
         // add functionality to region button
         AppCompatButton regionButton = findViewById(R.id.region_tab_button);
+        /**
+         * An anonymous inner class that implements the View.OnClickListener interface.
+         * It is used to add the functionality to the region button.
+         */
         regionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,6 +85,10 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
         });
         // add functionality to score button
         AppCompatButton scoreButton = findViewById(R.id.score_tab_button);
+        /**
+         * An anonymous inner class that implements the View.OnClickListener interface.
+         * It is used to add the functionality to the score button.
+         */
         scoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,6 +98,10 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
         });
         // add functionality to topQR button
         AppCompatButton topButton = findViewById(R.id.topQR_tab_button);
+        /**
+         * An anonymous inner class that implements the View.OnClickListener interface.
+         * It is used to add the functionality to the topQR button.
+         */
         topButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

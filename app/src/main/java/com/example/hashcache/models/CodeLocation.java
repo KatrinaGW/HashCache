@@ -8,7 +8,14 @@ import java.lang.reflect.Array;
 public class CodeLocation {
     private String locationName;
     private Coordinate coordinates;
-
+    /**
+     * Constructor for creating a new instance of CodeLocation
+     *
+     * @param locationName The name of the location
+     * @param x The x-coordinate of the location
+     * @param y The y-coordinate of the location
+     * @param z The z-coordinate of the location
+     */
     public CodeLocation(String locationName, double x, double y, double z){
         this.locationName = locationName;
         this.coordinates = new Coordinate(x, y, z);
