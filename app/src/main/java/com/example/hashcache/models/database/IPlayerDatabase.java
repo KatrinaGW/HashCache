@@ -33,10 +33,10 @@ public interface IPlayerDatabase {
     CompletableFuture<Void> addScannableCodeToPlayerWallet(String userId, String scannableCodeId);
     CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId);
 
-
     CompletableFuture<Void> removeScannableCode(String userId, String scannableCodeId);
 
     CompletableFuture<Void> changeUserName(String userId, String newUsername);
 
     CompletableFuture<HashMap<String, Integer>> getPlayerWalletTopLowScores(String userId);
+    CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds);
 }

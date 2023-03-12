@@ -5,9 +5,14 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
 
+import org.checkerframework.checker.units.qual.A;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * 
@@ -50,6 +55,25 @@ public class TestPlayerDatabase implements IPlayerDatabase {
             } else {
                 cf.complete(false);
             }
+        });
+        return cf;
+    }
+
+    /**
+     * Get all the Scannable Codes whose ids are in a given list
+     * @param scannableCodeIds the list of ids of scannable codes to get
+     * @return cf the CompleteableFuture with the list of ScannableCodes
+     */
+    public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
+        ArrayList<ScannableCode> scannableCodes = new ArrayList<>();
+
+        CompletableFuture.runAsync(() -> {
+            for(ScannableCode scannableCode : scannableCodeHashMap.values()){
+                scannableCodes.add(scannableCode);
+            }
+
+            cf.complete(scannableCodes);
         });
         return cf;
     }

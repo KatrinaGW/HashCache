@@ -10,6 +10,7 @@ import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
 import com.example.hashcache.models.database_connections.callbacks.GetIntegerCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.views.ScannableCodesArrayAdapter;
 
 import org.checkerframework.checker.units.qual.A;
 
@@ -150,6 +151,10 @@ public class PlayerWallet{
 
     }
 
+    /**
+     * Get the sum of all of the player's scores
+     * @return totalScore the sum of all of the player's scores
+     */
     public int getTotalScore(){
         return this.totalScore;
     }

@@ -28,8 +28,11 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
+import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.store.AppStore;
+
+import org.checkerframework.checker.units.qual.C;
 
 public class Settings extends AppCompatActivity {
     private TextView usernameView;
@@ -46,18 +49,11 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
 
-        Player playerInfo = AppStore.get().getCurrentPlayer();
-
-        // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
         usernameView = findViewById(R.id.username_textview);
         phoneNumberView = findViewById(R.id.phone_textview);
         emailView = findViewById(R.id.email_textview);
         geoLocationPreferenceCheckbox = findViewById(R.id.geolocation_checkbox);
-
-        setUsername(playerInfo.getUsername());
-        setEmail(playerInfo.getContactInfo().getEmail());
-        setPhoneNumber(playerInfo.getContactInfo().getPhoneNumber());
 
         geoLocationPreferenceCheckbox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,6 +99,23 @@ public class Settings extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        setValues();
+    }
+
+    private void setValues(){
+        Player playerInfo = AppStore.get().getCurrentPlayer();
+
+        setUsername(playerInfo.getUsername());
+        setEmail(playerInfo.getContactInfo().getEmail());
+        setPhoneNumber(playerInfo.getContactInfo().getPhoneNumber());
+        setRecordGeoLocationChecked(playerInfo.getPlayerPreferences().getRecordGeolocationPreference());
+    }
+
     /**
      * Called when the geolocation preference checkbox is clicked.
      *
@@ -147,5 +160,9 @@ public class Settings extends AppCompatActivity {
         }else{
             this.emailView.setVisibility(View.GONE);
         }
+    }
+
+    private void setRecordGeoLocationChecked(boolean checked){
+        this.geoLocationPreferenceCheckbox.setChecked(checked);
     }
 }
