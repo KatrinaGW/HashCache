@@ -46,7 +46,7 @@ public class PlayerWallet{
      * @param scannableCodeId The id of the scannable code
      * @param locationImage The image of the location where the user scanned the code
      */
-    public void addScannableCode(String scannableCodeId, int score, Image locationImage){
+    public void addScannableCode(String scannableCodeId, Image locationImage){
         this.scannableCodes.put(scannableCodeId, locationImage);
     }
 
