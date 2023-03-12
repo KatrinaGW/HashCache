@@ -37,8 +37,7 @@ public class HashController {
                     MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
                     messageDigest.update(qrContent.getBytes());
                     byte[] byteArray = messageDigest.digest();
-                    String hash = messageDigest.toString();
-                    HashInfoGenerator.generateHashInfo(qrContent).thenAccept(hashInfo -> {
+                    String hash = new BigInteger(1, byteArray).toString(16);
                         Database.getInstance().scannableCodeExists(hash).thenAccept(exists -> {
                             String userId = AppStore.get().getCurrentPlayer().getUserId();
                             if(exists){
