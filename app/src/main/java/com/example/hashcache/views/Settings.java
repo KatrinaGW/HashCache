@@ -16,20 +16,47 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
+import com.example.hashcache.models.Player;
+import com.example.hashcache.store.AppStore;
 
 public class Settings extends AppCompatActivity {
+    private TextView usernameView;
+    private TextView phoneNumberView;
+    private TextView emailView;
+    private CheckBox geoLocationPreferenceCheckbox;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
 
+        Player playerInfo = AppStore.get().getCurrentPlayer();
+
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
+        usernameView = findViewById(R.id.username_textview);
+        phoneNumberView = findViewById(R.id.phone_textview);
+        emailView = findViewById(R.id.email_textview);
+        geoLocationPreferenceCheckbox = findViewById(R.id.geolocation_checkbox);
+
+        setUsername(playerInfo.getUsername());
+        setEmail(playerInfo.getContactInfo().getEmail());
+        setPhoneNumber(playerInfo.getContactInfo().getPhoneNumber());
+
+        geoLocationPreferenceCheckbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onCheckboxClicked(v);
+            }
+        });
+
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,15 +99,26 @@ public class Settings extends AppCompatActivity {
 
         boolean checked = ((CheckBox) view).isChecked();
 
-        // see if the checkbox was clicked
-        int id = view.getId();
+        UpdateUserPreferencesCommand.toggleGeoLocationPreference(checked);
+    }
 
-        if (id == R.id.geolocation_checkbox) {
-            if (checked) {
-                // turn off geolocation
-            } else {
-                // turn on geolocation
-            }
+    private void setUsername(String username){
+        this.usernameView.setText(username);
+    }
+
+    private void setPhoneNumber(String phoneNumber){
+        if(!phoneNumber.equals("")){
+            this.phoneNumberView.setText(phoneNumber);
+        }else{
+            this.phoneNumberView.setVisibility(View.GONE);
+        }
+    }
+
+    private void setEmail(String email){
+        if(!email.equals("")){
+            this.emailView.setText(email);
+        }else{
+            this.emailView.setVisibility(View.GONE);
         }
     }
 }

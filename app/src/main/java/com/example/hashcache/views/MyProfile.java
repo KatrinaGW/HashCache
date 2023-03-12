@@ -23,6 +23,8 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.models.Player;
+import com.example.hashcache.store.AppStore;
 
 public class MyProfile extends AppCompatActivity {
     private View mPurpleRect;
@@ -40,6 +42,8 @@ public class MyProfile extends AppCompatActivity {
 
         // add functionality to logo button
         ImageButton logoButton = findViewById(R.id.logo_button);
+        mUsernameTextView = findViewById(R.id.username_textview);
+        mScoreTextView = findViewById(R.id.score_textview);
         logoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,6 +55,10 @@ public class MyProfile extends AppCompatActivity {
 
         // add functionality to QR STATS button
         AppCompatButton statsButton = findViewById(R.id.qr_stats_button);
+
+        Player playerInfo = AppStore.get().getCurrentPlayer();
+        setUsername(playerInfo.getUsername());
+        setScore(playerInfo.getPlayerWallet().getTotalScore());
         statsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
