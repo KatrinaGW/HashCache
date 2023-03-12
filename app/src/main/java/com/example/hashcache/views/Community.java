@@ -11,8 +11,6 @@
 package com.example.hashcache.views;
 
 
-import static android.util.Log.INFO;
-
 import android.R.layout;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,8 +27,11 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
-import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -54,6 +55,8 @@ public class Community extends AppCompatActivity {
                 startActivity(new Intent(Community.this, LeaderboardScoreActivity.class));
             }
         });
+
+
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);

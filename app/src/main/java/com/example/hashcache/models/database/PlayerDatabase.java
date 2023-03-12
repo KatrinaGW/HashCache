@@ -12,7 +12,9 @@ import com.example.hashcache.models.database_connections.ScannableCodesConnectio
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
+import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.store.AppStore;
+import com.google.firebase.firestore.CollectionReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -360,4 +362,5 @@ public class PlayerDatabase implements IPlayerDatabase {
         });
         return cf;
     }
+
 }

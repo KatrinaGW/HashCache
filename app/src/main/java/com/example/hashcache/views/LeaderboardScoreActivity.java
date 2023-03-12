@@ -5,12 +5,21 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.models.Player;
+import com.example.hashcache.models.database.Database;
+import com.example.hashcache.store.AppStore;
+
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+
 /**
 
  The LeaderboardScoreActivity class is an activity that displays the leaderboard of scores.
@@ -34,6 +43,30 @@ public class LeaderboardScoreActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_score);
+
+        // Sets the players numb qr codes
+        TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
+        int totalScore = AppStore.get().getCurrentPlayer().getPlayerWallet().getTotalScore();
+        playersNumQrCodes.setText(String.valueOf(totalScore));
+
+        // Get the text views needed to set the leaderboard
+        ArrayList<TextView> userNames = new ArrayList<>();
+        userNames.add(findViewById(R.id.user_one));
+        userNames.add(findViewById(R.id.user_two));
+        userNames.add(findViewById(R.id.user_three));
+
+        for(TextView name: userNames) {
+            name.setText("Temp");
+        }
+
+        ArrayList<TextView> totalScores = new ArrayList<>();
+        totalScores.add(findViewById(R.id.score_one));
+        totalScores.add(findViewById(R.id.score_two));
+        totalScores.add(findViewById(R.id.score_three));
+
+        for(TextView scoreView: totalScores) {
+            scoreView.setText(String.valueOf(1));
+        }
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);

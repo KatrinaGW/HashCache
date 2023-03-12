@@ -5,12 +5,18 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.models.Player;
+import com.example.hashcache.store.AppStore;
+
+import java.util.ArrayList;
+
 /**
 
  LeaderboardRegionActivity is an {@link AppCompatActivity} that displays the leaderboard based on the user's region.
@@ -30,10 +36,29 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_region);
 
+
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
-        /**
 
+        // Sets the players numb qr codes
+        TextView playersTotalScore = findViewById(R.id.score_value_textview);
+        int totalScore = AppStore.get().getCurrentPlayer().getPlayerWallet().getTotalScore();
+        playersTotalScore.setText(String.valueOf(totalScore));
+
+        // Get the text views needed to set the leaderboard
+        ArrayList<TextView> userNames = new ArrayList<>();
+        userNames.add(findViewById(R.id.user_one));
+        userNames.add(findViewById(R.id.user_two));
+        userNames.add(findViewById(R.id.user_three));
+
+        ArrayList<TextView> totalScores = new ArrayList<>();
+        totalScores.add(findViewById(R.id.score_one));
+        totalScores.add(findViewById(R.id.score_two));
+        totalScores.add(findViewById(R.id.score_three));
+
+        /**
+         * 
+         *
          {@link View.OnClickListener} that creates and displays a popup menu when the menu button is clicked.
          */
         menuButton.setOnClickListener(new View.OnClickListener() {
