@@ -33,6 +33,10 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
          *
          * @param savedInstanceState A Bundle object containing the activity's previously saved state.
          */
+
+        // Get the top 3 users sorted by the number of QR codes they have
+
+
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

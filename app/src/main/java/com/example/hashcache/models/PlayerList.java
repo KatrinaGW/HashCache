@@ -243,6 +243,7 @@ public class PlayerList {
      * Will cache all the usernames in to playerUserName
      */
     private void getUserNames() {
+        playersConnectionHandler.getPlayers();
         this.playerUserNames = playersConnectionHandler.getInAppPlayerUserNames();
     }
 }

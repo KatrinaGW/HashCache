@@ -47,13 +47,13 @@ public class Community extends AppCompatActivity {
         setContentView(R.layout.community);
 
         // add functionality to leaderboard button
-//        ImageButton logoButton = findViewById(R.id.leaderboard_button);
-//        logoButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(new Intent(Community.this, Leaderboard.class));
-//            }
-//        });
+        AppCompatButton logoButton = findViewById(R.id.leaderboard_button);
+        logoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Community.this, LeaderboardScoreActivity.class));
+            }
+        });
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
@@ -101,6 +101,7 @@ public class Community extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ArrayList<String> searchedPlayers = PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(), 10);
+                Log.i("search", String.valueOf(searchedPlayers.size()));
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchedPlayers);
                 searchedUsers.setAdapter(adapter);
             }
