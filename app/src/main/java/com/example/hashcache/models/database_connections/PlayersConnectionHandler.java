@@ -168,9 +168,9 @@ public class PlayersConnectionHandler {
                 if(task.isSuccessful()){
                     QuerySnapshot document = task.getResult();
                     if(!document.isEmpty()){
-                        DocumentSnapshot doc = document.getDocuments().get(0);
-                        String id = (String) doc.getData().get(FieldNames.USER_ID.fieldName);
-                        cf.complete(id);
+                        String userId = "";
+                        for (QueryDocumentSnapshot docs : task.getResult()) userId = docs.getId();
+                        cf.complete(userId);
                     }
                     else{
                         cf.completeExceptionally(new Exception("Username does not exist."));
@@ -429,12 +429,13 @@ public class PlayersConnectionHandler {
         HashMap<String, String> usernameData = new HashMap<>();
         usernameData.put(FieldNames.USERNAME.fieldName, username);
         String userId = UUID.randomUUID().toString();
-
+        System.out.println("Trying to create user " + username);
             fireStoreHelper.setDocumentReference(collectionReference.document(userId),
                     usernameData, new BooleanCallback() {
                         @Override
                         public void onCallback(Boolean isTrue) {
                             if(isTrue){
+                                System.out.println("User was created inside Katrina's function");
                                 getStringCallback.onCallback(userId);
                             }else{
                                 Log.e(TAG, "Something went wrong while setting the userId" +
