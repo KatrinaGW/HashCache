@@ -48,6 +48,8 @@ public class TestPlayerDatabase implements IPlayerDatabase {
      */
     @Override
     public CompletableFuture<Boolean> usernameExists(String username) {
+
+        System.out.println("Test -> usernameExists");
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             if (userNameToIdMapper.containsKey(username)) {
@@ -261,7 +263,7 @@ public class TestPlayerDatabase implements IPlayerDatabase {
         CompletableFuture.runAsync(() -> {
             if (players.containsKey(userId)) {
                 Player p = players.get(userId);
-                p.getPlayerWallet().addScannableCode(scannableCodeId, 0, null);
+                p.getPlayerWallet().addScannableCode(scannableCodeId, null);
                 cf.complete(null);
             } else {
                 cf.completeExceptionally(new Exception("UserId does not exist."));
@@ -272,7 +274,15 @@ public class TestPlayerDatabase implements IPlayerDatabase {
 
     @Override
     public CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId) {
-        return null;
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            if(scannableCodeHashMap.containsKey(scannableCodeId)){
+                cf.complete(true);
+            }else{
+                cf.complete(false);
+            }
+        });
+        return cf;
     }
 
     /**
