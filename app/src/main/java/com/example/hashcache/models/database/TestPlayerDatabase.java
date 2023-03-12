@@ -214,32 +214,6 @@ public class TestPlayerDatabase implements IPlayerDatabase {
     }
 
     /**
-     * Updates the contact information of a player.
-     *
-     * @param userId      the userId of the player to update the contact information
-     *                    for
-     * @param contactInfo the updated contact information
-     * @return a CompletableFuture that will complete successfully if the contact
-     *         information was updated successfully,
-     *         or an exception if the userId does not exist in the database
-     */
-
-    @Override
-    public CompletableFuture<Void> updateContactInfo(String userId, ContactInfo contactInfo) {
-        CompletableFuture<Void> cf = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
-            if (players.containsKey(userId)) {
-                Player p = players.get(userId);
-                p.setContactInfo(contactInfo);
-                cf.complete(null);
-            } else {
-                cf.completeExceptionally(new Exception("UserId does not exist."));
-            }
-        });
-        return cf;
-    }
-
-    /**
      * Adds a scannable code to database
      *
      * @param scannableCode the scannable code to add
@@ -309,6 +283,25 @@ public class TestPlayerDatabase implements IPlayerDatabase {
                     p.getPlayerWallet().deleteScannableCode(scanId);
                     cf.complete(true);
                 }
+            } else {
+                cf.completeExceptionally(new Exception("UserId does not exist."));
+            }
+        });
+        return cf;
+    }
+
+    /**
+     * Update a user's contact information
+     * @param contactInfo the contact information to set for the user
+     * @param userId the id of the user to update the contact information of
+     * @return cf the CompleteableFuture with a boolean value indicating if it was successful
+     */
+    @Override
+    public CompletableFuture<Boolean> updateContactInfo(ContactInfo contactInfo, String userId){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            if (players.containsKey(userId)) {
+                players.get(userId).setContactInfo(contactInfo);
             } else {
                 cf.completeExceptionally(new Exception("UserId does not exist."));
             }

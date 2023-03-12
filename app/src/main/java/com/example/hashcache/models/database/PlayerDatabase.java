@@ -15,6 +15,8 @@ import com.example.hashcache.models.database_connections.callbacks.GetScannableC
 import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
 import com.example.hashcache.store.AppStore;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
@@ -247,33 +249,6 @@ public class PlayerDatabase implements IPlayerDatabase {
         return cf;
     }
 
-    /**
-     * Updates the contact info for a given user.
-     *
-     * @param userId      the userId to update the contact info for
-     * @param contactInfo the updated contact info
-     * @return a CompletableFuture that will complete successfully if the contact
-     *         info was updated successfully,
-     *         or an exception if the userId does not exist in the database
-     */
-    @Override
-    public CompletableFuture<Void> updateContactInfo(String userId, ContactInfo contactInfo) {
-        CompletableFuture<Void> cf = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().updateContactInfo(userId, contactInfo, new BooleanCallback() {
-                @Override
-                public void onCallback(Boolean isTrue) {
-                    if (isTrue) {
-                        cf.complete(null);
-                    } else {
-                        cf.completeExceptionally(new Exception("Could not update contact info"));
-                    }
-                }
-            });
-        });
-        return cf;
-    }
-
     @Override
     public CompletableFuture<Void> addScannableCodeToPlayerWallet(String userId, String scannableCodeId) {
         System.out.println("[[ Trying to add to wallet...");
@@ -382,6 +357,34 @@ public class PlayerDatabase implements IPlayerDatabase {
         });
         return cf;
     }
+
+    /**
+     * Update a user's contact information
+     * @param contactInfo the contact information to set for the user
+     * @param userId the id of the user to update the contact information of
+     * @return cf the CompleteableFuture with a boolean value indicating if it was successful
+     */
+    @Override
+    public CompletableFuture<Boolean> updateContactInfo(ContactInfo contactInfo, String userId){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            PlayersConnectionHandler.getInstance().updateContactInfo(userId, contactInfo,
+                    new BooleanCallback() {
+                        @Override
+                        public void onCallback(Boolean isTrue) {
+                            if(isTrue){
+                                cf.complete(true);
+                            }else{
+                                cf.completeExceptionally(new Exception("Something went wrong " +
+                                        "while updating the contact information"));
+                            }
+                        }
+                    });
+        });
+
+        return cf;
+    };
 
     /**
      * Get the player's highest scoring QR code

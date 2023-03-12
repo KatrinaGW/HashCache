@@ -27,8 +27,6 @@ public interface IPlayerDatabase {
 
     CompletableFuture<Void> updatePlayerPreferences(String userId, PlayerPreferences playerPreferences);
 
-    CompletableFuture<Void> updateContactInfo(String userId, ContactInfo contactInfo);
-
     CompletableFuture<String> addScannableCode(ScannableCode scannableCode);
     CompletableFuture<Void> addScannableCodeToPlayerWallet(String userId, String scannableCodeId);
     CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId);
@@ -42,4 +40,5 @@ public interface IPlayerDatabase {
     CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds);
     CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds);
     CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId);
+    CompletableFuture<Boolean> updateContactInfo(ContactInfo contactInfo, String userId);
 }

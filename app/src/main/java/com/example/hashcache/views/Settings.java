@@ -19,8 +19,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,17 +30,15 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
-import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.store.AppStore;
-
-import org.checkerframework.checker.units.qual.C;
 
 public class Settings extends AppCompatActivity {
     private TextView usernameView;
     private TextView phoneNumberView;
     private TextView emailView;
     private CheckBox geoLocationPreferenceCheckbox;
+    private ImageView editInfoButton;
     /**
      * Called when the activity is starting. Initializes the activity and its associated layout.
      *
@@ -54,11 +54,19 @@ public class Settings extends AppCompatActivity {
         phoneNumberView = findViewById(R.id.phone_textview);
         emailView = findViewById(R.id.email_textview);
         geoLocationPreferenceCheckbox = findViewById(R.id.geolocation_checkbox);
+        editInfoButton = findViewById(R.id.edit_info_image);
 
         geoLocationPreferenceCheckbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onCheckboxClicked(v);
+            }
+        });
+
+        editInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Settings.this, EditPlayerInfoActivity.class));
             }
         });
 
