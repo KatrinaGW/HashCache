@@ -28,7 +28,10 @@ public interface IPlayerDatabase {
 
     CompletableFuture<Void> updateContactInfo(String userId, ContactInfo contactInfo);
 
-    CompletableFuture<Void> addScannableCode(String userId, ScannableCode scannableCode);
+    CompletableFuture<String> addScannableCode(ScannableCode scannableCode);
+    CompletableFuture<Void> addScannableCodeToPlayerWallet(String userId, String scannableCodeId);
+    CompletableFuture<Void> scannableCodeExists(String scannableCodeId);
+
 
     CompletableFuture<Void> removeScannableCode(String userId, String scannableCodeId);
 
