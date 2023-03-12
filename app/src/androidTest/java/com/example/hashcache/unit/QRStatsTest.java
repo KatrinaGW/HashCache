@@ -19,6 +19,7 @@ import com.example.hashcache.QRByLocation;
 import com.example.hashcache.QRScanActivity;
 import com.example.hashcache.QRStats;
 import com.example.hashcache.R;
+import com.example.hashcache.Settings;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;
@@ -32,7 +33,7 @@ import java.util.Random;
  * Test class for AppHome. All the UI tests are written here. Robotium test framework is
  used
  */
-public class AppHomeTest {
+public class QRStatsTest {
 
     private Solo solo;
     @Rule
@@ -47,58 +48,35 @@ public class AppHomeTest {
     @Before
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        final String ALLOWED_CHARACTERS ="0123456789qwertyuiopasdfghjklzxcvbnm";
-        final Random random=new Random();
-        final StringBuilder sb=new StringBuilder(15);
-        for(int i=0;i<15;++i)
+        final String ALLOWED_CHARACTERS = "0123456789qwertyuiopasdfghjklzxcvbnm";
+        final Random random = new Random();
+        final StringBuilder sb = new StringBuilder(15);
+        for (int i = 0; i < 15; ++i)
             sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
 
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
+        solo.clickOnImageButton(1);
+        solo.clickOnText("Stats");
+
     }
 
-    @Test
-    public void checkScanQRButton(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnButton("SCAN QR");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", QRScanActivity.class);
-    }
 
     @Test
-    public void checkLogoButton(){
+    public void checkProfileButton(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(0);
+        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
+        solo.clickOnButton("MY PROFILE");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
     }
 
 
     @Test
-    public void checkMapButton(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(2);
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", QRByLocation.class);
-    }
-
-    @Test
-    public void checkCommunityButton(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(3);
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", Community.class);
-    }
-
-    @Test
     public void checkMenuButton1(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(1);
+        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
+        solo.clickOnImageButton(0);
         solo.clickOnText("Map");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
@@ -107,8 +85,8 @@ public class AppHomeTest {
     @Test
     public void checkMenuButton2(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(1);
+        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
+        solo.clickOnImageButton(0);
         solo.clickOnText("My QR Codes");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
@@ -117,8 +95,8 @@ public class AppHomeTest {
     @Test
     public void checkMenuButton3(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(1);
+        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
+        solo.clickOnImageButton(0);
         solo.clickOnText("Stats");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", QRStats.class);
@@ -127,18 +105,12 @@ public class AppHomeTest {
     @Test
     public void checkMenuButton4(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(1);
+        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
+        solo.clickOnImageButton(0);
         solo.clickOnText("Community");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
     }
-
-
-
-
-
-
 
 
 }

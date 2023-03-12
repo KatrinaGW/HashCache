@@ -14,11 +14,17 @@ import androidx.test.rule.ActivityTestRule;
 import com.example.hashcache.AppHome;
 import com.example.hashcache.MainActivity;
 import com.example.hashcache.R;
+import com.example.hashcache.models.database_connections.CodeLocationConnectionHandler;
+import com.example.hashcache.models.database_connections.FireStoreHelper;
+import com.example.hashcache.models.database_connections.converters.CodeLocationDocumentConverter;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.robotium.solo.Solo;
+
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 
 import java.util.Random;
 
@@ -30,6 +36,7 @@ import java.util.Random;
 public class MainActivityTest {
 
     private Solo solo;
+
     @Rule
     public ActivityTestRule<MainActivity> rule =
             new ActivityTestRule<>(MainActivity.class, true, true);
@@ -38,6 +45,7 @@ public class MainActivityTest {
      * Runs before all tests and creates solo instance.
      * @throws Exception
      */
+
     @Before
     public void setUp() throws Exception{
         solo = new Solo(InstrumentationRegistry.getInstrumentation(),rule.getActivity());
@@ -58,6 +66,7 @@ public class MainActivityTest {
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
         solo.clickOnButton("START CACHING");
+        solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
 
     }
@@ -66,9 +75,8 @@ public class MainActivityTest {
     public void checkUsedUsername(){
         solo.enterText((EditText) solo.getView(R.id.username_edittext), "a");
         solo.clickOnButton("START CACHING");
+        solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
-        //assertThrows( IllegalArgumentException.class, () -> {
-        //    solo.clickOnButton("START CACHING"); });
     }
 
 
@@ -85,6 +93,7 @@ public class MainActivityTest {
 
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
+        solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
 
     }
