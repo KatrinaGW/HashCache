@@ -65,5 +65,4 @@ public class DependencyInjector {
                 FirebaseFirestore.getInstance());
     }
 
-    public
 }
