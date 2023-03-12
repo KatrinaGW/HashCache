@@ -277,6 +277,11 @@ public class PlayerDatabase implements IPlayerDatabase {
     }
 
     @Override
+    public CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId) {
+        return null;
+    }
+
+    @Override
     public CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId) {
         return ScannableCodesConnectionHandler.getInstance().scannableCodeIdExists(scannableCodeId);
     }

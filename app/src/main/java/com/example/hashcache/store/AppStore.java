@@ -53,4 +53,5 @@ public class AppStore {
     public ScannableCode getCurrentScannableCode() {
         return currentScannableCode;
     }
+
 }

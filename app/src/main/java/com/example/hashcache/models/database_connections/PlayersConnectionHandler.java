@@ -1,5 +1,7 @@
 package com.example.hashcache.models.database_connections;
 
+import static com.example.hashcache.models.database_connections.FireStoreHelper.setupFirebaseDocListener;
+
 import android.media.Image;
 import android.util.Log;
 
@@ -25,6 +27,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -375,6 +378,11 @@ public class PlayersConnectionHandler {
                         }
                     }
                 });
+    }
+
+
+    public CompletableFuture<Map<String, Object>> setupPlayerListener(String userId){
+        return setupFirebaseDocListener(db, CollectionNames.PLAYERS.collectionName, userId);
     }
 
     /**

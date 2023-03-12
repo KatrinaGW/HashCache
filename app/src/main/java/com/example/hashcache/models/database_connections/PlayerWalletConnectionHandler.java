@@ -1,5 +1,7 @@
 package com.example.hashcache.models.database_connections;
 
+import static com.example.hashcache.models.database_connections.FireStoreHelper.setupFirebaseDocListener;
+
 import android.media.Image;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -13,8 +15,10 @@ import com.example.hashcache.models.database_connections.callbacks.GetScannableC
 import com.example.hashcache.models.database_connections.converters.ScannableCodeDocumentConverter;
 import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.models.database_connections.values.FieldNames;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -28,6 +32,7 @@ import org.checkerframework.checker.units.qual.A;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -45,6 +50,25 @@ public class PlayerWalletConnectionHandler {
         this.fireStoreHelper = fireStoreHelper;
     }
 
+
+    public CompletableFuture<ArrayList<String>> getPlayerWalletChangeListener(String userId){
+        CompletableFuture<ArrayList<String>> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            CollectionReference scannedCodeCollection = db.collection(CollectionNames.PLAYERS.collectionName).document(userId)
+                    .collection(CollectionNames.PLAYER_WALLET.collectionName);
+
+            scannedCodeCollection.addSnapshotListener((snapshot, e) -> {
+                ArrayList<String> ids = new ArrayList<>();
+                for (QueryDocumentSnapshot document : snapshot) {
+                    String scannableCodeId = (String) document.getData()
+                            .get(FieldNames.SCANNABLE_CODE_ID.fieldName);
+                    ids.add(scannableCodeId);
+                }
+                cf.complete(ids);
+            });
+        });
+        return cf;
+    }
     public PlayerWalletConnectionHandler(FirebaseFirestore db){
         this.db = db;
     }
@@ -203,6 +227,10 @@ public class PlayerWalletConnectionHandler {
             );
         });
         return cf;
+    }
+
+    public CompletableFuture<Map<String, Object>> setupPlayerListener(String userId){
+        return setupFirebaseDocListener(db, CollectionNames.PLAYERS.collectionName, userId);
     }
 
     /**
