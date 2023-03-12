@@ -2,7 +2,6 @@ package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -15,9 +14,7 @@ import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
 
-import org.w3c.dom.Text;
-
-public class OtherProfileActivity extends AppCompatActivity {
+public class OtherProfileInformationActivity extends AppCompatActivity {
     TextView otherUsernameView;
     TextView otherEmailView;
     TextView otherPhoneNumberView;
@@ -26,7 +23,7 @@ public class OtherProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_other_profile);
+        setContentView(R.layout.activity_view_other_profile_information);
 
         Intent intent = getIntent();
         String otherUsername = intent.getStringExtra("otherUsername");
@@ -57,7 +54,7 @@ public class OtherProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // create main menu
-                PopupMenu menu = new PopupMenu(OtherProfileActivity.this, menuButton);
+                PopupMenu menu = new PopupMenu(OtherProfileInformationActivity.this, menuButton);
                 menu.getMenuInflater()
                         .inflate(R.menu.fragment_popup_menu, menu.getMenu());
 
@@ -67,21 +64,21 @@ public class OtherProfileActivity extends AppCompatActivity {
                         int id = item.getItemId();
 
                         if (id == R.id.menu_home) {                 // go to AppHome page
-                            startActivity(new Intent(OtherProfileActivity.this, AppHome.class));
+                            startActivity(new Intent(OtherProfileInformationActivity.this, AppHome.class));
                             return true;
 
                         } else if (id == R.id.menu_stats) {         // go to QRStats page
-                            startActivity(new Intent(OtherProfileActivity.this, QRStats.class));
+                            startActivity(new Intent(OtherProfileInformationActivity.this, QRStats.class));
                             return true;
 
                         } else if (id == R.id.menu_profile) {       // go to MyProfile
-                            startActivity(new Intent(OtherProfileActivity.this, MyProfile.class));
+                            startActivity(new Intent(OtherProfileInformationActivity.this, MyProfile.class));
                             return true;
 
                         } else if (id == R.id.menu_community) {     // remain on Community page
                             return true;
                         }
-                        return OtherProfileActivity.super.onOptionsItemSelected(item);
+                        return OtherProfileInformationActivity.super.onOptionsItemSelected(item);
                     }
                 });
                 menu.show();

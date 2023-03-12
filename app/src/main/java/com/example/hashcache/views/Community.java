@@ -14,7 +14,6 @@ package com.example.hashcache.views;
 import android.R.layout;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,13 +27,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
-import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.models.database.Database;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -106,7 +99,6 @@ public class Community extends AppCompatActivity {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -130,7 +122,7 @@ public class Community extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectUsername = userResults.get(position);
-                Intent intent = new Intent(getApplicationContext(), OtherProfileActivity.class);
+                Intent intent = new Intent(getApplicationContext(), OtherProfileInformationActivity.class);
                 intent.putExtra("otherUsername", selectUsername);
                 startActivity(intent);
             }

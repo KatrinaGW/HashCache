@@ -161,7 +161,17 @@ public class PlayerDatabase implements IPlayerDatabase {
 
     @Override
     public CompletableFuture<HashMap<String, String>> getPlayers() {
-        return PlayersConnectionHandler.getInstance().getPlayers();
+        CompletableFuture<HashMap<String, String>> cf = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(()->{
+            PlayersConnectionHandler.getInstance().getPlayers().thenAccept(
+                    players -> {
+                        cf.complete(players);
+                    }
+            );
+        });
+
+        return cf;
     }
 
     /**
