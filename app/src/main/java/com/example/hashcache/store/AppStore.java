@@ -1,6 +1,8 @@
 package com.example.hashcache.store;
 
 import com.example.hashcache.models.Player;
+import com.example.hashcache.models.ScannableCode;
+
 /**
  * Represents a store for holding global state information in the app
  */
@@ -10,6 +12,7 @@ public class AppStore {
 
     boolean isLoggedIn;
     private Player currentPlayer;
+    private ScannableCode currentScannableCode;
     /**
      * Gets the singleton instance of the AppStore
      *
@@ -32,7 +35,7 @@ public class AppStore {
      * @param player The player to set as the current player
      */
     public void setCurrentPlayer(Player player){
-        instance.currentPlayer = player;
+        currentPlayer = player;
     }
     /**
      * Gets the current player in the AppStore
@@ -40,6 +43,14 @@ public class AppStore {
      * @return currentPlayer The current player in the AppStore
      */
     public Player getCurrentPlayer(){
-        return instance.currentPlayer;
+        return currentPlayer;
+    }
+
+    public void setCurrentScannableCode(ScannableCode currentScannableCode) {
+        this.currentScannableCode = currentScannableCode;
+    }
+
+    public ScannableCode getCurrentScannableCode() {
+        return currentScannableCode;
     }
 }
