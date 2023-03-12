@@ -13,6 +13,8 @@ import com.example.hashcache.store.AppStore;
 
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+
 /**
 
  The PlayerDatabase class represents a database of players that can be interacted with.
@@ -75,13 +77,7 @@ public class PlayerDatabase implements IPlayerDatabase {
         });
         return cf;
     }
-    /**
-     * Gets the player object associated with a given userId.
-     *
-     * @param userId the userId to get the player object for
-     * @return a CompletableFuture that will return the player object associated with the given userId
-     *         if it exists, or an exception if the userId does not exist in the database
-     */
+
     @Override
     public CompletableFuture<Void> createPlayer(String username) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
@@ -100,10 +96,13 @@ public class PlayerDatabase implements IPlayerDatabase {
         return cf;
     }
     /**
-     * Gets a HashMap of all the players in the database.
+     * Gets the player object associated with a given userId.
      *
-     * @return a CompletableFuture that will return a HashMap of all the players in the database
+     * @param userId the userId to get the player object for
+     * @return a CompletableFuture that will return the player object associated with the given userId
+     *         if it exists, or an exception if the userId does not exist in the database
      */
+
     @Override
     public CompletableFuture<Player> getPlayer(String userId) {
         CompletableFuture<Player> cf = new CompletableFuture<>();
@@ -118,23 +117,22 @@ public class PlayerDatabase implements IPlayerDatabase {
         return cf;
     }
     /**
-     * Gets the total score for a given player.
+     * Gets a HashMap of all the players in the database.
      *
-     * @param userId the userId to get the total score for
-     * @return a CompletableFuture that will return the total score for the given player
+     * @return a CompletableFuture that will return a HashMap of all the players in the database
      */
+
     @Override
     public CompletableFuture<HashMap<String, String>> getPlayers() {
         return null;
     }
     /**
-     * Adds a comment to a scannable code.
+     * Gets the total score for a given player.
      *
-     * @param scannableCodeId the scannable code to add the comment to
-     * @param comment the comment to add
-     * @return a CompletableFuture that will complete successfully if the comment was added successfully,
-     *         or an exception if the scannable code does not exist in the database
+     * @param userId the userId to get the total score for
+     * @return a CompletableFuture that will return the total score for the given player
      */
+
     @Override
     public CompletableFuture<Integer> getTotalScore(String userId) {
         CompletableFuture<Integer> cf = new CompletableFuture<>();
@@ -160,7 +158,14 @@ public class PlayerDatabase implements IPlayerDatabase {
         });
         return cf;
     }
-
+    /**
+     * Adds a comment to a scannable code.
+     *
+     * @param scannableCodeId the scannable code to add the comment to
+     * @param comment the comment to add
+     * @return a CompletableFuture that will complete successfully if the comment was added successfully,
+     *         or an exception if the scannable code does not exist in the database
+     */
     @Override
     public CompletableFuture<Void> addComment(String scannableCodeId, Comment comment) {
         return null;
