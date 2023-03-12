@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -43,6 +44,8 @@ public class Community extends AppCompatActivity {
     private EditText mSearchEditText;
     private ListView mUserListView;
     private AppCompatButton mLeaderboardButton;
+    private ArrayList<String> userResults;
+    private ListView searchResultsView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         initView();
@@ -57,8 +60,6 @@ public class Community extends AppCompatActivity {
                 startActivity(new Intent(Community.this, LeaderboardScoreActivity.class));
             }
         });
-
-
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
@@ -100,7 +101,7 @@ public class Community extends AppCompatActivity {
 
         // Handles the search button
         EditText searchBarText = findViewById(R.id.search_bar_edittext);
-        ListView searchedUsers = findViewById(R.id.user_listview);
+        searchResultsView = findViewById(R.id.user_listview);
         ImageButton searchButton = findViewById(R.id.search_button);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,12 +111,28 @@ public class Community extends AppCompatActivity {
                     @Override
                     public void run() {
                         PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(), 10)
-                                .thenAccept(searchedPlayers->{
-                                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchedPlayers);
-                                    searchedUsers.setAdapter(adapter);
+                                .thenAccept(searchResults->{
+                                    userResults = searchResults;
+                                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchResults);
+                                    searchResultsView.setAdapter(adapter);
+
+                                    setListViewItemClickListener();
                                 });
                     }
                 });
+            }
+        });
+
+    }
+
+    private void setListViewItemClickListener(){
+        searchResultsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectUsername = userResults.get(position);
+                Intent intent = new Intent(getApplicationContext(), OtherProfileActivity.class);
+                intent.putExtra("otherUsername", selectUsername);
+                startActivity(intent);
             }
         });
     }
@@ -142,10 +159,6 @@ public class Community extends AppCompatActivity {
     public void setSearchQuery(String query) {
         mSearchEditText.setText(query);
     }
-
-   //public void setUserListViewAdapter(ListAdapterView adapter) {
-    //    mUserListView.setAdapter(adapter);
-    //}
 
     public void setUserListViewEmptyView(View view) {
         mUserListView.setEmptyView(view);

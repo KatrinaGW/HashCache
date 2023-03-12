@@ -38,6 +38,7 @@
         <activity android:name=".views.NewMonsterActivity"/>
         <activity android:name=".views.DisplayMonsterActivity"/>
         <activity android:name=".views.EditPlayerInfoActivity"/>
+        <activity android:name=".views.OtherProfileActivity"/>
 
         <provider
             android:name="com.google.firebase.provider.FirebaseInitProvider"
