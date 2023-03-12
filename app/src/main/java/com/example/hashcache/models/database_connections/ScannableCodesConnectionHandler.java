@@ -227,6 +227,9 @@ public class ScannableCodesConnectionHandler {
                                                 }
                                             });
                                         }
+                                                else{
+                                                    booleanCallback.onCallback(true);
+                                                }
                                     }
                                 }
                             });
