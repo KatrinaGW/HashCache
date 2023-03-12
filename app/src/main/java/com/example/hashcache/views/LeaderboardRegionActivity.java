@@ -51,11 +51,27 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         userNames.add(findViewById(R.id.user_two));
         userNames.add(findViewById(R.id.user_three));
 
+        for(TextView view: userNames) {
+            view.setText("Temp");
+        }
+
+        ArrayList<TextView> monsterNames = new ArrayList<>();
+        monsterNames.add(findViewById(R.id.user_one));
+        monsterNames.add(findViewById(R.id.user_two));
+        monsterNames.add(findViewById(R.id.user_three));
+
+        for(TextView view: monsterNames) {
+            view.setText("Zorg");
+        }
+
         ArrayList<TextView> totalScores = new ArrayList<>();
         totalScores.add(findViewById(R.id.score_one));
         totalScores.add(findViewById(R.id.score_two));
         totalScores.add(findViewById(R.id.score_three));
 
+        for(TextView view: totalScores) {
+            view.setText(String.valueOf(42));
+        }
         /**
          * 
          *

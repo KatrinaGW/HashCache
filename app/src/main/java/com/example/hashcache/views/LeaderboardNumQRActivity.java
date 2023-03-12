@@ -49,12 +49,18 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
         userNames.add(findViewById(R.id.user_two));
         userNames.add(findViewById(R.id.user_three));
 
+        for(TextView view: userNames) {
+            view.setText("Temp");
+        }
+
         ArrayList<TextView> qrCounts = new ArrayList<>();
         qrCounts.add(findViewById(R.id.num_one));
         qrCounts.add(findViewById(R.id.num_two));
         qrCounts.add(findViewById(R.id.num_three));
 
-
+        for(TextView view: qrCounts) {
+            view.setText(String.valueOf(42));
+        }
 
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
