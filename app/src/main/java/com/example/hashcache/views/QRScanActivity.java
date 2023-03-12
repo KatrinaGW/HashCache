@@ -17,6 +17,9 @@ import com.budiyev.android.codescanner.DecodeCallback;
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.hashInfo.HashController;
 import com.google.zxing.Result;
+
+import java.util.function.Function;
+
 /**
 
  QRScanActivity
@@ -52,9 +55,14 @@ public class QRScanActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        HashController.generateScannableCode(result.getText()).thenAccept(scannableCode -> {
-
-                            Toast.makeText(QRScanActivity.this, "Scannable code added!", Toast.LENGTH_SHORT).show();
+                        HashController.addScannableCode(result.getText()).thenAccept(scannableCode -> {
+                            System.out.println("Have added QR code!!");
+                        }).exceptionally(new Function<Throwable, Void>() {
+                            @Override
+                            public Void apply(Throwable throwable) {
+                                System.out.println("Could not add QR code" + throwable.getMessage());
+                                return null;
+                            }
                         });
 
                     }
