@@ -13,6 +13,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.hashcache.controllers.AddUserCommand;
 import com.example.hashcache.controllers.DependencyInjector;
@@ -23,9 +24,11 @@ import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.PlayerList;
+import com.example.hashcache.views.MainActivityView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
+import java.util.function.Function;
 import java.io.InputStream;
 import java.util.Random;
 
@@ -72,16 +75,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onStartCachingClicked(){
-        addUserCommand.addUser(usernameEditText.getText().toString(), new BooleanCallback() {
-            @Override
-            public void onCallback(Boolean isTrue) {
-                if(!isTrue){
-                    throw new IllegalArgumentException("Something went wrong while adding player");
-                }
-                Intent goHome = new Intent(MainActivity.this, AppHome.class);
 
-                startActivity(goHome);
+        addUserCommand.loginUser(getUsername()).thenAccept(res -> {
+            Intent goHome = new Intent(MainActivity.this, AppHome.class);
+            startActivity(goHome);
+        }).exceptionally(new Function<Throwable, Void>() {
+            @Override
+            public Void apply(Throwable throwable) {
+                // display some error on the screen
+                return null;
             }
         });
+    }
+    public void setStartBtnListener(View.OnClickListener listeners) {
+        findViewById(R.id.start_button).setOnClickListener(listeners);
+    }
+    public String getUsername(){
+        TextView tx = this.findViewById(R.id.username_edittext);
+        return tx.getText().toString();
+    }
+
+    public void setUsername(String username){
+        TextView tx = this.findViewById(R.id.username_edittext);
+        tx.setText(username);
     }
 }

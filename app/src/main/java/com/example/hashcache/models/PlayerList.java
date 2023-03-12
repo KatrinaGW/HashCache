@@ -4,6 +4,7 @@ import com.example.hashcache.controllers.DependencyInjector;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,14 +63,12 @@ public class PlayerList {
      * @param username the username of the player to add
      * @return success indicates if the user was successfully added or not
      */
-    public boolean addPlayer(String username, BooleanCallback booleanCallback){
+    public boolean addPlayer(String username, GetStringCallback getStringCallback){
         boolean success = true;
 
         if(!this.playerUserNames.contains(username)){
-            Player newPlayer = new Player(username);
-            
             try{
-                this.playersConnectionHandler.addPlayer(newPlayer, booleanCallback);
+                this.playersConnectionHandler.createPlayer(username, getStringCallback);
             }catch (IllegalArgumentException e){
                 success = false;
             }

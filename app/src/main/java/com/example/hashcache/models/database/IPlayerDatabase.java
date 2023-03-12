@@ -1,10 +1,12 @@
 package com.example.hashcache.models.database;
 
+import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
 
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 public interface IPlayerDatabase {
@@ -16,6 +18,11 @@ public interface IPlayerDatabase {
     CompletableFuture<Void> createPlayer(String username);
 
     CompletableFuture<Player> getPlayer(String userId);
+    CompletableFuture<HashMap<String, String>> getPlayers();
+
+    CompletableFuture<Integer> getTotalScore(String userId);
+
+    CompletableFuture<Void> addComment(String scannableCodeId, Comment comment);
 
     CompletableFuture<Void> updatePlayerPreferences(String userId, PlayerPreferences playerPreferences);
 
@@ -24,7 +31,6 @@ public interface IPlayerDatabase {
     CompletableFuture<Void> addScannableCode(String userId, ScannableCode scannableCode);
 
     CompletableFuture<Void> removeScannableCode(String userId, String scannableCodeId);
-
 
     CompletableFuture<Void> changeUserName(String userId, String newUsername);
 }
