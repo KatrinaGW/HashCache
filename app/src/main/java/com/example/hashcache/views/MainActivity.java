@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
      @see InputStream
 
-     @see HashInfoGenerator.NameGenerator#getNames
+     @see NameGenerator#getNames
 
      @see AppHome
 
