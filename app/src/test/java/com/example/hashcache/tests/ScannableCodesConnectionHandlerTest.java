@@ -75,7 +75,7 @@ public class ScannableCodesConnectionHandlerTest {
             CollectionReference mockCollection = Mockito.mock(CollectionReference.class);
             DocumentReference mockDocument = Mockito.mock(DocumentReference.class);
             ScannableCode mockScannableCode = new ScannableCode("mockId", new HashInfo(null,
-                    "mockName", 1));
+                    "mockName", 1), 123);
             Comment mockComment = new Comment("body", "id");
             mockScannableCode.addComment(mockComment);
 
@@ -127,7 +127,7 @@ public class ScannableCodesConnectionHandlerTest {
     void addScanableCodeThrowsTest(){
         CollectionReference mockCollection = Mockito.mock(CollectionReference.class);
         ScannableCode mockScannableCode = new ScannableCode("mockId", new HashInfo(null,
-                "mockName", 1));
+                "mockName", 1), 123);
 
         when(mockDb.collection(anyString())).thenReturn(mockCollection);
 
