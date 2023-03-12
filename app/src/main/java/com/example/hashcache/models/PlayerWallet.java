@@ -1,15 +1,27 @@
 package com.example.hashcache.models;
 
+import static java.util.Collections.max;
+import static java.util.Collections.min;
+
 import android.media.Image;
+
+import com.example.hashcache.controllers.DependencyInjector;
+import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
+import com.example.hashcache.models.database_connections.callbacks.GetIntegerCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.views.ScannableCodesArrayAdapter;
+
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Represents a list of the player's current scanned codes
  */
 public class PlayerWallet{
-    private static PlayerWallet INSTANCE;
     private HashMap<String, Image> scannableCodes;
     private int size;
 
@@ -18,16 +30,14 @@ public class PlayerWallet{
         this.scannableCodes = new HashMap<String, Image>();
     }
 
-
     /**
      * Adds a scannable code to the player's collection without an image
      * @param scannableCodeId The id of the scanned code
      */
     public void addScannableCode(String scannableCodeId){
         this.scannableCodes.put(scannableCodeId, null);
+        this.size++;
     }
-
-
 
     /**
      * Adds a scannable code and its image to the player's collection
@@ -35,8 +45,8 @@ public class PlayerWallet{
      * @param locationImage The image of the location where the user scanned the code
      */
     public void addScannableCode(String scannableCodeId, Image locationImage){
-        this.size++;
         this.scannableCodes.put(scannableCodeId, locationImage);
+        this.size++;
     }
 
     /**
@@ -81,14 +91,11 @@ public class PlayerWallet{
     public void deleteScannableCode(String scannableCodeId){
         if(this.scannableCodes.containsKey(scannableCodeId)){
             this.scannableCodes.remove(scannableCodeId);
+            this.size--;
+
         }else{
             throw new IllegalArgumentException("Player wallet does not contain scannable" +
                     "code with given id");
         }
-
     }
-
-    //Do we need to get the scannablecode from here? Since I'm assuming we're just connecting to
-    //DB and can get it somewhere else. Assume id is already known if the user gets here - doesn't
-    //seem to be a point in adding that method
 }

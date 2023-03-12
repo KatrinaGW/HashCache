@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database_connections.callbacks.GetContactInfoCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerPreferencesCallback;
@@ -23,6 +24,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.Map;
 
 /**
  * Handles the conversion between a DocumentReference and a PlayerObject
@@ -84,6 +87,7 @@ public class PlayerDocumentConverter {
 
                             if(task.getResult().size()>0){
                                 for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Map<String, Object> temp = document.getData();
                                     scannableCodeId = (String) document.getData()
                                             .get(FieldNames.SCANNABLE_CODE_ID.fieldName);
                                     //TODO: check for empty image and then add if it exists
@@ -144,7 +148,7 @@ public class PlayerDocumentConverter {
                             Log.e(TAG, "User does not have a username!");
                         }
 
-                        getPlayerCallback.onCallback(new Player(username[0], document.getId(),
+                        getPlayerCallback.onCallback(new Player(document.getId(), username[0],
                                 contactInfo, playerPreferences, null));
 
                     } else {

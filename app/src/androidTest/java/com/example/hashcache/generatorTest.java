@@ -3,7 +3,9 @@ package com.example.hashcache;
 
 import androidx.test.core.app.ActivityScenario;
 
-import com.example.hashcache.controllers.HashInfoGenerator;
+import com.example.hashcache.controllers.hashInfo.HashInfoGenerator;
+import com.example.hashcache.controllers.hashInfo.NameGenerator;
+import com.example.hashcache.views.MainActivity;
 
 import org.junit.Test;
 
@@ -21,7 +23,7 @@ public class generatorTest {
     public void setup() {
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             // Your test code goes here
-            String name = HashInfoGenerator.NameGenerator.generateName(new Random().nextLong());
+            String name = NameGenerator.generateName(new Random().nextLong());
             assert(name.length() > 1);
         }
 

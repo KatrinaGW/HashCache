@@ -1,4 +1,4 @@
-package com.example.hashcache;
+package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,15 +10,39 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
+import com.example.hashcache.R;
+/**
+
+ The LeaderboardTopQRActivity class is an activity that displays the leaderboard of scores based on the top QR codes scanned.
+
+ It has a menu button that displays a popup menu of different activities to navigate to.
+
+ The user can navigate to different leaderboards - region, number of QR codes scanned, and scores - by clicking on the respective buttons.
+ */
 public class LeaderboardTopQRActivity extends AppCompatActivity {
+    /**
+
+     This method sets up the activity, inflating the layout and adding functionality to the menu button,
+
+     region button, number of QR codes scanned button, and score button.
+
+     @param savedInstanceState Bundle containing the data it most recently supplied in onSaveInstanceState(Bundle)
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // setup the activity and inflate the layout
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_topqr);
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * This method is called when the menu button is clicked.
+             * It displays a popup menu of different activities to navigate to.
+             *
+             * @param v The view that was clicked
+             */
             @Override
             public void onClick(View v) {
 
@@ -29,6 +53,12 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
 
                 // navigate to different activities based on menu item selected
                 menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    /**
+                     * This method is called when a menu item is clicked.
+                     *
+                     * @param item The menu item that was clicked
+                     * @return true if the event was handled, false otherwise.
+                     */
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
 
@@ -67,6 +97,12 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
         // add functionality to numQR button
         AppCompatButton numQRButton = findViewById(R.id.numQR_tab_button);
         numQRButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * This method is called when the number of QR codes scanned button is clicked.
+             * It starts the LeaderboardNumQRActivity, displaying the leaderboard of scores based on the number of QR codes scanned.
+             *
+             * @param v The view that was clicked
+             */
             @Override
             public void onClick(View v) {
                 // go to numQR leaderboard page
@@ -76,6 +112,12 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
         // add functionality to score button
         AppCompatButton topButton = findViewById(R.id.score_tab_button);
         topButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * This method is called when the score button is clicked.
+             * It starts the LeaderboardScoreActivity, displaying the leaderboard of scores.
+             *
+             * @param v The view that was clicked
+             */
             @Override
             public void onClick(View v) {
                 // go to score leaderboard page

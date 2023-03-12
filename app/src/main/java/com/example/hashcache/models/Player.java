@@ -1,5 +1,6 @@
 package com.example.hashcache.models;
 
+import com.example.hashcache.controllers.DependencyInjector;
 import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 
@@ -50,12 +51,12 @@ public class Player{
      * @param username: the user name of the user.
      */
     public static boolean createInstance(String username) {
-        if(!PlayersConnectionHandler.getInstance().getInAppPlayerUserNames().contains(username)) {
+        if(!PlayerList.getInstance().getPlayerUserNames().contains(username)) {
             INSTANCE = new Player(username);
             return true;
         } else {
             // Put code to fetch from the database the user information
-            PlayersConnectionHandler.getInstance().getPlayer(username, new GetPlayerCallback() {
+            PlayerList.getInstance().getPlayer(username, new GetPlayerCallback() {
                 @Override
                 public void onCallback(Player player) {
                     INSTANCE = player;
@@ -72,6 +73,7 @@ public class Player{
 
         return INSTANCE;
     }
+
 
     /**
      * Gets the userId for the user
@@ -112,6 +114,14 @@ public class Player{
      */
     public PlayerPreferences getPlayerPreferences(){
         return this.playerPreferences;
+    }
+
+    public void setPlayerPreferences(PlayerPreferences preferences){
+        this.playerPreferences = preferences;
+    }
+
+    public void setContactInfo(ContactInfo contactInfo){
+        this.contactInfo = contactInfo;
     }
 
     /**

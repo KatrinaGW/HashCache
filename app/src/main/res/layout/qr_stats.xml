@@ -63,15 +63,17 @@
             android:textColor="@color/HC_light_purple"
             android:textSize="24sp"
             android:textStyle="bold" />
+
         <TextView
+            android:id="@+id/total_score_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/total_score_textview"
+            android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/score_icon"
             android:text="xxxxxxx"
             android:textColor="@color/white"
-            android:textSize="24sp"
-            android:layout_marginStart="24dp"/>
+            android:textSize="24sp" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -103,15 +105,17 @@
             android:textColor="@color/HC_light_purple"
             android:textSize="24sp"
             android:textStyle="bold" />
+
         <TextView
+            android:id="@+id/my_codes_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/my_codes_textview"
+            android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/codes_icon"
             android:text="xxxxxxx"
             android:textColor="@color/white"
-            android:textSize="24sp"
-            android:layout_marginStart="24dp"/>
+            android:textSize="24sp" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -144,15 +148,19 @@
             android:textColor="@color/HC_light_purple"
             android:textSize="24sp"
             android:textStyle="bold" />
+
         <TextView
+            android:id="@+id/top_score_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/top_score_textview"
+            android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/top_score_icon"
             android:text="xxxxxxx"
+            android:onClick="onClick"
+            android:clickable="true"
             android:textColor="@color/white"
-            android:textSize="24sp"
-            android:layout_marginStart="24dp"/>
+            android:textSize="24sp" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -185,15 +193,19 @@
             android:textColor="@color/HC_light_purple"
             android:textSize="24sp"
             android:textStyle="bold" />
+
         <TextView
+            android:id="@+id/low_score_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/low_score_textview"
+            android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/low_score_icon"
             android:text="xxxxxxx"
             android:textColor="@color/white"
-            android:textSize="24sp"
-            android:layout_marginStart="24dp"/>
+            android:onClick="onClick"
+            android:clickable="true"
+            android:textSize="24sp" />
     </RelativeLayout>
 
     <androidx.appcompat.widget.AppCompatButton

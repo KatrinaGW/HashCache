@@ -1,32 +1,73 @@
 package com.example.hashcache.models.database_connections;
 
 import android.media.Image;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.Player;
-import com.example.hashcache.models.PlayerWallet;
+import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database_connections.converters.ScannableCodeDocumentConverter;
 import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.models.database_connections.values.FieldNames;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Handles the database operations on a player's PlayerWallet collection
  */
 public class PlayerWalletConnectionHandler {
     final String TAG = "Sample";
+    private FirebaseFirestore db;
     private FireStoreHelper fireStoreHelper;
+    private static PlayerWalletConnectionHandler INSTANCE;
 
     public PlayerWalletConnectionHandler(FireStoreHelper fireStoreHelper){
         this.fireStoreHelper = fireStoreHelper;
+    }
+
+    public PlayerWalletConnectionHandler(FirebaseFirestore db){
+        this.db = db;
+    }
+
+    public static PlayerWalletConnectionHandler getInstance(FireStoreHelper fireStoreHelper){
+        if(INSTANCE == null){
+            INSTANCE = new PlayerWalletConnectionHandler(fireStoreHelper);
+        }
+        return INSTANCE;
+    }
+
+    public static PlayerWalletConnectionHandler getInstance(FirebaseFirestore db){
+        if(INSTANCE == null){
+            INSTANCE = new PlayerWalletConnectionHandler(db);
+        }
+        return INSTANCE;
+    }
+
+    public static PlayerWalletConnectionHandler getInstance(){
+        if(INSTANCE == null){
+            INSTANCE = new PlayerWalletConnectionHandler(FirebaseFirestore.getInstance());
+        }
+        return INSTANCE;
     }
 
     /**
@@ -98,5 +139,105 @@ public class PlayerWalletConnectionHandler {
                         }
                     }
                 });
+    }
+
+    /**
+     * Gets the total score of all scannableCodeIds in a list
+     * @param scannableCodeIds the ids of codes to sum
+     * @return cf the CompletableFuture that contains the total score
+     */
+    public CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<Long> cf = new CompletableFuture<>();
+        AtomicLong totalScore = new AtomicLong(0);
+
+        CompletableFuture.runAsync(() -> {
+            Query docRef = db.collection(CollectionNames.SCANNABLE_CODES.collectionName);
+            docRef.get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot document : task.getResult()){
+                        if(scannableCodeIds.contains(document.getId())){
+                            totalScore.addAndGet(Long.parseLong((String) document.getData().get(FieldNames.GENERATED_SCORE.fieldName)));
+                        }
+                    }
+                    cf.complete(totalScore.longValue());
+                }
+                else{
+                    cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+                }
+            });
+        });
+        return cf;
+    }
+
+    /**
+     * Gets the the highest score from a list of scannableCodes
+     *
+     * @param scannableCodeIds the list of scannableIds to get the highest score from
+     * @return a CompletableFuture that will return the highest scoring ScannableCode
+     */
+    public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
+        HashMap<String, Integer> scoreStats = new HashMap<>();
+
+        CompletableFuture.runAsync(() -> {
+            Database.getInstance().getScannableCodesByIdInList(scannableCodeIds).thenAccept(
+                    scannableCodes -> {
+                        if(scannableCodes.size()>0){
+                            long highestScore = 0;
+                            ScannableCode highestScoring = scannableCodes.get(0);
+
+                            for(int i = 0; i < scannableCodes.size(); i++){
+                                ScannableCode scannableCode = scannableCodes.get(i);
+                                if(scannableCode.getHashInfo().getGeneratedScore() > highestScore){
+                                    highestScore = scannableCode.getHashInfo().getGeneratedScore();
+                                    highestScoring = scannableCode;
+                                }
+                            }
+                            cf.complete(highestScoring);
+                        }else{
+                            cf.completeExceptionally(new Exception("No scannablecodes could be found" +
+                                    "for the given IDs!"));
+                        }
+
+                    }
+            );
+        });
+        return cf;
+    }
+
+    /**
+     * Gets the the lowest score from a list of scannableCodes
+     *
+     * @param scannableCodeIds the list of scannableIds to get the lowest score from
+     * @return a CompletableFuture that will return the lowest scoring ScannableCode
+     */
+    public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
+        HashMap<String, Integer> scoreStats = new HashMap<>();
+
+        CompletableFuture.runAsync(() -> {
+            Database.getInstance().getScannableCodesByIdInList(scannableCodeIds).thenAccept(
+                    scannableCodes -> {
+                        if(scannableCodes.size()>0){
+                            long lowestScore = Long.MAX_VALUE;
+                            ScannableCode lowestScoring = scannableCodes.get(0);
+
+                            for(int i = 1; i < scannableCodes.size(); i++){
+                                ScannableCode scannableCode = scannableCodes.get(i);
+                                if(scannableCode.getHashInfo().getGeneratedScore() < lowestScore){
+                                    lowestScore = scannableCode.getHashInfo().getGeneratedScore();
+                                    lowestScoring = scannableCode;
+                                }
+                            }
+                            cf.complete(lowestScoring);
+                        }else{
+                            cf.completeExceptionally(new Exception("No scannablecodes could be found" +
+                                    "for the given IDs!"));
+                        }
+
+                    }
+            );
+        });
+        return cf;
     }
 }
