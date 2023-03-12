@@ -19,6 +19,7 @@ import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
 
 import java.util.ArrayList;
+import java.util.function.Function;
 
 public class OtherCacheActivity extends AppCompatActivity {
     private TextView otherUsernameHeader;
@@ -38,8 +39,11 @@ public class OtherCacheActivity extends AppCompatActivity {
         otherUsernameHeader = findViewById(R.id.other_username_header);
         otherUserScoreHeader = findViewById(R.id.other_user_score);
         player = AppStore.get().getSelectedPlayer();
+        scannableCodesList = findViewById(R.id.scannable_codes_list);
 
         otherUsernameHeader.setText(player.getUsername());
+
+        setAdapterValues();
 
         ImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
@@ -77,13 +81,6 @@ public class OtherCacheActivity extends AppCompatActivity {
                 menu.show();
             }
         });
-
-//        scannableCodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                //onScannableCodeItemClicked(i);
-//            }
-//        });
     }
 
     @Override
@@ -116,6 +113,12 @@ public class OtherCacheActivity extends AppCompatActivity {
                             scannableCodes);
                     scannableCodesList.setAdapter(scannableCodesArrayAdapter);
                     setListViewButtonListener();
+                }).exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        System.out.println(throwable);
+                        return null;
+                    }
                 });
 
         Database.getInstance()
