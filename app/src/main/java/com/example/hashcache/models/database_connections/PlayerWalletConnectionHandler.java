@@ -164,26 +164,39 @@ public class PlayerWalletConnectionHandler {
         return cf;
     }
 
-    public CompletableFuture<ArrayList<ScannableCode>> getPlayerWalletScannableCodes(ArrayList<String> scannableCodeIds){
-        CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
-        ArrayList<ScannableCode> scannableCodes = new ArrayList<>();
-        ScannableCodeDocumentConverter scannableCodeDocumentConverter = new ScannableCodeDocumentConverter();
+    /**
+     * Gets the the highest and lowest scores from a list of scannableCodes
+     *
+     * @param scannableCodeIds the list of scannableIds to get the highest and lowest scores from
+     * @return a CompletableFuture that will return the score stats for the given player
+     */
+    public CompletableFuture<HashMap<String, Integer>> getPlayerWalletTopLowScores(ArrayList<String> scannableCodeIds){
+        CompletableFuture<HashMap<String, Integer>> cf = new CompletableFuture<>();
+        HashMap<String, Integer> scoreStats = new HashMap<>();
 
         CompletableFuture.runAsync(() -> {
             Query docRef = db.collection(CollectionNames.SCANNABLE_CODES.collectionName);
             docRef.get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
+                    int highestScore = 0;
+                    int lowestScore = Integer.MAX_VALUE;
+                    int currentScore;
+
                     for(QueryDocumentSnapshot document : task.getResult()){
                         if(scannableCodeIds.contains(document.getId())){
-                            scannableCodeDocumentConverter.getScannableCodeFromDocument(document, new GetScannableCodeCallback() {
-                                @Override
-                                public void onCallback(ScannableCode scannableCode) {
-                                    scannableCodes.add(scannableCode);
-                                }
-                            });
+                            currentScore = Integer.parseInt(document.getData().get(FieldNames.GENERATED_SCORE.fieldName).toString());
+                            if(currentScore<lowestScore){
+                                lowestScore = currentScore;
+                            }
+                            if(currentScore>highestScore){
+                                highestScore = currentScore;
+                            }
                         }
                     }
-                    cf.complete(totalScore.intValue());
+
+                    scoreStats.put("highestScore", highestScore);
+                    scoreStats.put("lowestScore", lowestScore);
+                    cf.complete(scoreStats);
                 }
                 else{
                     cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));

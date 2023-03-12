@@ -1,5 +1,8 @@
 package com.example.hashcache.models;
 
+import static java.util.Collections.max;
+import static java.util.Collections.min;
+
 import android.media.Image;
 
 import com.example.hashcache.controllers.DependencyInjector;
@@ -23,13 +26,15 @@ public class PlayerWallet{
     private int totalScore;
     private int lowScore;
     private int highScore;
+    private ArrayList<Integer> scores;
 
     public PlayerWallet(){
         this.size = 0;
         this.scannableCodes = new HashMap<String, Image>();
         this.totalScore = 0;
-        this.lowScore = 0;
+        this.lowScore = Integer.MAX_VALUE;
         this.highScore = 0;
+        scores = new ArrayList<>();
     }
 
     /**
@@ -53,6 +58,7 @@ public class PlayerWallet{
     private void updateStatsAfterAdd(int score){
         this.size++;
         this.totalScore+=score;
+        scores.add(score);
 
         if(score < lowScore){
             this.lowScore = score;
@@ -132,12 +138,14 @@ public class PlayerWallet{
     private void updateAfterDelete(int score){
         this.totalScore-=score;
         this.size--;
+        scores.remove(score);
 
         if(this.size == 0){
             this.highScore = 0;
-            this.lowScore = 0;
+            this.lowScore = Integer.MAX_VALUE;
         }else{
-            //call db functions to update everything
+            this.lowScore = min(scores);
+            this.highScore = max(scores);
         }
 
     }

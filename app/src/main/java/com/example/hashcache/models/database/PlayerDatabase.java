@@ -13,6 +13,7 @@ import com.example.hashcache.models.database_connections.callbacks.GetPlayerCall
 import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
 import com.example.hashcache.store.AppStore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -122,13 +123,13 @@ public class PlayerDatabase implements IPlayerDatabase {
     public CompletableFuture<HashMap<String, String>> getPlayers() {
         return null;
     }
+
     /**
      * Gets the total score for a given player.
      *
      * @param userId the userId to get the total score for
      * @return a CompletableFuture that will return the total score for the given player
      */
-
     @Override
     public CompletableFuture<Integer> getTotalScore(String userId) {
         CompletableFuture<Integer> cf = new CompletableFuture<>();
@@ -281,6 +282,37 @@ public class PlayerDatabase implements IPlayerDatabase {
                 p.updateUserName(newUsername);
                 cf.complete(null);
             } else {
+                cf.completeExceptionally(new Exception("UserId does not exist."));
+            }
+        });
+        return cf;
+    }
+
+    /**
+     * Get the player's highest and lowest scoring QR codes
+     * @param userId the id of the user whose stats to pull
+     * @return cf the CompletableFuture with the QR Stats
+     */
+    @Override
+    public CompletableFuture<HashMap<String, Integer>> getPlayerWalletTopLowScores(String userId){
+        CompletableFuture<HashMap<String, Integer>> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            if(players.containsKey(userId)){
+                Player p = players.get(userId);
+                PlayerWalletConnectionHandler.getInstance()
+                        .getPlayerWalletTopLowScores(p.getPlayerWallet().getScannedCodeIds())
+                        .thenAccept(scoreStats -> {
+                            cf.complete(scoreStats);
+                        })
+                        .exceptionally(new Function<Throwable, Void>() {
+                            @Override
+                            public Void apply(Throwable throwable) {
+                                cf.completeExceptionally(throwable);
+                                return null;
+                            }
+                        });
+            }
+            else{
                 cf.completeExceptionally(new Exception("UserId does not exist."));
             }
         });
