@@ -149,7 +149,7 @@ public class PlayerDocumentConverter {
                             Log.e(TAG, "User does not have a username!");
                         }
 
-                        getPlayerCallback.onCallback(new Player(username[0], document.getId(),
+                        getPlayerCallback.onCallback(new Player(document.getId(), username[0],
                                 contactInfo, playerPreferences, null));
 
                     } else {

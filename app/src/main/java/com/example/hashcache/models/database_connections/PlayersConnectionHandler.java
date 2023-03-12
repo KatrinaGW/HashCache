@@ -168,9 +168,9 @@ public class PlayersConnectionHandler {
                 if(task.isSuccessful()){
                     QuerySnapshot document = task.getResult();
                     if(!document.isEmpty()){
-                        DocumentSnapshot doc = document.getDocuments().get(0);
-                        String id = (String) doc.getData().get(FieldNames.USER_ID.fieldName);
-                        cf.complete(id);
+                        String userId = "";
+                        for (QueryDocumentSnapshot docs : task.getResult()) userId = docs.getId();
+                        cf.complete(userId);
                     }
                     else{
                         cf.completeExceptionally(new Exception("Username does not exist."));
@@ -217,7 +217,9 @@ public class PlayersConnectionHandler {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         playerDocumentConverter.getPlayerFromDocument(documentReference,
-                                player -> cf.complete(player));
+                                player -> {
+                                    cf.complete(player);
+                                });
                     } else {
                         cf.completeExceptionally(new IllegalArgumentException("Given username does not exist!"));
                     }
@@ -432,7 +434,6 @@ public class PlayersConnectionHandler {
         data.put(FieldNames.PHONE_NUMBER.fieldName, "");
         data.put(FieldNames.RECORD_GEOLOCATION.fieldName, "");
         String userId = UUID.randomUUID().toString();
-
             fireStoreHelper.setDocumentReference(collectionReference.document(userId),
                     data, new BooleanCallback() {
                         @Override

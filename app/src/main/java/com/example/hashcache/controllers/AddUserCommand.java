@@ -1,5 +1,7 @@
 package com.example.hashcache.controllers;
 
+import android.util.Log;
+
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database.PlayerDatabase;
@@ -55,6 +57,8 @@ public class AddUserCommand {
             }).exceptionally(new Function<Throwable, Void>() {
                 @Override
                 public Void apply(Throwable throwable) {
+                    Log.d("ERROR", "Could not get player" + userName);
+                    Log.d("Reason", throwable.getMessage());
                     cf.completeExceptionally(new Exception("Could not get player."));
                     return null;
                 }
