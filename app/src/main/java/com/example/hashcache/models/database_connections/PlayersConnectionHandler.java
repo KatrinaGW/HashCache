@@ -464,9 +464,6 @@ public class PlayersConnectionHandler {
      */
     public void playerScannedCodeAdded(String userId, String scannableCodeId,
                                        Image locationImage, BooleanCallback booleanCallback){
-        if(!this.inAppUsernamesIds.containsValue(userId)){
-            throw new IllegalArgumentException("Given userId does not exist!");
-        }
 
         CollectionReference scannedCodeCollection = collectionReference
                 .document(userId)
@@ -487,9 +484,6 @@ public class PlayersConnectionHandler {
      */
     public void playerScannedCodeDeleted(String userId, String scannableCodeId,
                                          BooleanCallback booleanCallback){
-        if(!this.inAppUsernamesIds.containsValue(userId)){
-            throw new IllegalArgumentException("Given userId does not exist!");
-        }
 
         CollectionReference scannedCodeCollection = collectionReference
                 .document(userId)
