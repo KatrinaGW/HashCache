@@ -167,8 +167,8 @@ public class PlayerDatabase implements IPlayerDatabase {
      *         player
      */
     @Override
-    public CompletableFuture<Integer> getTotalScore(String userId) {
-        CompletableFuture<Integer> cf = new CompletableFuture<>();
+    public CompletableFuture<Long> getTotalScore(String userId) {
+        CompletableFuture<Long> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             if (players.containsKey(userId)) {
                 Player p = players.get(userId);
@@ -424,6 +424,31 @@ public class PlayerDatabase implements IPlayerDatabase {
                     .getPlayerWalletLowScore(scannableCodeIds)
                     .thenAccept(lowScore -> {
                         cf.complete(lowScore);
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
+        return cf;
+    }
+
+    /**
+     * Gets the total score of all scannableCodeIds in a list
+     * @param scannableCodeIds the ids of codes to sum
+     * @return cf the CompletableFuture that contains the total score
+     */
+    @Override
+    public CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<Long> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            PlayerWalletConnectionHandler.getInstance()
+                    .getPlayerWalletTotalScore(scannableCodeIds)
+                    .thenAccept(totalScore -> {
+                        cf.complete(totalScore);
                     })
                     .exceptionally(new Function<Throwable, Void>() {
                         @Override

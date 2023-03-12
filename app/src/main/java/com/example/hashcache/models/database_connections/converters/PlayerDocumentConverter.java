@@ -25,6 +25,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Map;
+
 /**
  * Handles the conversion between a DocumentReference and a PlayerObject
  */
@@ -81,18 +83,15 @@ public class PlayerDocumentConverter {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             String scannableCodeId;
-                            int score;
                             Image scannableCodeImage;
 
                             if(task.getResult().size()>0){
                                 for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Map<String, Object> temp = document.getData();
                                     scannableCodeId = (String) document.getData()
                                             .get(FieldNames.SCANNABLE_CODE_ID.fieldName);
-                                    score = Integer.parseInt(document.getData().get(
-                                            FieldNames.GENERATED_SCORE.fieldName
-                                    ).toString());
                                     //TODO: check for empty image and then add if it exists
-                                    playerWallet.addScannableCode(scannableCodeId, score);
+                                    playerWallet.addScannableCode(scannableCodeId);
                                 }
                             }
 

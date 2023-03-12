@@ -21,7 +21,7 @@ public interface IPlayerDatabase {
     CompletableFuture<Player> getPlayer(String userId);
     CompletableFuture<HashMap<String, String>> getPlayers();
 
-    CompletableFuture<Integer> getTotalScore(String userId);
+    CompletableFuture<Long> getTotalScore(String userId);
 
     CompletableFuture<Void> addComment(String scannableCodeId, Comment comment);
 
@@ -39,5 +39,6 @@ public interface IPlayerDatabase {
 
     CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds);
     CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds);
+    CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds);
     CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds);
 }

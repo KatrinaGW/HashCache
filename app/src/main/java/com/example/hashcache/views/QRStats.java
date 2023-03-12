@@ -41,6 +41,7 @@ public class QRStats extends AppCompatActivity {
     private AppCompatButton myProfileButton;
     private ScannableCode lowestScoring;
     private ScannableCode highestScoring;
+    private PlayerWallet playerWallet;
     /**
      * Initializes the activity and sets the layout. Also adds functionality to the menu button and my profile button.
      *
@@ -130,10 +131,10 @@ public class QRStats extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        PlayerWallet playerWallet = AppStore.get().getCurrentPlayer().getPlayerWallet();
+        playerWallet = AppStore.get().getCurrentPlayer().getPlayerWallet();
 
         setMyCodesValueTextView(playerWallet.getSize());
-        setTotalScoreValueTextView(playerWallet.getTotalScore());
+        setTotalScoreValueTextView();
         setLowScoreValueTextView();
         setTopScoreValueTextView();
 
@@ -192,12 +193,17 @@ public class QRStats extends AppCompatActivity {
         return myProfileButton;
     }
 
-    private void setTotalScoreValueTextView(int totalScore){
-        if(totalScore>0){
-            this.totalScoreValueTextView.setText(Integer.toString(totalScore));
-        }else{
-            this.totalScoreValueTextView.setText(R.string.no_codes_scanned);
-        }
+    private void setTotalScoreValueTextView(){
+        Database.getInstance()
+                .getPlayerWalletTotalScore(playerWallet.getScannedCodeIds())
+                .thenAccept(totalScore -> {
+                    if(totalScore>0){
+                        this.totalScoreValueTextView.setText(Long.toString(totalScore));
+                    }else{
+                        this.totalScoreValueTextView.setText(R.string.no_codes_scanned);
+                    }
+
+                });
     }
 
     private void setMyCodesValueTextView(int numCodes){

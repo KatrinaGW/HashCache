@@ -102,9 +102,8 @@ public class MyProfile extends AppCompatActivity {
         // add functionality to QR STATS button
         AppCompatButton statsButton = findViewById(R.id.qr_stats_button);
 
-        Player playerInfo = AppStore.get().getCurrentPlayer();
+        playerInfo = AppStore.get().getCurrentPlayer();
         setUsername(playerInfo.getUsername());
-        setScore(playerInfo.getPlayerWallet().getTotalScore());
         statsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -180,6 +179,12 @@ public class MyProfile extends AppCompatActivity {
                             scannableCodes);
                     mScannableCodesList.setAdapter(scannableCodesArrayAdapter);
                 });
+
+        Database.getInstance()
+                .getPlayerWalletTotalScore(playerInfo.getPlayerWallet().getScannedCodeIds())
+                .thenAccept(totalScore -> {
+                    this.setScore(totalScore);
+                });
     }
 
     private void setValues(){
@@ -247,7 +252,7 @@ public class MyProfile extends AppCompatActivity {
      * @param score the score to be set
      * @see TextView
      */
-    public void setScore(int score) {
+    public void setScore(long score) {
         mScoreTextView.setText("Score: " + score);
     }
     /**

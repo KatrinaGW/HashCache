@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Handles the database operations on a player's PlayerWallet collection
@@ -145,9 +146,9 @@ public class PlayerWalletConnectionHandler {
      * @param scannableCodeIds the ids of codes to sum
      * @return cf the CompletableFuture that contains the total score
      */
-    public CompletableFuture<Integer> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds){
-        CompletableFuture<Integer> cf = new CompletableFuture<>();
-        AtomicInteger totalScore = new AtomicInteger(0);
+    public CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<Long> cf = new CompletableFuture<>();
+        AtomicLong totalScore = new AtomicLong(0);
 
         CompletableFuture.runAsync(() -> {
             Query docRef = db.collection(CollectionNames.SCANNABLE_CODES.collectionName);
@@ -155,11 +156,10 @@ public class PlayerWalletConnectionHandler {
                 if(task.isSuccessful()){
                     for(QueryDocumentSnapshot document : task.getResult()){
                         if(scannableCodeIds.contains(document.getId())){
-                            totalScore.addAndGet(Integer.parseInt(document.getData().get(FieldNames.GENERATED_SCORE.fieldName)
-                                    .toString()));
+                            totalScore.addAndGet(Long.parseLong((String) document.getData().get(FieldNames.GENERATED_SCORE.fieldName)));
                         }
                     }
-                    cf.complete(totalScore.intValue());
+                    cf.complete(totalScore.longValue());
                 }
                 else{
                     cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));

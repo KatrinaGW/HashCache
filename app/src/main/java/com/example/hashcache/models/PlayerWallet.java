@@ -24,21 +24,19 @@ import java.util.Set;
 public class PlayerWallet{
     private HashMap<String, Image> scannableCodes;
     private int size;
-    private int totalScore;
 
     public PlayerWallet(){
         this.size = 0;
         this.scannableCodes = new HashMap<String, Image>();
-        this.totalScore = 0;
     }
 
     /**
      * Adds a scannable code to the player's collection without an image
      * @param scannableCodeId The id of the scanned code
      */
-    public void addScannableCode(String scannableCodeId, long score){
+    public void addScannableCode(String scannableCodeId){
         this.scannableCodes.put(scannableCodeId, null);
-        this.updateStatsAfterAdd(score);
+        this.size++;
     }
 
     /**
@@ -48,11 +46,7 @@ public class PlayerWallet{
      */
     public void addScannableCode(String scannableCodeId, Image locationImage){
         this.scannableCodes.put(scannableCodeId, locationImage);
-    }
-
-    private void updateStatsAfterAdd(long score){
         this.size++;
-        this.totalScore+=score;
     }
 
     /**
@@ -107,15 +101,6 @@ public class PlayerWallet{
     }
 
     private void updateAfterDelete(long score){
-        this.totalScore-=score;
         this.size--;
-    }
-
-    /**
-     * Get the sum of all of the player's scores
-     * @return totalScore the sum of all of the player's scores
-     */
-    public int getTotalScore(){
-        return this.totalScore;
     }
 }

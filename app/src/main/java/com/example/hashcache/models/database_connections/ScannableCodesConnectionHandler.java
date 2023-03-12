@@ -185,30 +185,43 @@ public class ScannableCodesConnectionHandler {
         CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
         ArrayList<ScannableCode> scannableCodes = new ArrayList<>();
 
-        CompletableFuture.runAsync(() -> {
-            Query docRef = this.collectionReference;
-            docRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    ScannableCode scannableCode;
-
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        if (scannableCodeIds.contains(document.getId())) {
-                            scannableCodeDocumentConverter.getScannableCodeFromDocument(document.getReference(),
-                                    new GetScannableCodeCallback() {
-                                        @Override
-                                        public void onCallback(ScannableCode scannableCode) {
-                                            scannableCodes.add(scannableCode);
-                                        }
-                                    });
+        if(scannableCodeIds.size()==0){
+            cf.complete(scannableCodes);
+        }else{
+            CompletableFuture.runAsync(() -> {
+                Query docRef = this.collectionReference;
+                docRef.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        int matches = 0;
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            if (scannableCodeIds.contains(document.getId())) {
+                                matches++;
+                                scannableCodeDocumentConverter.getScannableCodeFromDocument(document.getReference(),
+                                        new GetScannableCodeCallback() {
+                                            @Override
+                                            public void onCallback(ScannableCode scannableCode) {
+                                                scannableCodes.add(scannableCode);
+                                                if(scannableCodes.size()==scannableCodeIds.size()){
+                                                    cf.complete(scannableCodes);
+                                                }
+                                            }
+                                        });
+                            }
                         }
-                    }
 
-                    cf.complete(scannableCodes);
-                } else {
-                    cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
-                }
+                        if(matches != scannableCodeIds.size()){
+                            cf.completeExceptionally(new Exception("One or more player wallet code ids" +
+                                    "could not be mapped to actual codes!"));
+                        }
+
+                    } else {
+                        cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+                    }
+                });
             });
-        });
+        }
+
+
         return cf;
     }
 

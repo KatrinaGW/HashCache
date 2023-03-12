@@ -170,7 +170,7 @@ public class TestPlayerDatabase implements IPlayerDatabase {
      *         database
      */
     @Override
-    public CompletableFuture<Integer> getTotalScore(String userId) {
+    public CompletableFuture<Long> getTotalScore(String userId) {
         return null;
     }
 
@@ -390,6 +390,28 @@ public class TestPlayerDatabase implements IPlayerDatabase {
                 }
 
                 cf.complete(lowestScoring);
+            }
+        });
+        return cf;
+    }
+
+    /**
+     * Gets the total score of all scannableCodeIds in a list
+     * @param scannableCodeIds the ids of codes to sum
+     * @return cf the CompletableFuture that contains the total score
+     */
+    @Override
+    public CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<Long> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            long runningScore = 0;
+
+            if(scannableCodeHashMap.size()>0){
+                for(ScannableCode scannableCode : scannableCodeHashMap.values()){
+                    runningScore+=scannableCode.getHashInfo().getGeneratedScore();
+                }
+
+                cf.complete(runningScore);
             }
         });
         return cf;
