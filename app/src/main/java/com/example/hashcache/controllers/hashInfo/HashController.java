@@ -42,14 +42,14 @@ public class HashController {
                     HashInfoGenerator.generateHashInfo(byteArray).thenAccept(hashInfo -> {
                         Database.getInstance().scannableCodeExists(hash).thenAccept(exists -> {
                             String userId = AppStore.get().getCurrentPlayer().getUserId();
+                            ScannableCode sc = new ScannableCode(hash, hashInfo);
                             if(exists){
 
-                                addScannableCodeToPlayer(hash, userId, cf);
+                                addScannableCodeToPlayer(hash, userId, cf, sc);
                             }
                             else{
-                                ScannableCode sc = new ScannableCode(hash, hashInfo);
                                 Database.getInstance().addScannableCode(sc).thenAccept(id -> {
-                                    addScannableCodeToPlayer(hash, userId, cf);
+                                    addScannableCodeToPlayer(hash, userId, cf, sc);
                                 }).exceptionally(throwable -> {
                                     cf.completeExceptionally(throwable);
                                     return null;
@@ -75,8 +75,9 @@ public class HashController {
         return cf;
     }
 
-    private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf) {
+    private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf, ScannableCode sc) {
         Database.getInstance().addScannableCodeToPlayerWallet(userId, hash).thenAccept(created->{
+            AppStore.get().setCurrentScannableCode(sc);
             cf.complete(null);
         }).exceptionally(new Function<Throwable, Void>() {
             @Override
