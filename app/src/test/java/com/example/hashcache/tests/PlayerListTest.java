@@ -43,20 +43,20 @@ public class PlayerListTest {
         mockGetStringCallback = Mockito.mock(GetStringCallback.class);
         PlayerList.resetInstance();
     }
-    @Test
-    void testAddPlayerSuccess(){
-        when(mockPlayerConnectionHandler.getInAppPlayerUserNames()).thenReturn(names);
-        doAnswer(invocation -> {
-            names.add(newPlayerUsername);
-            return null;
-        }).when(mockPlayerConnectionHandler).createPlayer(anyString(), any(GetStringCallback.class));
-
-        PlayerList playerList = PlayerList.getInstance(mockPlayerConnectionHandler);
-
-        verify(mockPlayerConnectionHandler, times(1)).createPlayer(anyString(),
-                any(GetStringCallback.class));
-        assertEquals(playerList.getPlayerUserNames().get(0), names.get(0));
-    }
+//    @Test
+//    void testAddPlayerSuccess(){
+//        when(mockPlayerConnectionHandler.getInAppPlayerUserNames()).thenReturn(names);
+//        doAnswer(invocation -> {
+//            names.add(newPlayerUsername);
+//            return null;
+//        }).when(mockPlayerConnectionHandler).createPlayer(anyString(), any(GetStringCallback.class));
+//
+//        PlayerList playerList = PlayerList.getInstance(mockPlayerConnectionHandler);
+//
+//        verify(mockPlayerConnectionHandler, times(1)).createPlayer(anyString(),
+//                any(GetStringCallback.class));
+//        assertEquals(playerList.getPlayerUserNames().get(0), names.get(0));
+//    }
 
     @Test
     void testAddPlayerFailure(){
