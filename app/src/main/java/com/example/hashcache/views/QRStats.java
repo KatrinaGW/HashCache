@@ -19,7 +19,11 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+/**
 
+ The QRStats activity displays statistics for the current user, including total score, number of codes scanned,
+ highest score achieved, and lowest score achieved. It also provides buttons for navigating to other pages.
+ */
 public class QRStats extends AppCompatActivity {
     private ImageButton menuButton;
     private ImageButton scoreIcon;
@@ -28,6 +32,12 @@ public class QRStats extends AppCompatActivity {
     private TextView topScoreTextView;
     private TextView lowScoreTextView;
     private AppCompatButton myProfileButton;
+    /**
+     * Initializes the activity and sets the layout. Also adds functionality to the menu button and my profile button.
+     *
+     * @param savedInstanceState a Bundle object containing the activity's previously saved state, if any
+     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +84,11 @@ public class QRStats extends AppCompatActivity {
         // add functionality to profile button
         AppCompatButton loginButton = findViewById(R.id.my_profile_button);
         loginButton.setOnClickListener(new View.OnClickListener() {
+            /**
+
+             This method handles the click event of the My Profile button in the QRStats activity and starts the MyProfile activity.
+             @param v The view that was clicked
+             */
             @Override
             public void onClick(View v) {
 
@@ -83,6 +98,9 @@ public class QRStats extends AppCompatActivity {
             }
         });
     }
+    /**
+     * Initializes the activity's UI elements.
+     */
     private void init() {
 
         menuButton = findViewById(R.id.menu_button);
