@@ -16,7 +16,8 @@ import android.widget.TextView;
 
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
-import com.example.hashcache.controllers.HashInfoGenerator;
+import com.example.hashcache.controllers.hashInfo.HashInfoGenerator;
+import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         // Gets input stream to names.csv which is used for name generation
         InputStream is;
         is = getResources().openRawResource(R.raw.names);
-        HashInfoGenerator.NameGenerator.getNames(is);
+        NameGenerator.getNames(is);
 
         // Sets the listener for the start button
         setStartBtnListener(new View.OnClickListener() {
