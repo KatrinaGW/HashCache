@@ -105,11 +105,17 @@ public class Community extends AppCompatActivity {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(), 10)
-                        .thenAccept(searchedPlayers->{
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchedPlayers);
-                            searchedUsers.setAdapter(adapter);
-                        });
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(), 10)
+                                .thenAccept(searchedPlayers->{
+                                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchedPlayers);
+                                    searchedUsers.setAdapter(adapter);
+                                });
+                    }
+                });
             }
         });
     }
