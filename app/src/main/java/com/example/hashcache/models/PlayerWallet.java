@@ -88,19 +88,14 @@ public class PlayerWallet{
      * @param scannableCodeId the id of the scannable code to delete
      * @throws IllegalArgumentException when the id does not exist in the player wallet
      */
-    public void deleteScannableCode(String scannableCodeId, long score){
+    public void deleteScannableCode(String scannableCodeId){
         if(this.scannableCodes.containsKey(scannableCodeId)){
             this.scannableCodes.remove(scannableCodeId);
-            updateAfterDelete(score);
+            this.size--;
 
         }else{
             throw new IllegalArgumentException("Player wallet does not contain scannable" +
                     "code with given id");
         }
-
-    }
-
-    private void updateAfterDelete(long score){
-        this.size--;
     }
 }

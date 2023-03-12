@@ -4,11 +4,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.Build;
+import android.provider.ContactsContract;
 
 import androidx.annotation.RequiresApi;
 
 
 import com.example.hashcache.models.HashInfo;
+import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
@@ -86,6 +88,32 @@ public class HashController {
                 return null;
             }
         });
+    }
+
+    public static CompletableFuture<Boolean> deleteScannableCodeFromWallet(String scannableCodeId,
+                                                                           String userId) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(new Runnable() {
+
+            @Override
+            public void run() {
+                Database.getInstance().removeScannableCode(userId, scannableCodeId)
+                        .thenAccept(completed -> {
+                    if(completed){
+                        cf.complete(completed);
+                        Player currentPlayer = AppStore.get().getCurrentPlayer();
+                        if(currentPlayer.getUserId() == userId){
+                            currentPlayer.getPlayerWallet().deleteScannableCode(scannableCodeId);
+                        }
+                    }else{
+                        cf.completeExceptionally(new Exception("Something went wrong while " +
+                                "deleting the scannable code from the wallet"));
+                    }
+                });
+            }
+        });
+
+        return cf;
     }
 }
 

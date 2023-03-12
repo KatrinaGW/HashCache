@@ -17,6 +17,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.controllers.hashInfo.HashController;
 import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
@@ -46,22 +47,19 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     private ImageView miniMap;
     private ImageButton menuButton;
     private Button deleteButton;
-    private String scannableCodeId;
+    private ScannableCode currentScannableCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_monster);
 
-        Intent intent = getIntent();
-        scannableCodeId = intent.getStringExtra("scannableCodeId");
-
         init();
         // take location photo
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // go to activity to take location photo
+                onDeleteButtonClicked();
             }
         });
 
@@ -125,10 +123,10 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Database.getInstance().getScannableCodeById(scannableCodeId).thenAccept(scannableCode -> {
-            setMonsterName(scannableCode.getHashInfo().getGeneratedName());
-            setMonsterScore(scannableCode.getHashInfo().getGeneratedScore());
-        });
+        currentScannableCode = AppStore.get().getCurrentScannableCode();
+        HashInfo currentHashInfo = currentScannableCode.getHashInfo();
+        setMonsterScore(currentHashInfo.getGeneratedScore());
+        setMonsterName(currentHashInfo.getGeneratedName());
     }
 
     private void init() {
@@ -138,6 +136,15 @@ public class DisplayMonsterActivity extends AppCompatActivity {
         miniMap = findViewById(R.id.mini_map);
         menuButton = findViewById(R.id.menu_button);
         deleteButton = findViewById(R.id.delete_button);
+    }
+
+    private void onDeleteButtonClicked(){
+        HashController.deleteScannableCodeFromWallet(currentScannableCode.getScannableCodeId(),
+                        AppStore.get().getCurrentPlayer().getUserId())
+                .thenAccept(completed -> {
+                    AppStore.get().setCurrentScannableCode(null);
+                    startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
+                });
     }
 
     public void setMonsterName(String name) {

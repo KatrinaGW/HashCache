@@ -296,8 +296,8 @@ public class TestPlayerDatabase implements IPlayerDatabase {
      *         or an exception if the userId does not exist in the database
      */
     @Override
-    public CompletableFuture<Void> removeScannableCode(String userId, String scannableCodeId) {
-        CompletableFuture<Void> cf = new CompletableFuture<>();
+    public CompletableFuture<Boolean> removeScannableCode(String userId, String scannableCodeId) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             if (players.containsKey(userId)) {
                 if (scannableCodeHashMap.containsKey(scannableCodeId)) {
@@ -306,8 +306,8 @@ public class TestPlayerDatabase implements IPlayerDatabase {
                     String scanId = scannableCodeId;
                     ScannableCode scannableCode = scannableCodeHashMap.get(scannableCodeId);
                     scannableCodeHashMap.remove(scanId);
-                    p.getPlayerWallet().deleteScannableCode(scanId, scannableCode.getHashInfo().getGeneratedScore());
-                    cf.complete(null);
+                    p.getPlayerWallet().deleteScannableCode(scanId);
+                    cf.complete(true);
                 }
             } else {
                 cf.completeExceptionally(new Exception("UserId does not exist."));

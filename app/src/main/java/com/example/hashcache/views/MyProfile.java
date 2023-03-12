@@ -24,7 +24,6 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
-import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
@@ -197,9 +196,8 @@ public class MyProfile extends AppCompatActivity {
     private void onScannableCodeItemClicked(int i){
         ScannableCode clickedScannableCode = scannableCodes.get(i);
 
-        Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
-        intent.putExtra("scannableCodeId", clickedScannableCode.getScannableCodeId());
-        startActivity(intent);
+        AppStore.get().setCurrentScannableCode(clickedScannableCode);
+        startActivity(new Intent(MyProfile.this, DisplayMonsterActivity.class));
     }
 
     /**
