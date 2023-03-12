@@ -10,14 +10,27 @@
 
 package com.example.hashcache;
 
+
+import static android.util.Log.INFO;
+
+import android.R.layout;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
+
+import com.example.hashcache.models.Player;
+import com.example.hashcache.models.PlayerList;
+
+import java.util.ArrayList;
 
 public class Community extends AppCompatActivity {
     @Override
@@ -69,6 +82,19 @@ public class Community extends AppCompatActivity {
                     }
                 });
                 menu.show();
+            }
+        });
+
+        // Handles the search button
+        EditText searchBarText = findViewById(R.id.search_bar_edittext);
+        ListView searchedUsers = findViewById(R.id.user_listview);
+        ImageButton searchButton = findViewById(R.id.search_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<String> searchedPlayers = PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(), 10);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchedPlayers);
+                searchedUsers.setAdapter(adapter);
             }
         });
     }
