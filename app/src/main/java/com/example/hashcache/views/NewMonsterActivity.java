@@ -1,7 +1,10 @@
 package com.example.hashcache.views;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -13,6 +16,11 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.controllers.hashInfo.ImageGenerator;
+import com.example.hashcache.models.HashInfo;
+import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.store.AppStore;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -24,6 +32,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
+
+import java.util.function.Function;
+
 /**
 
  The NewMonsterActivity class represents an activity in the app that allows users to create a new monster.
@@ -52,12 +63,35 @@ public class NewMonsterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_monster);
 
+        init();
         // take location photo
         ImageButton photoButton = findViewById(R.id.photo_button);
         photoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // go to activity to take location photo
+            }
+        });
+
+        ScannableCode curCode =AppStore.get().getCurrentScannableCode();
+        HashInfo curInfo = curCode.getHashInfo();
+        setMonsterName(curInfo.getGeneratedName());
+        setMonsterScore(curInfo.getGeneratedScore());
+        ImageGenerator.getImageFromHash(curCode.getScannableCodeId()).thenAccept(drawable -> {
+            Log.d("NewMonsterActivity", "Received drawable from API");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d("NewMonsterActivity", "Setting image...");
+                    setMonsterImage(drawable);
+                }
+            });
+
+        }).exceptionally(new Function<Throwable, Void>() {
+            @Override
+            public Void apply(Throwable throwable) {
+                Log.d("NewMonsterActivity ERROR", throwable.getMessage());
+                return null;
             }
         });
 
@@ -131,6 +165,7 @@ public class NewMonsterActivity extends AppCompatActivity {
                 });
                 menu.show();
             }
+
         });
     }
     private void init() {
@@ -149,12 +184,12 @@ public class NewMonsterActivity extends AppCompatActivity {
         monsterName.setText(name);
     }
 
-    public void setMonsterScore(int score) {
-        monsterScore.setText("score: " + score);
+    public void setMonsterScore(long score) {
+        monsterScore.setText("Score: " + score);
     }
 
-    public void setMonsterImage(int imageRes) {
-        monsterImage.setImageResource(imageRes);
+    public void setMonsterImage(Drawable image) {
+        monsterImage.setImageDrawable(image);
     }
 
     public void setMiniMapImage(int imageRes) {
