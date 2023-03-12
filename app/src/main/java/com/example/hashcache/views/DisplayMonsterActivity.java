@@ -127,6 +127,23 @@ public class DisplayMonsterActivity extends AppCompatActivity {
         HashInfo currentHashInfo = currentScannableCode.getHashInfo();
         setMonsterScore(currentHashInfo.getGeneratedScore());
         setMonsterName(currentHashInfo.getGeneratedName());
+        ImageGenerator.getImageFromHash(currentScannableCode.getScannableCodeId()).thenAccept(drawable -> {
+            Log.d("NewMonsterActivity", "Received drawable from API");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d("NewMonsterActivity", "Setting image...");
+                    setMonsterImage(drawable);
+                }
+            });
+
+        }).exceptionally(new Function<Throwable, Void>() {
+            @Override
+            public Void apply(Throwable throwable) {
+                Log.d("NewMonsterActivity ERROR", throwable.getMessage());
+                return null;
+            }
+        });
     }
 
     private void init() {
