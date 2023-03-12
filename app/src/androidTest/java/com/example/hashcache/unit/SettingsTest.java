@@ -1,25 +1,17 @@
 package com.example.hashcache.unit;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.widget.EditText;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.example.hashcache.AppHome;
-import com.example.hashcache.Community;
-import com.example.hashcache.MainActivity;
-import com.example.hashcache.MyProfile;
-import com.example.hashcache.QRByLocation;
-import com.example.hashcache.QRScanActivity;
-import com.example.hashcache.QRStats;
+import com.example.hashcache.views.AppHome;
+import com.example.hashcache.views.Community;
+import com.example.hashcache.views.MainActivity;
+import com.example.hashcache.views.MyProfile;
+import com.example.hashcache.views.QRStats;
 import com.example.hashcache.R;
-import com.example.hashcache.Settings;
+import com.example.hashcache.views.Settings;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;

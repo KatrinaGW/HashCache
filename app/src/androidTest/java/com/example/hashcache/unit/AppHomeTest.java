@@ -11,14 +11,15 @@ import android.widget.EditText;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.example.hashcache.AppHome;
-import com.example.hashcache.Community;
-import com.example.hashcache.MainActivity;
-import com.example.hashcache.MyProfile;
-import com.example.hashcache.QRByLocation;
-import com.example.hashcache.QRScanActivity;
-import com.example.hashcache.QRStats;
+import com.example.hashcache.views.AppHome;
+import com.example.hashcache.views.Community;
+import com.example.hashcache.views.MainActivity;
+import com.example.hashcache.views.MyProfile;
+import com.example.hashcache.views.QRByLocation;
+import com.example.hashcache.views.QRScanActivity;
+import com.example.hashcache.views.QRStats;
 import com.example.hashcache.R;
+import com.example.hashcache.views.Settings;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;
