@@ -16,7 +16,7 @@
         android:theme="@style/Theme.HashCache"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".views.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,18 +24,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AppHome"/>
-        <activity android:name=".QRStats"/>
-        <activity android:name=".MyProfile"/>
-        <activity android:name=".Community"/>
-        <activity android:name=".QRByLocation"/>
-        <activity android:name=".Settings"/>
-        <activity android:name=".QRScanActivity"/>
-        <activity android:name=".LeaderboardScoreActivity"/>
-        <activity android:name=".LeaderboardRegionActivity"/>
-        <activity android:name=".LeaderboardNumQRActivity"/>
-        <activity android:name=".LeaderboardTopQRActivity"/>
-        <activity android:name=".NewMonsterActivity"/>
+        <activity android:name=".views.AppHome"/>
+        <activity android:name=".views.QRStats"/>
+        <activity android:name=".views.MyProfile"/>
+        <activity android:name=".views.Community"/>
+        <activity android:name=".views.QRByLocation"/>
+        <activity android:name=".views.Settings"/>
+        <activity android:name=".views.QRScanActivity"/>
+        <activity android:name=".views.LeaderboardScoreActivity"/>
+        <activity android:name=".views.LeaderboardRegionActivity"/>
+        <activity android:name=".views.LeaderboardNumQRActivity"/>
+        <activity android:name=".views.LeaderboardTopQRActivity"/>
+        <activity android:name=".views.NewMonsterActivity"/>
         <provider
             android:name="com.google.firebase.provider.FirebaseInitProvider"
             android:authorities="${applicationId}.firebaseinitprovider"

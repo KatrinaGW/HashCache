@@ -6,8 +6,11 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerWalletCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
 import com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter;
 import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.models.database_connections.values.FieldNames;
@@ -22,6 +25,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -29,6 +33,10 @@ import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * Handles all calls to the Firebase Players database
@@ -68,27 +76,6 @@ public class PlayersConnectionHandler {
         this.db = db;
 
         collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
-
-        /**
-         * When the collection is updated, update the userId and username mapping accordingly
-         */
-        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
-            FirebaseFirestoreException error) {
-                String username;
-                inAppUsernamesIds.clear();
-
-                for(QueryDocumentSnapshot doc: queryDocumentSnapshots)
-                {
-                    if(doc.getData().get(FieldNames.USERNAME.fieldName) != null){
-                        username = doc.getData().get(FieldNames.USERNAME.fieldName).toString();
-                        Log.d(TAG, username);
-                        inAppUsernamesIds.put(username, doc.getId());
-                    }
-                }
-            }
-        });
     }
 
     /**
@@ -152,6 +139,100 @@ public class PlayersConnectionHandler {
     }
 
     /**
+     * Returns a boolean CompletableFuture indicating if the username exists or not.
+     *
+     * @param username the username to use to pull the player with
+     */
+
+    public CompletableFuture<Boolean> usernameExists(String username){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            Query docRef = collectionReference.whereEqualTo(FieldNames.USERNAME.fieldName, username).limit(1);
+            docRef.get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    QuerySnapshot document = task.getResult();
+                        cf.complete(!document.isEmpty());
+                }
+                else{
+                    cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+                }
+            });
+        });
+        return cf;
+    }
+    public CompletableFuture<String> getPlayerIdByUsername(String username){
+        CompletableFuture<String> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            Query docRef = collectionReference.whereEqualTo(FieldNames.USERNAME.fieldName, username).limit(1);
+            docRef.get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    QuerySnapshot document = task.getResult();
+                    if(!document.isEmpty()){
+                        String userId = "";
+                        for (QueryDocumentSnapshot docs : task.getResult()) userId = docs.getId();
+                        cf.complete(userId);
+                    }
+                    else{
+                        cf.completeExceptionally(new Exception("Username does not exist."));
+                    }
+                }
+                else{
+                    cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+                }
+            });
+        });
+        return cf;
+    }
+
+    public CompletableFuture<HashMap<String, String>> getPlayers(){
+        CompletableFuture<HashMap<String, String>> cf = new CompletableFuture<>();
+        HashMap<String, String> usernamesIds = new HashMap<>();
+
+        db.collection(CollectionNames.PLAYERS.collectionName)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                usernamesIds.put(document.getData().get(FieldNames.USERNAME.fieldName).toString(),
+                                        document.getData().get(FieldNames.USER_ID.fieldName).toString());
+                                cf.complete(usernamesIds);
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                            cf.completeExceptionally(task.getException());
+                        }
+                    }
+                });
+        return cf;
+    }
+
+    public CompletableFuture<Player> getPlayerAsync(String userId) {
+        DocumentReference documentReference = collectionReference.document(userId);
+        CompletableFuture<Player> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            documentReference.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        playerDocumentConverter.getPlayerFromDocument(documentReference,
+                                player -> {
+                                    cf.complete(player);
+                                });
+                    } else {
+                        cf.completeExceptionally(new IllegalArgumentException("Given username does not exist!"));
+                    }
+                } else {
+                    Log.d(TAG, "Failed with: ", task.getException());
+                    cf.completeExceptionally(task.getException());
+                }
+            });
+        });
+        return cf;
+    }
+
+    /**
      * Gets a Player with a given username from the Players database
      *
      * @param userName the username to use to pull the player with
@@ -204,81 +285,6 @@ public class PlayersConnectionHandler {
                 }
             });
         }
-    }
-
-    /**
-     * Adds a player to the database
-     *
-     * @param player the player to add to the database
-     * @param booleanCallback the callback function to call once the operation has finished. Call
-     *                        with true if the operation was successful, and false otherwise
-     * @throws IllegalArgumentException if the username is empty, too long, or already belongs
-     * to a player
-     */
-    public void addPlayer(Player player, BooleanCallback booleanCallback){
-        String userId = player.getUserId();
-        String username = player.getUsername();
-        ContactInfo contactInfo = player.getContactInfo();
-        PlayerPreferences playerPreferences = player.getPlayerPreferences();
-
-        if(username == null || username.equals("")|| username.length()>=50){
-            throw new IllegalArgumentException("Username null, empty, or too long");
-        }
-
-        if(inAppUsernamesIds.keySet().contains(username)){
-            throw new IllegalArgumentException("Username taken!");
-        }
-        /**
-         * Sets the id on the document as the userId
-         * @param isTrue indicates if setting the PlayerWallet was successful
-         */
-        setUserId(userId, new BooleanCallback() {
-            /**
-             * Sets the username on the document
-             * @param isTrue indicates if setting the userId was successful
-             */
-            @Override
-            public void onCallback(Boolean isTrue)
-            {
-                setUserName(collectionReference.document(userId),username, new BooleanCallback() {
-
-                    /**
-                     * Sets the contact information on the document
-                     * @param isTrue indicates if setting the username was successful
-                     */
-                    @Override
-                    public void onCallback(Boolean isTrue) {
-                        if (isTrue) {
-                            DocumentReference playerDocument = collectionReference.document(userId);
-                            setContactInfo(playerDocument, contactInfo, new BooleanCallback() {
-                                /**
-                                 * Sets the player preferences on the document
-                                 * @param isTrue indicates if setting the contact information
-                                 *               was successful
-                                 */
-                                @Override
-                                public void onCallback(Boolean isTrue) {
-                                    if (isTrue) {
-                                        setPlayerPreferences(playerDocument, playerPreferences, new BooleanCallback() {
-                                            /**
-                                             * Caches the created player and calls the given callback function with
-                                             * the success of the player creation
-                                             * @param isTrue indicates if setting the player preferences was successful
-                                             */
-                                            @Override
-                                            public void onCallback(Boolean isTrue) {
-                                                cachedPlayers.put(player.getUsername(), player);
-                                                booleanCallback.onCallback(isTrue);
-                                            }
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
-            }
-        });
     }
 
     /**
@@ -378,10 +384,6 @@ public class PlayersConnectionHandler {
      * @throws IllegalArgumentException if the current username does not exist
      */
     public void updateUserName(String oldUsername, String newUsername, BooleanCallback booleanCallback){
-        if(!this.inAppUsernamesIds.containsKey(oldUsername)){
-            throw new IllegalArgumentException("Old username does not exist!");
-        }
-
         this.setUserName(this.collectionReference.document(inAppUsernamesIds.get(oldUsername)),
                 newUsername, new BooleanCallback() {
                     @Override
@@ -420,31 +422,31 @@ public class PlayersConnectionHandler {
 
     /**
      * Sets the id of a new document with the userId
-     * @param userId the userId to use as the id on the document
-     * @param booleanCallback the callback function to call once the operation has finished. Calls
-     *                        with true if the operation was successful, and false otherwise
+     * @param username the username of the user
+     * @param getStringCallback the callback function to call once the operation has finished. Calls
+     *                        with the userId if the operation was successful, and null otherwise
      * @throws IllegalArgumentException if there already is a document with the given userId
      */
-    private void setUserId(String userId, BooleanCallback booleanCallback){
-        HashMap<String, String> userIdData = new HashMap<>();
-        userIdData.put(FieldNames.USER_ID.fieldName, userId);
-        if(this.inAppUsernamesIds.containsValue(userId)){
-            throw new IllegalArgumentException("There already exists a document with the given id!");
-        } else{
+    public void createPlayer(String username, GetStringCallback getStringCallback){
+        HashMap<String, String> data = new HashMap<>();
+        data.put(FieldNames.USERNAME.fieldName, username);
+        data.put(FieldNames.EMAIL.fieldName, "");
+        data.put(FieldNames.PHONE_NUMBER.fieldName, "");
+        data.put(FieldNames.RECORD_GEOLOCATION.fieldName, "");
+        String userId = UUID.randomUUID().toString();
             fireStoreHelper.setDocumentReference(collectionReference.document(userId),
-                    userIdData, new BooleanCallback() {
+                    data, new BooleanCallback() {
                         @Override
                         public void onCallback(Boolean isTrue) {
                             if(isTrue){
-                                booleanCallback.onCallback(true);
+                                getStringCallback.onCallback(userId);
                             }else{
                                 Log.e(TAG, "Something went wrong while setting the userId" +
                                         "on a new Playerdocument");
-                                booleanCallback.onCallback(false);
+                                getStringCallback.onCallback(null);
                             }
                         }
                     });
-        }
     }
 
     /**

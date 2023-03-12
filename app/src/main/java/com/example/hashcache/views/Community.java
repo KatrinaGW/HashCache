@@ -8,7 +8,7 @@
  * Additional buttons permit navigation to other pages.
  */
 
-package com.example.hashcache;
+package com.example.hashcache.views;
 
 
 import static android.util.Log.INFO;
@@ -25,16 +25,24 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
+import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
 
 import java.util.ArrayList;
 
 public class Community extends AppCompatActivity {
+    private ImageButton mMenuButton;
+    private ImageButton mSearchButton;
+    private EditText mSearchEditText;
+    private ListView mUserListView;
+    private AppCompatButton mLeaderboardButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        initView();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.community);
 
@@ -97,5 +105,40 @@ public class Community extends AppCompatActivity {
                 searchedUsers.setAdapter(adapter);
             }
         });
+    }
+    private void initView() {
+        mMenuButton = findViewById(R.id.menu_button);
+        mSearchButton = findViewById(R.id.search_button);
+        mSearchEditText = findViewById(R.id.search_bar_edittext);
+        mUserListView = findViewById(R.id.user_listview);
+        mLeaderboardButton = findViewById(R.id.leaderboard_button);
+    }
+
+    public void setMenuButtonListener(View.OnClickListener listener) {
+        mMenuButton.setOnClickListener(listener);
+    }
+
+    public void setSearchButtonListener(View.OnClickListener listener) {
+        mSearchButton.setOnClickListener(listener);
+    }
+
+    public String getSearchQuery() {
+        return mSearchEditText.getText().toString();
+    }
+
+    public void setSearchQuery(String query) {
+        mSearchEditText.setText(query);
+    }
+
+   //public void setUserListViewAdapter(ListAdapterView adapter) {
+    //    mUserListView.setAdapter(adapter);
+    //}
+
+    public void setUserListViewEmptyView(View view) {
+        mUserListView.setEmptyView(view);
+    }
+
+    public void setLeaderboardButtonListener(View.OnClickListener listener) {
+        mLeaderboardButton.setOnClickListener(listener);
     }
 }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HashCache</string>
+    <string name="no_codes_scanned">No codes scanned yet!</string>
 </resources>

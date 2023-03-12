@@ -28,6 +28,17 @@ public class DependencyInjector {
                 new FireStoreHelper(), FirebaseFirestore.getInstance());
     }
 
+    public static ScannableCodesConnectionHandler getOrMakeScannableCodesConnectionHandler(){
+        ScannableCodesConnectionHandler scannableCodesConnectionHandler;
+        try{
+            scannableCodesConnectionHandler = ScannableCodesConnectionHandler.getInstance();
+        }catch(IllegalArgumentException e){
+            scannableCodesConnectionHandler = makeScannableCodesConnectionHandler();
+        }
+
+        return scannableCodesConnectionHandler;
+    }
+
     /**
      * Create and return an instance of the PlayersConnectionHandler with its necessary
      * dependencies
@@ -53,4 +64,5 @@ public class DependencyInjector {
         return CodeLocationConnectionHandler.makeInstance(new FireStoreHelper(), new CodeLocationDocumentConverter(),
                 FirebaseFirestore.getInstance());
     }
+
 }

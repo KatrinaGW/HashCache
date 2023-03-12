@@ -116,6 +116,14 @@ public class Player{
         return this.playerPreferences;
     }
 
+    public void setPlayerPreferences(PlayerPreferences preferences){
+        this.playerPreferences = preferences;
+    }
+
+    public void setContactInfo(ContactInfo contactInfo){
+        this.contactInfo = contactInfo;
+    }
+
     /**
      * Gets the player's current wallet of scannable codes
      * @return playerWallet The player's current wallet of scannable codes

@@ -1,42 +1,88 @@
 package com.example.hashcache.models;
 
+import static java.util.Collections.max;
+import static java.util.Collections.min;
+
 import android.media.Image;
+
+import com.example.hashcache.controllers.DependencyInjector;
+import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
+import com.example.hashcache.models.database_connections.callbacks.GetIntegerCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
+
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Represents a list of the player's current scanned codes
  */
 public class PlayerWallet{
-    private static PlayerWallet INSTANCE;
     private HashMap<String, Image> scannableCodes;
     private int size;
+    private int totalScore;
+    private int lowScore;
+    private int highScore;
+    private ArrayList<Integer> scores;
 
     public PlayerWallet(){
         this.size = 0;
         this.scannableCodes = new HashMap<String, Image>();
+        this.totalScore = 0;
+        this.lowScore = Integer.MAX_VALUE;
+        this.highScore = 0;
+        scores = new ArrayList<>();
     }
-
 
     /**
      * Adds a scannable code to the player's collection without an image
      * @param scannableCodeId The id of the scanned code
      */
-    public void addScannableCode(String scannableCodeId){
+    public void addScannableCode(String scannableCodeId, int score){
         this.scannableCodes.put(scannableCodeId, null);
+        this.updateStatsAfterAdd(score);
     }
-
-
 
     /**
      * Adds a scannable code and its image to the player's collection
      * @param scannableCodeId The id of the scannable code
      * @param locationImage The image of the location where the user scanned the code
      */
-    public void addScannableCode(String scannableCodeId, Image locationImage){
-        this.size++;
+    public void addScannableCode(String scannableCodeId, int score, Image locationImage){
         this.scannableCodes.put(scannableCodeId, locationImage);
+    }
+
+    private void updateStatsAfterAdd(int score){
+        this.size++;
+        this.totalScore+=score;
+        scores.add(score);
+
+        if(score < lowScore){
+            this.lowScore = score;
+        }
+
+        if(score > highScore){
+            this.highScore = score;
+        }
+    }
+
+    /**
+     * Gets the player's lowest score
+     * @return lowScore the player's lowest score
+     */
+    public int getLowScore(){
+        return this.lowScore;
+    }
+
+    /**
+     * Gets the player's highest score
+     * @return highScore the player's highest score
+     */
+    public int getHighScore(){
+        return this.highScore;
     }
 
     /**
@@ -78,9 +124,10 @@ public class PlayerWallet{
      * @param scannableCodeId the id of the scannable code to delete
      * @throws IllegalArgumentException when the id does not exist in the player wallet
      */
-    public void deleteScannableCode(String scannableCodeId){
+    public void deleteScannableCode(String scannableCodeId, int score){
         if(this.scannableCodes.containsKey(scannableCodeId)){
             this.scannableCodes.remove(scannableCodeId);
+
         }else{
             throw new IllegalArgumentException("Player wallet does not contain scannable" +
                     "code with given id");
@@ -88,7 +135,22 @@ public class PlayerWallet{
 
     }
 
-    //Do we need to get the scannablecode from here? Since I'm assuming we're just connecting to
-    //DB and can get it somewhere else. Assume id is already known if the user gets here - doesn't
-    //seem to be a point in adding that method
+    private void updateAfterDelete(int score){
+        this.totalScore-=score;
+        this.size--;
+        scores.remove(score);
+
+        if(this.size == 0){
+            this.highScore = 0;
+            this.lowScore = Integer.MAX_VALUE;
+        }else{
+            this.lowScore = min(scores);
+            this.highScore = max(scores);
+        }
+
+    }
+
+    public int getTotalScore(){
+        return this.totalScore;
+    }
 }
