@@ -15,6 +15,7 @@ import com.example.hashcache.store.AppStore;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -38,9 +39,11 @@ public class HashController {
                     messageDigest.update(qrContent.getBytes());
                     byte[] byteArray = messageDigest.digest();
                     String hash = new BigInteger(1, byteArray).toString(16);
+                    HashInfoGenerator.generateHashInfo(byteArray).thenAccept(hashInfo -> {
                         Database.getInstance().scannableCodeExists(hash).thenAccept(exists -> {
                             String userId = AppStore.get().getCurrentPlayer().getUserId();
                             if(exists){
+
                                 addScannableCodeToPlayer(hash, userId, cf);
                             }
                             else{
@@ -75,6 +78,12 @@ public class HashController {
     private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf) {
         Database.getInstance().addScannableCodeToPlayerWallet(userId, hash).thenAccept(created->{
             cf.complete(null);
+        }).exceptionally(new Function<Throwable, Void>() {
+            @Override
+            public Void apply(Throwable throwable) {
+                cf.completeExceptionally(throwable);
+                return null;
+            }
         });
     }
 }
