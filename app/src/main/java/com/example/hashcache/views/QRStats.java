@@ -63,14 +63,14 @@ public class QRStats extends AppCompatActivity {
         topScoreValueTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: go to page for the highest scoring code
+                highestScoringCodeClicked();
             }
         });
 
         lowScoreValueTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: go to apge for the lowest scoring code
+                lowestScoringCodeClicked();
             }
         });
 
@@ -153,6 +153,16 @@ public class QRStats extends AppCompatActivity {
                         setTopScoreValueTextView();
                     });
         }
+    }
+
+    private void highestScoringCodeClicked(){
+        AppStore.get().setCurrentScannableCode(highestScoring);
+        startActivity(new Intent(QRStats.this, DisplayMonsterActivity.class));
+    }
+
+    private void lowestScoringCodeClicked(){
+        AppStore.get().setCurrentScannableCode(lowestScoring);
+        startActivity(new Intent(QRStats.this, DisplayMonsterActivity.class));
     }
 
     private void init() {
