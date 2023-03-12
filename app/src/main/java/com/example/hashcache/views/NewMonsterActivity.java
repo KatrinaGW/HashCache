@@ -5,12 +5,25 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatButton;
 /**
 
  The NewMonsterActivity class represents an activity in the app that allows users to create a new monster.
@@ -26,6 +39,14 @@ public class NewMonsterActivity extends AppCompatActivity {
      *
      * @param savedInstanceState saved state of the activity, if it was previously closed.
      */
+    private TextView monsterName;
+    private TextView monsterScore;
+    private ImageView monsterImage;
+    private ImageView miniMap;
+    private ImageButton menuButton;
+    private TextView takePhotoText;
+    private ImageButton photoButton;
+    private AppCompatButton skipPhotoButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,5 +133,45 @@ public class NewMonsterActivity extends AppCompatActivity {
             }
         });
     }
+    private void init() {
+
+        monsterName = findViewById(R.id.monster_name);
+        monsterScore = findViewById(R.id.monster_score);
+        monsterImage = findViewById(R.id.monster_image);
+        miniMap = findViewById(R.id.mini_map);
+        menuButton = findViewById(R.id.menu_button);
+        takePhotoText = findViewById(R.id.take_photo_text);
+        photoButton = findViewById(R.id.photo_button);
+        skipPhotoButton = findViewById(R.id.skip_photo_button);
+    }
+
+    public void setMonsterName(String name) {
+        monsterName.setText(name);
+    }
+
+    public void setMonsterScore(int score) {
+        monsterScore.setText("score: " + score);
+    }
+
+    public void setMonsterImage(int imageRes) {
+        monsterImage.setImageResource(imageRes);
+    }
+
+    public void setMiniMapImage(int imageRes) {
+        miniMap.setImageResource(imageRes);
+    }
+
+    public void setMenuButtonClickListener(View.OnClickListener listener) {
+        menuButton.setOnClickListener(listener);
+    }
+
+    public void setPhotoButtonClickListener(View.OnClickListener listener) {
+        photoButton.setOnClickListener(listener);
+    }
+
+    public void setSkipPhotoButtonClickListener(View.OnClickListener listener) {
+        skipPhotoButton.setOnClickListener(listener);
+    }
+    
 
 }
