@@ -19,6 +19,8 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.models.PlayerWallet;
+import com.example.hashcache.store.AppStore;
 
 public class QRStats extends AppCompatActivity {
     private ImageButton menuButton;
@@ -27,6 +29,10 @@ public class QRStats extends AppCompatActivity {
     private TextView myCodesTextView;
     private TextView topScoreTextView;
     private TextView lowScoreTextView;
+    private TextView totalScoreValueTextView;
+    private TextView myCodesValueTextView;
+    private TextView topScoreValueTextView;
+    private TextView lowScoreValueTextView;
     private AppCompatButton myProfileButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +41,17 @@ public class QRStats extends AppCompatActivity {
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
+        totalScoreValueTextView = findViewById(R.id.total_score_value);
+        myCodesValueTextView = findViewById(R.id.my_codes_value);
+        topScoreValueTextView = findViewById(R.id.top_score_value);
+        lowScoreValueTextView = findViewById(R.id.low_score_value);
+
+        PlayerWallet playerWallet = AppStore.get().getCurrentPlayer().getPlayerWallet();
+        setLowScoreValueTextView(playerWallet.getLowScore());
+        setTopScoreValueTextView(playerWallet.getHighScore());
+        setMyCodesValueTextView(playerWallet.getSize());
+        setTotalScoreValueTextView(playerWallet.getTotalScore());
+
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,6 +100,18 @@ public class QRStats extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        PlayerWallet playerWallet = AppStore.get().getCurrentPlayer().getPlayerWallet();
+        setLowScoreValueTextView(playerWallet.getLowScore());
+        setTopScoreValueTextView(playerWallet.getHighScore());
+        setMyCodesValueTextView(playerWallet.getSize());
+        setTotalScoreValueTextView(playerWallet.getTotalScore());
+    }
+
     private void init() {
 
         menuButton = findViewById(R.id.menu_button);
@@ -119,5 +148,37 @@ public class QRStats extends AppCompatActivity {
 
     public AppCompatButton getMyProfileButton() {
         return myProfileButton;
+    }
+
+    private void setTotalScoreValueTextView(int totalScore){
+        if(totalScore>0){
+            this.totalScoreValueTextView.setText(Integer.toString(totalScore));
+        }else{
+            this.totalScoreValueTextView.setText(R.string.no_codes_scanned);
+        }
+    }
+
+    private void setMyCodesValueTextView(int numCodes){
+        if(numCodes>0){
+            this.myCodesValueTextView.setText(Integer.toString(numCodes));
+        }else{
+            this.myCodesValueTextView.setText(R.string.no_codes_scanned);
+        }
+    }
+
+    private void setTopScoreValueTextView(int topScore){
+        if(topScore>0){
+            this.topScoreValueTextView.setText(Integer.toString(topScore));
+        }else{
+            this.topScoreValueTextView.setText(R.string.no_codes_scanned);
+        }
+    }
+
+    private void setLowScoreValueTextView(int lowScore){
+        if(lowScore>0){
+            this.lowScoreValueTextView.setText(Integer.toString(lowScore));
+        }else{
+            this.lowScoreValueTextView.setText(R.string.no_codes_scanned);
+        }
     }
 }

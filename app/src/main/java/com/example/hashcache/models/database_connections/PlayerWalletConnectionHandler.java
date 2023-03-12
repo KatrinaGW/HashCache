@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database_connections.converters.ScannableCodeDocumentConverter;
 import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.models.database_connections.values.FieldNames;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -16,6 +18,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -151,6 +155,48 @@ public class PlayerWalletConnectionHandler {
                         }
                     }
                     cf.complete(totalScore.intValue());
+                }
+                else{
+                    cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+                }
+            });
+        });
+        return cf;
+    }
+
+    /**
+     * Gets the the highest and lowest scores from a list of scannableCodes
+     *
+     * @param scannableCodeIds the list of scannableIds to get the highest and lowest scores from
+     * @return a CompletableFuture that will return the score stats for the given player
+     */
+    public CompletableFuture<HashMap<String, Integer>> getPlayerWalletTopLowScores(ArrayList<String> scannableCodeIds){
+        CompletableFuture<HashMap<String, Integer>> cf = new CompletableFuture<>();
+        HashMap<String, Integer> scoreStats = new HashMap<>();
+
+        CompletableFuture.runAsync(() -> {
+            Query docRef = db.collection(CollectionNames.SCANNABLE_CODES.collectionName);
+            docRef.get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    int highestScore = 0;
+                    int lowestScore = Integer.MAX_VALUE;
+                    int currentScore;
+
+                    for(QueryDocumentSnapshot document : task.getResult()){
+                        if(scannableCodeIds.contains(document.getId())){
+                            currentScore = Integer.parseInt(document.getData().get(FieldNames.GENERATED_SCORE.fieldName).toString());
+                            if(currentScore<lowestScore){
+                                lowestScore = currentScore;
+                            }
+                            if(currentScore>highestScore){
+                                highestScore = currentScore;
+                            }
+                        }
+                    }
+
+                    scoreStats.put("highestScore", highestScore);
+                    scoreStats.put("lowestScore", lowestScore);
+                    cf.complete(scoreStats);
                 }
                 else{
                     cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));

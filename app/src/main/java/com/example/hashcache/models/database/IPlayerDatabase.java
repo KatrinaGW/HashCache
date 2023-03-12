@@ -6,6 +6,7 @@ import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -36,4 +37,6 @@ public interface IPlayerDatabase {
     CompletableFuture<Void> removeScannableCode(String userId, String scannableCodeId);
 
     CompletableFuture<Void> changeUserName(String userId, String newUsername);
+
+    CompletableFuture<HashMap<String, Integer>> getPlayerWalletTopLowScores(String userId);
 }
