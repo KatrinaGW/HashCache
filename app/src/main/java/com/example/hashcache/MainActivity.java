@@ -40,17 +40,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        boolean hasBeenInitialized=false;
-        List<FirebaseApp> firebaseApps = FirebaseApp.getApps(getApplicationContext());
-        for(FirebaseApp app : firebaseApps){
-            if(app.getName().equals(FirebaseApp.DEFAULT_APP_NAME)){
-                hasBeenInitialized=true;
-            }
-        }
-
-        if(!hasBeenInitialized) FirebaseApp.initializeApp(this, new FirebaseOptions.Builder()
+        
+        FirebaseApp.initializeApp(this, new FirebaseOptions.Builder()
                 .setApplicationId("1:901109849854:android:59c5ab124b7d20ef1d4faf")
                 .setApiKey("AIzaSyBbOhuWDn2sYOsEkslCjercBYitb2MLMho")
                 .setDatabaseUrl("https://hashcache2.firebaseio.com/")
