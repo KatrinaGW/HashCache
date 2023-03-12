@@ -48,6 +48,7 @@ public class AppHome extends AppCompatActivity {
 
         Player playerInfo = AppStore.get().getCurrentPlayer();
         setUsername(playerInfo.getUsername());
+        setScore(playerInfo.getPlayerWallet().getTotalScore());
         // add functionality to logo button
         ImageButton logoButton = findViewById(R.id.logo_button);
         logoButton.setOnClickListener(new View.OnClickListener() {

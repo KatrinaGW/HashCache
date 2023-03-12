@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database_connections.callbacks.GetContactInfoCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerPreferencesCallback;
@@ -80,14 +81,18 @@ public class PlayerDocumentConverter {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             String scannableCodeId;
+                            int score;
                             Image scannableCodeImage;
 
                             if(task.getResult().size()>0){
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     scannableCodeId = (String) document.getData()
                                             .get(FieldNames.SCANNABLE_CODE_ID.fieldName);
+                                    score = Integer.parseInt(document.getData().get(
+                                            FieldNames.GENERATED_SCORE.fieldName
+                                    ).toString());
                                     //TODO: check for empty image and then add if it exists
-                                    playerWallet.addScannableCode(scannableCodeId);
+                                    playerWallet.addScannableCode(scannableCodeId, score);
                                 }
                             }
 

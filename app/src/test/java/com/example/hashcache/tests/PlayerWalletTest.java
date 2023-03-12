@@ -5,11 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.PlayerWallet;
+import com.example.hashcache.models.ScannableCode;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -28,25 +32,25 @@ public class PlayerWalletTest {
     @Test
     void GetScannableCodeLocationImage(){
         PlayerWallet playerWallet= new PlayerWallet();
-        String uuid = UUID.randomUUID().toString();
+        ScannableCode scannableCode = new ScannableCode("123", new HashInfo(null, "name", 321));
 
-        playerWallet.addScannableCode(uuid);
+        playerWallet.addScannableCode(scannableCode.getScannableCodeId(), scannableCode.getHashInfo().getGeneratedScore());
 
-        assertNull(playerWallet.getScannableCodeLocationImage(uuid));
+        assertNull(playerWallet.getScannableCodeLocationImage(scannableCode.getScannableCodeId()));
     }
 
     @Test
     void GetScannedCodeIds(){
         PlayerWallet playerWallet= new PlayerWallet();
-        String firstUUID = UUID.randomUUID().toString();
-        String secondUUID = UUID.randomUUID().toString();
+        ScannableCode firstMockScannableCode = new ScannableCode("123", new HashInfo(null, "name1", 321));
+        ScannableCode secondMockScannableCode = new ScannableCode("124", new HashInfo(null, "name2", 321));
 
-        playerWallet.addScannableCode(firstUUID);
-        playerWallet.addScannableCode(secondUUID);
+        playerWallet.addScannableCode(firstMockScannableCode.getScannableCodeId(), firstMockScannableCode.getHashInfo().getGeneratedScore());
+        playerWallet.addScannableCode(secondMockScannableCode.getScannableCodeId(), secondMockScannableCode.getHashInfo().getGeneratedScore());
 
         ArrayList<String> expectedUUIDs = new ArrayList<>();
-        expectedUUIDs.add(firstUUID.toString());
-        expectedUUIDs.add(secondUUID.toString());
+        expectedUUIDs.add(firstMockScannableCode.getScannableCodeId());
+        expectedUUIDs.add(secondMockScannableCode.getScannableCodeId());
 
         assertTrue(expectedUUIDs.containsAll(playerWallet.getScannedCodeIds()) &&
                 playerWallet.getScannedCodeIds().containsAll(expectedUUIDs));
