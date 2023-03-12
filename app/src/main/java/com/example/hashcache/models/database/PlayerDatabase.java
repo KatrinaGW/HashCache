@@ -75,7 +75,6 @@ public class PlayerDatabase implements IPlayerDatabase {
                     PlayersConnectionHandler.getInstance().createPlayer(username, new GetStringCallback() {
                         @Override
                         public void onCallback(String callbackString) {
-                            System.out.println("User has been created" + username);
                             cf.complete(null);
                         }
                     });
@@ -101,7 +100,14 @@ public class PlayerDatabase implements IPlayerDatabase {
         CompletableFuture.runAsync(() -> {
             PlayersConnectionHandler.getInstance().getPlayerAsync(userId).thenAccept(playa -> {
                 cf.complete(playa);
-            }).completeExceptionally(new Exception("Could not get player"));
+            }).exceptionally(new Function<Throwable, Void>() {
+                @Override
+                public Void apply(Throwable throwable) {
+                    System.out.println("There was an error getting the player.");
+                    cf.completeExceptionally(throwable);
+                    return null;
+                }
+            });
 
         });
         return cf;
