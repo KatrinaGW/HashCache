@@ -9,7 +9,15 @@
  */
 
 package com.example.hashcache.views;
-
+/*
+ * Community
+ *
+ * Community/social page of the app.
+ * Displays a scrollable list of other app users,
+ * and search bar for searching for users by username.
+ * Clicking on a user navigates to their profile page.
+ * Additional buttons permit navigation to other pages.
+ */
 
 import static android.util.Log.INFO;
 
@@ -33,7 +41,11 @@ import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
 
 import java.util.ArrayList;
-
+/**
+ * The Community class represents the community/social page of the app. It displays a scrollable list of other app users
+ * and provides a search bar for searching for users by username. Clicking on a user navigates to their profile page.
+ * Additional buttons permit navigation to other pages.
+ */
 public class Community extends AppCompatActivity {
     private ImageButton mMenuButton;
     private ImageButton mSearchButton;
@@ -41,6 +53,11 @@ public class Community extends AppCompatActivity {
     private ListView mUserListView;
     private AppCompatButton mLeaderboardButton;
     @Override
+    /**
+     * Initializes the view elements and sets the click listeners for the menu button, search button, and leaderboard button.
+     *
+     * @param savedInstanceState the saved instance state
+     */
     protected void onCreate(Bundle savedInstanceState) {
         initView();
         super.onCreate(savedInstanceState);
@@ -113,19 +130,35 @@ public class Community extends AppCompatActivity {
         mUserListView = findViewById(R.id.user_listview);
         mLeaderboardButton = findViewById(R.id.leaderboard_button);
     }
+    /**
 
+     Sets a listener for menu button in the Community activity.
+     @param listener A listener for menu button.
+     */
     public void setMenuButtonListener(View.OnClickListener listener) {
         mMenuButton.setOnClickListener(listener);
     }
+    /**
 
+     Sets a listener for search button in the Community activity.
+     @param listener A listener for search button.
+     */
     public void setSearchButtonListener(View.OnClickListener listener) {
         mSearchButton.setOnClickListener(listener);
     }
+    /**
 
+     Returns the search query in the search bar of Community activity.
+     @return The search query in the search bar of Community activity.
+     */
     public String getSearchQuery() {
         return mSearchEditText.getText().toString();
     }
+    /**
 
+     Sets the search query in the search bar of Community activity.
+     @param query The search query to set in the search bar of Community activity.
+     */
     public void setSearchQuery(String query) {
         mSearchEditText.setText(query);
     }
@@ -133,11 +166,19 @@ public class Community extends AppCompatActivity {
    //public void setUserListViewAdapter(ListAdapterView adapter) {
     //    mUserListView.setAdapter(adapter);
     //}
+    /**
 
+     Sets an empty view for the user list view in the Community activity.
+     @param view The empty view to set for the user list view in the Community activity.
+     */
     public void setUserListViewEmptyView(View view) {
         mUserListView.setEmptyView(view);
     }
+    /**
 
+     Sets a listener for the leaderboard button in the Community activity.
+     @param listener A listener for the leaderboard button.
+     */
     public void setLeaderboardButtonListener(View.OnClickListener listener) {
         mLeaderboardButton.setOnClickListener(listener);
     }
