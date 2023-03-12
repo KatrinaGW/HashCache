@@ -13,11 +13,13 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
 
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
 
@@ -45,8 +47,13 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
 
         // Sets the players numb qr codes
         TextView playersTopQrCode = findViewById(R.id.score_value_textview);
-        int qrCodeScore = AppStore.get().getCurrentPlayer().getPlayerWallet().getSize();
-        playersTopQrCode.setText(String.valueOf(qrCodeScore));
+        AtomicLong playerTopQrScore = new AtomicLong();
+        Database.getInstance()
+                .getTotalScore(AppStore.get().getCurrentPlayer().getUserId())
+                .thenAccept( score -> {
+                    playerTopQrScore.set(score);
+                });
+        playersTopQrCode.setText(String.valueOf(playerTopQrScore));
 
         // Gets the text view for the user names
         ArrayList<TextView> userNames = new ArrayList<>();

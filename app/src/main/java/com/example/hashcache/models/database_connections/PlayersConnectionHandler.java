@@ -494,7 +494,8 @@ public class PlayersConnectionHandler {
                 scannableCodeId, booleanCallback);
     }
 
-    public void getPlayersUsernameSortedBy(String filter) {
+
+    public void getAppUserNames() {
 
     }
 }

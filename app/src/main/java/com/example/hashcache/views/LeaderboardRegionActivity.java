@@ -13,9 +13,11 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
 
@@ -40,10 +42,17 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
 
+
         // Sets the players numb qr codes
         TextView playersTotalScore = findViewById(R.id.score_value_textview);
-        int totalScore = AppStore.get().getCurrentPlayer().getPlayerWallet().getTotalScore();
-        playersTotalScore.setText(String.valueOf(totalScore));
+        AtomicLong playerScores = new AtomicLong();
+        Database.getInstance()
+                .getTotalScore(AppStore.get().getCurrentPlayer().getUserId())
+                .thenAccept( score -> {
+                    playerScores.set(score);
+                });
+
+        playersTotalScore.setText(String.valueOf(playerScores));
 
         // Get the text views needed to set the leaderboard
         ArrayList<TextView> userNames = new ArrayList<>();

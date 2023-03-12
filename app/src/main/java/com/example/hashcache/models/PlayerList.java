@@ -3,7 +3,6 @@ package com.example.hashcache.models;
 import android.util.Log;
 
 import com.example.hashcache.controllers.DependencyInjector;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
 import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
@@ -77,10 +76,22 @@ public class PlayerList {
      * @return playerUserNames the usernames of all players
      */
     public ArrayList<String> getPlayerUserNames(){
-        return this.playerUserNames;
+        ArrayList<String> usernames = new ArrayList<>();
+        playersConnectionHandler.getPlayers()
+                .thenAccept(map -> {
+                    Object[] list = map.keySet().toArray();
+                    for(int i = 0; i < list.length; i++) {
+                        usernames.add(list[i].toString());
+                    }
+
+                }
+        );
+        return usernames;
     }
 
-    /**
+    /*
+     *
+     *
      * Adds a player to the database
      * @param username the username of the player to add
      * @return success indicates if the user was successfully added or not
@@ -136,12 +147,7 @@ public class PlayerList {
         Integer distance;
         ArrayList<Username> foundPlayers = new ArrayList<>();
         ArrayList<String> userNames = PlayerList.getInstance().getPlayerUserNames();
-        if(userNames.size() == 0) {
-            getUserNames();
-            userNames = PlayerList.getInstance().getPlayerUserNames();
-        }
 
-        Log.i("Important", String.valueOf(userNames.size()));
         for(String name: userNames) {
             distance = getInstance().computeLevenshteinDistance(name, searchTerm);
             if(distance != -1) {
@@ -239,13 +245,7 @@ public class PlayerList {
         return dynProMat[a.length()][b.length()];
     }
 
-    /**
-     * Will cache all the usernames in to playerUserName
-     */
-    private void getUserNames() {
-        playersConnectionHandler.getPlayers();
-        this.playerUserNames = playersConnectionHandler.getInAppPlayerUserNames();
-    }
+
 }
 
 /*

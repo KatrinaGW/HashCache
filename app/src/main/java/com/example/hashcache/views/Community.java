@@ -28,6 +28,7 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
 import com.example.hashcache.models.PlayerList;
+import com.example.hashcache.models.database.Database;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.Query;
@@ -104,7 +105,7 @@ public class Community extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ArrayList<String> searchedPlayers = PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(), 10);
-                Log.i("search", String.valueOf(searchedPlayers.size()));
+                Log.i("Searched player size", String.valueOf(searchedPlayers.size()));
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchedPlayers);
                 searchedUsers.setAdapter(adapter);
             }

@@ -13,10 +13,12 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
 import com.google.firebase.firestore.CollectionReference;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The LeaderboardNumQRActivity class extends the AppCompatActivity and is used to display the
@@ -40,7 +42,12 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
 
         // Sets the players numb qr codes
         TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
-        int numQrCodes = AppStore.get().getCurrentPlayer().getPlayerWallet().getSize();
+        AtomicLong numQrCodes = new AtomicLong();
+        Database.getInstance()
+                .getTotalScore(AppStore.get().getCurrentPlayer().getUserId())
+                .thenAccept( score -> {
+                    numQrCodes.set(score);
+                });
         playersNumQrCodes.setText(String.valueOf(numQrCodes));
 
         // Get the text views needed to set the leaderboard

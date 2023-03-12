@@ -16,9 +16,8 @@ import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
 
@@ -46,8 +45,14 @@ public class LeaderboardScoreActivity extends AppCompatActivity {
 
         // Sets the players numb qr codes
         TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
-        int totalScore = AppStore.get().getCurrentPlayer().getPlayerWallet().getTotalScore();
-        playersNumQrCodes.setText(String.valueOf(totalScore));
+
+        AtomicLong playerScores = new AtomicLong();
+        Database.getInstance()
+                .getTotalScore(AppStore.get().getCurrentPlayer().getUserId())
+                .thenAccept( score -> {
+                            playerScores.set(score);
+                });
+        playersNumQrCodes.setText(String.valueOf(playerScores));
 
         // Get the text views needed to set the leaderboard
         ArrayList<TextView> userNames = new ArrayList<>();
