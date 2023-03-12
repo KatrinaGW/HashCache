@@ -186,7 +186,7 @@ public class PlayerWalletConnectionHandler {
                             long highestScore = 0;
                             ScannableCode highestScoring = scannableCodes.get(0);
 
-                            for(int i = 1; i < scannableCodes.size(); i++){
+                            for(int i = 0; i < scannableCodes.size(); i++){
                                 ScannableCode scannableCode = scannableCodes.get(i);
                                 if(scannableCode.getHashInfo().getGeneratedScore() > highestScore){
                                     highestScore = scannableCode.getHashInfo().getGeneratedScore();
