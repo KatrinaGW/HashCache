@@ -13,11 +13,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.models.Player;
@@ -25,13 +27,26 @@ import com.example.hashcache.store.AppStore;
 
 public class AppHome extends AppCompatActivity {
 
+    private ImageButton mLogoButton;
+    private TextView mUsernameTextView;
+    private TextView mScoreTextView;
+    private ImageButton mMenuButton;
+    private ImageButton mMapButton;
+    private ImageButton mCommunityButton;
+    private View mTempMap;
+    private AppCompatButton mScanQrButton;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_home);
+        initView();
 
         TextView playerName = findViewById(R.id.username_textview);
-        playerName.setText(AppStore.get().getCurrentPlayer().getUsername());
+
+        Player playerInfo = AppStore.get().getCurrentPlayer();
+        setUsername(playerInfo.getUsername());
         // add functionality to logo button
         ImageButton logoButton = findViewById(R.id.logo_button);
         logoButton.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +122,58 @@ public class AppHome extends AppCompatActivity {
                 menu.show();
             }
         });
+    }
+
+    private void initView() {
+        mLogoButton = findViewById(R.id.logo_button);
+        mUsernameTextView = findViewById(R.id.username_textview);
+        mScoreTextView = findViewById(R.id.score_textview);
+        mMenuButton = findViewById(R.id.menu_button);
+        mMapButton = findViewById(R.id.map_button);
+        mCommunityButton = findViewById(R.id.community_button);
+        mTempMap = findViewById(R.id.temp_map);
+        mScanQrButton = findViewById(R.id.scan_qr_button);
+    }
+
+    public void setLogoButtonListener(View.OnClickListener listener) {
+        mLogoButton.setOnClickListener(listener);
+    }
+
+    public void setMenuButtonListener(View.OnClickListener listener) {
+        mMenuButton.setOnClickListener(listener);
+    }
+
+    public void setMapButtonListener(View.OnClickListener listener) {
+        mMapButton.setOnClickListener(listener);
+    }
+
+    public void setCommunityButtonListener(View.OnClickListener listener) {
+        mCommunityButton.setOnClickListener(listener);
+    }
+
+    public void setScanQrButtonListener(View.OnClickListener listener) {
+        mScanQrButton.setOnClickListener(listener);
+    }
+
+    public String getUsername() {
+        return mUsernameTextView.getText().toString();
+    }
+
+    public void setUsername(String username) {
+        mUsernameTextView.setText(username);
+    }
+
+    public int getScore() {
+        String scoreStr = mScoreTextView.getText().toString().replace("Score: ", "");
+        return Integer.parseInt(scoreStr);
+    }
+
+    public void setScore(int score) {
+        mScoreTextView.setText("Score: " + score);
+    }
+
+    public void setMapTempViewClickListener(OnClickListener listener) {
+        mTempMap.setOnClickListener(listener);
     }
 
 }
