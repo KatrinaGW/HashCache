@@ -32,7 +32,12 @@ import com.example.hashcache.R;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.store.AppStore;
+/**
 
+ The Settings activity displays the user's settings page, including their username and contact information,
+ and allows them to toggle their location settings on and off, as well as edit their username and contact information.
+ Additional buttons permit navigation to other pages within the application.
+ */
 public class Settings extends AppCompatActivity {
     private TextView usernameView;
     private TextView phoneNumberView;
