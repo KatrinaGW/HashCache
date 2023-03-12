@@ -15,6 +15,7 @@ import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
 import com.example.hashcache.R;
+import com.example.hashcache.controllers.hashInfo.HashController;
 import com.google.zxing.Result;
 /**
 
@@ -51,7 +52,11 @@ public class QRScanActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(QRScanActivity.this, result.getText(), Toast.LENGTH_SHORT).show();
+                        HashController.generateScannableCode(result.getText()).thenAccept(scannableCode -> {
+
+                            Toast.makeText(QRScanActivity.this, "Scannable code added!", Toast.LENGTH_SHORT).show();
+                        });
+
                     }
                 });
             }

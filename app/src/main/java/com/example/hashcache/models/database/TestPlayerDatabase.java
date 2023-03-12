@@ -271,7 +271,7 @@ public class TestPlayerDatabase implements IPlayerDatabase {
     }
 
     @Override
-    public CompletableFuture<Void> scannableCodeExists(String scannableCodeId) {
+    public CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId) {
         return null;
     }
 

@@ -8,7 +8,7 @@ import android.media.Image;
 public class HashInfo {
     private Image generatedImage;
     private String generatedName;
-    private int generatedScore;
+    private long generatedScore;
 
     /**
      * Creates a container for the generated elements of the hash
@@ -16,7 +16,7 @@ public class HashInfo {
      * @param generatedName The name generated from the Hash
      * @param generatedScore The score generated from the Hash
      */
-    public HashInfo(Image generatedImage, String generatedName, int generatedScore){
+    public HashInfo(Image generatedImage, String generatedName, long generatedScore){
         this.generatedImage = generatedImage;
         this.generatedName = generatedName;
         this.generatedScore = generatedScore;
@@ -34,7 +34,7 @@ public class HashInfo {
      * Gets the score generated from this hash
      * @return generatedScore The score generated from a hash
      */
-    public int getGeneratedScore() {
+    public long getGeneratedScore() {
         return generatedScore;
     }
 

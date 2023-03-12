@@ -12,17 +12,29 @@ public class ScannableCode{
     private HashInfo hashInfo;
     private ArrayList<Comment> comments;
 
-    public ScannableCode(String codeLocationId, HashInfo hashInfo, long hash){
+    public ScannableCode(String codeLocationId, HashInfo hashInfo, String sha256Hash){
         this.codeLocationId = codeLocationId;
         this.hashInfo = hashInfo;
-        this.scannableCodeId = codeLocationId + Long.toString(hash);
+        this.scannableCodeId = sha256Hash;
+        this.comments = new ArrayList<>();
+    }
 
+    public ScannableCode(String sha256Hash, HashInfo hashInfo){
+        this.codeLocationId = "";
+        this.hashInfo = hashInfo;
+        this.scannableCodeId = sha256Hash;
         this.comments = new ArrayList<>();
     }
 
     public ScannableCode(String id, String codeLocationId, HashInfo hashInfo, ArrayList<Comment> comments){
         this.scannableCodeId = id;
         this.codeLocationId = codeLocationId;
+        this.hashInfo = hashInfo;
+        this.comments = comments;
+    }
+    public ScannableCode(String id, HashInfo hashInfo, ArrayList<Comment> comments){
+        this.scannableCodeId = id;
+        this.codeLocationId = "";
         this.hashInfo = hashInfo;
         this.comments = comments;
     }
