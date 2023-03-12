@@ -4,6 +4,7 @@
  */
 package com.example.hashcache.views;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -16,6 +17,8 @@ import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.hashInfo.HashController;
+import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.store.AppStore;
 import com.google.zxing.Result;
 
 import java.util.function.Function;
@@ -57,6 +60,8 @@ public class QRScanActivity extends AppCompatActivity {
                     public void run() {
                         HashController.addScannableCode(result.getText()).thenAccept(scannableCode -> {
                             System.out.println("Have added QR code!!");
+                            Intent intent = new Intent(QRScanActivity.this, NewMonsterActivity.class);
+                            startActivity(intent);
                         }).exceptionally(new Function<Throwable, Void>() {
                             @Override
                             public Void apply(Throwable throwable) {
