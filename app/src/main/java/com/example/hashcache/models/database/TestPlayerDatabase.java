@@ -267,4 +267,41 @@ public class TestPlayerDatabase implements IPlayerDatabase {
         });
         return cf;
     }
+
+    /**
+     * Gets the total score for a given player.
+     *
+     * @param userId the userId to get the total score for
+     * @return a CompletableFuture that will return the total score for the given player
+     */
+    @Override
+    public CompletableFuture<HashMap<String, Integer>> getPlayerWalletTopLowScores(String userId){
+        CompletableFuture<HashMap<String, Integer>> cf = new CompletableFuture<>();
+        HashMap<String, Integer> qrStats = new HashMap<>();
+        CompletableFuture.runAsync(() -> {
+            if(players.containsKey(userId)){
+                int highestScore = 0;
+                int lowestScore = Integer.MAX_VALUE;
+
+                for(ScannableCode scannableCode : scannableCodeHashMap.values()){
+                    int currentScore = scannableCode.getHashInfo().getGeneratedScore();
+                    if(currentScore < lowestScore){
+                        lowestScore = currentScore;
+                    }
+
+                    if(currentScore > highestScore){
+                        highestScore = currentScore;
+                    }
+                }
+
+                qrStats.put("highestScore", highestScore);
+                qrStats.put("lowestScore", lowestScore);
+                cf.complete(qrStats);
+            }
+            else{
+                cf.completeExceptionally(new Exception("UserId does not exist."));
+            }
+        });
+        return cf;
+    }
 }

@@ -12,10 +12,10 @@ public class ScannableCode{
     private HashInfo hashInfo;
     private ArrayList<Comment> comments;
 
-    public ScannableCode(String codeLocationId, HashInfo hashInfo){
+    public ScannableCode(String codeLocationId, HashInfo hashInfo, long hash){
         this.codeLocationId = codeLocationId;
         this.hashInfo = hashInfo;
-        this.scannableCodeId = UUID.randomUUID().toString();
+        this.scannableCodeId = codeLocationId + Long.toString(hash);
 
         this.comments = new ArrayList<>();
     }
