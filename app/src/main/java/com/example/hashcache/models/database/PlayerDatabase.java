@@ -95,6 +95,30 @@ public class PlayerDatabase implements IPlayerDatabase {
     }
 
     /**
+     * Get all the Scannable Codes whose ids are in a given list
+     * @param scannableCodeIds the list of ids of scannable codes to get
+     * @return cf the CompleteableFuture with the list of ScannableCodes
+     */
+    public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            ScannableCodesConnectionHandler.getInstance()
+                    .getScannableCodesByIdInList(scannableCodeIds).thenAccept(scannableCodes -> {
+                cf.complete(scannableCodes);
+            }).exceptionally(new Function<Throwable, Void>() {
+                @Override
+                public Void apply(Throwable throwable) {
+                    System.out.println("There was an error getting the scannableCodes.");
+                    cf.completeExceptionally(throwable);
+                    return null;
+                }
+            });
+
+        });
+        return cf;
+    }
+
+    /**
      * Gets the player object associated with a given userId.
      *
      * @param userId the userId to get the player object for

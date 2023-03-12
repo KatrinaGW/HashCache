@@ -150,6 +150,10 @@ public class PlayerWallet{
 
     }
 
+    /**
+     * Get the sum of all of the player's scores
+     * @return totalScore the sum of all of the player's scores
+     */
     public int getTotalScore(){
         return this.totalScore;
     }

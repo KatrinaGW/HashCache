@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">HashCache</string>
     <string name="no_codes_scanned">No codes scanned yet!</string>
+    <string name="scannable_code_name">Cached Name</string>
+    <string name="scannable_code_score">Score for Cache</string>
 </resources>

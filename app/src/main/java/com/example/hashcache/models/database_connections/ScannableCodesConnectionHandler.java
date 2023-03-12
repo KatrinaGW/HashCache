@@ -17,14 +17,17 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Handles all calls to the Firebase ScannableCodes database
@@ -130,6 +133,43 @@ public class ScannableCodesConnectionHandler {
             DocumentReference documentReference = this.collectionReference.document(scannableCodeId);
             this.scannableCodeDocumentConverter.getScannableCodeFromDocument(documentReference, getScannableCodeCallback);
         }
+    }
+
+    /**
+     * Get all the Scannable Codes whose ids are in a given list
+     * @param scannableCodeIds the list of ids of scannable codes to get
+     * @return cf the CompleteableFuture with the list of ScannableCodes
+     */
+    public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
+        ArrayList<ScannableCode> scannableCodes = new ArrayList<>();
+
+        CompletableFuture.runAsync(() -> {
+            Query docRef = this.collectionReference;
+            docRef.get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    ScannableCode scannableCode;
+
+                    for(QueryDocumentSnapshot document : task.getResult()){
+                        if(scannableCodeIds.contains(document.getId())){
+                            scannableCodeDocumentConverter.getScannableCodeFromDocument(document.getReference(),
+                                    new GetScannableCodeCallback() {
+                                        @Override
+                                        public void onCallback(ScannableCode scannableCode) {
+                                            scannableCodes.add(scannableCode);
+                                        }
+                                    });
+                        }
+                    }
+
+                    cf.complete(scannableCodes);
+                }
+                else{
+                    cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+                }
+            });
+        });
+        return cf;
     }
 
     /**
