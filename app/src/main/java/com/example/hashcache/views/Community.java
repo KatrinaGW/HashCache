@@ -27,6 +27,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.Database;
 import com.google.android.gms.tasks.Task;
@@ -104,10 +105,11 @@ public class Community extends AppCompatActivity {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> searchedPlayers = PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(), 10);
-                Log.i("Searched player size", String.valueOf(searchedPlayers.size()));
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchedPlayers);
-                searchedUsers.setAdapter(adapter);
+                PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(), 10)
+                        .thenAccept(searchedPlayers->{
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchedPlayers);
+                            searchedUsers.setAdapter(adapter);
+                        });
             }
         });
     }

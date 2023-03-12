@@ -46,10 +46,18 @@ public class AppStore {
         return currentPlayer;
     }
 
+    /**
+     * Sets the selected scannable code
+     * @param currentScannableCode the scananbleCode to set as selected
+     */
     public void setCurrentScannableCode(ScannableCode currentScannableCode) {
         this.currentScannableCode = currentScannableCode;
     }
 
+    /**
+     * Gets the selectedScannableCode
+     * @return currentScannableCode the currently selectedScannableCode
+     */
     public ScannableCode getCurrentScannableCode() {
         return currentScannableCode;
     }
