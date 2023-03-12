@@ -2,7 +2,7 @@
     https://github.com/yuriy-budiyev/code-scanner
 
  */
-package com.example.hashcache;
+package com.example.hashcache.views;
 
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
+import com.example.hashcache.R;
 import com.google.zxing.Result;
 
 public class QRScanActivity extends AppCompatActivity {

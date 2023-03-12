@@ -1,4 +1,4 @@
-package com.example.hashcache;
+package com.example.hashcache.views;
 
 import android.view.View;
 import android.view.ViewGroup;

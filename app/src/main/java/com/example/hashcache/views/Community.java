@@ -8,7 +8,7 @@
  * Additional buttons permit navigation to other pages.
  */
 
-package com.example.hashcache;
+package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,6 +21,8 @@ import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
+
+import com.example.hashcache.R;
 
 public class Community extends AppCompatActivity {
     private ImageButton mMenuButton;
@@ -105,8 +107,8 @@ public class Community extends AppCompatActivity {
         mSearchEditText.setText(query);
     }
 
-    //public void setUserListViewAdapter(ListAdapterView adapter) {
-       // mUserListView.setAdapter(adapter);
+   //public void setUserListViewAdapter(ListAdapterView adapter) {
+    //    mUserListView.setAdapter(adapter);
     //}
 
     public void setUserListViewEmptyView(View view) {

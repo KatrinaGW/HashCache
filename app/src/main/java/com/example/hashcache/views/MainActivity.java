@@ -4,33 +4,25 @@
  * Allows users to create an account and start the game.
  */
 
-package com.example.hashcache;
+package com.example.hashcache.views;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
-import com.example.hashcache.controllers.DependencyInjector;
 import com.example.hashcache.controllers.HashInfoGenerator;
-import com.example.hashcache.models.HashInfo;
-import com.example.hashcache.models.PlayerWallet;
-import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.views.MainActivityView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
 import java.util.function.Function;
 import java.io.InputStream;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,29 +56,23 @@ public class MainActivity extends AppCompatActivity {
         is = getResources().openRawResource(R.raw.names);
         HashInfoGenerator.NameGenerator.getNames(is);
 
-
-        startButton.setOnClickListener(new View.OnClickListener() {
+        setStartBtnListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                onStartCachingClicked();
-            }
-        });
-
-    }
-
-    private void onStartCachingClicked(){
-
-        addUserCommand.loginUser(getUsername()).thenAccept(res -> {
-            Intent goHome = new Intent(MainActivity.this, AppHome.class);
-            startActivity(goHome);
-        }).exceptionally(new Function<Throwable, Void>() {
-            @Override
-            public Void apply(Throwable throwable) {
-                // display some error on the screen
-                return null;
+            public void onClick(View view) {
+                addUserCommand.loginUser(getUsername()).thenAccept(res -> {
+                    Intent goHome = new Intent(MainActivity.this, AppHome.class);
+                    startActivity(goHome);
+                }).exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        // display some error on the screen
+                        return null;
+                    }
+                });
             }
         });
     }
+
     public void setStartBtnListener(View.OnClickListener listeners) {
         findViewById(R.id.start_button).setOnClickListener(listeners);
     }

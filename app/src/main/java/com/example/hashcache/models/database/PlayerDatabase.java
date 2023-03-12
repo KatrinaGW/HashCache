@@ -6,6 +6,7 @@ import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.IPlayerDatabase;
+import com.example.hashcache.models.database_connections.PlayerWalletConnectionHandler;
 import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.store.AppStore;
@@ -136,7 +137,28 @@ public class PlayerDatabase implements IPlayerDatabase {
      */
     @Override
     public CompletableFuture<Integer> getTotalScore(String userId) {
-        return null;
+        CompletableFuture<Integer> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            if(players.containsKey(userId)){
+                Player p = players.get(userId);
+                PlayerWalletConnectionHandler.getInstance()
+                        .getPlayerWalletTotalScore(p.getPlayerWallet().getScannedCodeIds())
+                        .thenAccept(totalScore -> {
+                            cf.complete(totalScore);
+                        })
+                        .exceptionally(new Function<Throwable, Void>() {
+                            @Override
+                            public Void apply(Throwable throwable) {
+                                cf.completeExceptionally(throwable);
+                                return null;
+                            }
+                        });
+            }
+            else{
+                cf.completeExceptionally(new Exception("UserId does not exist."));
+            }
+        });
+        return cf;
     }
 
     @Override

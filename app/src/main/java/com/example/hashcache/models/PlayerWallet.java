@@ -33,8 +33,6 @@ public class PlayerWallet{
         this.scannableCodes.put(scannableCodeId, null);
     }
 
-
-
     /**
      * Adds a scannable code and its image to the player's collection
      * @param scannableCodeId The id of the scannable code

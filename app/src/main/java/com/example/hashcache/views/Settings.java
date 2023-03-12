@@ -8,7 +8,7 @@
  * Additional buttons permit navigation to other pages.
  */
 
-package com.example.hashcache;
+package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +19,8 @@ import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
+
+import com.example.hashcache.R;
 
 public class Settings extends AppCompatActivity {
     @Override
