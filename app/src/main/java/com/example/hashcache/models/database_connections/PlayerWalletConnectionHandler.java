@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database_connections.converters.ScannableCodeDocumentConverter;
 import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.models.database_connections.values.FieldNames;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -16,6 +18,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -148,6 +152,35 @@ public class PlayerWalletConnectionHandler {
                         if(scannableCodeIds.contains(document.getId())){
                             totalScore.addAndGet(Integer.parseInt(document.getData().get(FieldNames.GENERATED_SCORE.fieldName)
                                     .toString()));
+                        }
+                    }
+                    cf.complete(totalScore.intValue());
+                }
+                else{
+                    cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+                }
+            });
+        });
+        return cf;
+    }
+
+    public CompletableFuture<ArrayList<ScannableCode>> getPlayerWalletScannableCodes(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
+        ArrayList<ScannableCode> scannableCodes = new ArrayList<>();
+        ScannableCodeDocumentConverter scannableCodeDocumentConverter = new ScannableCodeDocumentConverter();
+
+        CompletableFuture.runAsync(() -> {
+            Query docRef = db.collection(CollectionNames.SCANNABLE_CODES.collectionName);
+            docRef.get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot document : task.getResult()){
+                        if(scannableCodeIds.contains(document.getId())){
+                            scannableCodeDocumentConverter.getScannableCodeFromDocument(document, new GetScannableCodeCallback() {
+                                @Override
+                                public void onCallback(ScannableCode scannableCode) {
+                                    scannableCodes.add(scannableCode);
+                                }
+                            });
                         }
                     }
                     cf.complete(totalScore.intValue());

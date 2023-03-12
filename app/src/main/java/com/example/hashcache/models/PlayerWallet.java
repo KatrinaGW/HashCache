@@ -21,11 +21,15 @@ public class PlayerWallet{
     private HashMap<String, Image> scannableCodes;
     private int size;
     private int totalScore;
+    private int lowScore;
+    private int highScore;
 
     public PlayerWallet(){
         this.size = 0;
         this.scannableCodes = new HashMap<String, Image>();
         this.totalScore = 0;
+        this.lowScore = 0;
+        this.highScore = 0;
     }
 
     /**
@@ -33,10 +37,8 @@ public class PlayerWallet{
      * @param scannableCodeId The id of the scanned code
      */
     public void addScannableCode(String scannableCodeId, int score){
-        this.size++;
         this.scannableCodes.put(scannableCodeId, null);
-        this.totalScore+=score;
-
+        this.updateStatsAfterAdd(score);
     }
 
     /**
@@ -45,9 +47,36 @@ public class PlayerWallet{
      * @param locationImage The image of the location where the user scanned the code
      */
     public void addScannableCode(String scannableCodeId, int score, Image locationImage){
-        this.size++;
         this.scannableCodes.put(scannableCodeId, locationImage);
+    }
+
+    private void updateStatsAfterAdd(int score){
+        this.size++;
         this.totalScore+=score;
+
+        if(score < lowScore){
+            this.lowScore = score;
+        }
+
+        if(score > highScore){
+            this.highScore = score;
+        }
+    }
+
+    /**
+     * Gets the player's lowest score
+     * @return lowScore the player's lowest score
+     */
+    public int getLowScore(){
+        return this.lowScore;
+    }
+
+    /**
+     * Gets the player's highest score
+     * @return highScore the player's highest score
+     */
+    public int getHighScore(){
+        return this.highScore;
     }
 
     /**
@@ -92,12 +121,23 @@ public class PlayerWallet{
     public void deleteScannableCode(String scannableCodeId, int score){
         if(this.scannableCodes.containsKey(scannableCodeId)){
             this.scannableCodes.remove(scannableCodeId);
-            this.totalScore-=score;
-            this.size--;
 
         }else{
             throw new IllegalArgumentException("Player wallet does not contain scannable" +
                     "code with given id");
+        }
+
+    }
+
+    private void updateAfterDelete(int score){
+        this.totalScore-=score;
+        this.size--;
+
+        if(this.size == 0){
+            this.highScore = 0;
+            this.lowScore = 0;
+        }else{
+            //call db functions to update everything
         }
 
     }
