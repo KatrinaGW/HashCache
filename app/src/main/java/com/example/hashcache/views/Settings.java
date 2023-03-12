@@ -7,7 +7,12 @@
  * Allows user to edit their username and contact information.
  * Additional buttons permit navigation to other pages.
  */
+/**
 
+ The Settings activity displays the user's settings page, including their username and contact information,
+ and allows them to toggle their location settings on and off, as well as edit their username and contact information.
+ Additional buttons permit navigation to other pages within the application.
+ */
 package com.example.hashcache.views;
 
 import android.content.Intent;
@@ -31,7 +36,11 @@ public class Settings extends AppCompatActivity {
     private TextView phoneNumberView;
     private TextView emailView;
     private CheckBox geoLocationPreferenceCheckbox;
-
+    /**
+     * Called when the activity is starting. Initializes the activity and its associated layout.
+     *
+     * @param savedInstanceState Bundle object containing the activity's previously saved state, if any.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,18 +103,31 @@ public class Settings extends AppCompatActivity {
             }
         });
     }
-
+    /**
+     * Called when the geolocation preference checkbox is clicked.
+     *
+     * @param view The checkbox view that was clicked.
+     */
     public void onCheckboxClicked(View view) {
 
         boolean checked = ((CheckBox) view).isChecked();
 
         UpdateUserPreferencesCommand.toggleGeoLocationPreference(checked);
     }
-
+    /**
+     * Sets the username of the current user in the username view.
+     *
+     * @param username The username of the current user.
+     */
     private void setUsername(String username){
         this.usernameView.setText(username);
     }
-
+    /**
+     * Sets the phone number of the current user in the phone number view.
+     * If the phone number is empty, the view is hidden.
+     *
+     * @param phoneNumber The phone number of the current user.
+     */
     private void setPhoneNumber(String phoneNumber){
         if(!phoneNumber.equals("")){
             this.phoneNumberView.setText(phoneNumber);
@@ -113,7 +135,12 @@ public class Settings extends AppCompatActivity {
             this.phoneNumberView.setVisibility(View.GONE);
         }
     }
-
+    /**
+     * Sets the email address of the current user in the email address view.
+     * If the email address is empty, the view is hidden.
+     *
+     * @param email The email address of the current user.
+     */
     private void setEmail(String email){
         if(!email.equals("")){
             this.emailView.setText(email);

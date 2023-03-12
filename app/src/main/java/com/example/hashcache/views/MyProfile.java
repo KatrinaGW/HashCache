@@ -25,7 +25,28 @@ import androidx.appcompat.widget.PopupMenu;
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.store.AppStore;
-
+/**
+ * MyProfile
+ *
+ * The MyProfile class is an activity that displays the user's profile page.
+ *
+ * It displays a scrollable list of QR monsters scanned by the user, along with their username and score. The top logo
+ * button allows navigation to the user settings page. Selecting a monster navigates to that monster's info page. Additional
+ * buttons permit navigation to other pages.
+ *
+ * @see AppCompatActivity
+ * @see AppCompatButton
+ * @see ImageButton
+ * @see ListView
+ * @see TextView
+ * @see PopupMenu
+ * @see MenuItem
+ * @see Player
+ * @see AppStore
+ * @see Settings
+ * @see QRStats
+ * @see Community
+ */
 public class MyProfile extends AppCompatActivity {
     private View mPurpleRect;
     private ImageButton mLogoButton;
@@ -35,6 +56,17 @@ public class MyProfile extends AppCompatActivity {
     private ListView mTempList;
     private AppCompatButton mQRStatsButton;
     @Override
+    /**
+     * Called when the activity is created.
+     *
+     * It sets up the functionality for the logo button, the QR STATS button, and the menu button. It also retrieves the
+     * current user's information and sets the username and score on the profile page.
+     *
+     * @param savedInstanceState the saved state of the activity, if it was previously closed
+     * @see AppStore
+     * @see Player
+     */
+
     protected void onCreate(Bundle savedInstanceState) {
         initView();
         super.onCreate(savedInstanceState);
@@ -106,6 +138,9 @@ public class MyProfile extends AppCompatActivity {
             }
         });
     }
+    /**
+     * Initializes the view.
+     */
     private void initView() {
 
         mPurpleRect = findViewById(R.id.purple_rect);
@@ -116,31 +151,78 @@ public class MyProfile extends AppCompatActivity {
         mTempList = findViewById(R.id.temp_list);
         mQRStatsButton = findViewById(R.id.qr_stats_button);
     }
-
+    /**
+     * Sets the listener for the logo button.
+     *
+     * @param listener the listener to be set for the logo button
+     * @see ImageButton
+     * @see Settings
+     */
     public void setLogoButtonListener(View.OnClickListener listener) {
         mLogoButton.setOnClickListener(listener);
     }
+    /**
+     * Sets the listener for the menu button.
+     *
+     * @param listener the listener to be set for the menu button
+     * @see ImageButton
+     * @see PopupMenu
+     * @see MenuItem
+     * @see AppHome
+     * @see QRStats
+     * @see Community
+     */
 
     public void setMenuButtonListener(View.OnClickListener listener) {
         mMenuButton.setOnClickListener(listener);
     }
+    /**
+     * Sets the username displayed on the profile page.
+     *
+     * @param username the username to be set
+     * @see TextView
+     */
 
     public void setUsername(String username) {
         mUsernameTextView.setText(username);
     }
-
+    /**
+     * Sets the score displayed on the profile page.
+     *
+     * @param score the score to be set
+     * @see TextView
+     */
     public void setScore(int score) {
         mScoreTextView.setText("Score: " + score);
     }
-
+    /**
+     * Sets the list adapter for the list of QR monsters.
+     *
+     * @param adapter the adapter to be set for the list of QR monsters
+     * @see ProfileListAdapter
+     * @see ListView
+     */
     public void setListAdapter(ProfileListAdapter adapter) {
         mTempList.setAdapter(adapter);
     }
-
+    /**
+     * Sets the empty view for the list of QR monsters.
+     *
+     * @param view the empty view to be set for the list of QR monsters
+     * @see ListView
+     */
     public void setEmptyView(View view) {
         mTempList.setEmptyView(view);
     }
+    /**
 
+     Sets the click listener for the QR Stats button on the MyProfile page.
+     This method takes a View.OnClickListener as a parameter and sets it as the click listener for the mQRStatsButton,
+     which is an instance of AppCompatButton. When the user clicks on the QR Stats button, the listener's onClick()
+     method is called. This method can be used to perform some action when the button is clicked, such as navigating to
+     the QR Stats page.
+     @param listener the View.OnClickListener to set as the click listener for the QR Stats button
+     */
     public void setQRStatsButtonListener(View.OnClickListener listener) {
         mQRStatsButton.setOnClickListener(listener);
     }

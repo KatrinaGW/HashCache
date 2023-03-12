@@ -23,13 +23,57 @@ import com.google.firebase.FirebaseOptions;
 
 import java.util.function.Function;
 import java.io.InputStream;
+/**
 
+ MainActivity
+
+ The MainActivity class is the main entry point to the game. It allows users to create an account and start the game.
+
+ It initializes Firebase and the PlayerList instance, and sets up the functionality for the start button.
+
+ @see AppCompatActivity
+
+ @see FirebaseOptions.Builder
+
+ @see AddUserCommand
+
+ @see PlayerList
+ */
 public class MainActivity extends AppCompatActivity {
 
     PlayerList playerList;
     EditText usernameEditText;
     AddUserCommand addUserCommand;
+    /**
 
+     onCreate method is called when the activity is created.
+
+     It initializes Firebase, the AddUserCommand instance, and the PlayerList instance.
+
+     It sets up the functionality for the start button, which will take the user to the AppHome activity.
+
+     It also sets up the functionality for the name generator, which generates random names.
+
+     @param savedInstanceState saved state of the activity, if it was previously closed.
+
+     @see FirebaseApp#initializeApp
+
+     @see FirebaseOptions.Builder
+
+     @see AddUserCommand
+
+     @see PlayerList
+
+     @see AppCompatButton
+
+     @see InputStream
+
+     @see HashInfoGenerator.NameGenerator#getNames
+
+     @see AppHome
+
+     @see Function
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,8 +87,9 @@ public class MainActivity extends AppCompatActivity {
                 .setStorageBucket("hashcache2.appspot.com")
                 .setProjectId("hashcache2")
                 .build());
-
+        // Initializes the AddUserCommand and PlayerList instances
         addUserCommand = new AddUserCommand();
+
         playerList = PlayerList.getInstance();
 
         // add functionality to start button
@@ -56,7 +101,9 @@ public class MainActivity extends AppCompatActivity {
         is = getResources().openRawResource(R.raw.names);
         HashInfoGenerator.NameGenerator.getNames(is);
 
+        // Sets the listener for the start button
         setStartBtnListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 addUserCommand.loginUser(getUsername()).thenAccept(res -> {
@@ -72,15 +119,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    /**
+     * Sets the listener for the start button.
+     *
+     * @param listeners the listener to be set for the start button
+     * @see View.OnClickListener
+     */
     public void setStartBtnListener(View.OnClickListener listeners) {
         findViewById(R.id.start_button).setOnClickListener(listeners);
     }
+    /**
+     * Gets the username entered by the user.
+     *
+     * @return the username entered by the user
+     */
     public String getUsername(){
         TextView tx = this.findViewById(R.id.username_edittext);
         return tx.getText().toString();
     }
-
+    /**
+     * Sets the username entered by the user.
+     *
+     * @param username the username to be set
+     */
     public void setUsername(String username){
         TextView tx = this.findViewById(R.id.username_edittext);
         tx.setText(username);
