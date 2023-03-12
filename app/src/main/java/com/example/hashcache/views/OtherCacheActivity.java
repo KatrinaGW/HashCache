@@ -78,12 +78,12 @@ public class OtherCacheActivity extends AppCompatActivity {
             }
         });
 
-        scannableCodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //onScannableCodeItemClicked(i);
-            }
-        });
+//        scannableCodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                //onScannableCodeItemClicked(i);
+//            }
+//        });
     }
 
     @Override
@@ -97,7 +97,17 @@ public class OtherCacheActivity extends AppCompatActivity {
         }
     }
 
+    private void setListViewButtonListener(){
+        scannableCodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //onScannableCodeItemClicked(i);
+            }
+        });
+    }
+
     private void setAdapterValues(){
+
         Database.getInstance()
                 .getScannableCodesByIdInList(player.getPlayerWallet().getScannedCodeIds())
                 .thenAccept(scannableCodes -> {
@@ -105,6 +115,7 @@ public class OtherCacheActivity extends AppCompatActivity {
                     scannableCodesArrayAdapter = new ScannableCodesArrayAdapter(this,
                             scannableCodes);
                     scannableCodesList.setAdapter(scannableCodesArrayAdapter);
+                    setListViewButtonListener();
                 });
 
         Database.getInstance()
