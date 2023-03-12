@@ -9,6 +9,7 @@ import com.example.hashcache.models.ScannableCode;
 public class AppStore {
     private static AppStore instance;
     private AppStore(){}
+    private Player selectedPlayer;
 
     boolean isLoggedIn;
     private Player currentPlayer;
@@ -60,5 +61,21 @@ public class AppStore {
      */
     public ScannableCode getCurrentScannableCode() {
         return currentScannableCode;
+    }
+
+    /**
+     * Set the currently selected player
+     * @param player the player to set as selected
+     */
+    public void setSelectedPlayer(Player player){
+        this.selectedPlayer = player;
+    }
+
+    /**
+     * Get the currently selected player
+     * @return selectedPLayer the currently selected player
+     */
+    public Player getSelectedPlayer(){
+        return this.selectedPlayer;
     }
 }

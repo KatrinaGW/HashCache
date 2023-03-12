@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -13,12 +14,14 @@ import androidx.appcompat.widget.PopupMenu;
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
+import com.example.hashcache.store.AppStore;
 
 public class OtherProfileInformationActivity extends AppCompatActivity {
-    TextView otherUsernameView;
-    TextView otherEmailView;
-    TextView otherPhoneNumberView;
-    Player otherPlayer;
+    private TextView otherUsernameView;
+    private TextView otherEmailView;
+    private TextView otherPhoneNumberView;
+    private Player otherPlayer;
+    private Button viewCacheButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,7 @@ public class OtherProfileInformationActivity extends AppCompatActivity {
         otherUsernameView = findViewById(R.id.other_username_textview);
         otherEmailView = findViewById(R.id.other_email_textview);
         otherPhoneNumberView = findViewById(R.id.other_phone_textview);
+        viewCacheButton = findViewById(R.id.view_other_player_codes);
 
         Database.getInstance().getIdByUsername(otherUsername).thenAccept(
                 userId -> {
@@ -47,6 +51,14 @@ public class OtherProfileInformationActivity extends AppCompatActivity {
                     );
                 }
         );
+
+        viewCacheButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppStore.get().setSelectedPlayer(otherPlayer);
+                startActivity(new Intent(OtherProfileInformationActivity.this, OtherCacheActivity.class));
+            }
+        });
 
         ImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
