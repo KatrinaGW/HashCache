@@ -15,12 +15,14 @@
         android:elevation="6dp"/>
 
     <ImageButton
-        android:id="@+id/logo_icon"
+        android:id="@+id/edit_info_image"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:background="@drawable/circle_button"
         android:src="@android:drawable/ic_menu_edit"
         android:layout_centerHorizontal="true"
+        android:clickable="true"
+        android:onClick="onClick"
         android:layout_marginTop="48dp"
         android:elevation="6dp"/>
 
@@ -28,7 +30,7 @@
         android:id="@+id/username_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/logo_icon"
+        android:layout_below="@id/edit_info_image"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"

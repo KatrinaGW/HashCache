@@ -21,22 +21,24 @@ public interface IPlayerDatabase {
     CompletableFuture<Player> getPlayer(String userId);
     CompletableFuture<HashMap<String, String>> getPlayers();
 
-    CompletableFuture<Integer> getTotalScore(String userId);
+    CompletableFuture<Long> getTotalScore(String userId);
 
     CompletableFuture<Void> addComment(String scannableCodeId, Comment comment);
 
     CompletableFuture<Void> updatePlayerPreferences(String userId, PlayerPreferences playerPreferences);
 
-    CompletableFuture<Void> updateContactInfo(String userId, ContactInfo contactInfo);
-
     CompletableFuture<String> addScannableCode(ScannableCode scannableCode);
     CompletableFuture<Void> addScannableCodeToPlayerWallet(String userId, String scannableCodeId);
-    CompletableFuture<Void> scannableCodeExists(String scannableCodeId);
+    CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId);
 
-
-    CompletableFuture<Void> removeScannableCode(String userId, String scannableCodeId);
+    CompletableFuture<Boolean> removeScannableCode(String userId, String scannableCodeId);
 
     CompletableFuture<Void> changeUserName(String userId, String newUsername);
 
-    CompletableFuture<HashMap<String, Integer>> getPlayerWalletTopLowScores(String userId);
+    CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds);
+    CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds);
+    CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds);
+    CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds);
+    CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId);
+    CompletableFuture<Boolean> updateContactInfo(ContactInfo contactInfo, String userId);
 }

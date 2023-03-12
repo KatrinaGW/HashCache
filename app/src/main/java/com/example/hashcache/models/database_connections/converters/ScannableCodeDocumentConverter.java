@@ -64,6 +64,7 @@ public class ScannableCodeDocumentConverter {
                             //TODO: Store the image once we figure out how to do it
                         }catch (NullPointerException e){
                             Log.e(TAG, "Scannable Code missing fields!");
+                            getScannableCodeCallback.onCallback(null);
                         }
                     } else {
                         Log.d(TAG, "No such document");

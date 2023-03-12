@@ -16,7 +16,7 @@ public class Database {
         if(instance == null){
             synchronized(PlayerDatabase.class) {
                 if(instance == null){
-                    instance = new TestPlayerDatabase();
+                    instance = new PlayerDatabase();
                 }
             }
         }

@@ -20,6 +20,8 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
 import com.example.hashcache.models.PlayerWallet;
+import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
 /**
  The QRStats activity displays statistics for the current user, including total score, number of codes scanned,
@@ -37,6 +39,9 @@ public class QRStats extends AppCompatActivity {
     private TextView topScoreValueTextView;
     private TextView lowScoreValueTextView;
     private AppCompatButton myProfileButton;
+    private ScannableCode lowestScoring;
+    private ScannableCode highestScoring;
+    private PlayerWallet playerWallet;
     /**
      * Initializes the activity and sets the layout. Also adds functionality to the menu button and my profile button.
      *
@@ -55,11 +60,19 @@ public class QRStats extends AppCompatActivity {
         topScoreValueTextView = findViewById(R.id.top_score_value);
         lowScoreValueTextView = findViewById(R.id.low_score_value);
 
-        PlayerWallet playerWallet = AppStore.get().getCurrentPlayer().getPlayerWallet();
-        setLowScoreValueTextView(playerWallet.getLowScore());
-        setTopScoreValueTextView(playerWallet.getHighScore());
-        setMyCodesValueTextView(playerWallet.getSize());
-        setTotalScoreValueTextView(playerWallet.getTotalScore());
+        topScoreValueTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                highestScoringCodeClicked();
+            }
+        });
+
+        lowScoreValueTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lowestScoringCodeClicked();
+            }
+        });
 
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,12 +131,38 @@ public class QRStats extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        playerWallet = AppStore.get().getCurrentPlayer().getPlayerWallet();
 
-        PlayerWallet playerWallet = AppStore.get().getCurrentPlayer().getPlayerWallet();
-        setLowScoreValueTextView(playerWallet.getLowScore());
-        setTopScoreValueTextView(playerWallet.getHighScore());
         setMyCodesValueTextView(playerWallet.getSize());
-        setTotalScoreValueTextView(playerWallet.getTotalScore());
+        setTotalScoreValueTextView();
+        setLowScoreValueTextView();
+        setTopScoreValueTextView();
+
+        if(playerWallet.getSize()>0){
+            Database.getInstance()
+                    .getPlayerWalletLowScore(playerWallet.getScannedCodeIds())
+                    .thenAccept(lowestScoring -> {
+                        this.lowestScoring = lowestScoring;
+                        setLowScoreValueTextView();
+                    });
+
+            Database.getInstance()
+                    .getPlayerWalletTopScore(playerWallet.getScannedCodeIds())
+                    .thenAccept(lowestScoring -> {
+                        this.highestScoring = lowestScoring;
+                        setTopScoreValueTextView();
+                    });
+        }
+    }
+
+    private void highestScoringCodeClicked(){
+        AppStore.get().setCurrentScannableCode(highestScoring);
+        startActivity(new Intent(QRStats.this, DisplayMonsterActivity.class));
+    }
+
+    private void lowestScoringCodeClicked(){
+        AppStore.get().setCurrentScannableCode(lowestScoring);
+        startActivity(new Intent(QRStats.this, DisplayMonsterActivity.class));
     }
 
     private void init() {
@@ -164,12 +203,17 @@ public class QRStats extends AppCompatActivity {
         return myProfileButton;
     }
 
-    private void setTotalScoreValueTextView(int totalScore){
-        if(totalScore>0){
-            this.totalScoreValueTextView.setText(Integer.toString(totalScore));
-        }else{
-            this.totalScoreValueTextView.setText(R.string.no_codes_scanned);
-        }
+    private void setTotalScoreValueTextView(){
+        Database.getInstance()
+                .getPlayerWalletTotalScore(playerWallet.getScannedCodeIds())
+                .thenAccept(totalScore -> {
+                    if(totalScore>0){
+                        this.totalScoreValueTextView.setText(Long.toString(totalScore));
+                    }else{
+                        this.totalScoreValueTextView.setText(R.string.no_codes_scanned);
+                    }
+
+                });
     }
 
     private void setMyCodesValueTextView(int numCodes){
@@ -180,17 +224,17 @@ public class QRStats extends AppCompatActivity {
         }
     }
 
-    private void setTopScoreValueTextView(int topScore){
-        if(topScore>0){
-            this.topScoreValueTextView.setText(Integer.toString(topScore));
+    private void setTopScoreValueTextView(){
+        if(highestScoring!=null){
+            this.topScoreValueTextView.setText(Long.toString(highestScoring.getHashInfo().getGeneratedScore()));
         }else{
             this.topScoreValueTextView.setText(R.string.no_codes_scanned);
         }
     }
 
-    private void setLowScoreValueTextView(int lowScore){
-        if(lowScore>0){
-            this.lowScoreValueTextView.setText(Integer.toString(lowScore));
+    private void setLowScoreValueTextView(){
+        if(lowestScoring != null){
+            this.lowScoreValueTextView.setText(Long.toString(lowestScoring.getHashInfo().getGeneratedScore()));
         }else{
             this.lowScoreValueTextView.setText(R.string.no_codes_scanned);
         }

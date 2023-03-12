@@ -8,7 +8,7 @@ import com.example.hashcache.models.database_connections.callbacks.BooleanCallba
 
  The PlayerWalletCommander class handles commands to add or delete scannable codes from a player's wallet.
  */
-public class PlayerWalletCommander {
+public class PlayerWalletCommand {
     /**
      * Adds a scannable code to the player's wallet.
      *

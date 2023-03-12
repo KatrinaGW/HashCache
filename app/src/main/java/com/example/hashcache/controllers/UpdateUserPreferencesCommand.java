@@ -8,6 +8,6 @@ public class UpdateUserPreferencesCommand {
     public static void toggleGeoLocationPreference(boolean enabled){
         Player currentPlayer = AppStore.get().getCurrentPlayer();
         currentPlayer.getPlayerPreferences().setGeoLocationRecording(enabled);
-        Database.getInstance().updateContactInfo(currentPlayer.getUserId(), currentPlayer.getContactInfo());
+        Database.getInstance().updatePlayerPreferences(currentPlayer.getUserId(), currentPlayer.getPlayerPreferences());
     }
 }
