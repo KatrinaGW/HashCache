@@ -105,9 +105,9 @@ public class Community extends AppCompatActivity {
         mSearchEditText.setText(query);
     }
 
-    public void setUserListViewAdapter(ListAdapterView adapter) {
-        mUserListView.setAdapter(adapter);
-    }
+   //public void setUserListViewAdapter(ListAdapterView adapter) {
+    //    mUserListView.setAdapter(adapter);
+    //}
 
     public void setUserListViewEmptyView(View view) {
         mUserListView.setEmptyView(view);
