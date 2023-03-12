@@ -217,7 +217,9 @@ public class PlayersConnectionHandler {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         playerDocumentConverter.getPlayerFromDocument(documentReference,
-                                player -> cf.complete(player));
+                                player -> {
+                                    cf.complete(player);
+                                });
                     } else {
                         cf.completeExceptionally(new IllegalArgumentException("Given username does not exist!"));
                     }
@@ -432,13 +434,11 @@ public class PlayersConnectionHandler {
         data.put(FieldNames.PHONE_NUMBER.fieldName, "");
         data.put(FieldNames.RECORD_GEOLOCATION.fieldName, "");
         String userId = UUID.randomUUID().toString();
-        System.out.println("Trying to create user " + username);
             fireStoreHelper.setDocumentReference(collectionReference.document(userId),
                     data, new BooleanCallback() {
                         @Override
                         public void onCallback(Boolean isTrue) {
                             if(isTrue){
-                                System.out.println("User was created inside Katrina's function");
                                 getStringCallback.onCallback(userId);
                             }else{
                                 Log.e(TAG, "Something went wrong while setting the userId" +
