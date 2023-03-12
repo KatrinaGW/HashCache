@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -64,29 +65,23 @@ public class MainActivity extends AppCompatActivity {
         is = getResources().openRawResource(R.raw.names);
         HashInfoGenerator.NameGenerator.getNames(is);
 
-
-        startButton.setOnClickListener(new View.OnClickListener() {
+        setStartBtnListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                onStartCachingClicked();
-            }
-        });
-
-    }
-
-    private void onStartCachingClicked(){
-
-        addUserCommand.loginUser(getUsername()).thenAccept(res -> {
-            Intent goHome = new Intent(MainActivity.this, AppHome.class);
-            startActivity(goHome);
-        }).exceptionally(new Function<Throwable, Void>() {
-            @Override
-            public Void apply(Throwable throwable) {
-                // display some error on the screen
-                return null;
+            public void onClick(View view) {
+                addUserCommand.loginUser(getUsername()).thenAccept(res -> {
+                    Intent goHome = new Intent(MainActivity.this, AppHome.class);
+                    startActivity(goHome);
+                }).exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        // display some error on the screen
+                        return null;
+                    }
+                });
             }
         });
     }
+
     public void setStartBtnListener(View.OnClickListener listeners) {
         findViewById(R.id.start_button).setOnClickListener(listeners);
     }
