@@ -11,6 +11,8 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.google.firebase.firestore.CollectionReference;
+
 /**
  * The LeaderboardNumQRActivity class extends the AppCompatActivity and is used to display the
  * leaderboard based on the number of QR codes scanned.
@@ -35,7 +37,6 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
          */
 
         // Get the top 3 users sorted by the number of QR codes they have
-
 
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
