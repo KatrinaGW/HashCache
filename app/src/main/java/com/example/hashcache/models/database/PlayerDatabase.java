@@ -275,12 +275,34 @@ public class PlayerDatabase implements IPlayerDatabase {
 
     @Override
     public CompletableFuture<Void> addScannableCodeToPlayerWallet(String userId, String scannableCodeId) {
-        return null;
+        System.out.println("[[ Trying to add to wallet...");
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+           PlayersConnectionHandler.getInstance().playerScannedCodeAdded(userId, scannableCodeId, null, new BooleanCallback() {
+               @Override
+               public void onCallback(Boolean isTrue) {
+                   System.out.println("[[ Got response!!!");
+                   if(isTrue){
+                       cf.complete(null);
+                   }
+                   else{
+                       cf.completeExceptionally(new Exception("Could not add scannable to player wallet, userId: " + userId + " codeId " + scannableCodeId));
+                   }
+               }
+           });
+        }).exceptionally(new Function<Throwable, Void>() {
+            @Override
+            public Void apply(Throwable throwable) {
+                cf.completeExceptionally(throwable);
+                return null;
+            }
+        });
+        return cf;
     }
 
     @Override
     public CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId) {
-        return null;
+        return ScannableCodesConnectionHandler.getInstance().scannableCodeIdExists(scannableCodeId);
     }
 
     /**
@@ -294,7 +316,17 @@ public class PlayerDatabase implements IPlayerDatabase {
     public CompletableFuture<String> addScannableCode(ScannableCode scannableCode) {
         CompletableFuture<String> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            cf.complete("S");
+            ScannableCodesConnectionHandler.getInstance().addScannableCode(scannableCode, new BooleanCallback() {
+                @Override
+                public void onCallback(Boolean isTrue) {
+                    if(isTrue){
+                        cf.complete(scannableCode.getScannableCodeId());
+                    }
+                    else{
+                        cf.completeExceptionally(new Exception("Could not add ScannableCode ID: " + scannableCode.getScannableCodeId()));
+                    }
+                }
+            });
         });
         return cf;
     }
