@@ -42,8 +42,8 @@ public class PlayerWalletTest {
     @Test
     void GetScannedCodeIds(){
         PlayerWallet playerWallet= new PlayerWallet();
-        ScannableCode firstMockScannableCode = new ScannableCode("123", new HashInfo(null, "name1", 321), 1234);
-        ScannableCode secondMockScannableCode = new ScannableCode("124", new HashInfo(null, "name2", 321), 1234);
+        ScannableCode firstMockScannableCode = new ScannableCode("123", new HashInfo(null, "name1", 321), String.valueOf(1234));
+        ScannableCode secondMockScannableCode = new ScannableCode("124", new HashInfo(null, "name2", 321), String.valueOf(1234));
 
         playerWallet.addScannableCode(firstMockScannableCode.getScannableCodeId(), firstMockScannableCode.getHashInfo().getGeneratedScore());
         playerWallet.addScannableCode(secondMockScannableCode.getScannableCodeId(), secondMockScannableCode.getHashInfo().getGeneratedScore());
