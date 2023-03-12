@@ -11,6 +11,7 @@ import com.example.hashcache.models.database_connections.PlayersConnectionHandle
 import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
 import com.example.hashcache.store.AppStore;
 
@@ -457,6 +458,31 @@ public class PlayerDatabase implements IPlayerDatabase {
                             return null;
                         }
                     });
+        });
+        return cf;
+    }
+
+    /**
+     * Gets a scannable code from the database with a specific id
+     *
+     * @param scannableCodeId          the id of the scannable code to get
+     * @return cf the CompleteableFuture with the found scannableCode
+     */
+    @Override
+    public CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            ScannableCodesConnectionHandler.getInstance().getScannableCode(scannableCodeId, new GetScannableCodeCallback() {
+                @Override
+                public void onCallback(ScannableCode scannableCode) {
+                    if(scannableCode!=null){
+                        cf.complete(scannableCode);
+                    }else{
+                        cf.completeExceptionally(new Exception("Something went wrong while " +
+                                "getting the scannableCode!"));
+                    }
+                }
+            });
         });
         return cf;
     }

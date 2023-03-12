@@ -197,7 +197,9 @@ public class MyProfile extends AppCompatActivity {
     private void onScannableCodeItemClicked(int i){
         ScannableCode clickedScannableCode = scannableCodes.get(i);
 
-        //TODO: Show page with the scannableCodeInformation
+        Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
+        intent.putExtra("scannableCodeId", clickedScannableCode.getScannableCodeId());
+        startActivity(intent);
     }
 
     /**

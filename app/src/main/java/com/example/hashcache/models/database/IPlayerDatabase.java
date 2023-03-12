@@ -41,4 +41,5 @@ public interface IPlayerDatabase {
     CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds);
     CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds);
     CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds);
+    CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId);
 }

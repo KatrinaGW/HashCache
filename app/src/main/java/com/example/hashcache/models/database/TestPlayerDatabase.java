@@ -416,4 +416,23 @@ public class TestPlayerDatabase implements IPlayerDatabase {
         });
         return cf;
     }
+
+    /**
+     * Gets a scannable code from the database with a specific id
+     *
+     * @param scannableCodeId          the id of the scannable code to get
+     * @return cf the CompleteableFuture with the found scannableCode
+     */
+    @Override
+    public CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            if(scannableCodeHashMap.containsKey(scannableCodeId)){
+                cf.complete((scannableCodeHashMap.get(scannableCodeId)));
+            }else{
+                cf.completeExceptionally(new Exception("Could not find ScannableCode"));
+            }
+        });
+        return cf;
+    }
 }

@@ -36,6 +36,7 @@
         <activity android:name=".views.LeaderboardNumQRActivity"/>
         <activity android:name=".views.LeaderboardTopQRActivity"/>
         <activity android:name=".views.NewMonsterActivity"/>
+        <activity android:name=".views.DisplayMonsterActivity"/>
         <provider
             android:name="com.google.firebase.provider.FirebaseInitProvider"
             android:authorities="${applicationId}.firebaseinitprovider"
