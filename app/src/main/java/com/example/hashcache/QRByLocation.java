@@ -15,14 +15,25 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 
 public class QRByLocation extends AppCompatActivity {
+    private ListView locationListView;
+    private TextView qrNearTextView;
+    private RadioGroup rangeChoices;
+    private RadioButton oneKmRadioButton;
+    private RadioButton fiveKmRadioButton;
+    private RadioButton tenKmRadioButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        init();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.qr_by_location);
 
@@ -87,5 +98,50 @@ public class QRByLocation extends AppCompatActivity {
                 // show QR codes found within 10 km radius
             }
         }
+    }
+    private void init() {
+
+        locationListView = findViewById(R.id.location_listview);
+        qrNearTextView = findViewById(R.id.qr_near_textview);
+        rangeChoices = findViewById(R.id.range_choices);
+        oneKmRadioButton = findViewById(R.id.onekm_radiobutton);
+        fiveKmRadioButton = findViewById(R.id.fivekm_radiobutton);
+        tenKmRadioButton = findViewById(R.id.tenkm_radiobutton);
+    }
+
+    public ListView getLocationListView() {
+        return locationListView;
+    }
+
+    public TextView getQrNearTextView() {
+        return qrNearTextView;
+    }
+
+    public RadioGroup getRangeChoices() {
+        return rangeChoices;
+    }
+
+    public RadioButton getOneKmRadioButton() {
+        return oneKmRadioButton;
+    }
+
+    public RadioButton getFiveKmRadioButton() {
+        return fiveKmRadioButton;
+    }
+
+    public RadioButton getTenKmRadioButton() {
+        return tenKmRadioButton;
+    }
+
+    public void setOneKmRadioButtonChecked(boolean checked) {
+        oneKmRadioButton.setChecked(checked);
+    }
+
+    public void setFiveKmRadioButtonChecked(boolean checked) {
+        fiveKmRadioButton.setChecked(checked);
+    }
+
+    public void setTenKmRadioButtonChecked(boolean checked) {
+        tenKmRadioButton.setChecked(checked);
     }
 }

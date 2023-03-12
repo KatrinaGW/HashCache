@@ -12,13 +12,20 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 public class QRStats extends AppCompatActivity {
-
+    private ImageButton menuButton;
+    private ImageButton scoreIcon;
+    private TextView totalScoreTextView;
+    private TextView myCodesTextView;
+    private TextView topScoreTextView;
+    private TextView lowScoreTextView;
+    private AppCompatButton myProfileButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,5 +80,42 @@ public class QRStats extends AppCompatActivity {
                 startActivity(goHome);
             }
         });
+    }
+    private void init() {
+
+        menuButton = findViewById(R.id.menu_button);
+        scoreIcon = findViewById(R.id.score_icon);
+        totalScoreTextView = findViewById(R.id.total_score_textview);
+        myCodesTextView = findViewById(R.id.my_codes_textview);
+        topScoreTextView = findViewById(R.id.top_score_textview);
+        lowScoreTextView = findViewById(R.id.low_score_textview);
+        myProfileButton = findViewById(R.id.my_profile_button);
+    }
+    public ImageButton getMenuButton() {
+        return menuButton;
+    }
+
+    public ImageButton getScoreIcon() {
+        return scoreIcon;
+    }
+
+    public TextView getTotalScoreTextView() {
+        return totalScoreTextView;
+    }
+
+    public TextView getMyCodesTextView() {
+        return myCodesTextView;
+    }
+
+    public TextView getTopScoreTextView() {
+        return topScoreTextView;
+    }
+
+    public TextView getLowScoreTextView() {
+        return lowScoreTextView;
+    }
+
+    public AppCompatButton getMyProfileButton() {
+        return myProfileButton;
     }
 }

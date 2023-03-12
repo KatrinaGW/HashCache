@@ -15,14 +15,24 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 public class MyProfile extends AppCompatActivity {
+    private View mPurpleRect;
+    private ImageButton mLogoButton;
+    private TextView mUsernameTextView;
+    private TextView mScoreTextView;
+    private ImageButton mMenuButton;
+    private ListView mTempList;
+    private AppCompatButton mQRStatsButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        initView();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.my_profile);
 
@@ -85,5 +95,43 @@ public class MyProfile extends AppCompatActivity {
                 menu.show();
             }
         });
+    }
+    private void initView() {
+
+        mPurpleRect = findViewById(R.id.purple_rect);
+        mLogoButton = findViewById(R.id.logo_button);
+        mUsernameTextView = findViewById(R.id.username_textview);
+        mScoreTextView = findViewById(R.id.score_textview);
+        mMenuButton = findViewById(R.id.menu_button);
+        mTempList = findViewById(R.id.temp_list);
+        mQRStatsButton = findViewById(R.id.qr_stats_button);
+    }
+
+    public void setLogoButtonListener(View.OnClickListener listener) {
+        mLogoButton.setOnClickListener(listener);
+    }
+
+    public void setMenuButtonListener(View.OnClickListener listener) {
+        mMenuButton.setOnClickListener(listener);
+    }
+
+    public void setUsername(String username) {
+        mUsernameTextView.setText(username);
+    }
+
+    public void setScore(int score) {
+        mScoreTextView.setText("Score: " + score);
+    }
+
+    public void setListAdapter(ProfileListAdapter adapter) {
+        mTempList.setAdapter(adapter);
+    }
+
+    public void setEmptyView(View view) {
+        mTempList.setEmptyView(view);
+    }
+
+    public void setQRStatsButtonListener(View.OnClickListener listener) {
+        mQRStatsButton.setOnClickListener(listener);
     }
 }
