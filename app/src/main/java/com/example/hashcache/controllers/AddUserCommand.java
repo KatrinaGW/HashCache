@@ -10,10 +10,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-
+/**
+ * The AddUserCommand class is responsible for handling the logic for adding a new user or logging in an existing user.
+ */
 public class AddUserCommand {
     FirebaseFirestore db;
-
+    /**
+     * Logs in the user with the given username or creates a new user with the given username if the user does not exist.
+     *
+     * @param userName the username of the user to log in or create
+     * @return a CompletableFuture that completes when the user has been logged in or created
+     */
     public CompletableFuture<Void> loginUser(String userName){
         CompletableFuture<Void> cf = new CompletableFuture<>();
         Database.getInstance().usernameExists(userName).thenAccept(exists -> {
@@ -34,7 +41,12 @@ public class AddUserCommand {
         });
         return cf;
     }
-
+    /**
+     * Sets up the user with the given username after the user has been logged in or created.
+     *
+     * @param userName the username of the user to set up
+     * @param cf the CompletableFuture to complete when the user has been set up
+     */
     private void setupUser(String userName, CompletableFuture<Void> cf) {
         Database.getInstance().getIdByUsername(userName).thenAccept(userId -> {
             Database.getInstance().getPlayer(userId).thenAccept(player -> {

@@ -426,12 +426,15 @@ public class PlayersConnectionHandler {
      * @throws IllegalArgumentException if there already is a document with the given userId
      */
     public void createPlayer(String username, GetStringCallback getStringCallback){
-        HashMap<String, String> usernameData = new HashMap<>();
-        usernameData.put(FieldNames.USERNAME.fieldName, username);
+        HashMap<String, String> data = new HashMap<>();
+        data.put(FieldNames.USERNAME.fieldName, username);
+        data.put(FieldNames.EMAIL.fieldName, "");
+        data.put(FieldNames.PHONE_NUMBER.fieldName, "");
+        data.put(FieldNames.RECORD_GEOLOCATION.fieldName, "");
         String userId = UUID.randomUUID().toString();
         System.out.println("Trying to create user " + username);
             fireStoreHelper.setDocumentReference(collectionReference.document(userId),
-                    usernameData, new BooleanCallback() {
+                    data, new BooleanCallback() {
                         @Override
                         public void onCallback(Boolean isTrue) {
                             if(isTrue){
@@ -444,7 +447,6 @@ public class PlayersConnectionHandler {
                             }
                         }
                     });
-
     }
 
     /**

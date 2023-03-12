@@ -3,6 +3,7 @@ package com.example.hashcache.models;
 import android.media.Image;
 
 import com.example.hashcache.controllers.DependencyInjector;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
 import com.example.hashcache.models.database_connections.callbacks.GetIntegerCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
@@ -19,30 +20,34 @@ import java.util.Set;
 public class PlayerWallet{
     private HashMap<String, Image> scannableCodes;
     private int size;
+    private int totalScore;
 
     public PlayerWallet(){
         this.size = 0;
         this.scannableCodes = new HashMap<String, Image>();
+        this.totalScore = 0;
     }
 
     /**
      * Adds a scannable code to the player's collection without an image
      * @param scannableCodeId The id of the scanned code
      */
-    public void addScannableCode(String scannableCodeId){
+    public void addScannableCode(String scannableCodeId, int score){
+        this.size++;
         this.scannableCodes.put(scannableCodeId, null);
+        this.totalScore+=score;
+
     }
-
-
 
     /**
      * Adds a scannable code and its image to the player's collection
      * @param scannableCodeId The id of the scannable code
      * @param locationImage The image of the location where the user scanned the code
      */
-    public void addScannableCode(String scannableCodeId, Image locationImage){
+    public void addScannableCode(String scannableCodeId, int score, Image locationImage){
         this.size++;
         this.scannableCodes.put(scannableCodeId, locationImage);
+        this.totalScore+=score;
     }
 
     /**
@@ -84,9 +89,12 @@ public class PlayerWallet{
      * @param scannableCodeId the id of the scannable code to delete
      * @throws IllegalArgumentException when the id does not exist in the player wallet
      */
-    public void deleteScannableCode(String scannableCodeId){
+    public void deleteScannableCode(String scannableCodeId, int score){
         if(this.scannableCodes.containsKey(scannableCodeId)){
             this.scannableCodes.remove(scannableCodeId);
+            this.totalScore-=score;
+            this.size--;
+
         }else{
             throw new IllegalArgumentException("Player wallet does not contain scannable" +
                     "code with given id");
@@ -94,7 +102,7 @@ public class PlayerWallet{
 
     }
 
-    //Do we need to get the scannablecode from here? Since I'm assuming we're just connecting to
-    //DB and can get it somewhere else. Assume id is already known if the user gets here - doesn't
-    //seem to be a point in adding that method
+    public int getTotalScore(){
+        return this.totalScore;
+    }
 }

@@ -5,7 +5,7 @@
  * Additional buttons permit navigation to other pages.
  */
 
-package com.example.hashcache;
+package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +17,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
+
+import com.example.hashcache.R;
 
 public class QRStats extends AppCompatActivity {
     private ImageButton menuButton;

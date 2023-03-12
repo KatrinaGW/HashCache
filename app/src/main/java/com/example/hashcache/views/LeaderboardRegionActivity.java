@@ -1,4 +1,4 @@
-package com.example.hashcache;
+package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,11 +10,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
-public class LeaderboardNumQRActivity extends AppCompatActivity {
+import com.example.hashcache.R;
+
+public class LeaderboardRegionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_leaderboard_numqr);
+        setContentView(R.layout.activity_leaderboard_region);
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
@@ -23,7 +25,7 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // create menu
-                PopupMenu menu = new PopupMenu(LeaderboardNumQRActivity.this, menuButton);
+                PopupMenu menu = new PopupMenu(LeaderboardRegionActivity.this, menuButton);
                 menu.getMenuInflater()
                         .inflate(R.menu.fragment_popup_menu, menu.getMenu());
 
@@ -33,44 +35,44 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
                         int id = item.getItemId();
 
                         if (id == R.id.menu_home) {                 // go to AppHome page
-                            startActivity(new Intent(LeaderboardNumQRActivity.this, AppHome.class));
+                            startActivity(new Intent(LeaderboardRegionActivity.this, AppHome.class));
                             return true;
 
                         } else if (id == R.id.menu_stats) {         // go to QRStats page
-                            startActivity(new Intent(LeaderboardNumQRActivity.this, QRStats.class));
+                            startActivity(new Intent(LeaderboardRegionActivity.this, QRStats.class));
                             return true;
 
                         } else if (id == R.id.menu_profile) {       // go to MyProfile
-                            startActivity(new Intent(LeaderboardNumQRActivity.this, MyProfile.class));
+                            startActivity(new Intent(LeaderboardRegionActivity.this, MyProfile.class));
                             return true;
 
                         } else if (id == R.id.menu_community) {     // go to Community
-                            startActivity(new Intent(LeaderboardNumQRActivity.this, Community.class));
+                            startActivity(new Intent(LeaderboardRegionActivity.this, Community.class));
                             return true;
                         }
-                        return LeaderboardNumQRActivity.super.onOptionsItemSelected(item);
+                        return LeaderboardRegionActivity.super.onOptionsItemSelected(item);
                     }
                 });
                 menu.show();
             }
         });
 
-        // add functionality to region button
-        AppCompatButton regionButton = findViewById(R.id.region_tab_button);
-        regionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // go to numQR leaderboard page
-                startActivity(new Intent(LeaderboardNumQRActivity.this, LeaderboardRegionActivity.class));
-            }
-        });
         // add functionality to score button
         AppCompatButton scoreButton = findViewById(R.id.score_tab_button);
         scoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // go to score leaderboard page
-                startActivity(new Intent(LeaderboardNumQRActivity.this, LeaderboardScoreActivity.class));
+                startActivity(new Intent(LeaderboardRegionActivity.this, LeaderboardScoreActivity.class));
+            }
+        });
+        // add functionality to numQR button
+        AppCompatButton numQRButton = findViewById(R.id.numQR_tab_button);
+        numQRButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // go to numQR leaderboard page
+                startActivity(new Intent(LeaderboardRegionActivity.this, LeaderboardNumQRActivity.class));
             }
         });
         // add functionality to topQR button
@@ -79,8 +81,9 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // go to topQR leaderboard page
-                startActivity(new Intent(LeaderboardNumQRActivity.this, LeaderboardTopQRActivity.class));
+                startActivity(new Intent(LeaderboardRegionActivity.this, LeaderboardTopQRActivity.class));
             }
         });
     }
 }
+

@@ -4,34 +4,25 @@
  * Allows users to create an account and start the game.
  */
 
-package com.example.hashcache;
+package com.example.hashcache.views;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
-import com.example.hashcache.controllers.DependencyInjector;
 import com.example.hashcache.controllers.HashInfoGenerator;
-import com.example.hashcache.models.HashInfo;
-import com.example.hashcache.models.PlayerWallet;
-import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.views.MainActivityView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
 import java.util.function.Function;
 import java.io.InputStream;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 

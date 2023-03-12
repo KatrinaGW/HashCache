@@ -17,19 +17,29 @@ public class PlayerList {
     private ArrayList<String> playerUserNames;
     private HashMap<String, String> playerIdsNamesMapping;
     private PlayersConnectionHandler playersConnectionHandler;
-
+    /**
+     * Private constructor for creating a new instance of PlayerList
+     */
     private PlayerList(){
         playerUserNames = new ArrayList<>();
         playerIdsNamesMapping = new HashMap<>();
         playersConnectionHandler = DependencyInjector
                 .makePlayersConnectionHandler(playerIdsNamesMapping);
     }
-
+    /**
+     * Private constructor for creating a new instance of PlayerList with a given PlayersConnectionHandler
+     *
+     * @param playersConnectionHandler The PlayersConnectionHandler used to interact with the database
+     */
     private PlayerList(PlayersConnectionHandler playersConnectionHandler){
         this.playersConnectionHandler = playersConnectionHandler;
         playerUserNames = playersConnectionHandler.getInAppPlayerUserNames();
     }
-
+    /**
+     * Gets the singleton instance of the PlayerList
+     *
+     * @return INSTANCE The singleton instance of the PlayerList
+     */
     public static PlayerList getInstance() {
         if(INSTANCE == null) {
             INSTANCE = new PlayerList();
@@ -37,7 +47,13 @@ public class PlayerList {
 
         return INSTANCE;
     }
-
+    /**
+     * Gets the singleton instance of the PlayerList with a given PlayersConnectionHandler
+     *
+     * @param playersConnectionHandler The PlayersConnectionHandler used to interact with the database
+     *
+     * @return INSTANCE The singleton instance of the PlayerList
+     */
     public static PlayerList getInstance(PlayersConnectionHandler playersConnectionHandler) {
         if(INSTANCE == null) {
             INSTANCE = new PlayerList(playersConnectionHandler);
@@ -45,7 +61,9 @@ public class PlayerList {
 
         return INSTANCE;
     }
-
+    /**
+     * Resets the singleton instance of the PlayerList
+     */
     public static void resetInstance(){
         INSTANCE = null;
     }
