@@ -5,9 +5,14 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
 
+import org.checkerframework.checker.units.qual.A;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * 
@@ -43,6 +48,8 @@ public class TestPlayerDatabase implements IPlayerDatabase {
      */
     @Override
     public CompletableFuture<Boolean> usernameExists(String username) {
+
+        System.out.println("Test -> usernameExists");
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             if (userNameToIdMapper.containsKey(username)) {
@@ -50,6 +57,25 @@ public class TestPlayerDatabase implements IPlayerDatabase {
             } else {
                 cf.complete(false);
             }
+        });
+        return cf;
+    }
+
+    /**
+     * Get all the Scannable Codes whose ids are in a given list
+     * @param scannableCodeIds the list of ids of scannable codes to get
+     * @return cf the CompleteableFuture with the list of ScannableCodes
+     */
+    public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
+        ArrayList<ScannableCode> scannableCodes = new ArrayList<>();
+
+        CompletableFuture.runAsync(() -> {
+            for(ScannableCode scannableCode : scannableCodeHashMap.values()){
+                scannableCodes.add(scannableCode);
+            }
+
+            cf.complete(scannableCodes);
         });
         return cf;
     }
@@ -144,7 +170,7 @@ public class TestPlayerDatabase implements IPlayerDatabase {
      *         database
      */
     @Override
-    public CompletableFuture<Integer> getTotalScore(String userId) {
+    public CompletableFuture<Long> getTotalScore(String userId) {
         return null;
     }
 
@@ -188,32 +214,6 @@ public class TestPlayerDatabase implements IPlayerDatabase {
     }
 
     /**
-     * Updates the contact information of a player.
-     *
-     * @param userId      the userId of the player to update the contact information
-     *                    for
-     * @param contactInfo the updated contact information
-     * @return a CompletableFuture that will complete successfully if the contact
-     *         information was updated successfully,
-     *         or an exception if the userId does not exist in the database
-     */
-
-    @Override
-    public CompletableFuture<Void> updateContactInfo(String userId, ContactInfo contactInfo) {
-        CompletableFuture<Void> cf = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
-            if (players.containsKey(userId)) {
-                Player p = players.get(userId);
-                p.setContactInfo(contactInfo);
-                cf.complete(null);
-            } else {
-                cf.completeExceptionally(new Exception("UserId does not exist."));
-            }
-        });
-        return cf;
-    }
-
-    /**
      * Adds a scannable code to database
      *
      * @param scannableCode the scannable code to add
@@ -237,7 +237,7 @@ public class TestPlayerDatabase implements IPlayerDatabase {
         CompletableFuture.runAsync(() -> {
             if (players.containsKey(userId)) {
                 Player p = players.get(userId);
-                p.getPlayerWallet().addScannableCode(scannableCodeId, 0, null);
+                p.getPlayerWallet().addScannableCode(scannableCodeId, null);
                 cf.complete(null);
             } else {
                 cf.completeExceptionally(new Exception("UserId does not exist."));
@@ -247,8 +247,16 @@ public class TestPlayerDatabase implements IPlayerDatabase {
     }
 
     @Override
-    public CompletableFuture<Void> scannableCodeExists(String scannableCodeId) {
-        return null;
+    public CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            if(scannableCodeHashMap.containsKey(scannableCodeId)){
+                cf.complete(true);
+            }else{
+                cf.complete(false);
+            }
+        });
+        return cf;
     }
 
     /**
@@ -262,8 +270,8 @@ public class TestPlayerDatabase implements IPlayerDatabase {
      *         or an exception if the userId does not exist in the database
      */
     @Override
-    public CompletableFuture<Void> removeScannableCode(String userId, String scannableCodeId) {
-        CompletableFuture<Void> cf = new CompletableFuture<>();
+    public CompletableFuture<Boolean> removeScannableCode(String userId, String scannableCodeId) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             if (players.containsKey(userId)) {
                 if (scannableCodeHashMap.containsKey(scannableCodeId)) {
@@ -272,9 +280,28 @@ public class TestPlayerDatabase implements IPlayerDatabase {
                     String scanId = scannableCodeId;
                     ScannableCode scannableCode = scannableCodeHashMap.get(scannableCodeId);
                     scannableCodeHashMap.remove(scanId);
-                    p.getPlayerWallet().deleteScannableCode(scanId, scannableCode.getHashInfo().getGeneratedScore());
-                    cf.complete(null);
+                    p.getPlayerWallet().deleteScannableCode(scanId);
+                    cf.complete(true);
                 }
+            } else {
+                cf.completeExceptionally(new Exception("UserId does not exist."));
+            }
+        });
+        return cf;
+    }
+
+    /**
+     * Update a user's contact information
+     * @param contactInfo the contact information to set for the user
+     * @param userId the id of the user to update the contact information of
+     * @return cf the CompleteableFuture with a boolean value indicating if it was successful
+     */
+    @Override
+    public CompletableFuture<Boolean> updateContactInfo(ContactInfo contactInfo, String userId){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            if (players.containsKey(userId)) {
+                players.get(userId).setContactInfo(contactInfo);
             } else {
                 cf.completeExceptionally(new Exception("UserId does not exist."));
             }
@@ -310,37 +337,93 @@ public class TestPlayerDatabase implements IPlayerDatabase {
     }
 
     /**
-     * Gets the total score for a given player.
-     *
-     * @param userId the userId to get the total score for
-     * @return a CompletableFuture that will return the total score for the given player
+     * Get the player's highest scoring QR code
+     * @param scannableCodeIds the scannableIds to find the highest scoring scannableId
+     * @return cf the CompletableFuture with the highest scoring code
      */
     @Override
-    public CompletableFuture<HashMap<String, Integer>> getPlayerWalletTopLowScores(String userId){
-        CompletableFuture<HashMap<String, Integer>> cf = new CompletableFuture<>();
-        HashMap<String, Integer> qrStats = new HashMap<>();
+    public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            if(players.containsKey(userId)){
-                int highestScore = 0;
-                int lowestScore = Integer.MAX_VALUE;
+            ScannableCode highestScoring = null;
 
+            if(scannableCodeHashMap.size()>0){
                 for(ScannableCode scannableCode : scannableCodeHashMap.values()){
-                    int currentScore = scannableCode.getHashInfo().getGeneratedScore();
-                    if(currentScore < lowestScore){
-                        lowestScore = currentScore;
-                    }
-
-                    if(currentScore > highestScore){
-                        highestScore = currentScore;
+                    if(highestScoring == null ||
+                            scannableCode.getHashInfo().getGeneratedScore() > highestScoring
+                                    .getHashInfo().getGeneratedScore()){
+                        highestScoring = scannableCode;
                     }
                 }
 
-                qrStats.put("highestScore", highestScore);
-                qrStats.put("lowestScore", lowestScore);
-                cf.complete(qrStats);
+                cf.complete(highestScoring);
             }
-            else{
-                cf.completeExceptionally(new Exception("UserId does not exist."));
+        });
+        return cf;
+    }
+
+    /**
+     * Get the player's lowest scoring QR code
+     * @param scannableCodeIds the scannableIds to find the lowest scoring scannableId
+     * @return cf the CompletableFuture with the lowest scoring code
+     */
+    @Override
+    public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            ScannableCode lowestScoring = null;
+
+            if(scannableCodeHashMap.size()>0){
+                for(ScannableCode scannableCode : scannableCodeHashMap.values()){
+                    if(lowestScoring == null ||
+                            scannableCode.getHashInfo().getGeneratedScore() < lowestScoring
+                                    .getHashInfo().getGeneratedScore()){
+                        lowestScoring = scannableCode;
+                    }
+                }
+
+                cf.complete(lowestScoring);
+            }
+        });
+        return cf;
+    }
+
+    /**
+     * Gets the total score of all scannableCodeIds in a list
+     * @param scannableCodeIds the ids of codes to sum
+     * @return cf the CompletableFuture that contains the total score
+     */
+    @Override
+    public CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<Long> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            long runningScore = 0;
+
+            if(scannableCodeHashMap.size()>0){
+                for(ScannableCode scannableCode : scannableCodeHashMap.values()){
+                    runningScore+=scannableCode.getHashInfo().getGeneratedScore();
+                }
+
+                cf.complete(runningScore);
+            }
+        });
+        return cf;
+    }
+
+    /**
+     * Gets a scannable code from the database with a specific id
+     *
+     * @param scannableCodeId          the id of the scannable code to get
+     * @return cf the CompleteableFuture with the found scannableCode
+     */
+    @Override
+    public CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            if(scannableCodeHashMap.containsKey(scannableCodeId)){
+                cf.complete((scannableCodeHashMap.get(scannableCodeId)));
+            }else{
+                cf.completeExceptionally(new Exception("Could not find ScannableCode"));
             }
         });
         return cf;

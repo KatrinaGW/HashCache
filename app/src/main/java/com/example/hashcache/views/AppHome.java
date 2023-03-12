@@ -24,6 +24,7 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
 /**
 
@@ -41,6 +42,7 @@ public class AppHome extends AppCompatActivity {
     private ImageButton mCommunityButton;
     private View mTempMap;
     private AppCompatButton mScanQrButton;
+    private Player playerInfo;
 
 
     @Override
@@ -51,9 +53,8 @@ public class AppHome extends AppCompatActivity {
 
         TextView playerName = findViewById(R.id.username_textview);
 
-        Player playerInfo = AppStore.get().getCurrentPlayer();
+        playerInfo = AppStore.get().getCurrentPlayer();
         setUsername(playerInfo.getUsername());
-        setScore(playerInfo.getPlayerWallet().getTotalScore());
         // add functionality to logo button
         ImageButton logoButton = findViewById(R.id.logo_button);
         logoButton.setOnClickListener(new View.OnClickListener() {
@@ -141,6 +142,16 @@ public class AppHome extends AppCompatActivity {
         mTempMap = findViewById(R.id.temp_map);
         mScanQrButton = findViewById(R.id.scan_qr_button);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Database.getInstance()
+                .getPlayerWalletTotalScore(playerInfo.getPlayerWallet().getScannedCodeIds())
+                .thenAccept(totalScore -> {
+                    this.setScore(totalScore);
+                });
+    }
     /**
 
      Sets the listener for the logo button.
@@ -211,7 +222,7 @@ public class AppHome extends AppCompatActivity {
      Sets the score of the player.
      @param score the score of the player
      */
-    public void setScore(int score) {
+    public void setScore(long score) {
         mScoreTextView.setText("Score: " + score);
     }
     /**

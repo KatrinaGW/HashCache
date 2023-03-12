@@ -23,6 +23,7 @@ import com.example.hashcache.models.database_connections.callbacks.GetStringCall
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
@@ -43,20 +44,26 @@ public class PlayerListTest {
         mockGetStringCallback = Mockito.mock(GetStringCallback.class);
         PlayerList.resetInstance();
     }
-//    @Test
-//    void testAddPlayerSuccess(){
-//        when(mockPlayerConnectionHandler.getInAppPlayerUserNames()).thenReturn(names);
-//        doAnswer(invocation -> {
-//            names.add(newPlayerUsername);
-//            return null;
-//        }).when(mockPlayerConnectionHandler).createPlayer(anyString(), any(GetStringCallback.class));
-//
-//        PlayerList playerList = PlayerList.getInstance(mockPlayerConnectionHandler);
-//
-//        verify(mockPlayerConnectionHandler, times(1)).createPlayer(anyString(),
-//                any(GetStringCallback.class));
-//        assertEquals(playerList.getPlayerUserNames().get(0), names.get(0));
-//    }
+
+    @Test
+    void testAddPlayerSuccess(){
+        GetStringCallback mockGetStringCallback = Mockito.mock(GetStringCallback.class);
+        Player mockPlayer = new Player("name");
+
+        when(mockPlayerConnectionHandler.getInAppPlayerUserNames()).thenReturn(names);
+        doAnswer(invocation -> {
+            names.add(newPlayerUsername);
+            mockGetStringCallback.onCallback("id");
+            return null;
+        }).when(mockPlayerConnectionHandler).createPlayer(mockPlayer.getUsername(), mockGetStringCallback);
+
+        PlayerList playerList = PlayerList.getInstance(mockPlayerConnectionHandler);
+        playerList.addPlayer(mockPlayer.getUsername(), mockGetStringCallback);
+
+        verify(mockPlayerConnectionHandler, times(1)).createPlayer(anyString(),
+                any(GetStringCallback.class));
+        assertEquals(playerList.getPlayerUserNames().get(0), names.get(0));
+    }
 
     @Test
     void testAddPlayerFailure(){

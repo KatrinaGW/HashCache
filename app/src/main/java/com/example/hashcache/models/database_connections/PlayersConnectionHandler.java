@@ -195,10 +195,13 @@ public class PlayersConnectionHandler {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                usernamesIds.put(document.getData().get(FieldNames.USERNAME.fieldName).toString(),
-                                        document.getData().get(FieldNames.USER_ID.fieldName).toString());
-                                cf.complete(usernamesIds);
+                                if(document.exists()){
+                                    usernamesIds.put((String) document.getData().get(FieldNames.USERNAME.fieldName),
+                                            (String) document.getData().get(FieldNames.USER_ID.fieldName));
+                                }
                             }
+
+                            cf.complete(usernamesIds);
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                             cf.completeExceptionally(task.getException());
@@ -461,9 +464,6 @@ public class PlayersConnectionHandler {
      */
     public void playerScannedCodeAdded(String userId, String scannableCodeId,
                                        Image locationImage, BooleanCallback booleanCallback){
-        if(!this.inAppUsernamesIds.containsValue(userId)){
-            throw new IllegalArgumentException("Given userId does not exist!");
-        }
 
         CollectionReference scannedCodeCollection = collectionReference
                 .document(userId)
@@ -484,9 +484,6 @@ public class PlayersConnectionHandler {
      */
     public void playerScannedCodeDeleted(String userId, String scannableCodeId,
                                          BooleanCallback booleanCallback){
-        if(!this.inAppUsernamesIds.containsValue(userId)){
-            throw new IllegalArgumentException("Given userId does not exist!");
-        }
 
         CollectionReference scannedCodeCollection = collectionReference
                 .document(userId)

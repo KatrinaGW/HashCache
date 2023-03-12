@@ -6,6 +6,8 @@
 
 package com.example.hashcache.views;
 
+import static com.example.hashcache.controllers.DependencyInjector.getOrMakeScannableCodesConnectionHandler;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import android.content.Intent;
@@ -16,8 +18,10 @@ import android.widget.TextView;
 
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
-import com.example.hashcache.controllers.HashInfoGenerator;
+import com.example.hashcache.controllers.hashInfo.HashInfoGenerator;
+import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
+import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
@@ -87,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
                 .setStorageBucket("hashcache2.appspot.com")
                 .setProjectId("hashcache2")
                 .build());
+
+        getOrMakeScannableCodesConnectionHandler();
         // Initializes the AddUserCommand and PlayerList instances
         addUserCommand = new AddUserCommand();
 
@@ -99,16 +105,18 @@ public class MainActivity extends AppCompatActivity {
         // Gets input stream to names.csv which is used for name generation
         InputStream is;
         is = getResources().openRawResource(R.raw.names);
-        HashInfoGenerator.NameGenerator.getNames(is);
-
-        // Sets the listener for the start button
+        NameGenerator.getNames(is);        // Sets the listener for the start button
         setStartBtnListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
                 addUserCommand.loginUser(getUsername()).thenAccept(res -> {
                     Intent goHome = new Intent(MainActivity.this, AppHome.class);
-                    startActivity(goHome);
+
+                    PlayersConnectionHandler.getInstance().getPlayers().thenAccept(players -> {
+                        startActivity(goHome);
+                    });
+
                 }).exceptionally(new Function<Throwable, Void>() {
                     @Override
                     public Void apply(Throwable throwable) {

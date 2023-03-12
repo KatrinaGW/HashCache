@@ -32,9 +32,9 @@ public class PlayerWalletTest {
     @Test
     void GetScannableCodeLocationImage(){
         PlayerWallet playerWallet= new PlayerWallet();
-        ScannableCode scannableCode = new ScannableCode("123", new HashInfo(null, "name", 321), 1234);
+        ScannableCode scannableCode = new ScannableCode("123", new HashInfo(null, "name", 321));
 
-        playerWallet.addScannableCode(scannableCode.getScannableCodeId(), scannableCode.getHashInfo().getGeneratedScore());
+        playerWallet.addScannableCode(scannableCode.getScannableCodeId());
 
         assertNull(playerWallet.getScannableCodeLocationImage(scannableCode.getScannableCodeId()));
     }
@@ -42,11 +42,11 @@ public class PlayerWalletTest {
     @Test
     void GetScannedCodeIds(){
         PlayerWallet playerWallet= new PlayerWallet();
-        ScannableCode firstMockScannableCode = new ScannableCode("123", new HashInfo(null, "name1", 321), 1234);
-        ScannableCode secondMockScannableCode = new ScannableCode("124", new HashInfo(null, "name2", 321), 1234);
+        ScannableCode firstMockScannableCode = new ScannableCode("123", new HashInfo(null, "name1", 321), String.valueOf(1234));
+        ScannableCode secondMockScannableCode = new ScannableCode("124", new HashInfo(null, "name2", 321), String.valueOf(1234));
 
-        playerWallet.addScannableCode(firstMockScannableCode.getScannableCodeId(), firstMockScannableCode.getHashInfo().getGeneratedScore());
-        playerWallet.addScannableCode(secondMockScannableCode.getScannableCodeId(), secondMockScannableCode.getHashInfo().getGeneratedScore());
+        playerWallet.addScannableCode(firstMockScannableCode.getScannableCodeId());
+        playerWallet.addScannableCode(secondMockScannableCode.getScannableCodeId());
 
         ArrayList<String> expectedUUIDs = new ArrayList<>();
         expectedUUIDs.add(firstMockScannableCode.getScannableCodeId());

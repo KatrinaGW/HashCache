@@ -11,8 +11,11 @@ import com.example.hashcache.models.database_connections.PlayersConnectionHandle
 import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
 import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
 import com.example.hashcache.store.AppStore;
+
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,6 +98,30 @@ public class PlayerDatabase implements IPlayerDatabase {
     }
 
     /**
+     * Get all the Scannable Codes whose ids are in a given list
+     * @param scannableCodeIds the list of ids of scannable codes to get
+     * @return cf the CompleteableFuture with the list of ScannableCodes
+     */
+    public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            ScannableCodesConnectionHandler.getInstance()
+                    .getScannableCodesByIdInList(scannableCodeIds).thenAccept(scannableCodes -> {
+                cf.complete(scannableCodes);
+            }).exceptionally(new Function<Throwable, Void>() {
+                @Override
+                public Void apply(Throwable throwable) {
+                    System.out.println("There was an error getting the scannableCodes.");
+                    cf.completeExceptionally(throwable);
+                    return null;
+                }
+            });
+
+        });
+        return cf;
+    }
+
+    /**
      * Gets the player object associated with a given userId.
      *
      * @param userId the userId to get the player object for
@@ -143,8 +170,8 @@ public class PlayerDatabase implements IPlayerDatabase {
      *         player
      */
     @Override
-    public CompletableFuture<Integer> getTotalScore(String userId) {
-        CompletableFuture<Integer> cf = new CompletableFuture<>();
+    public CompletableFuture<Long> getTotalScore(String userId) {
+        CompletableFuture<Long> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             if (players.containsKey(userId)) {
                 Player p = players.get(userId);
@@ -222,41 +249,36 @@ public class PlayerDatabase implements IPlayerDatabase {
         return cf;
     }
 
-    /**
-     * Updates the contact info for a given user.
-     *
-     * @param userId      the userId to update the contact info for
-     * @param contactInfo the updated contact info
-     * @return a CompletableFuture that will complete successfully if the contact
-     *         info was updated successfully,
-     *         or an exception if the userId does not exist in the database
-     */
     @Override
-    public CompletableFuture<Void> updateContactInfo(String userId, ContactInfo contactInfo) {
+    public CompletableFuture<Void> addScannableCodeToPlayerWallet(String userId, String scannableCodeId) {
+        System.out.println("[[ Trying to add to wallet...");
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().updateContactInfo(userId, contactInfo, new BooleanCallback() {
-                @Override
-                public void onCallback(Boolean isTrue) {
-                    if (isTrue) {
-                        cf.complete(null);
-                    } else {
-                        cf.completeExceptionally(new Exception("Could not update contact info"));
-                    }
-                }
-            });
+           PlayersConnectionHandler.getInstance().playerScannedCodeAdded(userId, scannableCodeId, null, new BooleanCallback() {
+               @Override
+               public void onCallback(Boolean isTrue) {
+                   System.out.println("[[ Got response!!!");
+                   if(isTrue){
+                       cf.complete(null);
+                   }
+                   else{
+                       cf.completeExceptionally(new Exception("Could not add scannable to player wallet, userId: " + userId + " codeId " + scannableCodeId));
+                   }
+               }
+           });
+        }).exceptionally(new Function<Throwable, Void>() {
+            @Override
+            public Void apply(Throwable throwable) {
+                cf.completeExceptionally(throwable);
+                return null;
+            }
         });
         return cf;
     }
 
     @Override
-    public CompletableFuture<Void> addScannableCodeToPlayerWallet(String userId, String scannableCodeId) {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Void> scannableCodeExists(String scannableCodeId) {
-        return null;
+    public CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId) {
+        return ScannableCodesConnectionHandler.getInstance().scannableCodeIdExists(scannableCodeId);
     }
 
     /**
@@ -270,7 +292,17 @@ public class PlayerDatabase implements IPlayerDatabase {
     public CompletableFuture<String> addScannableCode(ScannableCode scannableCode) {
         CompletableFuture<String> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            cf.complete("S");
+            ScannableCodesConnectionHandler.getInstance().addScannableCode(scannableCode, new BooleanCallback() {
+                @Override
+                public void onCallback(Boolean isTrue) {
+                    if(isTrue){
+                        cf.complete(scannableCode.getScannableCodeId());
+                    }
+                    else{
+                        cf.completeExceptionally(new Exception("Could not add ScannableCode ID: " + scannableCode.getScannableCodeId()));
+                    }
+                }
+            });
         });
         return cf;
     }
@@ -285,20 +317,16 @@ public class PlayerDatabase implements IPlayerDatabase {
      *         or an exception if the userId does not exist in the database
      */
     @Override
-    public CompletableFuture<Void> removeScannableCode(String userId, String scannableCodeId) {
-        CompletableFuture<Void> cf = new CompletableFuture<>();
+    public CompletableFuture<Boolean> removeScannableCode(String userId, String scannableCodeId) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            if (players.containsKey(userId)) {
-                Player p = players.get(userId);
-                String scanId = scannableCodeId;
-                ScannableCode scannableCode = scannableCodeHashMap.get(scanId);
-                scannableCodeHashMap.remove(scanId);
-                p.getPlayerWallet().deleteScannableCode(scannableCode.getScannableCodeId(),
-                        scannableCode.getHashInfo().getGeneratedScore());
-                cf.complete(null);
-            } else {
-                cf.completeExceptionally(new Exception("UserId does not exist."));
-            }
+            PlayersConnectionHandler.getInstance().playerScannedCodeDeleted(userId, scannableCodeId,
+                    new BooleanCallback() {
+                        @Override
+                        public void onCallback(Boolean isTrue) {
+                            cf.complete(isTrue);
+                        }
+                    });
         });
         return cf;
     }
@@ -331,32 +359,129 @@ public class PlayerDatabase implements IPlayerDatabase {
     }
 
     /**
-     * Get the player's highest and lowest scoring QR codes
-     * @param userId the id of the user whose stats to pull
+     * Update a user's contact information
+     * @param contactInfo the contact information to set for the user
+     * @param userId the id of the user to update the contact information of
+     * @return cf the CompleteableFuture with a boolean value indicating if it was successful
+     */
+    @Override
+    public CompletableFuture<Boolean> updateContactInfo(ContactInfo contactInfo, String userId){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            PlayersConnectionHandler.getInstance().updateContactInfo(userId, contactInfo,
+                    new BooleanCallback() {
+                        @Override
+                        public void onCallback(Boolean isTrue) {
+                            if(isTrue){
+                                cf.complete(true);
+                            }else{
+                                cf.completeExceptionally(new Exception("Something went wrong " +
+                                        "while updating the contact information"));
+                            }
+                        }
+                    });
+        });
+
+        return cf;
+    };
+
+    /**
+     * Get the player's highest scoring QR code
+     * @param scannableCodeIds the scannableIds to find the highest scoring scannableId
      * @return cf the CompletableFuture with the QR Stats
      */
     @Override
-    public CompletableFuture<HashMap<String, Integer>> getPlayerWalletTopLowScores(String userId){
-        CompletableFuture<HashMap<String, Integer>> cf = new CompletableFuture<>();
+    public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            if(players.containsKey(userId)){
-                Player p = players.get(userId);
-                PlayerWalletConnectionHandler.getInstance()
-                        .getPlayerWalletTopLowScores(p.getPlayerWallet().getScannedCodeIds())
-                        .thenAccept(scoreStats -> {
-                            cf.complete(scoreStats);
-                        })
-                        .exceptionally(new Function<Throwable, Void>() {
-                            @Override
-                            public Void apply(Throwable throwable) {
-                                cf.completeExceptionally(throwable);
-                                return null;
-                            }
-                        });
-            }
-            else{
-                cf.completeExceptionally(new Exception("UserId does not exist."));
-            }
+        PlayerWalletConnectionHandler.getInstance()
+                .getPlayerWalletTopScore(scannableCodeIds)
+                .thenAccept(topScore -> {
+                    cf.complete(topScore);
+                })
+                .exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        cf.completeExceptionally(throwable);
+                        return null;
+                    }
+                });
+        });
+        return cf;
+    }
+
+    /**
+     * Get the player's lowest scoring QR code
+     * @param scannableCodeIds the scannableIds to find the lowest scoring scannableId
+     * @return cf the CompletableFuture with the QR Stats
+     */
+    @Override
+    public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            PlayerWalletConnectionHandler.getInstance()
+                    .getPlayerWalletLowScore(scannableCodeIds)
+                    .thenAccept(lowScore -> {
+                        cf.complete(lowScore);
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
+        return cf;
+    }
+
+    /**
+     * Gets the total score of all scannableCodeIds in a list
+     * @param scannableCodeIds the ids of codes to sum
+     * @return cf the CompletableFuture that contains the total score
+     */
+    @Override
+    public CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<Long> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            PlayerWalletConnectionHandler.getInstance()
+                    .getPlayerWalletTotalScore(scannableCodeIds)
+                    .thenAccept(totalScore -> {
+                        cf.complete(totalScore);
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
+        return cf;
+    }
+
+    /**
+     * Gets a scannable code from the database with a specific id
+     *
+     * @param scannableCodeId          the id of the scannable code to get
+     * @return cf the CompleteableFuture with the found scannableCode
+     */
+    @Override
+    public CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            ScannableCodesConnectionHandler.getInstance().getScannableCode(scannableCodeId, new GetScannableCodeCallback() {
+                @Override
+                public void onCallback(ScannableCode scannableCode) {
+                    if(scannableCode!=null){
+                        cf.complete(scannableCode);
+                    }else{
+                        cf.completeExceptionally(new Exception("Something went wrong while " +
+                                "getting the scannableCode!"));
+                    }
+                }
+            });
         });
         return cf;
     }

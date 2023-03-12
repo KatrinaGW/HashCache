@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,7 +25,12 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
+import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
+
+import java.util.ArrayList;
+
 /**
  * MyProfile
  *
@@ -53,8 +59,12 @@ public class MyProfile extends AppCompatActivity {
     private TextView mUsernameTextView;
     private TextView mScoreTextView;
     private ImageButton mMenuButton;
-    private ListView mTempList;
+    private ListView mScannableCodesList;
     private AppCompatButton mQRStatsButton;
+    private ScannableCodesArrayAdapter scannableCodesArrayAdapter;
+    private Player playerInfo;
+    private boolean afterOnCreate;
+    private ArrayList<ScannableCode> scannableCodes;
     @Override
     /**
      * Called when the activity is created.
@@ -68,14 +78,17 @@ public class MyProfile extends AppCompatActivity {
      */
 
     protected void onCreate(Bundle savedInstanceState) {
-        initView();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.my_profile);
+        initView();
+
+        afterOnCreate = true;
+
+        setValues();
 
         // add functionality to logo button
         ImageButton logoButton = findViewById(R.id.logo_button);
-        mUsernameTextView = findViewById(R.id.username_textview);
-        mScoreTextView = findViewById(R.id.score_textview);
+
         logoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,9 +101,8 @@ public class MyProfile extends AppCompatActivity {
         // add functionality to QR STATS button
         AppCompatButton statsButton = findViewById(R.id.qr_stats_button);
 
-        Player playerInfo = AppStore.get().getCurrentPlayer();
+        playerInfo = AppStore.get().getCurrentPlayer();
         setUsername(playerInfo.getUsername());
-        setScore(playerInfo.getPlayerWallet().getTotalScore());
         statsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,18 +149,66 @@ public class MyProfile extends AppCompatActivity {
                 menu.show();
             }
         });
+
+        mScannableCodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                onScannableCodeItemClicked(i);
+            }
+        });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(!afterOnCreate){
+            setValues();
+        }else{
+            afterOnCreate = false;
+        }
+    }
+
+    private void setAdapterValues(){
+        Database.getInstance()
+                .getScannableCodesByIdInList(playerInfo.getPlayerWallet().getScannedCodeIds())
+                .thenAccept(scannableCodes -> {
+                    this.scannableCodes = scannableCodes;
+                    scannableCodesArrayAdapter = new ScannableCodesArrayAdapter(this,
+                            scannableCodes);
+                    mScannableCodesList.setAdapter(scannableCodesArrayAdapter);
+                });
+
+        Database.getInstance()
+                .getPlayerWalletTotalScore(playerInfo.getPlayerWallet().getScannedCodeIds())
+                .thenAccept(totalScore -> {
+                    this.setScore(totalScore);
+                });
+    }
+
+    private void setValues(){
+        mUsernameTextView = findViewById(R.id.username_textview);
+        mScoreTextView = findViewById(R.id.score_textview);
+        mScannableCodesList = findViewById(R.id.scannable_codes_list);
+        setAdapterValues();
+    }
+
+    private void onScannableCodeItemClicked(int i){
+        ScannableCode clickedScannableCode = scannableCodes.get(i);
+
+        AppStore.get().setCurrentScannableCode(clickedScannableCode);
+        startActivity(new Intent(MyProfile.this, DisplayMonsterActivity.class));
+    }
+
     /**
      * Initializes the view.
      */
     private void initView() {
+        playerInfo = AppStore.get().getCurrentPlayer();
 
         mPurpleRect = findViewById(R.id.purple_rect);
         mLogoButton = findViewById(R.id.logo_button);
-        mUsernameTextView = findViewById(R.id.username_textview);
-        mScoreTextView = findViewById(R.id.score_textview);
         mMenuButton = findViewById(R.id.menu_button);
-        mTempList = findViewById(R.id.temp_list);
         mQRStatsButton = findViewById(R.id.qr_stats_button);
     }
     /**
@@ -192,27 +252,8 @@ public class MyProfile extends AppCompatActivity {
      * @param score the score to be set
      * @see TextView
      */
-    public void setScore(int score) {
+    public void setScore(long score) {
         mScoreTextView.setText("Score: " + score);
-    }
-    /**
-     * Sets the list adapter for the list of QR monsters.
-     *
-     * @param adapter the adapter to be set for the list of QR monsters
-     * @see ProfileListAdapter
-     * @see ListView
-     */
-    public void setListAdapter(ProfileListAdapter adapter) {
-        mTempList.setAdapter(adapter);
-    }
-    /**
-     * Sets the empty view for the list of QR monsters.
-     *
-     * @param view the empty view to be set for the list of QR monsters
-     * @see ListView
-     */
-    public void setEmptyView(View view) {
-        mTempList.setEmptyView(view);
     }
     /**
 

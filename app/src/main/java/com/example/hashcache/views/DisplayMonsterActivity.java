@@ -1,12 +1,13 @@
 package com.example.hashcache.views;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,22 +17,12 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.controllers.hashInfo.HashController;
 import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
-
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatButton;
 
 import java.util.function.Function;
 
@@ -42,7 +33,7 @@ import java.util.function.Function;
  for the new monster or skipping the photo and navigating to the MyProfile activity. The menu button is also
  functional, allowing users to navigate to different activities in the app.
  */
-public class NewMonsterActivity extends AppCompatActivity {
+public class DisplayMonsterActivity extends AppCompatActivity {
     /**
      * Called when the activity is created.
      *
@@ -55,60 +46,20 @@ public class NewMonsterActivity extends AppCompatActivity {
     private ImageView monsterImage;
     private ImageView miniMap;
     private ImageButton menuButton;
-    private TextView takePhotoText;
-    private ImageButton photoButton;
-    private AppCompatButton skipPhotoButton;
+    private Button deleteButton;
+    private ScannableCode currentScannableCode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_monster);
+        setContentView(R.layout.activity_display_monster);
 
         init();
         // take location photo
-        ImageButton photoButton = findViewById(R.id.photo_button);
-        photoButton.setOnClickListener(new View.OnClickListener() {
+        deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // go to activity to take location photo
-            }
-        });
-
-        ScannableCode curCode =AppStore.get().getCurrentScannableCode();
-        HashInfo curInfo = curCode.getHashInfo();
-        setMonsterName(curInfo.getGeneratedName());
-        setMonsterScore(curInfo.getGeneratedScore());
-        ImageGenerator.getImageFromHash(curCode.getScannableCodeId()).thenAccept(drawable -> {
-            Log.d("NewMonsterActivity", "Received drawable from API");
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d("NewMonsterActivity", "Setting image...");
-                    setMonsterImage(drawable);
-                }
-            });
-
-        }).exceptionally(new Function<Throwable, Void>() {
-            @Override
-            public Void apply(Throwable throwable) {
-                Log.d("NewMonsterActivity ERROR", throwable.getMessage());
-                return null;
-            }
-        });
-
-        // skip taking location photo (go to my profile)
-        AppCompatButton skipPhotoButton = findViewById(R.id.skip_photo_button);
-        skipPhotoButton.setOnClickListener(new View.OnClickListener() {
-            /**
-             * Called when the skip photo button is clicked.
-             *
-             * Navigates to the MyProfile activity when the skip photo button is clicked.
-             *
-             * @param v the view that was clicked (the skip photo button)
-             */
-            @Override
-            public void onClick(View v) {
-                // go to profile page
-                startActivity(new Intent(NewMonsterActivity.this, MyProfile.class));
+                onDeleteButtonClicked();
             }
         });
 
@@ -127,7 +78,7 @@ public class NewMonsterActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // create menu
-                PopupMenu menu = new PopupMenu(NewMonsterActivity.this, menuButton);
+                PopupMenu menu = new PopupMenu(DisplayMonsterActivity.this, menuButton);
                 menu.getMenuInflater()
                         .inflate(R.menu.fragment_popup_menu, menu.getMenu());
 
@@ -145,22 +96,22 @@ public class NewMonsterActivity extends AppCompatActivity {
                         int id = item.getItemId();
 
                         if (id == R.id.menu_home) {                 // go to AppHome page
-                            startActivity(new Intent(NewMonsterActivity.this, AppHome.class));
+                            startActivity(new Intent(DisplayMonsterActivity.this, AppHome.class));
                             return true;
 
                         } else if (id == R.id.menu_stats) {         // go to QRStats page
-                            startActivity(new Intent(NewMonsterActivity.this, QRStats.class));
+                            startActivity(new Intent(DisplayMonsterActivity.this, QRStats.class));
                             return true;
 
                         } else if (id == R.id.menu_profile) {       // go to MyProfile
-                            startActivity(new Intent(NewMonsterActivity.this, MyProfile.class));
+                            startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
                             return true;
 
                         } else if (id == R.id.menu_community) {     // go to Community
-                            startActivity(new Intent(NewMonsterActivity.this, Community.class));
+                            startActivity(new Intent(DisplayMonsterActivity.this, Community.class));
                             return true;
                         }
-                        return NewMonsterActivity.super.onOptionsItemSelected(item);
+                        return DisplayMonsterActivity.super.onOptionsItemSelected(item);
                     }
                 });
                 menu.show();
@@ -168,16 +119,32 @@ public class NewMonsterActivity extends AppCompatActivity {
 
         });
     }
-    private void init() {
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        currentScannableCode = AppStore.get().getCurrentScannableCode();
+        HashInfo currentHashInfo = currentScannableCode.getHashInfo();
+        setMonsterScore(currentHashInfo.getGeneratedScore());
+        setMonsterName(currentHashInfo.getGeneratedName());
+    }
+
+    private void init() {
         monsterName = findViewById(R.id.monster_name);
         monsterScore = findViewById(R.id.monster_score);
         monsterImage = findViewById(R.id.monster_image);
         miniMap = findViewById(R.id.mini_map);
         menuButton = findViewById(R.id.menu_button);
-        takePhotoText = findViewById(R.id.take_photo_text);
-        photoButton = findViewById(R.id.photo_button);
-        skipPhotoButton = findViewById(R.id.skip_photo_button);
+        deleteButton = findViewById(R.id.delete_button);
+    }
+
+    private void onDeleteButtonClicked(){
+        HashController.deleteScannableCodeFromWallet(currentScannableCode.getScannableCodeId(),
+                        AppStore.get().getCurrentPlayer().getUserId())
+                .thenAccept(completed -> {
+                    AppStore.get().setCurrentScannableCode(null);
+                    startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
+                });
     }
 
     public void setMonsterName(String name) {
@@ -201,12 +168,6 @@ public class NewMonsterActivity extends AppCompatActivity {
     }
 
     public void setPhotoButtonClickListener(View.OnClickListener listener) {
-        photoButton.setOnClickListener(listener);
+        deleteButton.setOnClickListener(listener);
     }
-
-    public void setSkipPhotoButtonClickListener(View.OnClickListener listener) {
-        skipPhotoButton.setOnClickListener(listener);
-    }
-    
-
 }
