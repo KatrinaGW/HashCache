@@ -18,6 +18,7 @@ import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
 import com.example.hashcache.controllers.HashInfoGenerator;
 import com.example.hashcache.models.PlayerList;
+import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
@@ -108,7 +109,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 addUserCommand.loginUser(getUsername()).thenAccept(res -> {
                     Intent goHome = new Intent(MainActivity.this, AppHome.class);
-                    startActivity(goHome);
+
+                    PlayersConnectionHandler.getInstance().getPlayers().thenAccept(players -> {
+                        startActivity(goHome);
+                    });
+
                 }).exceptionally(new Function<Throwable, Void>() {
                     @Override
                     public Void apply(Throwable throwable) {
