@@ -11,8 +11,20 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+/**
+
+ LeaderboardRegionActivity is an {@link AppCompatActivity} that displays the leaderboard based on the user's region.
+
+ It includes a menu button and four navigation buttons to switch between different leaderboards.
+
+ */
 
 public class LeaderboardRegionActivity extends AppCompatActivity {
+    /**
+
+     Initializes the activity, sets the layout, and adds functionality to the menu and navigation buttons.
+     @param savedInstanceState a bundle of the saved state of the activity, if any
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,6 +32,10 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
+        /**
+
+         {@link View.OnClickListener} that creates and displays a popup menu when the menu button is clicked.
+         */
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,6 +75,10 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
 
         // add functionality to score button
         AppCompatButton scoreButton = findViewById(R.id.score_tab_button);
+        /**
+
+         {@link View.OnClickListener} that starts a new activity to the score leaderboard page when the score button is clicked.
+         */
         scoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,6 +88,10 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         });
         // add functionality to numQR button
         AppCompatButton numQRButton = findViewById(R.id.numQR_tab_button);
+        /**
+
+         {@link View.OnClickListener} that starts a new activity to the numQR leaderboard page when the numQR button is clicked.
+         */
         numQRButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,6 +101,10 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         });
         // add functionality to topQR button
         AppCompatButton topButton = findViewById(R.id.topQR_tab_button);
+        /**
+
+         {@link View.OnClickListener} that starts a new activity to the topQR leaderboard page when the topQR button is clicked.
+         */
         topButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
