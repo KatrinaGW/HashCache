@@ -355,32 +355,51 @@ public class PlayerDatabase implements IPlayerDatabase {
     }
 
     /**
-     * Get the player's highest and lowest scoring QR codes
-     * @param userId the id of the user whose stats to pull
+     * Get the player's highest scoring QR code
+     * @param scannableCodeIds the scannableIds to find the highest scoring scannableId
      * @return cf the CompletableFuture with the QR Stats
      */
     @Override
-    public CompletableFuture<HashMap<String, Integer>> getPlayerWalletTopLowScores(String userId){
-        CompletableFuture<HashMap<String, Integer>> cf = new CompletableFuture<>();
+    public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            if(players.containsKey(userId)){
-                Player p = players.get(userId);
-                PlayerWalletConnectionHandler.getInstance()
-                        .getPlayerWalletTopLowScores(p.getPlayerWallet().getScannedCodeIds())
-                        .thenAccept(scoreStats -> {
-                            cf.complete(scoreStats);
-                        })
-                        .exceptionally(new Function<Throwable, Void>() {
-                            @Override
-                            public Void apply(Throwable throwable) {
-                                cf.completeExceptionally(throwable);
-                                return null;
-                            }
-                        });
-            }
-            else{
-                cf.completeExceptionally(new Exception("UserId does not exist."));
-            }
+        PlayerWalletConnectionHandler.getInstance()
+                .getPlayerWalletTopScore(scannableCodeIds)
+                .thenAccept(topScore -> {
+                    cf.complete(topScore);
+                })
+                .exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        cf.completeExceptionally(throwable);
+                        return null;
+                    }
+                });
+        });
+        return cf;
+    }
+
+    /**
+     * Get the player's lowest scoring QR code
+     * @param scannableCodeIds the scannableIds to find the lowest scoring scannableId
+     * @return cf the CompletableFuture with the QR Stats
+     */
+    @Override
+    public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            PlayerWalletConnectionHandler.getInstance()
+                    .getPlayerWalletLowScore(scannableCodeIds)
+                    .thenAccept(lowScore -> {
+                        cf.complete(lowScore);
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
         });
         return cf;
     }

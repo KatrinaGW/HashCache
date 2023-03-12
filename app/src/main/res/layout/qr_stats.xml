@@ -157,6 +157,8 @@
             android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/top_score_icon"
             android:text="xxxxxxx"
+            android:onClick="onClick"
+            android:clickable="true"
             android:textColor="@color/white"
             android:textSize="24sp" />
     </RelativeLayout>
@@ -201,6 +203,8 @@
             android:layout_toEndOf="@id/low_score_icon"
             android:text="xxxxxxx"
             android:textColor="@color/white"
+            android:onClick="onClick"
+            android:clickable="true"
             android:textSize="24sp" />
     </RelativeLayout>
 

@@ -202,7 +202,7 @@ public class ScannableCodesConnectionHandler {
                             data.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCode.getScannableCodeId());
                             data.put(FieldNames.CODE_LOCATION_ID.fieldName, scannableCode.getCodeLocationId());
                             data.put(FieldNames.GENERATED_NAME.fieldName, hashInfo.getGeneratedName());
-                            data.put(FieldNames.GENERATED_SCORE.fieldName, Integer.toString(hashInfo.getGeneratedScore()));
+                            data.put(FieldNames.GENERATED_SCORE.fieldName, Long.toString(hashInfo.getGeneratedScore()));
 
                             /**
                              * Create a new document with the ScannableCode data and whose id is the

@@ -25,24 +25,18 @@ public class PlayerWallet{
     private HashMap<String, Image> scannableCodes;
     private int size;
     private int totalScore;
-    private int lowScore;
-    private int highScore;
-    private ArrayList<Integer> scores;
 
     public PlayerWallet(){
         this.size = 0;
         this.scannableCodes = new HashMap<String, Image>();
         this.totalScore = 0;
-        this.lowScore = Integer.MAX_VALUE;
-        this.highScore = 0;
-        scores = new ArrayList<>();
     }
 
     /**
      * Adds a scannable code to the player's collection without an image
      * @param scannableCodeId The id of the scanned code
      */
-    public void addScannableCode(String scannableCodeId, int score){
+    public void addScannableCode(String scannableCodeId, long score){
         this.scannableCodes.put(scannableCodeId, null);
         this.updateStatsAfterAdd(score);
     }
@@ -56,34 +50,9 @@ public class PlayerWallet{
         this.scannableCodes.put(scannableCodeId, locationImage);
     }
 
-    private void updateStatsAfterAdd(int score){
+    private void updateStatsAfterAdd(long score){
         this.size++;
         this.totalScore+=score;
-        scores.add(score);
-
-        if(score < lowScore){
-            this.lowScore = score;
-        }
-
-        if(score > highScore){
-            this.highScore = score;
-        }
-    }
-
-    /**
-     * Gets the player's lowest score
-     * @return lowScore the player's lowest score
-     */
-    public int getLowScore(){
-        return this.lowScore;
-    }
-
-    /**
-     * Gets the player's highest score
-     * @return highScore the player's highest score
-     */
-    public int getHighScore(){
-        return this.highScore;
     }
 
     /**
@@ -125,9 +94,10 @@ public class PlayerWallet{
      * @param scannableCodeId the id of the scannable code to delete
      * @throws IllegalArgumentException when the id does not exist in the player wallet
      */
-    public void deleteScannableCode(String scannableCodeId, int score){
+    public void deleteScannableCode(String scannableCodeId, long score){
         if(this.scannableCodes.containsKey(scannableCodeId)){
             this.scannableCodes.remove(scannableCodeId);
+            updateAfterDelete(score);
 
         }else{
             throw new IllegalArgumentException("Player wallet does not contain scannable" +
@@ -136,19 +106,9 @@ public class PlayerWallet{
 
     }
 
-    private void updateAfterDelete(int score){
+    private void updateAfterDelete(long score){
         this.totalScore-=score;
         this.size--;
-        scores.remove(score);
-
-        if(this.size == 0){
-            this.highScore = 0;
-            this.lowScore = Integer.MAX_VALUE;
-        }else{
-            this.lowScore = min(scores);
-            this.highScore = max(scores);
-        }
-
     }
 
     /**

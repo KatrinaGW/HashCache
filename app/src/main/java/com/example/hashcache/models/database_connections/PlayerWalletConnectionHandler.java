@@ -170,10 +170,10 @@ public class PlayerWalletConnectionHandler {
     }
 
     /**
-     * Gets the the highest and lowest scores from a list of scannableCodes
+     * Gets the the highest score from a list of scannableCodes
      *
-     * @param scannableCodeIds the list of scannableIds to get the highest and lowest scores from
-     * @return a CompletableFuture that will return the score stats for the given player
+     * @param scannableCodeIds the list of scannableIds to get the highest score from
+     * @return a CompletableFuture that will return the highest scoring ScannableCode
      */
     public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds){
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
@@ -183,7 +183,7 @@ public class PlayerWalletConnectionHandler {
             Database.getInstance().getScannableCodesByIdInList(scannableCodeIds).thenAccept(
                     scannableCodes -> {
                         if(scannableCodes.size()>0){
-                            int highestScore = 0;
+                            long highestScore = 0;
                             ScannableCode highestScoring = scannableCodes.get(0);
 
                             for(int i = 1; i < scannableCodes.size(); i++){
@@ -195,41 +195,49 @@ public class PlayerWalletConnectionHandler {
                             }
                             cf.complete(highestScoring);
                         }else{
-                            cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+                            cf.completeExceptionally(new Exception("No scannablecodes could be found" +
+                                    "for the given IDs!"));
                         }
 
                     }
             );
+        });
+        return cf;
+    }
 
-//            Query query = db.collection(CollectionNames.SCANNABLE_CODES.collectionName)
-//                    .orderBy("score", Query.Direction.DESCENDING);
-//            query.get().addOnCompleteListener(task -> {
-//                if(task.isSuccessful()){
-//                    boolean found = false;
-//                    int i = 0;
-//                    QuerySnapshot documents = task.getResult();
-//
-//                    for(QueryDocumentSnapshot document : task.getResult()){
-//                        if(scannableCodeIds.contains(document.getId())){
-//                            currentScore = Integer.parseInt((String) document.getData().get(FieldNames.GENERATED_SCORE.fieldName));
-//                            if(currentScore<lowestScore){
-//                                lowestScore = currentScore;
-//                            }
-//                            if(currentScore>highestScore){
-//                                highestScore = currentScore;
-//                            }
-//                        }
-//                    }
-//
-//                    scoreStats.put("highestScore", highestScore);
-//                    scoreStats.put("lowestScore", lowestScore);
-//                    cf.complete(scoreStats);
-//                }
-//                else{
-//                    cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
-//                }
-//            });
-//        });
+    /**
+     * Gets the the lowest score from a list of scannableCodes
+     *
+     * @param scannableCodeIds the list of scannableIds to get the lowest score from
+     * @return a CompletableFuture that will return the lowest scoring ScannableCode
+     */
+    public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
+        HashMap<String, Integer> scoreStats = new HashMap<>();
+
+        CompletableFuture.runAsync(() -> {
+            Database.getInstance().getScannableCodesByIdInList(scannableCodeIds).thenAccept(
+                    scannableCodes -> {
+                        if(scannableCodes.size()>0){
+                            long lowestScore = Long.MAX_VALUE;
+                            ScannableCode lowestScoring = scannableCodes.get(0);
+
+                            for(int i = 1; i < scannableCodes.size(); i++){
+                                ScannableCode scannableCode = scannableCodes.get(i);
+                                if(scannableCode.getHashInfo().getGeneratedScore() < lowestScore){
+                                    lowestScore = scannableCode.getHashInfo().getGeneratedScore();
+                                    lowestScoring = scannableCode;
+                                }
+                            }
+                            cf.complete(lowestScoring);
+                        }else{
+                            cf.completeExceptionally(new Exception("No scannablecodes could be found" +
+                                    "for the given IDs!"));
+                        }
+
+                    }
+            );
+        });
         return cf;
     }
 }

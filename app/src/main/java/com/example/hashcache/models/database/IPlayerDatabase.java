@@ -37,6 +37,7 @@ public interface IPlayerDatabase {
 
     CompletableFuture<Void> changeUserName(String userId, String newUsername);
 
-    CompletableFuture<HashMap<String, Integer>> getPlayerWalletTopLowScores(String userId);
+    CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds);
+    CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds);
     CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds);
 }

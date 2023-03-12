@@ -334,37 +334,52 @@ public class TestPlayerDatabase implements IPlayerDatabase {
     }
 
     /**
-     * Gets the total score for a given player.
-     *
-     * @param userId the userId to get the total score for
-     * @return a CompletableFuture that will return the total score for the given player
+     * Get the player's highest scoring QR code
+     * @param scannableCodeIds the scannableIds to find the highest scoring scannableId
+     * @return cf the CompletableFuture with the highest scoring code
      */
     @Override
-    public CompletableFuture<HashMap<String, Integer>> getPlayerWalletTopLowScores(String userId){
-        CompletableFuture<HashMap<String, Integer>> cf = new CompletableFuture<>();
-        HashMap<String, Integer> qrStats = new HashMap<>();
+    public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            if(players.containsKey(userId)){
-                int highestScore = 0;
-                int lowestScore = Integer.MAX_VALUE;
+            ScannableCode highestScoring = null;
 
+            if(scannableCodeHashMap.size()>0){
                 for(ScannableCode scannableCode : scannableCodeHashMap.values()){
-                    int currentScore = scannableCode.getHashInfo().getGeneratedScore();
-                    if(currentScore < lowestScore){
-                        lowestScore = currentScore;
-                    }
-
-                    if(currentScore > highestScore){
-                        highestScore = currentScore;
+                    if(highestScoring == null ||
+                            scannableCode.getHashInfo().getGeneratedScore() > highestScoring
+                                    .getHashInfo().getGeneratedScore()){
+                        highestScoring = scannableCode;
                     }
                 }
 
-                qrStats.put("highestScore", highestScore);
-                qrStats.put("lowestScore", lowestScore);
-                cf.complete(qrStats);
+                cf.complete(highestScoring);
             }
-            else{
-                cf.completeExceptionally(new Exception("UserId does not exist."));
+        });
+        return cf;
+    }
+
+    /**
+     * Get the player's lowest scoring QR code
+     * @param scannableCodeIds the scannableIds to find the lowest scoring scannableId
+     * @return cf the CompletableFuture with the lowest scoring code
+     */
+    @Override
+    public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds){
+        CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            ScannableCode lowestScoring = null;
+
+            if(scannableCodeHashMap.size()>0){
+                for(ScannableCode scannableCode : scannableCodeHashMap.values()){
+                    if(lowestScoring == null ||
+                            scannableCode.getHashInfo().getGeneratedScore() < lowestScoring
+                                    .getHashInfo().getGeneratedScore()){
+                        lowestScoring = scannableCode;
+                    }
+                }
+
+                cf.complete(lowestScoring);
             }
         });
         return cf;

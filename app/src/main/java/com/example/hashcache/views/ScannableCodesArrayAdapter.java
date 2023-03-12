@@ -54,7 +54,7 @@ public class ScannableCodesArrayAdapter extends ArrayAdapter<ScannableCode> {
         TextView scannableCodeScore = view.findViewById(R.id.scannable_code_score_listview_item);
 
         scannableCodeName.setText(scannableCode.getHashInfo().getGeneratedName());
-        scannableCodeScore.setText(Integer.toString(scannableCode.getHashInfo().getGeneratedScore()));
+        scannableCodeScore.setText(Long.toString(scannableCode.getHashInfo().getGeneratedScore()));
 
         return view;
     }
