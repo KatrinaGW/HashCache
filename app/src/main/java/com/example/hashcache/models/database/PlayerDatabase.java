@@ -1,5 +1,7 @@
 package com.example.hashcache.models.database;
 
+import java.util.Observable;
+
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
@@ -14,6 +16,7 @@ import com.example.hashcache.models.database_connections.callbacks.GetPlayerCall
 import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
 import com.example.hashcache.store.AppStore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import org.checkerframework.checker.units.qual.C;
 
@@ -29,7 +32,7 @@ import java.util.function.Function;
  * It implements the IPlayerDatabase interface which defines the methods that
  * can be performed on the database.
  */
-public class PlayerDatabase implements IPlayerDatabase {
+public class PlayerDatabase extends Observable implements IPlayerDatabase {
     /**
      * Singleton instance of the PlayerDatabase class.
      */
@@ -47,6 +50,8 @@ public class PlayerDatabase implements IPlayerDatabase {
      */
     private HashMap<String, ScannableCode> scannableCodeHashMap;
 
+    private ListenerRegistration playerListener;
+    private ListenerRegistration walletListener;
     /**
      * Checks if a username already exists in the database.
      *
@@ -389,7 +394,19 @@ public class PlayerDatabase implements IPlayerDatabase {
         });
 
         return cf;
-    };
+    }
+
+    @Override
+    public void onPlayerDataChanged(String playerId, GetPlayerCallback callback) {
+        playerListener = PlayersConnectionHandler.getInstance().setupPlayerListener(playerId, callback);
+    }
+
+    @Override
+    public void onPlayerWalletChanged(String playerId, BooleanCallback callback) {
+        walletListener = PlayerWalletConnectionHandler.getInstance().getPlayerWalletChangeListener(playerId, callback);
+    }
+
+    ;
 
     /**
      * Get the player's highest scoring QR code
@@ -490,4 +507,10 @@ public class PlayerDatabase implements IPlayerDatabase {
         });
         return cf;
     }
+
+    private void triggerObservers() {
+        setChanged();
+        notifyObservers();
+    }
+
 }
