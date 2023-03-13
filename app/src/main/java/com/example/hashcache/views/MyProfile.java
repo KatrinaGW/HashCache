@@ -29,7 +29,11 @@ import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * MyProfile
@@ -53,17 +57,13 @@ import java.util.ArrayList;
  * @see QRStats
  * @see Community
  */
-public class MyProfile extends AppCompatActivity {
+public class MyProfile extends AppCompatActivity implements Observer {
     private View mPurpleRect;
     private ImageButton mLogoButton;
-    private TextView mUsernameTextView;
-    private TextView mScoreTextView;
     private ImageButton mMenuButton;
     private ListView mScannableCodesList;
     private AppCompatButton mQRStatsButton;
     private ScannableCodesArrayAdapter scannableCodesArrayAdapter;
-    private Player playerInfo;
-    private boolean afterOnCreate;
     private ArrayList<ScannableCode> scannableCodes;
     @Override
     /**
@@ -81,11 +81,6 @@ public class MyProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.my_profile);
         initView();
-
-        afterOnCreate = true;
-
-        setValues();
-
         // add functionality to logo button
         ImageButton logoButton = findViewById(R.id.logo_button);
 
@@ -101,8 +96,6 @@ public class MyProfile extends AppCompatActivity {
         // add functionality to QR STATS button
         AppCompatButton statsButton = findViewById(R.id.qr_stats_button);
 
-        playerInfo = AppStore.get().getCurrentPlayer();
-        setUsername(playerInfo.getUsername());
         statsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,8 +140,13 @@ public class MyProfile extends AppCompatActivity {
                     }
                 });
                 menu.show();
+
+
             }
+
         });
+
+        mScannableCodesList = findViewById(R.id.scannable_codes_list);
 
         mScannableCodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -156,41 +154,9 @@ public class MyProfile extends AppCompatActivity {
                 onScannableCodeItemClicked(i);
             }
         });
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if(!afterOnCreate){
-            setValues();
-        }else{
-            afterOnCreate = false;
-        }
-    }
-
-    private void setAdapterValues(){
-        Database.getInstance()
-                .getScannableCodesByIdInList(playerInfo.getPlayerWallet().getScannedCodeIds())
-                .thenAccept(scannableCodes -> {
-                    this.scannableCodes = scannableCodes;
-                    scannableCodesArrayAdapter = new ScannableCodesArrayAdapter(this,
-                            scannableCodes);
-                    mScannableCodesList.setAdapter(scannableCodesArrayAdapter);
-                });
-
-        Database.getInstance()
-                .getPlayerWalletTotalScore(playerInfo.getPlayerWallet().getScannedCodeIds())
-                .thenAccept(totalScore -> {
-                    this.setScore(totalScore);
-                });
-    }
-
-    private void setValues(){
-        mUsernameTextView = findViewById(R.id.username_textview);
-        mScoreTextView = findViewById(R.id.score_textview);
-        mScannableCodesList = findViewById(R.id.scannable_codes_list);
-        setAdapterValues();
+        AppStore.get().addObserver(this);
+        setUIParams();
     }
 
     private void onScannableCodeItemClicked(int i){
@@ -204,8 +170,6 @@ public class MyProfile extends AppCompatActivity {
      * Initializes the view.
      */
     private void initView() {
-        playerInfo = AppStore.get().getCurrentPlayer();
-
         mPurpleRect = findViewById(R.id.purple_rect);
         mLogoButton = findViewById(R.id.logo_button);
         mMenuButton = findViewById(R.id.menu_button);
@@ -233,6 +197,7 @@ public class MyProfile extends AppCompatActivity {
      * @see Community
      */
 
+
     public void setMenuButtonListener(View.OnClickListener listener) {
         mMenuButton.setOnClickListener(listener);
     }
@@ -244,7 +209,8 @@ public class MyProfile extends AppCompatActivity {
      */
 
     public void setUsername(String username) {
-        mUsernameTextView.setText(username);
+        TextView tv = findViewById(R.id.username_textview);
+        tv.setText(username);
     }
     /**
      * Sets the score displayed on the profile page.
@@ -253,7 +219,8 @@ public class MyProfile extends AppCompatActivity {
      * @see TextView
      */
     public void setScore(long score) {
-        mScoreTextView.setText("Score: " + score);
+        TextView scoreTv = findViewById(R.id.score_textview);
+        scoreTv.setText("Score: " + score);
     }
     /**
 
@@ -267,4 +234,25 @@ public class MyProfile extends AppCompatActivity {
     public void setQRStatsButtonListener(View.OnClickListener listener) {
         mQRStatsButton.setOnClickListener(listener);
     }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        setUIParams();
+    }
+
+    public void setUIParams(){
+        Player currentPlayer = AppStore.get().getCurrentPlayer();
+        setUsername(currentPlayer.getUsername());
+        setScore(currentPlayer.getTotalScore());
+        Database.getInstance()
+                .getScannableCodesByIdInList(currentPlayer.getPlayerWallet().getScannedCodeIds())
+                .thenAccept(scannableCodes -> {
+                    this.scannableCodes = scannableCodes;
+                    scannableCodesArrayAdapter = new ScannableCodesArrayAdapter(this,
+                            scannableCodes);
+                    mScannableCodesList.setAdapter(scannableCodesArrayAdapter);
+                });
+
+    }
+
 }
