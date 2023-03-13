@@ -5,12 +5,22 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.models.Player;
+import com.example.hashcache.models.database.Database;
+import com.example.hashcache.store.AppStore;
+
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
 
  The LeaderboardTopQRActivity class is an activity that displays the leaderboard of scores based on the top QR codes scanned.
@@ -33,6 +43,52 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
         // setup the activity and inflate the layout
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_topqr);
+
+
+        // Sets the players numb qr codes
+        TextView playersTopQrCode = findViewById(R.id.score_value_textview);
+        AtomicLong playerTopQrScore = new AtomicLong();
+        Database.getInstance()
+                .getTotalScore(AppStore.get().getCurrentPlayer().getUserId())
+                .thenAccept( score -> {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            playerTopQrScore.set(score);
+                        }
+                    });
+                });
+        playersTopQrCode.setText(String.valueOf(playerTopQrScore));
+
+        // Gets the text view for the user names
+        ArrayList<TextView> userNames = new ArrayList<>();
+        userNames.add(findViewById(R.id.user_one));
+        userNames.add(findViewById(R.id.user_two));
+        userNames.add(findViewById(R.id.user_three));
+
+        for(TextView name: userNames) {
+            name.setText("Ryan");
+        }
+
+        // Gets the text view for the total scores
+        ArrayList<TextView> totalScore = new ArrayList<>();
+        totalScore.add(findViewById(R.id.score_one));
+        totalScore.add(findViewById(R.id.score_two));
+        totalScore.add(findViewById(R.id.score_three));
+
+        for(TextView name: totalScore) {
+            name.setText("5");
+        }
+
+        // Gets the textview for the monster names
+        ArrayList<TextView> monsterNames = new ArrayList<>();
+        monsterNames.add(findViewById(R.id.monster_name_one));
+        monsterNames.add(findViewById(R.id.monster_name_two));
+        monsterNames.add(findViewById(R.id.monster_name_three));
+
+        for(TextView name: monsterNames) {
+            name.setText("Zorg");
+        }
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);

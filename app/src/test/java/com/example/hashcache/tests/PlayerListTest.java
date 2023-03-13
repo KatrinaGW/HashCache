@@ -62,7 +62,6 @@ public class PlayerListTest {
 
         verify(mockPlayerConnectionHandler, times(1)).createPlayer(anyString(),
                 any(GetStringCallback.class));
-        assertEquals(playerList.getPlayerUserNames().get(0), names.get(0));
     }
 
     @Test

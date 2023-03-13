@@ -10,7 +10,6 @@ import java.util.UUID;
  * Represents a user with an id, username, contact info, preferences, and scannable codes
  */
 public class Player{
-    private static Player INSTANCE;
     private String username;
     private String userId;
     private long totalScore;
@@ -50,34 +49,6 @@ public class Player{
         this.playerWallet = playerWallet;
         this.totalScore = 0;
         this.lowestScore = 0;
-    }
-
-    /**
-     *
-     * @param username: the user name of the user.
-     */
-    public static boolean createInstance(String username) {
-        if(!PlayerList.getInstance().getPlayerUserNames().contains(username)) {
-            INSTANCE = new Player(username);
-            return true;
-        } else {
-            // Put code to fetch from the database the user information
-            PlayerList.getInstance().getPlayer(username, new GetPlayerCallback() {
-                @Override
-                public void onCallback(Player player) {
-                    INSTANCE = player;
-                }
-            });
-            return true;
-        }
-    }
-
-    public static Player getInstance() {
-        if(INSTANCE == null) {
-            throw new IllegalArgumentException("INSTANCE is not defined");
-        }
-
-        return INSTANCE;
     }
 
 
@@ -138,6 +109,10 @@ public class Player{
         return this.playerPreferences;
     }
 
+    /**
+     * Sets the player's current preferences
+     * @param preferences the preferences to use for the user
+     */
     public void setPlayerPreferences(PlayerPreferences preferences){
         this.playerPreferences = preferences;
     }

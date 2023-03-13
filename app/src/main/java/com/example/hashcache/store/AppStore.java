@@ -59,6 +59,11 @@ public class AppStore extends Observable {
         return currentPlayer;
     }
 
+    /**
+     * Sets the selected scannable code
+     * 
+     * @param currentScannableCode the scananbleCode to set as selected
+     */
     public void setCurrentScannableCode(ScannableCode currentScannableCode) {
         this.currentScannableCode = currentScannableCode;
     }

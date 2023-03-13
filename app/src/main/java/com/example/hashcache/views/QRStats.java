@@ -28,8 +28,10 @@ import java.util.Observable;
 import java.util.Observer;
 
 /**
- The QRStats activity displays statistics for the current user, including total score, number of codes scanned,
- highest score achieved, and lowest score achieved. It also provides buttons for navigating to other pages.
+ * The QRStats activity displays statistics for the current user, including
+ * total score, number of codes scanned,
+ * highest score achieved, and lowest score achieved. It also provides buttons
+ * for navigating to other pages.
  */
 public class QRStats extends AppCompatActivity implements Observer {
     private ImageButton menuButton;
@@ -46,10 +48,13 @@ public class QRStats extends AppCompatActivity implements Observer {
     private ScannableCode lowestScoring;
     private ScannableCode highestScoring;
     private PlayerWallet playerWallet;
+
     /**
-     * Initializes the activity and sets the layout. Also adds functionality to the menu button and my profile button.
+     * Initializes the activity and sets the layout. Also adds functionality to the
+     * menu button and my profile button.
      *
-     * @param savedInstanceState a Bundle object containing the activity's previously saved state, if any
+     * @param savedInstanceState a Bundle object containing the activity's
+     *                           previously saved state, if any
      */
 
     @Override
@@ -92,18 +97,18 @@ public class QRStats extends AppCompatActivity implements Observer {
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
 
-                        if (id == R.id.menu_home) {                 // go to AppHome page
+                        if (id == R.id.menu_home) { // go to AppHome page
                             startActivity(new Intent(QRStats.this, AppHome.class));
                             return true;
 
-                        } else if (id == R.id.menu_stats) {         // remain on QRStats page
+                        } else if (id == R.id.menu_stats) { // remain on QRStats page
                             return true;
 
-                        } else if (id == R.id.menu_profile) {       // go to MyProfile
+                        } else if (id == R.id.menu_profile) { // go to MyProfile
                             startActivity(new Intent(QRStats.this, MyProfile.class));
                             return true;
 
-                        } else if (id == R.id.menu_community) {     // go to Community
+                        } else if (id == R.id.menu_community) { // go to Community
                             startActivity(new Intent(QRStats.this, Community.class));
                             return true;
                         }
@@ -118,9 +123,11 @@ public class QRStats extends AppCompatActivity implements Observer {
         AppCompatButton loginButton = findViewById(R.id.my_profile_button);
         loginButton.setOnClickListener(new View.OnClickListener() {
             /**
-
-             This method handles the click event of the My Profile button in the QRStats activity and starts the MyProfile activity.
-             @param v The view that was clicked
+             * 
+             * This method handles the click event of the My Profile button in the QRStats
+             * activity and starts the MyProfile activity.
+             * 
+             * @param v The view that was clicked
              */
             @Override
             public void onClick(View v) {
@@ -151,13 +158,13 @@ public class QRStats extends AppCompatActivity implements Observer {
         setTotalScoreValue(totalScore);
     }
 
-    private void highestScoringCodeClicked(){
+    private void highestScoringCodeClicked() {
         ScannableCode highestScan = AppStore.get().getHighestScannableCode();
         AppStore.get().setCurrentScannableCode(highestScan);
         startActivity(new Intent(QRStats.this, DisplayMonsterActivity.class));
     }
 
-    private void lowestScoringCodeClicked(){
+    private void lowestScoringCodeClicked() {
         ScannableCode lowestScan = AppStore.get().getLowestScannableCode();
         startActivity(new Intent(QRStats.this, DisplayMonsterActivity.class));
     }
@@ -173,21 +180,22 @@ public class QRStats extends AppCompatActivity implements Observer {
         myProfileButton = findViewById(R.id.my_profile_button);
     }
 
-
-    public void setHighScoreValue(long score){
+    public void setHighScoreValue(long score) {
         topScoreTextView.setText(String.valueOf(score));
     }
-    public void setLowScoreValue(long score){
+
+    public void setLowScoreValue(long score) {
         lowScoreTextView.setText(String.valueOf(score));
     }
 
-    public void setTotalScoreValue(long score){
+    public void setTotalScoreValue(long score) {
         totalScoreTextView.setText(String.valueOf(score));
     }
 
-    public void setMyCodesValue(int value){
+    public void setMyCodesValue(int value) {
         myCodesTextView.setText(String.valueOf(value));
     }
+
     public ImageButton getMenuButton() {
         return menuButton;
     }
@@ -195,8 +203,6 @@ public class QRStats extends AppCompatActivity implements Observer {
     public ImageButton getScoreIcon() {
         return scoreIcon;
     }
-
-
 
     public AppCompatButton getMyProfileButton() {
         return myProfileButton;

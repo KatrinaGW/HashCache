@@ -40,8 +40,10 @@ import java.util.Observer;
  *
  * The MyProfile class is an activity that displays the user's profile page.
  *
- * It displays a scrollable list of QR monsters scanned by the user, along with their username and score. The top logo
- * button allows navigation to the user settings page. Selecting a monster navigates to that monster's info page. Additional
+ * It displays a scrollable list of QR monsters scanned by the user, along with
+ * their username and score. The top logo
+ * button allows navigation to the user settings page. Selecting a monster
+ * navigates to that monster's info page. Additional
  * buttons permit navigation to other pages.
  *
  * @see AppCompatActivity
@@ -65,14 +67,18 @@ public class MyProfile extends AppCompatActivity implements Observer {
     private AppCompatButton mQRStatsButton;
     private ScannableCodesArrayAdapter scannableCodesArrayAdapter;
     private ArrayList<ScannableCode> scannableCodes;
+
     @Override
     /**
      * Called when the activity is created.
      *
-     * It sets up the functionality for the logo button, the QR STATS button, and the menu button. It also retrieves the
-     * current user's information and sets the username and score on the profile page.
+     * It sets up the functionality for the logo button, the QR STATS button, and
+     * the menu button. It also retrieves the
+     * current user's information and sets the username and score on the profile
+     * page.
      *
-     * @param savedInstanceState the saved state of the activity, if it was previously closed
+     * @param savedInstanceState the saved state of the activity, if it was
+     *                           previously closed
      * @see AppStore
      * @see Player
      */
@@ -121,18 +127,18 @@ public class MyProfile extends AppCompatActivity implements Observer {
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
 
-                        if (id == R.id.menu_home) {                 // go to AppHome page
+                        if (id == R.id.menu_home) { // go to AppHome page
                             startActivity(new Intent(MyProfile.this, AppHome.class));
                             return true;
 
-                        } else if (id == R.id.menu_stats) {         // go to QRStats page
+                        } else if (id == R.id.menu_stats) { // go to QRStats page
                             startActivity(new Intent(MyProfile.this, QRStats.class));
                             return true;
 
-                        } else if (id == R.id.menu_profile) {       // remain on MyProfile
+                        } else if (id == R.id.menu_profile) { // remain on MyProfile
                             return true;
 
-                        } else if (id == R.id.menu_community) {     // go to Community
+                        } else if (id == R.id.menu_community) { // go to Community
                             startActivity(new Intent(MyProfile.this, Community.class));
                             return true;
                         }
@@ -140,7 +146,6 @@ public class MyProfile extends AppCompatActivity implements Observer {
                     }
                 });
                 menu.show();
-
 
             }
 
@@ -159,11 +164,14 @@ public class MyProfile extends AppCompatActivity implements Observer {
         setUIParams();
     }
 
-    private void onScannableCodeItemClicked(int i){
+    private void onScannableCodeItemClicked(int i) {
         ScannableCode clickedScannableCode = scannableCodes.get(i);
 
+        Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
+        intent.putExtra("belongsToCurrentUser", true);
+
         AppStore.get().setCurrentScannableCode(clickedScannableCode);
-        startActivity(new Intent(MyProfile.this, DisplayMonsterActivity.class));
+        startActivity(intent);
     }
 
     /**
@@ -175,6 +183,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
         mMenuButton = findViewById(R.id.menu_button);
         mQRStatsButton = findViewById(R.id.qr_stats_button);
     }
+
     /**
      * Sets the listener for the logo button.
      *
@@ -185,6 +194,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
     public void setLogoButtonListener(View.OnClickListener listener) {
         mLogoButton.setOnClickListener(listener);
     }
+
     /**
      * Sets the listener for the menu button.
      *
@@ -197,10 +207,10 @@ public class MyProfile extends AppCompatActivity implements Observer {
      * @see Community
      */
 
-
     public void setMenuButtonListener(View.OnClickListener listener) {
         mMenuButton.setOnClickListener(listener);
     }
+
     /**
      * Sets the username displayed on the profile page.
      *
@@ -212,6 +222,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
         TextView tv = findViewById(R.id.username_textview);
         tv.setText(username);
     }
+
     /**
      * Sets the score displayed on the profile page.
      *
@@ -222,14 +233,20 @@ public class MyProfile extends AppCompatActivity implements Observer {
         TextView scoreTv = findViewById(R.id.score_textview);
         scoreTv.setText("Score: " + score);
     }
-    /**
 
-     Sets the click listener for the QR Stats button on the MyProfile page.
-     This method takes a View.OnClickListener as a parameter and sets it as the click listener for the mQRStatsButton,
-     which is an instance of AppCompatButton. When the user clicks on the QR Stats button, the listener's onClick()
-     method is called. This method can be used to perform some action when the button is clicked, such as navigating to
-     the QR Stats page.
-     @param listener the View.OnClickListener to set as the click listener for the QR Stats button
+    /**
+     * 
+     * Sets the click listener for the QR Stats button on the MyProfile page.
+     * This method takes a View.OnClickListener as a parameter and sets it as the
+     * click listener for the mQRStatsButton,
+     * which is an instance of AppCompatButton. When the user clicks on the QR Stats
+     * button, the listener's onClick()
+     * method is called. This method can be used to perform some action when the
+     * button is clicked, such as navigating to
+     * the QR Stats page.
+     * 
+     * @param listener the View.OnClickListener to set as the click listener for the
+     *                 QR Stats button
      */
     public void setQRStatsButtonListener(View.OnClickListener listener) {
         mQRStatsButton.setOnClickListener(listener);
@@ -240,7 +257,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
         setUIParams();
     }
 
-    public void setUIParams(){
+    public void setUIParams() {
         Player currentPlayer = AppStore.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
         setScore(currentPlayer.getTotalScore());

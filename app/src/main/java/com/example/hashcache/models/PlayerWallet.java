@@ -1,22 +1,8 @@
 package com.example.hashcache.models;
 
-import static java.util.Collections.max;
-import static java.util.Collections.min;
-
 import android.media.Image;
-
-import com.example.hashcache.controllers.DependencyInjector;
-import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.GetIntegerCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
-import com.example.hashcache.views.ScannableCodesArrayAdapter;
-
-import org.checkerframework.checker.units.qual.A;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 /**
  * Represents a list of the player's current scanned codes

@@ -1,7 +1,5 @@
 package com.example.hashcache.models.database_connections.converters;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.database_connections.callbacks.GetCodeLocationCallback;

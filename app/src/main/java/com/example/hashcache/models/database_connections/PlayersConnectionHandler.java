@@ -231,6 +231,12 @@ public class PlayersConnectionHandler {
         return cf;
     }
 
+    /**
+     * Gets the player asynchronously
+     * 
+     * @param userId the userid of the player object to get
+     * @return cf the CompleteableFuture with the searched for player
+     */
     public CompletableFuture<Player> getPlayerAsync(String userId) {
         DocumentReference documentReference = collectionReference.document(userId);
         CompletableFuture<Player> cf = new CompletableFuture<>();
@@ -564,5 +570,9 @@ public class PlayersConnectionHandler {
 
         playerWalletConnectionHandler.deleteScannableCodeFromWallet(scannedCodeCollection,
                 scannableCodeId, booleanCallback);
+    }
+
+    public void getAppUserNames() {
+
     }
 }

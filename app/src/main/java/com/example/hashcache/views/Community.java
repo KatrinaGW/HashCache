@@ -19,14 +19,13 @@ package com.example.hashcache.views;
  * Additional buttons permit navigation to other pages.
  */
 
-import static android.util.Log.INFO;
-
 import android.R.layout;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -37,7 +36,6 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
-import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
 
 import java.util.ArrayList;
@@ -52,6 +50,8 @@ public class Community extends AppCompatActivity {
     private EditText mSearchEditText;
     private ListView mUserListView;
     private AppCompatButton mLeaderboardButton;
+    private ArrayList<String> userResults;
+    private ListView searchResultsView;
     @Override
     /**
      * Initializes the view elements and sets the click listeners for the menu button, search button, and leaderboard button.
@@ -64,13 +64,13 @@ public class Community extends AppCompatActivity {
         setContentView(R.layout.community);
 
         // add functionality to leaderboard button
-//        ImageButton logoButton = findViewById(R.id.leaderboard_button);
-//        logoButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(new Intent(Community.this, Leaderboard.class));
-//            }
-//        });
+        AppCompatButton logoButton = findViewById(R.id.leaderboard_button);
+        logoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Community.this, LeaderboardScoreActivity.class));
+            }
+        });
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
@@ -112,14 +112,43 @@ public class Community extends AppCompatActivity {
 
         // Handles the search button
         EditText searchBarText = findViewById(R.id.search_bar_edittext);
-        ListView searchedUsers = findViewById(R.id.user_listview);
+        searchResultsView = findViewById(R.id.user_listview);
         ImageButton searchButton = findViewById(R.id.search_button);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> searchedPlayers = PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(), 10);
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchedPlayers);
-                searchedUsers.setAdapter(adapter);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(), 10)
+                                .thenAccept(searchResults->{
+
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            userResults = searchResults;
+                                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchResults);
+                                            searchResultsView.setAdapter(adapter);
+
+                                            setListViewItemClickListener();
+                                        }
+                                    });
+                                });
+                    }
+                });
+            }
+        });
+
+    }
+
+    private void setListViewItemClickListener(){
+        searchResultsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectUsername = userResults.get(position);
+                Intent intent = new Intent(getApplicationContext(), OtherProfileInformationActivity.class);
+                intent.putExtra("otherUsername", selectUsername);
+                startActivity(intent);
             }
         });
     }
@@ -163,14 +192,6 @@ public class Community extends AppCompatActivity {
         mSearchEditText.setText(query);
     }
 
-   //public void setUserListViewAdapter(ListAdapterView adapter) {
-    //    mUserListView.setAdapter(adapter);
-    //}
-    /**
-
-     Sets an empty view for the user list view in the Community activity.
-     @param view The empty view to set for the user list view in the Community activity.
-     */
     public void setUserListViewEmptyView(View view) {
         mUserListView.setEmptyView(view);
     }

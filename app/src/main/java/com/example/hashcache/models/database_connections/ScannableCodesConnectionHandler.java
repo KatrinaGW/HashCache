@@ -122,6 +122,11 @@ public class ScannableCodesConnectionHandler {
         return INSTANCE;
     }
 
+    /**
+     * Check if a scannable code with a certain id exists
+     * @param scannablecodeId the id to check for
+     * @return cf the CompletableFuture with a boolean return value indicating if the document exists
+     */
     public CompletableFuture<Boolean> scannableCodeIdExists(String scannablecodeId) {
         DocumentReference documentReference = collectionReference.document(scannablecodeId);
         CompletableFuture<Boolean> cf = new CompletableFuture<>();

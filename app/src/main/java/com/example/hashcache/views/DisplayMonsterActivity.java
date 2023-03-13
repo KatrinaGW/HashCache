@@ -48,11 +48,16 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     private ImageButton menuButton;
     private Button deleteButton;
     private ScannableCode currentScannableCode;
+    private boolean belongToCurrentUser;
+    private TextView deleteLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_monster);
+
+        Intent intent = getIntent();
+        belongToCurrentUser = intent.getBooleanExtra("belongsToCurrentUser", false);
 
         init();
         // take location photo
@@ -153,15 +158,34 @@ public class DisplayMonsterActivity extends AppCompatActivity {
         miniMap = findViewById(R.id.mini_map);
         menuButton = findViewById(R.id.menu_button);
         deleteButton = findViewById(R.id.delete_button);
+        deleteLabel = findViewById(R.id.delete_text);
+
+        if(!belongToCurrentUser){
+            deleteLabel.setVisibility(View.GONE);
+            deleteButton.setVisibility(View.GONE);
+        }else{
+            deleteLabel.setVisibility(View.VISIBLE);
+            deleteButton.setVisibility(View.VISIBLE);
+        }
     }
 
     private void onDeleteButtonClicked(){
-        HashController.deleteScannableCodeFromWallet(currentScannableCode.getScannableCodeId(),
-                        AppStore.get().getCurrentPlayer().getUserId())
-                .thenAccept(completed -> {
-                    AppStore.get().setCurrentScannableCode(null);
-                    startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
-                });
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                HashController.deleteScannableCodeFromWallet(currentScannableCode.getScannableCodeId(),
+                                AppStore.get().getCurrentPlayer().getUserId())
+                        .thenAccept(completed -> {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    AppStore.get().setCurrentScannableCode(null);
+                                    startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
+                                }
+                            });
+                        });
+            }
+        });
     }
 
     public void setMonsterName(String name) {

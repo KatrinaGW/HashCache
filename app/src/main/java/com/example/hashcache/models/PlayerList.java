@@ -1,17 +1,21 @@
 package com.example.hashcache.models;
 
+import android.app.VoiceInteractor;
 import android.util.Log;
 
 import com.example.hashcache.controllers.DependencyInjector;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
 import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
+
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents a container for all the players in game right now
@@ -76,8 +80,21 @@ public class PlayerList {
      * Gets the usernames of all players
      * @return playerUserNames the usernames of all players
      */
-    public ArrayList<String> getPlayerUserNames(){
-        return this.playerUserNames;
+    public CompletableFuture<ArrayList<String>> getPlayerUserNames(){
+        CompletableFuture<ArrayList<String>> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            ArrayList<String> usernames = new ArrayList<>();
+            Database.getInstance().getPlayers()
+                    .thenAccept(map -> {
+                                Object[] list = map.keySet().toArray();
+                                for (int i = 0; i < list.length; i++) {
+                                    usernames.add(list[i].toString());
+                                }
+                                cf.complete(usernames);
+                            }
+                    );
+        });
+        return cf;
     }
 
     /**
@@ -105,20 +122,9 @@ public class PlayerList {
      * Gets a player with a given username
      * @param username the username of the player to find
      * @param getPlayerCallback callback function to get username after asynchronous firestore call
-     * @return player The player with the given username
      */
     public void getPlayer(String username, GetPlayerCallback getPlayerCallback){
         this.playersConnectionHandler.getPlayer(username, getPlayerCallback);
-    }
-
-    /**
-     * Returns a list of the game-wide players, sorted in a specified manner
-     * @param filter used to tell the sort function how to sort the array
-     * @return players The playerlist sorted in the specified manner
-     */
-    public ArrayList<String> getPlayersSortedBy(Comparator filter){
-        Collections.sort(this.playerUserNames, filter);
-        return this.playerUserNames;
     }
 
     /**
@@ -129,48 +135,41 @@ public class PlayerList {
      * @param k number of names to return
      * @return list of user who closely match the search term
      */
-    public ArrayList<String> searchPlayers(String searchTerm, int k) {
+    public CompletableFuture<ArrayList<String>> searchPlayers(String searchTerm, int k) {
         if(INSTANCE == null) {
             throw new IllegalArgumentException("The playerList singleton object has yet to be created");
         }
-        Integer distance;
+
+        CompletableFuture<ArrayList<String>> cf = new CompletableFuture<>();
         ArrayList<Username> foundPlayers = new ArrayList<>();
-        ArrayList<String> userNames = PlayerList.getInstance().getPlayerUserNames();
-        if(userNames.size() == 0) {
-            getUserNames();
-            userNames = PlayerList.getInstance().getPlayerUserNames();
-        }
 
-        Log.i("Important", String.valueOf(userNames.size()));
-        for(String name: userNames) {
-            distance = getInstance().computeLevenshteinDistance(name, searchTerm);
-            if(distance != -1) {
-                foundPlayers.add(new Username(name, distance));
-            }
-        }
+        CompletableFuture.runAsync(()->{
+            Database.getInstance().getPlayers().thenAccept(usernames -> {
+                int distance;
+                for(String name: usernames.keySet()) {
+                    distance = getInstance().computeLevenshteinDistance(name, searchTerm);
+                    if(distance != -1) {
+                        foundPlayers.add(new Username(name, distance));
+                    }
+                }
 
-        // Sorts the collection by distance
-        Collections.sort(foundPlayers, new Comparator<Username>() {
-            @Override
-            public int compare(Username o1, Username o2) {
-                return o1.distance.compareTo(o2.distance);
-            }
+                // Sorts the collection by distance
+                Collections.sort(foundPlayers, new Comparator<Username>() {
+                    @Override
+                    public int compare(Username o1, Username o2) {
+                        return o1.distance.compareTo(o2.distance);
+                    }
+                });
+                ArrayList<String> searchedPlayers = new ArrayList<>();
+                for (int i = 0; i < k && i < foundPlayers.size(); i++) {
+                    searchedPlayers.add(foundPlayers.get(i).name);
+                }
+
+                cf.complete(searchedPlayers);
+            });
         });
-        ArrayList<String> searchedPlayers = new ArrayList<>();
-        for (int i = 0; i < k && i < foundPlayers.size(); i++) {
-            searchedPlayers.add(foundPlayers.get(i).name);
-        }
-        return searchedPlayers;
-    }
 
-    /**
-     * Gets the first n players in the playerlist sorted by a specified manner
-     * @param filter The way to sort the players
-     * @param n The top number of players to get
-     * @return this.players sublist The top n players sorted in a specified manner
-     */
-    public ArrayList<String> getFirstNPlayersSortedBy(Comparator filter, int n){
-        return (ArrayList<String>) (this.getPlayersSortedBy(filter)).subList(0, n);
+        return cf;
     }
 
     /**
@@ -239,17 +238,12 @@ public class PlayerList {
         return dynProMat[a.length()][b.length()];
     }
 
-    /**
-     * Will cache all the usernames in to playerUserName
-     */
-    private void getUserNames() {
-        this.playerUserNames = playersConnectionHandler.getInAppPlayerUserNames();
-    }
+
 }
 
-/*
+/**
  * Class to hold userName info for sorting
- */
+ **/
 class Username {
     public String name;
     public Integer distance;

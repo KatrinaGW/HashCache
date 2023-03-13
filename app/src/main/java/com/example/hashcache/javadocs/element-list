@@ -1,2 +1,13 @@
 com.example.hashcache
+com.example.hashcache.controllers
+com.example.hashcache.controllers.hashInfo
 com.example.hashcache.models
+com.example.hashcache.models.database
+com.example.hashcache.models.database_connections
+com.example.hashcache.models.database_connections.callbacks
+com.example.hashcache.models.database_connections.converters
+com.example.hashcache.models.database_connections.values
+com.example.hashcache.store
+com.example.hashcache.tests
+com.example.hashcache.unit
+com.example.hashcache.views

@@ -5,12 +5,21 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.models.Player;
+import com.example.hashcache.models.database.Database;
+import com.example.hashcache.store.AppStore;
+import com.google.firebase.firestore.CollectionReference;
+
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * The LeaderboardNumQRActivity class extends the AppCompatActivity and is used to display the
  * leaderboard based on the number of QR codes scanned.
@@ -21,6 +30,8 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
      *
      * @param savedInstanceState A Bundle object containing the activity's previously saved state.
      */
+
+    // Set the player scores can just use singleton don't have to fetch from the database
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,11 +39,41 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
-        /**
-         * onCreate method is used to initialize the activity and is called when the activity is first created.
-         *
-         * @param savedInstanceState A Bundle object containing the activity's previously saved state.
-         */
+
+        // Sets the players numb qr codes
+        TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
+        AtomicLong numQrCodes = new AtomicLong();
+        Database.getInstance()
+                .getTotalScore(AppStore.get().getCurrentPlayer().getUserId())
+                .thenAccept( score -> {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            numQrCodes.set(score);
+                        }
+                    });
+                });
+        playersNumQrCodes.setText(String.valueOf(numQrCodes));
+
+        // Get the text views needed to set the leaderboard
+        ArrayList<TextView> userNames = new ArrayList<>();
+        userNames.add(findViewById(R.id.user_one));
+        userNames.add(findViewById(R.id.user_two));
+        userNames.add(findViewById(R.id.user_three));
+
+        for(TextView view: userNames) {
+            view.setText("Temp");
+        }
+
+        ArrayList<TextView> qrCounts = new ArrayList<>();
+        qrCounts.add(findViewById(R.id.num_one));
+        qrCounts.add(findViewById(R.id.num_two));
+        qrCounts.add(findViewById(R.id.num_three));
+
+        for(TextView view: qrCounts) {
+            view.setText(String.valueOf(42));
+        }
+
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
