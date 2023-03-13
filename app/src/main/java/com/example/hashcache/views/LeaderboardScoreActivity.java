@@ -50,7 +50,12 @@ public class LeaderboardScoreActivity extends AppCompatActivity {
         Database.getInstance()
                 .getTotalScore(AppStore.get().getCurrentPlayer().getUserId())
                 .thenAccept( score -> {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
                             playerScores.set(score);
+                        }
+                    });
                 });
         playersNumQrCodes.setText(String.valueOf(playerScores));
 
