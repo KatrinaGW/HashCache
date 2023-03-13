@@ -29,6 +29,10 @@ public class CodeLocation {
         return locationName;
     }
 
+    /**
+     * Set a new location name
+     * @param locationName the name to use for the location
+     */
     public void setLocationName(String locationName) {
         this.locationName = locationName;
     }

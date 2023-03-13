@@ -160,6 +160,12 @@ public class PlayersConnectionHandler {
         });
         return cf;
     }
+
+    /**
+     * Get the player's id by their username
+     * @param username the username of the player whose id is needed
+     * @return cf the CompletableFuture with the user's id
+     */
     public CompletableFuture<String> getPlayerIdByUsername(String username){
         CompletableFuture<String> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
@@ -184,6 +190,10 @@ public class PlayersConnectionHandler {
         return cf;
     }
 
+    /**
+     * Get all the player names and ids in the collection
+     * @return cf the CompletableFuture with the ids mapped to the names
+     */
     public CompletableFuture<HashMap<String, String>> getPlayers(){
         CompletableFuture<HashMap<String, String>> cf = new CompletableFuture<>();
         HashMap<String, String> usernamesIds = new HashMap<>();
@@ -211,6 +221,11 @@ public class PlayersConnectionHandler {
         return cf;
     }
 
+    /**
+     * Gets the player asynchronously
+     * @param userId the userid of the player object to get
+     * @return cf the CompleteableFuture with the searched for player
+     */
     public CompletableFuture<Player> getPlayerAsync(String userId) {
         DocumentReference documentReference = collectionReference.document(userId);
         CompletableFuture<Player> cf = new CompletableFuture<>();

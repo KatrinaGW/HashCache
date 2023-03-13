@@ -10,7 +10,6 @@ import java.util.UUID;
  * Represents a user with an id, username, contact info, preferences, and scannable codes
  */
 public class Player{
-    private static Player INSTANCE;
     private String username;
     private String userId;
     private ContactInfo contactInfo;
@@ -44,14 +43,6 @@ public class Player{
         this.contactInfo = contactInfo;
         this.playerPreferences = playerPreferences;
         this.playerWallet = playerWallet;
-    }
-
-    public static Player getInstance() {
-        if(INSTANCE == null) {
-            throw new IllegalArgumentException("INSTANCE is not defined");
-        }
-
-        return INSTANCE;
     }
 
 
@@ -96,6 +87,10 @@ public class Player{
         return this.playerPreferences;
     }
 
+    /**
+     * Sets the player's current preferences
+     * @param preferences the preferences to use for the user
+     */
     public void setPlayerPreferences(PlayerPreferences preferences){
         this.playerPreferences = preferences;
     }

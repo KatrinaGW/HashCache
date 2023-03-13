@@ -11,12 +11,12 @@ import android.widget.EditText;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.example.hashcache.AppHome;
-import com.example.hashcache.MainActivity;
 import com.example.hashcache.R;
 import com.example.hashcache.models.database_connections.CodeLocationConnectionHandler;
 import com.example.hashcache.models.database_connections.FireStoreHelper;
 import com.example.hashcache.models.database_connections.converters.CodeLocationDocumentConverter;
+import com.example.hashcache.views.AppHome;
+import com.example.hashcache.views.MainActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.robotium.solo.Solo;
 
@@ -63,7 +63,6 @@ public class MainActivityTest {
 
     @Test
     public void checkEmptyInput(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
         solo.clickOnButton("START CACHING");
         solo.sleep(100);
