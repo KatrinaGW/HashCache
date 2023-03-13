@@ -182,7 +182,11 @@ public class MyProfile extends AppCompatActivity {
         Database.getInstance()
                 .getPlayerWalletTotalScore(playerInfo.getPlayerWallet().getScannedCodeIds())
                 .thenAccept(totalScore -> {
-                    this.setScore(totalScore);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setScore(totalScore);                        }
+                    });
                 });
     }
 
