@@ -132,7 +132,6 @@ public class PlayersConnectionHandler {
      */
     public ArrayList<String> getInAppPlayerUserNames(){
         ArrayList<String> inAppUserNames = new ArrayList<>();
-        Log.d("Please read", String.valueOf(inAppUserNames.size()));
         for(String username : inAppUsernamesIds.keySet()){
             inAppUserNames.add(username);
         }
