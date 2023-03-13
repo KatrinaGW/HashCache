@@ -22,6 +22,7 @@ package com.example.hashcache.views;
 import android.R.layout;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -121,11 +122,17 @@ public class Community extends AppCompatActivity {
                     public void run() {
                         PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(), 10)
                                 .thenAccept(searchResults->{
-                                    userResults = searchResults;
-                                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchResults);
-                                    searchResultsView.setAdapter(adapter);
 
-                                    setListViewItemClickListener();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            userResults = searchResults;
+                                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), layout.simple_list_item_1, searchResults);
+                                            searchResultsView.setAdapter(adapter);
+
+                                            setListViewItemClickListener();
+                                        }
+                                    });
                                 });
                     }
                 });

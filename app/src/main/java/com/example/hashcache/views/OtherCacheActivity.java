@@ -122,7 +122,6 @@ public class OtherCacheActivity extends AppCompatActivity {
                 }).exceptionally(new Function<Throwable, Void>() {
                     @Override
                     public Void apply(Throwable throwable) {
-                        System.out.println(throwable);
                         return null;
                     }
                 });
@@ -130,7 +129,12 @@ public class OtherCacheActivity extends AppCompatActivity {
         Database.getInstance()
                 .getPlayerWalletTotalScore(player.getPlayerWallet().getScannedCodeIds())
                 .thenAccept(totalScore -> {
-                    this.otherUserScoreHeader.setText(Long.toString(totalScore));
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            otherUserScoreHeader.setText(Long.toString(totalScore));
+                        }
+                    });
                 });
     }
 }

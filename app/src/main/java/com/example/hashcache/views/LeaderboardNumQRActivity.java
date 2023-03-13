@@ -46,7 +46,12 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
         Database.getInstance()
                 .getTotalScore(AppStore.get().getCurrentPlayer().getUserId())
                 .thenAccept( score -> {
-                    numQrCodes.set(score);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            numQrCodes.set(score);
+                        }
+                    });
                 });
         playersNumQrCodes.setText(String.valueOf(numQrCodes));
 
