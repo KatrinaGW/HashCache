@@ -97,9 +97,7 @@ public class PlayerList {
         return cf;
     }
 
-    /*
-     *
-     *
+    /**
      * Adds a player to the database
      * @param username the username of the player to add
      * @return success indicates if the user was successfully added or not
@@ -128,16 +126,6 @@ public class PlayerList {
      */
     public void getPlayer(String username, GetPlayerCallback getPlayerCallback){
         this.playersConnectionHandler.getPlayer(username, getPlayerCallback);
-    }
-
-    /**
-     * Returns a list of the game-wide players, sorted in a specified manner
-     * @param filter used to tell the sort function how to sort the array
-     * @return players The playerlist sorted in the specified manner
-     */
-    public ArrayList<String> getPlayersSortedBy(Comparator filter){
-        Collections.sort(this.playerUserNames, filter);
-        return this.playerUserNames;
     }
 
     /**
@@ -183,16 +171,6 @@ public class PlayerList {
         });
 
         return cf;
-    }
-
-    /**
-     * Gets the first n players in the playerlist sorted by a specified manner
-     * @param filter The way to sort the players
-     * @param n The top number of players to get
-     * @return this.players sublist The top n players sorted in a specified manner
-     */
-    public ArrayList<String> getFirstNPlayersSortedBy(Comparator filter, int n){
-        return (ArrayList<String>) (this.getPlayersSortedBy(filter)).subList(0, n);
     }
 
     /**
@@ -264,9 +242,9 @@ public class PlayerList {
 
 }
 
-/*
+/**
  * Class to hold userName info for sorting
- */
+ **/
 class Username {
     public String name;
     public Integer distance;
