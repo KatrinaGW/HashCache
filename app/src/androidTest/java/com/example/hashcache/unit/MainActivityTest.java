@@ -63,7 +63,6 @@ public class MainActivityTest {
 
     @Test
     public void checkEmptyInput(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
         solo.clickOnButton("START CACHING");
         solo.sleep(100);
