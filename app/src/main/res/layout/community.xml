@@ -14,37 +14,36 @@
         android:layout_alignParentEnd="true"
         android:elevation="6dp"/>
 
-    <LinearLayout
-        android:id="@+id/search_bar"
-        android:layout_width="match_parent"
+
+    <EditText
+        android:id="@+id/search_bar_edittext"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/menu_button"
+        android:layout_marginEnd="24dp"
         android:layout_marginVertical="24dp"
-        android:orientation="horizontal">
+        android:background="@color/white"
+        android:hint="search for players..."
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="16dp"
+        android:layout_below="@+id/menu_button"
+        android:layout_alignStart="@+id/user_listview"/>
 
-        <EditText
-            android:id="@+id/search_bar_edittext"
-            android:layout_width="288dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="24dp"
-            android:background="@color/white"
-            android:hint="search for players..."
-            android:padding="8dp" />
-
-        <ImageButton
-            android:id="@+id/search_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:src="@android:drawable/ic_menu_search" />
-    </LinearLayout>
+    <ImageButton
+        android:id="@+id/search_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/search_bar_edittext"
+        android:layout_below="@+id/menu_button"
+        android:layout_marginVertical="24dp"
+        android:layout_alignEnd="@+id/user_listview"
+        android:src="@android:drawable/ic_menu_search" />
 
     <ListView
         android:id="@+id/user_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_rect_green"
-        android:layout_below="@+id/search_bar"
+        android:layout_below="@+id/search_bar_edittext"
         android:layout_above="@id/leaderboard_button"
         android:layout_marginHorizontal="24dp"/>
 
