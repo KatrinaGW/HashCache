@@ -13,9 +13,17 @@ import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
 import javax.net.ssl.HttpsURLConnection;
-
+/**
+ * The ImageGenerator class provides methods for generating images for scannable codes using their hash values.
+ */
 public class ImageGenerator {
     private static final String TAG = ImageGenerator.class.toString();
+    /**
+     * Retrieves an image for a scannable code using its hash value.
+     *
+     * @param hash the hash value to generate an image for
+     * @return a CompletableFuture that completes with a Drawable object containing the generated image
+     */
     public static CompletableFuture<Drawable> getImageFromHash(String hash) {
         CompletableFuture<Drawable> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(new Runnable() {
@@ -26,6 +34,7 @@ public class ImageGenerator {
                 String urlString = String.format("https://robohash.org/%s?set=set2", hash);
                 Log.d(TAG, String.format("URL is: %s", urlString));
                 try {
+                    // Get the image from the URL and create a new Drawable object from it
                         InputStream inputStream = (InputStream) new URL(urlString).getContent();
                     cf.complete(Drawable.createFromStream(inputStream, "src name"));
 

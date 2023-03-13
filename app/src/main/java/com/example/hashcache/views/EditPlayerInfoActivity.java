@@ -1,3 +1,10 @@
+/**
+
+ EditPlayerInfoActivity
+ Activity that allows the user to edit their contact information.
+ This includes their email address and phone number.
+ Upon clicking the confirmation button, the new information is saved to the database.
+ */
 package com.example.hashcache.views;
 
 import android.content.Intent;
@@ -20,7 +27,11 @@ public class EditPlayerInfoActivity extends AppCompatActivity {
     private EditText editPhoneNumber;
     private Button confirmButton;
     private ContactInfo currentContactInfo;
-
+    /**
+     * Initializes the EditPlayerInfoActivity.
+     * Sets the EditText objects and confirmation button and sets a click listener to the button.
+     * Initializes the values of the email and phone number EditText objects.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +51,11 @@ public class EditPlayerInfoActivity extends AppCompatActivity {
         initValues();
 
     }
-
+    /**
+     * Initializes the values of the email and phone number EditText objects.
+     * Gets the current contact information of the user and sets the text of the EditText objects
+     * with the current values of the user's email and phone number.
+     */
     private void initValues(){
         currentContactInfo = AppStore.get().getCurrentPlayer().getContactInfo();
         System.out.println("INITIalizing values");
@@ -48,13 +63,20 @@ public class EditPlayerInfoActivity extends AppCompatActivity {
         editEmail.setText(currentContactInfo.getEmail());
         editPhoneNumber.setText(currentContactInfo.getPhoneNumber());
     }
-
+    /**
+     * Initializes the values of the email and phone number EditText objects when the activity is resumed.
+     */
     @Override
     protected void onResume() {
         super.onResume();
         initValues();
     }
-
+    /**
+     * Saves the new contact information of the user to the database.
+     * Creates a new ContactInfo object with the values in the EditText objects.
+     * Calls the UpdateContactInfoCommand to update the contact information in the database.
+     * Upon successful completion, starts the Settings activity.
+     */
     private void onConfirmClicked(){
         String emailText = editEmail.getText().toString();
         String phoneNumberText = editPhoneNumber.getText().toString();

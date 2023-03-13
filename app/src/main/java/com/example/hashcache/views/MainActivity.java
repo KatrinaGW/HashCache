@@ -25,6 +25,7 @@ import com.example.hashcache.models.database_connections.PlayersConnectionHandle
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
+import java.util.List;
 import java.util.function.Function;
 import java.io.InputStream;
 /**
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
      @see InputStream
 
-     @see HashInfoGenerator.NameGenerator#getNames
+     @see NameGenerator#getNames
 
      @see AppHome
 
@@ -83,7 +84,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseApp.initializeApp(this, new FirebaseOptions.Builder()
+
+
+        boolean hasBeenInitialized=false;
+        List<FirebaseApp> firebaseApps = FirebaseApp.getApps(getApplicationContext());
+        for(FirebaseApp app : firebaseApps){
+            if(app.getName().equals(FirebaseApp.DEFAULT_APP_NAME)){
+                hasBeenInitialized=true;
+            }
+        }
+
+        if(!hasBeenInitialized) FirebaseApp.initializeApp(this, new FirebaseOptions.Builder()
                 .setApplicationId("1:901109849854:android:59c5ab124b7d20ef1d4faf")
                 .setApiKey("AIzaSyBbOhuWDn2sYOsEkslCjercBYitb2MLMho")
                 .setDatabaseUrl("https://hashcache2.firebaseio.com/")
