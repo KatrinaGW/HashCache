@@ -66,7 +66,7 @@ public class CommunityTest {
         solo.assertCurrentActivity("Wrong Activity", Community.class);
         solo.clickOnButton("LEADERBOARD");
         solo.sleep(100);
-        //solo.assertCurrentActivity("Wrong Activity", LeaderBoard.class);
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivityTest.class);
     }
 
     @Test
