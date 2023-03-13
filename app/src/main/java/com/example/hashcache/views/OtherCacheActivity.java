@@ -98,7 +98,13 @@ public class OtherCacheActivity extends AppCompatActivity {
         scannableCodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //onScannableCodeItemClicked(i);
+                ScannableCode scannableCode = scannableCodes.get(i);
+                AppStore.get().setCurrentScannableCode(scannableCode);
+
+                Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
+                intent.putExtra("belongsToCurrentUser", false);
+
+                startActivity(intent);
             }
         });
     }
