@@ -20,6 +20,12 @@ import java.util.concurrent.CompletableFuture;
  @see CompletableFuture
  */
 public class UpdateContactInfoCommand {
+    /**
+     * Update a user's contact information in the database
+     * @param userId the id of the user whose contact info needs to be updated
+     * @param contactInfo the new contact information that needs to be used for the user
+     * @return cf the CompletableFuture with the boolean value indicating if the operation was successful
+     */
     public static CompletableFuture<Boolean> updateContactInfoCommand(String userId, ContactInfo contactInfo){
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
