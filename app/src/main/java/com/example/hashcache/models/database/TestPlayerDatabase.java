@@ -247,6 +247,11 @@ public class TestPlayerDatabase implements IPlayerDatabase {
     }
 
     @Override
+    public CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId) {
+        return null;
+    }
+
+    @Override
     public CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {

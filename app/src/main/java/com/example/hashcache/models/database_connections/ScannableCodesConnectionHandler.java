@@ -66,18 +66,7 @@ public class ScannableCodesConnectionHandler {
         this.scannableCodeDocumentConverter = scannableCodeDocumentConverter;
         this.fireStoreHelper = fireStoreHelper;
         this.db = db;
-
         collectionReference = db.collection(CollectionNames.SCANNABLE_CODES.collectionName);
-
-        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots,
-                    @Nullable FirebaseFirestoreException error) {
-                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                    // TODO: get scannable code
-                }
-            }
-        });
     }
 
     /**
@@ -185,9 +174,9 @@ public class ScannableCodesConnectionHandler {
         CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
         ArrayList<ScannableCode> scannableCodes = new ArrayList<>();
 
-        if(scannableCodeIds.size()==0){
+        if (scannableCodeIds.size() == 0) {
             cf.complete(scannableCodes);
-        }else{
+        } else {
             CompletableFuture.runAsync(() -> {
                 Query docRef = this.collectionReference;
                 docRef.get().addOnCompleteListener(task -> {
@@ -201,7 +190,7 @@ public class ScannableCodesConnectionHandler {
                                             @Override
                                             public void onCallback(ScannableCode scannableCode) {
                                                 scannableCodes.add(scannableCode);
-                                                if(scannableCodes.size()==scannableCodeIds.size()){
+                                                if (scannableCodes.size() == scannableCodeIds.size()) {
                                                     cf.complete(scannableCodes);
                                                 }
                                             }
@@ -209,7 +198,7 @@ public class ScannableCodesConnectionHandler {
                             }
                         }
 
-                        if(matches != scannableCodeIds.size()){
+                        if (matches != scannableCodeIds.size()) {
                             cf.completeExceptionally(new Exception("One or more player wallet code ids" +
                                     "could not be mapped to actual codes!"));
                         }
@@ -220,7 +209,6 @@ public class ScannableCodesConnectionHandler {
                 });
             });
         }
-
 
         return cf;
     }
@@ -284,8 +272,7 @@ public class ScannableCodesConnectionHandler {
                                                                     }
                                                                 }
                                                             });
-                                                }
-                                                else{
+                                                } else {
                                                     booleanCallback.onCallback(true);
                                                 }
                                             }

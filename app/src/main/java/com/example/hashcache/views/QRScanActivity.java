@@ -58,13 +58,26 @@ public class QRScanActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(QRScanActivity.this, "Caching...", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         HashController.addScannableCode(result.getText()).thenAccept(scannableCode -> {
                             System.out.println("Have added QR code!!");
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(QRScanActivity.this, "Added QR code!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             Intent intent = new Intent(QRScanActivity.this, NewMonsterActivity.class);
                             startActivity(intent);
                         }).exceptionally(new Function<Throwable, Void>() {
                             @Override
                             public Void apply(Throwable throwable) {
+
                                 System.out.println("Could not add QR code" + throwable.getMessage());
                                 return null;
                             }

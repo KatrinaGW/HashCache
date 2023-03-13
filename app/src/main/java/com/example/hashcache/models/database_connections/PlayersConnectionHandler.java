@@ -129,6 +129,7 @@ public class PlayersConnectionHandler {
         INSTANCE = null;
     }
 
+
     /**
      * Gets all of the current usernames across the app
      * @return inAppPlayerUserNames the usernames of all players in the app
