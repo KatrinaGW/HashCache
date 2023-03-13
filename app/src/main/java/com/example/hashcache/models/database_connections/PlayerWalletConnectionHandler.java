@@ -23,6 +23,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -50,24 +51,17 @@ public class PlayerWalletConnectionHandler {
         this.fireStoreHelper = fireStoreHelper;
     }
 
-    public CompletableFuture<ArrayList<String>> getPlayerWalletChangeListener(String userId) {
+    public ListenerRegistration getPlayerWalletChangeListener(String userId, BooleanCallback callback) {
         CompletableFuture<ArrayList<String>> cf = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
-            CollectionReference scannedCodeCollection = db.collection(CollectionNames.PLAYERS.collectionName)
-                    .document(userId)
-                    .collection(CollectionNames.PLAYER_WALLET.collectionName);
+        CollectionReference scannedCodeCollection = db.collection(CollectionNames.PLAYERS.collectionName)
+                .document(userId)
+                .collection(CollectionNames.PLAYER_WALLET.collectionName);
 
-            scannedCodeCollection.addSnapshotListener((snapshot, e) -> {
-                ArrayList<String> ids = new ArrayList<>();
-                for (QueryDocumentSnapshot document : snapshot) {
-                    String scannableCodeId = (String) document.getData()
-                            .get(FieldNames.SCANNABLE_CODE_ID.fieldName);
-                    ids.add(scannableCodeId);
-                }
-                cf.complete(ids);
-            });
+        ListenerRegistration reg = scannedCodeCollection.addSnapshotListener((snapshot, e) -> {
+            Log.d("FIRESTORE WALLET LISTENER", "Wallet has been changed");
+            callback.onCallback(true);
         });
-        return cf;
+        return reg;
     }
 
     public PlayerWalletConnectionHandler(FirebaseFirestore db) {
@@ -136,9 +130,9 @@ public class PlayerWalletConnectionHandler {
                 });
     }
 
-    public CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId){
-        DocumentReference documentReference = db.collection(CollectionNames.PLAYERS.collectionName).document(userId).
-                collection(CollectionNames.PLAYER_WALLET.collectionName).document(scannableCodeId);
+    public CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId) {
+        DocumentReference documentReference = db.collection(CollectionNames.PLAYERS.collectionName).document(userId)
+                .collection(CollectionNames.PLAYER_WALLET.collectionName).document(scannableCodeId);
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             documentReference.get().addOnCompleteListener(task -> {
@@ -224,7 +218,6 @@ public class PlayerWalletConnectionHandler {
         });
         return cf;
     }
-
 
     /**
      * Gets the the highest score from a list of scannableCodes
