@@ -6,6 +6,8 @@ import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
+import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 
 import org.checkerframework.checker.units.qual.A;
 
@@ -247,6 +249,11 @@ public class TestPlayerDatabase implements IPlayerDatabase {
     }
 
     @Override
+    public CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId) {
+        return null;
+    }
+
+    @Override
     public CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
@@ -307,6 +314,16 @@ public class TestPlayerDatabase implements IPlayerDatabase {
             }
         });
         return cf;
+    }
+
+    @Override
+    public void onPlayerDataChanged(String playerId, GetPlayerCallback callback) {
+
+    }
+
+    @Override
+    public void onPlayerWalletChanged(String playerId, BooleanCallback callback) {
+
     }
 
     /**

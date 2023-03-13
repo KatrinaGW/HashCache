@@ -54,23 +54,6 @@ public class CodeLocationConnectionHandler {
 
         collectionReference = db.collection(CollectionNames.CODE_LOCATIONS.collectionName);
 
-        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
-            FirebaseFirestoreException error) {
-                cachedCodeLocations.clear();
-                for(QueryDocumentSnapshot doc: queryDocumentSnapshots)
-                {
-                    Log.d(TAG, "Code Location with id " + doc.getId());
-                    double x = Double.parseDouble((String) doc.getData().get("x"));
-                    double y = Double.parseDouble((String) doc.getData().get("y"));
-                    double z = Double.parseDouble((String) doc.getData().get("z"));
-                    String locationName = (String) doc.getData().get("name");
-
-                    cachedCodeLocations.put(doc.getId(), new CodeLocation(locationName, x, y, z));
-                }
-            }
-        });
     }
 
     /**

@@ -5,6 +5,8 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ public interface IPlayerDatabase {
 
     CompletableFuture<String> addScannableCode(ScannableCode scannableCode);
     CompletableFuture<Void> addScannableCodeToPlayerWallet(String userId, String scannableCodeId);
+    CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId);
     CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId);
 
     CompletableFuture<Boolean> removeScannableCode(String userId, String scannableCodeId);
@@ -41,4 +44,6 @@ public interface IPlayerDatabase {
     CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds);
     CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId);
     CompletableFuture<Boolean> updateContactInfo(ContactInfo contactInfo, String userId);
+    void onPlayerDataChanged(String userId, GetPlayerCallback callback);
+    void onPlayerWalletChanged(String playerId, BooleanCallback callback);
 }

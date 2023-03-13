@@ -32,13 +32,17 @@ import com.example.hashcache.R;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.store.AppStore;
+
+import java.util.Observable;
+import java.util.Observer;
+
 /**
 
  The Settings activity displays the user's settings page, including their username and contact information,
  and allows them to toggle their location settings on and off, as well as edit their username and contact information.
  Additional buttons permit navigation to other pages within the application.
  */
-public class Settings extends AppCompatActivity {
+public class Settings extends AppCompatActivity implements Observer {
     private TextView usernameView;
     private TextView phoneNumberView;
     private TextView emailView;
@@ -111,6 +115,8 @@ public class Settings extends AppCompatActivity {
                 menu.show();
             }
         });
+        AppStore.get().addObserver(this);
+
     }
 
     @Override
@@ -122,7 +128,6 @@ public class Settings extends AppCompatActivity {
 
     private void setValues(){
         Player playerInfo = AppStore.get().getCurrentPlayer();
-
         setUsername(playerInfo.getUsername());
         setEmail(playerInfo.getContactInfo().getEmail());
         setPhoneNumber(playerInfo.getContactInfo().getPhoneNumber());
@@ -177,5 +182,10 @@ public class Settings extends AppCompatActivity {
 
     private void setRecordGeoLocationChecked(boolean checked){
         this.geoLocationPreferenceCheckbox.setChecked(checked);
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        setValues();
     }
 }
