@@ -1,6 +1,7 @@
 package com.example.hashcache.models.database_connections;
 
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
@@ -13,6 +14,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,25 +26,25 @@ import java.util.concurrent.CompletableFuture;
 public class FireStoreHelper {
     final String TAG = "Sample";
 
-    public static CompletableFuture<Map<String, Object>> setupFirebaseDocListener(FirebaseFirestore db, String collectionName, String documentId){
-        CompletableFuture<Map<String, Object>> cf = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
-            final DocumentReference documentReference = db.collection(collectionName).document(documentId);
-            documentReference.addSnapshotListener((snapshot, e) -> {
-                cf.complete(null);
-                if (e != null) {
-                    cf.completeExceptionally(e);
-                    return;
-                }
+    public static Pair<CompletableFuture<Map<String, Object>>, ListenerRegistration> setupFirebaseDocListener(FirebaseFirestore db, String collectionName, String documentId){
 
-                if (snapshot != null && snapshot.exists()) {
-                    cf.complete(snapshot.getData());
-                } else {
+        CompletableFuture<Map<String, Object>> cf = new CompletableFuture<>();
+        final DocumentReference documentReference = db.collection(collectionName).document(documentId);
+        ListenerRegistration registration = documentReference.addSnapshotListener((snapshot, e) -> {
                     cf.complete(null);
+                    if (e != null) {
+                        cf.completeExceptionally(e);
+                        return;
+                    }
+
+                    if (snapshot != null && snapshot.exists()) {
+                        cf.complete(snapshot.getData());
+                    } else {
+                        cf.complete(null);
+                    }
                 }
-            });
-        });
-        return cf;
+        );
+        return new Pair(cf, registration);
     }
 
     /**
