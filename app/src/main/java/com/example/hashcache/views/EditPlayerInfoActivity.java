@@ -9,6 +9,7 @@ package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -58,7 +59,6 @@ public class EditPlayerInfoActivity extends AppCompatActivity {
      */
     private void initValues(){
         currentContactInfo = AppStore.get().getCurrentPlayer().getContactInfo();
-        System.out.println("INITIalizing values");
         System.out.println(currentContactInfo.getEmail());
         editEmail.setText(currentContactInfo.getEmail());
         editPhoneNumber.setText(currentContactInfo.getPhoneNumber());
@@ -90,7 +90,12 @@ public class EditPlayerInfoActivity extends AppCompatActivity {
                         newContactInfo)
                 .thenAccept(isComplete->{
                     if(isComplete){
-                        startActivity(new Intent(EditPlayerInfoActivity.this, Settings.class));
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                startActivity(new Intent(EditPlayerInfoActivity.this, Settings.class));
+                            }
+                        });
                     }
                 });
     }
