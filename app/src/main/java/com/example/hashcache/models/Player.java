@@ -13,6 +13,8 @@ public class Player{
     private static Player INSTANCE;
     private String username;
     private String userId;
+    private long totalScore;
+    private long lowestScore;
     private ContactInfo contactInfo;
     private PlayerPreferences playerPreferences;
     private PlayerWallet playerWallet;
@@ -27,6 +29,8 @@ public class Player{
         this.contactInfo = new ContactInfo();
         this.playerPreferences = new PlayerPreferences();
         this.playerWallet = new PlayerWallet();
+        this.totalScore = 0;
+        this.lowestScore = 0;
     }
 
 
@@ -44,6 +48,8 @@ public class Player{
         this.contactInfo = contactInfo;
         this.playerPreferences = playerPreferences;
         this.playerWallet = playerWallet;
+        this.totalScore = 0;
+        this.lowestScore = 0;
     }
 
     /**
@@ -97,6 +103,22 @@ public class Player{
      */
     public String getUsername(){
         return this.username;
+    }
+
+    public long getTotalScore(){
+        return this.totalScore;
+    }
+
+    public void setTotalScore(long score){
+        this.totalScore = score;
+    }
+
+    public long getLowestScore(){
+        return this.lowestScore;
+    }
+
+    public void setLowestScore(long score){
+        this.totalScore = score;
     }
 
     /**
