@@ -7,6 +7,7 @@ import androidx.test.rule.ActivityTestRule;
 
 import com.example.hashcache.views.AppHome;
 import com.example.hashcache.views.Community;
+import com.example.hashcache.views.EditPlayerInfoActivity;
 import com.example.hashcache.views.MainActivity;
 import com.example.hashcache.views.MyProfile;
 import com.example.hashcache.views.QRStats;
@@ -93,6 +94,15 @@ public class SettingsTest {
         solo.clickOnText("Community");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
+    }
+
+    @Test
+    public void checkEditPlayerInfoButton(){
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
+        solo.assertCurrentActivity("Wrong Activity", Settings.class);
+        solo.clickOnImageButton(1);
+        solo.sleep(100);
+        solo.assertCurrentActivity("Wrong Activity", EditPlayerInfoActivity.class);
     }
 
 
