@@ -28,6 +28,10 @@ public class DependencyInjector {
                 new FireStoreHelper(), FirebaseFirestore.getInstance());
     }
 
+    /**
+     * Create or get a current instance of the ScannableCodesConnectionHandlers
+     * @return scannableCodesConnectionHandler a static instance of the ScannableCodesConnectionHandler class
+     */
     public static ScannableCodesConnectionHandler getOrMakeScannableCodesConnectionHandler(){
         ScannableCodesConnectionHandler scannableCodesConnectionHandler;
         try{
