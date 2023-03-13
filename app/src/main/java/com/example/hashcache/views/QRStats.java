@@ -157,12 +157,18 @@ public class QRStats extends AppCompatActivity {
 
     private void highestScoringCodeClicked(){
         AppStore.get().setCurrentScannableCode(highestScoring);
-        startActivity(new Intent(QRStats.this, DisplayMonsterActivity.class));
+        Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
+        intent.putExtra("belongsToCurrentUser", true);
+
+        startActivity(intent);
     }
 
     private void lowestScoringCodeClicked(){
         AppStore.get().setCurrentScannableCode(lowestScoring);
-        startActivity(new Intent(QRStats.this, DisplayMonsterActivity.class));
+        Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
+        intent.putExtra("belongsToCurrentUser", true);
+
+        startActivity(intent);
     }
 
     private void init() {
@@ -226,16 +232,20 @@ public class QRStats extends AppCompatActivity {
 
     private void setTopScoreValueTextView(){
         if(highestScoring!=null){
+            this.topScoreValueTextView.setClickable(true);
             this.topScoreValueTextView.setText(Long.toString(highestScoring.getHashInfo().getGeneratedScore()));
         }else{
+            this.topScoreValueTextView.setClickable(false);
             this.topScoreValueTextView.setText(R.string.no_codes_scanned);
         }
     }
 
     private void setLowScoreValueTextView(){
         if(lowestScoring != null){
+            this.lowScoreValueTextView.setClickable(true);
             this.lowScoreValueTextView.setText(Long.toString(lowestScoring.getHashInfo().getGeneratedScore()));
         }else{
+            this.lowScoreValueTextView.setClickable(false);
             this.lowScoreValueTextView.setText(R.string.no_codes_scanned);
         }
     }
