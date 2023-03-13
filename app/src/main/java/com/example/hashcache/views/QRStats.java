@@ -135,22 +135,30 @@ public class QRStats extends AppCompatActivity {
 
         setMyCodesValueTextView(playerWallet.getSize());
         setTotalScoreValueTextView();
-        setLowScoreValueTextView();
+        setLowestScoringTextView();
         setTopScoreValueTextView();
 
         if(playerWallet.getSize()>0){
             Database.getInstance()
                     .getPlayerWalletLowScore(playerWallet.getScannedCodeIds())
                     .thenAccept(lowestScoring -> {
-                        this.lowestScoring = lowestScoring;
-                        setLowScoreValueTextView();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setLowestScoring(lowestScoring);
+                            }
+                        });
                     });
 
             Database.getInstance()
                     .getPlayerWalletTopScore(playerWallet.getScannedCodeIds())
-                    .thenAccept(lowestScoring -> {
-                        this.highestScoring = lowestScoring;
-                        setTopScoreValueTextView();
+                    .thenAccept(topScoring -> {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setTopScoring(topScoring);
+                            }
+                        });
                     });
         }
     }
@@ -240,7 +248,17 @@ public class QRStats extends AppCompatActivity {
         }
     }
 
-    private void setLowScoreValueTextView(){
+    private void setLowestScoring(ScannableCode lowestScoring){
+        this.lowestScoring = lowestScoring;
+        this.setLowestScoringTextView();
+    }
+
+    private void setTopScoring(ScannableCode topScoring){
+        this.highestScoring = topScoring;
+        this.setTopScoreValueTextView();
+    }
+
+    private void setLowestScoringTextView(){
         if(lowestScoring != null){
             this.lowScoreValueTextView.setClickable(true);
             this.lowScoreValueTextView.setText(Long.toString(lowestScoring.getHashInfo().getGeneratedScore()));
