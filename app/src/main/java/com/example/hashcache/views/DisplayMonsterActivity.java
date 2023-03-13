@@ -170,12 +170,22 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     }
 
     private void onDeleteButtonClicked(){
-        HashController.deleteScannableCodeFromWallet(currentScannableCode.getScannableCodeId(),
-                        AppStore.get().getCurrentPlayer().getUserId())
-                .thenAccept(completed -> {
-                    AppStore.get().setCurrentScannableCode(null);
-                    startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
-                });
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                HashController.deleteScannableCodeFromWallet(currentScannableCode.getScannableCodeId(),
+                                AppStore.get().getCurrentPlayer().getUserId())
+                        .thenAccept(completed -> {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    AppStore.get().setCurrentScannableCode(null);
+                                    startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
+                                }
+                            });
+                        });
+            }
+        });
     }
 
     public void setMonsterName(String name) {
