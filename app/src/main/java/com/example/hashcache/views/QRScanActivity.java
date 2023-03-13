@@ -17,6 +17,7 @@ import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.hashInfo.HashController;
+import com.example.hashcache.controllers.hashInfo.HashExceptions;
 import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
 import com.example.hashcache.store.AppStore;
 import com.google.zxing.Result;
@@ -77,7 +78,20 @@ public class QRScanActivity extends AppCompatActivity {
                         }).exceptionally(new Function<Throwable, Void>() {
                             @Override
                             public Void apply(Throwable throwable) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
 
+                                        if(throwable instanceof HashExceptions.AlreadyHasCodeEx){
+                                            Toast.makeText(QRScanActivity.this, "ERROR: You already have QR code on your wallet!", Toast.LENGTH_SHORT).show();
+                                        }
+                                        else{
+                                            Toast.makeText(QRScanActivity.this, "ERROR: There was an error adding QR code!", Toast.LENGTH_SHORT).show();
+                                        }
+                                        Intent intent = new Intent(QRScanActivity.this, AppHome.class);
+                                        startActivity(intent);
+                                    }
+                                });
                                 System.out.println("Could not add QR code" + throwable.getMessage());
                                 return null;
                             }
