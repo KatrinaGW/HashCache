@@ -196,8 +196,11 @@ public class MyProfile extends AppCompatActivity {
     private void onScannableCodeItemClicked(int i){
         ScannableCode clickedScannableCode = scannableCodes.get(i);
 
+        Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
+        intent.putExtra("belongsToCurrentUser", true);
+
         AppStore.get().setCurrentScannableCode(clickedScannableCode);
-        startActivity(new Intent(MyProfile.this, DisplayMonsterActivity.class));
+        startActivity(intent);
     }
 
     /**

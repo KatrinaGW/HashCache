@@ -492,4 +492,9 @@ public class PlayersConnectionHandler {
         playerWalletConnectionHandler.deleteScannableCodeFromWallet(scannedCodeCollection,
                 scannableCodeId, booleanCallback);
     }
+
+
+    public void getAppUserNames() {
+
+    }
 }

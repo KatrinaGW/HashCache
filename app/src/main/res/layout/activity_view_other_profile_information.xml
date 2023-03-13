@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.hashcache.views.OtherProfileInformationActivity"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:id="@+id/menu_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/menu_button_light"
+        android:src="@android:drawable/ic_dialog_dialer"
+        android:padding="6dp"
+        android:layout_marginEnd="18dp"
+        android:layout_alignParentEnd="true"
+        android:elevation="6dp"/>
+
+    <TextView
+        android:id="@+id/other_username_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:text="LOADING"
+        android:textColor="@color/white"
+        android:textSize="32sp" />
+
+    <TextView
+        android:id="@+id/other_phone_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="loading..."
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:layout_below="@id/other_username_textview"
+        android:layout_marginHorizontal="60dp"/>
+
+    <TextView
+        android:id="@+id/other_email_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="loading..."
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:layout_below="@id/other_phone_textview"
+        android:layout_marginHorizontal="60dp"
+        android:layout_marginTop="12dp"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/view_other_player_codes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/other_email_textview"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/rectangle_button"
+        android:elevation="6dp"
+        android:text="View Cache"
+        android:textSize="24sp" />
+
+</RelativeLayout>

@@ -13,7 +13,9 @@ import com.example.hashcache.models.database_connections.callbacks.BooleanCallba
 import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
 import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
+import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.store.AppStore;
+import com.google.firebase.firestore.CollectionReference;
 
 import org.checkerframework.checker.units.qual.C;
 
@@ -159,7 +161,17 @@ public class PlayerDatabase implements IPlayerDatabase {
 
     @Override
     public CompletableFuture<HashMap<String, String>> getPlayers() {
-        return PlayersConnectionHandler.getInstance().getPlayers();
+        CompletableFuture<HashMap<String, String>> cf = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(()->{
+            PlayersConnectionHandler.getInstance().getPlayers().thenAccept(
+                    players -> {
+                        cf.complete(players);
+                    }
+            );
+        });
+
+        return cf;
     }
 
     /**
@@ -485,4 +497,5 @@ public class PlayerDatabase implements IPlayerDatabase {
         });
         return cf;
     }
+
 }

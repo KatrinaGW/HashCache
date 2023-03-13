@@ -46,26 +46,6 @@ public class Player{
         this.playerWallet = playerWallet;
     }
 
-    /**
-     *
-     * @param username: the user name of the user.
-     */
-    public static boolean createInstance(String username) {
-        if(!PlayerList.getInstance().getPlayerUserNames().contains(username)) {
-            INSTANCE = new Player(username);
-            return true;
-        } else {
-            // Put code to fetch from the database the user information
-            PlayerList.getInstance().getPlayer(username, new GetPlayerCallback() {
-                @Override
-                public void onCallback(Player player) {
-                    INSTANCE = player;
-                }
-            });
-            return true;
-        }
-    }
-
     public static Player getInstance() {
         if(INSTANCE == null) {
             throw new IllegalArgumentException("INSTANCE is not defined");
