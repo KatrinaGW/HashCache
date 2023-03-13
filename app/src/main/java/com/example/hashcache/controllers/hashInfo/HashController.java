@@ -57,8 +57,15 @@ public class HashController {
                             ScannableCode sc = new ScannableCode(hash, hashInfo);
                             // If the scannable code already exists in the database, add it to the player's wallet
                             if(exists){
+                                Database.getInstance().scannableCodeExistsOnPlayerWallet(userId, hash).thenAccept(scanExistsOnPlayer -> {
+                                    if(!scanExistsOnPlayer){
+                                        addScannableCodeToPlayer(hash, userId, cf, sc);
+                                    }
+                                    else{
+                                        cf.completeExceptionally(new HashExceptions.AlreadyHasCodeEx("QR code already on your wallet!"));
+                                    }
+                                });
 
-                                addScannableCodeToPlayer(hash, userId, cf, sc);
                             }
                             // Otherwise, add it to the database and the player's wallet
                             else{
