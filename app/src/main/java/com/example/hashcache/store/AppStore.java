@@ -20,6 +20,7 @@ public class AppStore extends Observable {
 
     boolean isLoggedIn;
     private Player currentPlayer;
+    private Player selectedPlayer;
     private ScannableCode currentScannableCode = new ScannableCode();
     private ScannableCode lowestScannableCode = new ScannableCode();
     private ScannableCode highestScannableCode = new ScannableCode();
@@ -41,6 +42,14 @@ public class AppStore extends Observable {
         return instance;
     }
 
+
+    public void setSelectedPlayer(Player player){
+        selectedPlayer = player;
+    }
+
+    public Player getSelectedPlayer(){
+        return selectedPlayer;
+    }
     /**
      * Sets the current player in the AppStore
      *
