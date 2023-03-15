@@ -7,20 +7,14 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.IPlayerDatabase;
-import com.example.hashcache.models.database_connections.PlayerWalletConnectionHandler;
-import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
-import com.example.hashcache.models.database_connections.values.CollectionNames;
-import com.example.hashcache.store.AppStore;
-import com.google.firebase.firestore.CollectionReference;
+import com.example.hashcache.models.database.database_connections.PlayerWalletConnectionHandler;
+import com.example.hashcache.models.database.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.models.database.database_connections.ScannableCodesConnectionHandler;
+import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetStringCallback;
 import com.google.firebase.firestore.ListenerRegistration;
-
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,11 +28,11 @@ import java.util.function.Function;
  * It implements the IPlayerDatabase interface which defines the methods that
  * can be performed on the database.
  */
-public class PlayerDatabase extends Observable implements IPlayerDatabase {
+public class DatabaseMapper extends Observable implements DatabasePort {
     /**
      * Singleton instance of the PlayerDatabase class.
      */
-    private static PlayerDatabase instance;
+    private static DatabaseMapper instance;
     /**
      * HashMap that contains all the players in the database.
      */

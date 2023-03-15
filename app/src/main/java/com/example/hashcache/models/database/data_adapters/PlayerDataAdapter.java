@@ -1,18 +1,14 @@
-package com.example.hashcache.models.database_connections.converters;
+package com.example.hashcache.models.database.data_adapters;
 
 import android.media.Image;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database_connections.callbacks.GetContactInfoCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerPreferencesCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerWalletCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
-import com.example.hashcache.models.database_connections.values.CollectionNames;
-import com.example.hashcache.models.database_connections.values.FieldNames;
+import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerWalletCallback;
+import com.example.hashcache.models.database.values.CollectionNames;
+import com.example.hashcache.models.database.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
@@ -30,7 +26,7 @@ import java.util.Map;
 /**
  * Handles the conversion between a DocumentReference and a PlayerObject
  */
-public class PlayerDocumentConverter {
+public class PlayerDataAdapter {
     final String TAG = "Sample";
 
     /**

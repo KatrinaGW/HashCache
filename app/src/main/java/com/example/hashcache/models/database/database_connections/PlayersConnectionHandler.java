@@ -1,21 +1,16 @@
-package com.example.hashcache.models.database_connections;
-
-import static com.example.hashcache.models.database_connections.FireStoreHelper.setupFirebaseDocListener;
+package com.example.hashcache.models.database.database_connections;
 
 import android.media.Image;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.example.hashcache.models.PlayerWallet;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerWalletCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
-import com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter;
-import com.example.hashcache.models.database_connections.values.CollectionNames;
-import com.example.hashcache.models.database_connections.values.FieldNames;
+import com.example.hashcache.models.database.data_adapters.PlayerDataAdapter;
+import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetStringCallback;
+import com.example.hashcache.models.database.values.CollectionNames;
+import com.example.hashcache.models.database.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
@@ -24,21 +19,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.checkerframework.checker.units.qual.A;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -52,7 +40,7 @@ public class PlayersConnectionHandler {
     private HashMap<String, String> inAppUsernamesIds;
     private HashMap<String, Player> cachedPlayers;
     final String TAG = "Sample";
-    private PlayerDocumentConverter playerDocumentConverter;
+    private PlayerDataAdapter playerDataAdapter;
     private FireStoreHelper fireStoreHelper;
     private PlayerWalletConnectionHandler playerWalletConnectionHandler;
     private static PlayersConnectionHandler INSTANCE;
@@ -62,7 +50,7 @@ public class PlayersConnectionHandler {
      * database
      * 
      * @param inAppNamesIds                 a mapping of userIds to their usernames
-     * @param playerDocumentConverter       the instance of the
+     * @param playerDataAdapter       the instance of the
      *                                      PlayerDocumentConverter class
      *                                      to use to convert documents into Player
      *                                      objects
@@ -76,12 +64,12 @@ public class PlayersConnectionHandler {
      *                                      wallet collection
      */
     private PlayersConnectionHandler(HashMap<String, String> inAppNamesIds,
-            PlayerDocumentConverter playerDocumentConverter,
+            PlayerDataAdapter playerDataAdapter,
             FireStoreHelper fireStoreHelper,
             FirebaseFirestore db, PlayerWalletConnectionHandler playerWalletConnectionHandler) {
         this.inAppUsernamesIds = inAppNamesIds;
         this.cachedPlayers = new HashMap<>();
-        this.playerDocumentConverter = playerDocumentConverter;
+        this.playerDataAdapter = playerDataAdapter;
         this.fireStoreHelper = fireStoreHelper;
         this.playerWalletConnectionHandler = playerWalletConnectionHandler;
         this.db = db;
@@ -109,7 +97,7 @@ public class PlayersConnectionHandler {
      * its dependencies
      * 
      * @param inAppNamesIds                 a mapping of userIds to their usernames
-     * @param playerDocumentConverter       the instance of the
+     * @param playerDataAdapter       the instance of the
      *                                      PlayerDocumentConverter class
      *                                      to use to convert documents into Player
      *                                      objects
@@ -127,13 +115,13 @@ public class PlayersConnectionHandler {
      * @throws IllegalArgumentException if the INSTANCE has already been initialized
      */
     public static PlayersConnectionHandler makeInstance(HashMap<String, String> inAppNamesIds,
-            PlayerDocumentConverter playerDocumentConverter,
+            PlayerDataAdapter playerDataAdapter,
             FireStoreHelper fireStoreHelper,
             FirebaseFirestore db, PlayerWalletConnectionHandler playerWalletConnectionHandler) {
         if (INSTANCE != null) {
             throw new IllegalArgumentException("Instance of PlayersConnectionHandler already exists!");
         }
-        INSTANCE = new PlayersConnectionHandler(inAppNamesIds, playerDocumentConverter,
+        INSTANCE = new PlayersConnectionHandler(inAppNamesIds, playerDataAdapter,
                 fireStoreHelper, db, playerWalletConnectionHandler);
         return INSTANCE;
     }
@@ -245,7 +233,7 @@ public class PlayersConnectionHandler {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        playerDocumentConverter.getPlayerFromDocument(documentReference,
+                        playerDataAdapter.getPlayerFromDocument(documentReference,
                                 player -> {
                                     cf.complete(player);
                                 });
@@ -297,7 +285,7 @@ public class PlayersConnectionHandler {
                              * Converts the document into a Player object, and calls the given
                              * callback function with it
                              */
-                            playerDocumentConverter.getPlayerFromDocument(documentReference,
+                            playerDataAdapter.getPlayerFromDocument(documentReference,
                                     new GetPlayerCallback() {
                                         @Override
                                         public void onCallback(Player player) {

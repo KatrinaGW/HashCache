@@ -1,15 +1,10 @@
 package com.example.hashcache.models;
 
-import android.app.VoiceInteractor;
-import android.util.Log;
-
 import com.example.hashcache.controllers.DependencyInjector;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
-
-import org.checkerframework.checker.units.qual.C;
+import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.models.database.database_connections.callbacks.GetStringCallback;
 
 import java.util.ArrayList;
 import java.util.Collections;

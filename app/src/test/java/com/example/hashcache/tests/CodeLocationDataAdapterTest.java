@@ -8,8 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.CodeLocation;
-import com.example.hashcache.models.database_connections.callbacks.GetCodeLocationCallback;
-import com.example.hashcache.models.database_connections.converters.CodeLocationDocumentConverter;
+import com.example.hashcache.models.database.data_adapters.CodeLocationDataAdapter;
+import com.example.hashcache.models.database.database_connections.callbacks.GetCodeLocationCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -18,9 +18,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class CodeLocationDocumentConverterTest {
-    private CodeLocationDocumentConverter getCodeLocationDocumentConverter(){
-        return new CodeLocationDocumentConverter();
+public class CodeLocationDataAdapterTest {
+    private CodeLocationDataAdapter getCodeLocationDocumentConverter(){
+        return new CodeLocationDataAdapter();
     }
 
     @Test
@@ -41,8 +41,8 @@ public class CodeLocationDocumentConverterTest {
         when(mockTask.getResult()).thenReturn(mockDocumentSnapshot);
         when(mockDocumentSnapshot.exists()).thenReturn(true);
 
-        CodeLocationDocumentConverter codeLocationDocumentConverter = getCodeLocationDocumentConverter();
-        codeLocationDocumentConverter.getCodeLocationFromDocument(mockDocumentReference,
+        CodeLocationDataAdapter codeLocationDataAdapter = getCodeLocationDocumentConverter();
+        codeLocationDataAdapter.getCodeLocationFromDocument(mockDocumentReference,
                 mockGetCodeLocationCallback);
 
         verify(mockGetCodeLocationCallback, times(1)).onCallback(
@@ -64,9 +64,9 @@ public class CodeLocationDocumentConverterTest {
             return null;
         }).when(mockTask).addOnCompleteListener(any(OnCompleteListener.class));
 
-        CodeLocationDocumentConverter codeLocationDocumentConverter = getCodeLocationDocumentConverter();
+        CodeLocationDataAdapter codeLocationDataAdapter = getCodeLocationDocumentConverter();
 
-        codeLocationDocumentConverter.getCodeLocationFromDocument(mockDocumentReference, mockGetCodeLocationCallback);
+        codeLocationDataAdapter.getCodeLocationFromDocument(mockDocumentReference, mockGetCodeLocationCallback);
         verify(mockGetCodeLocationCallback, times(1)).onCallback(null);
     }
 
@@ -88,10 +88,10 @@ public class CodeLocationDocumentConverterTest {
         when(mockTask.getResult()).thenReturn(mockDocumentSnapshot);
         when(mockDocumentSnapshot.exists()).thenReturn(false);
 
-        CodeLocationDocumentConverter codeLocationDocumentConverter = getCodeLocationDocumentConverter();
+        CodeLocationDataAdapter codeLocationDataAdapter = getCodeLocationDocumentConverter();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            codeLocationDocumentConverter.getCodeLocationFromDocument(mockDocumentReference, mockGetCodeLocationCallback);
+            codeLocationDataAdapter.getCodeLocationFromDocument(mockDocumentReference, mockGetCodeLocationCallback);
         });
     }
 

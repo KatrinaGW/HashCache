@@ -9,11 +9,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.CodeLocation;
-import com.example.hashcache.models.database_connections.CodeLocationConnectionHandler;
-import com.example.hashcache.models.database_connections.FireStoreHelper;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetCodeLocationCallback;
-import com.example.hashcache.models.database_connections.converters.CodeLocationDocumentConverter;
+import com.example.hashcache.models.database.data_adapters.CodeLocationDataAdapter;
+import com.example.hashcache.models.database.database_connections.CodeLocationConnectionHandler;
+import com.example.hashcache.models.database.database_connections.FireStoreHelper;
+import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetCodeLocationCallback;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -22,16 +22,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.Collection;
 import java.util.HashMap;
 
 public class CodeLocationConnectionHandlerTest {
     FireStoreHelper mockFireStoreHelper;
     FirebaseFirestore mockDb;
-    CodeLocationDocumentConverter mockCodeLocationDocumentConverter;
+    CodeLocationDataAdapter mockCodeLocationDataAdapter;
 
     private CodeLocationConnectionHandler getMockCodeLocationConnectionHandler(){
-        return CodeLocationConnectionHandler.makeInstance(mockFireStoreHelper, mockCodeLocationDocumentConverter,
+        return CodeLocationConnectionHandler.makeInstance(mockFireStoreHelper, mockCodeLocationDataAdapter,
                 mockDb);
     }
 
@@ -40,7 +39,7 @@ public class CodeLocationConnectionHandlerTest {
         CodeLocationConnectionHandler.resetInstance();
         mockFireStoreHelper = Mockito.mock(FireStoreHelper.class);
         mockDb = Mockito.mock(FirebaseFirestore.class);
-        mockCodeLocationDocumentConverter = Mockito.mock(CodeLocationDocumentConverter.class);
+        mockCodeLocationDataAdapter = Mockito.mock(CodeLocationDataAdapter.class);
     }
 
     @Test
@@ -85,7 +84,7 @@ public class CodeLocationConnectionHandlerTest {
         GetCodeLocationCallback mockGetCodeLocationCallback = new GetCodeLocationCallback() {
             @Override
             public void onCallback(CodeLocation codeLocation) {
-                verify(mockCodeLocationDocumentConverter, times(1)).getCodeLocationFromDocument(
+                verify(mockCodeLocationDataAdapter, times(1)).getCodeLocationFromDocument(
                         any(DocumentReference.class), any(GetCodeLocationCallback.class)
                 );
 
@@ -100,7 +99,7 @@ public class CodeLocationConnectionHandlerTest {
             GetCodeLocationCallback getCodeLocationCallback = invocation.getArgumentAt(1, GetCodeLocationCallback.class);
             getCodeLocationCallback.onCallback(mockCodeLocation);
             return null;
-        }).when(mockCodeLocationDocumentConverter).getCodeLocationFromDocument(any(DocumentReference.class),
+        }).when(mockCodeLocationDataAdapter).getCodeLocationFromDocument(any(DocumentReference.class),
                 any(GetCodeLocationCallback.class));
 
         CodeLocationConnectionHandler codeLocationConnectionHandler = getMockCodeLocationConnectionHandler();

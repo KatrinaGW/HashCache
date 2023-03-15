@@ -2,12 +2,8 @@ package com.example.hashcache.tests;
 
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.models.database_connections.CodeLocationConnectionHandler;
-import com.example.hashcache.models.database_connections.FireStoreHelper;
-import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.converters.CodeLocationDocumentConverter;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.hashcache.models.database.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

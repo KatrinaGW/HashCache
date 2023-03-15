@@ -7,9 +7,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
-import com.example.hashcache.models.database_connections.converters.ScannableCodeDocumentConverter;
-import com.example.hashcache.models.database_connections.values.CollectionNames;
+import com.example.hashcache.models.database.database_connections.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database.data_adapters.ScannableCodeDataAdapter;
+import com.example.hashcache.models.database.values.CollectionNames;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -25,8 +25,8 @@ import java.util.Map;
 
 public class ScannableCodeDocumentConverterTest {
 
-    private ScannableCodeDocumentConverter getScannableCodeDocumentConverter(){
-        return new ScannableCodeDocumentConverter();
+    private ScannableCodeDataAdapter getScannableCodeDocumentConverter(){
+        return new ScannableCodeDataAdapter();
     }
 
     @Test
@@ -67,7 +67,7 @@ public class ScannableCodeDocumentConverterTest {
             return mockQueryTask;
         }).when(mockQueryTask).addOnCompleteListener(any(OnCompleteListener.class));
 
-        ScannableCodeDocumentConverter scannableCodeDocumentConverter = getScannableCodeDocumentConverter();
+        ScannableCodeDataAdapter scannableCodeDocumentConverter = getScannableCodeDocumentConverter();
         scannableCodeDocumentConverter.getScannableCodeFromDocument(mockDocumentReference, mockGetScannableCodeCallback);
 
         verify(mockGetScannableCodeCallback, times(1)).onCallback(any(ScannableCode.class));

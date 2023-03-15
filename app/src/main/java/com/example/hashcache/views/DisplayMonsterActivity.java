@@ -3,7 +3,6 @@ package com.example.hashcache.views;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
@@ -21,8 +19,7 @@ import com.example.hashcache.controllers.hashInfo.HashController;
 import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
 
 import java.util.function.Function;
 
@@ -128,7 +125,7 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        currentScannableCode = AppStore.get().getCurrentScannableCode();
+        currentScannableCode = Context.get().getCurrentScannableCode();
         HashInfo currentHashInfo = currentScannableCode.getHashInfo();
         setMonsterScore(currentHashInfo.getGeneratedScore());
         setMonsterName(currentHashInfo.getGeneratedName());
@@ -174,12 +171,12 @@ public class DisplayMonsterActivity extends AppCompatActivity {
             @Override
             public void run() {
                 HashController.deleteScannableCodeFromWallet(currentScannableCode.getScannableCodeId(),
-                                AppStore.get().getCurrentPlayer().getUserId())
+                                Context.get().getCurrentPlayer().getUserId())
                         .thenAccept(completed -> {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    AppStore.get().setCurrentScannableCode(null);
+                                    Context.get().setCurrentScannableCode(null);
                                     startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
                                 }
                             });

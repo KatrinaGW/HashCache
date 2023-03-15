@@ -19,7 +19,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -31,7 +30,7 @@ import androidx.appcompat.widget.PopupMenu;
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
 import com.example.hashcache.models.Player;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -115,7 +114,7 @@ public class Settings extends AppCompatActivity implements Observer {
                 menu.show();
             }
         });
-        AppStore.get().addObserver(this);
+        Context.get().addObserver(this);
 
     }
 
@@ -127,7 +126,7 @@ public class Settings extends AppCompatActivity implements Observer {
     }
 
     private void setValues(){
-        Player playerInfo = AppStore.get().getCurrentPlayer();
+        Player playerInfo = Context.get().getCurrentPlayer();
         setUsername(playerInfo.getUsername());
         setEmail(playerInfo.getContactInfo().getEmail());
         setPhoneNumber(playerInfo.getContactInfo().getPhoneNumber());

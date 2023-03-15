@@ -1,13 +1,13 @@
 package com.example.hashcache.controllers;
 
-import com.example.hashcache.models.database_connections.CodeLocationConnectionHandler;
-import com.example.hashcache.models.database_connections.FireStoreHelper;
-import com.example.hashcache.models.database_connections.PlayerWalletConnectionHandler;
-import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.models.database_connections.converters.CodeLocationDocumentConverter;
-import com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter;
-import com.example.hashcache.models.database_connections.converters.ScannableCodeDocumentConverter;
+import com.example.hashcache.models.database.data_adapters.CodeLocationDataAdapter;
+import com.example.hashcache.models.database.data_adapters.PlayerDataAdapter;
+import com.example.hashcache.models.database.database_connections.CodeLocationConnectionHandler;
+import com.example.hashcache.models.database.database_connections.FireStoreHelper;
+import com.example.hashcache.models.database.database_connections.PlayerWalletConnectionHandler;
+import com.example.hashcache.models.database.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.models.database.database_connections.ScannableCodesConnectionHandler;
+import com.example.hashcache.models.database.data_adapters.ScannableCodeDataAdapter;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -24,7 +24,7 @@ public class DependencyInjector {
      * class
      */
     public static ScannableCodesConnectionHandler makeScannableCodesConnectionHandler(){
-        return ScannableCodesConnectionHandler.makeInstance(new ScannableCodeDocumentConverter(),
+        return ScannableCodesConnectionHandler.makeInstance(new ScannableCodeDataAdapter(),
                 new FireStoreHelper(), FirebaseFirestore.getInstance());
     }
 
@@ -54,7 +54,7 @@ public class DependencyInjector {
             String> inAppUsernamesIds){
         FireStoreHelper fireStoreHelper = new FireStoreHelper();
 
-        return PlayersConnectionHandler.makeInstance(inAppUsernamesIds, new PlayerDocumentConverter(),
+        return PlayersConnectionHandler.makeInstance(inAppUsernamesIds, new PlayerDataAdapter(),
                 fireStoreHelper, FirebaseFirestore.getInstance(), new PlayerWalletConnectionHandler(fireStoreHelper));
     }
 
@@ -65,7 +65,7 @@ public class DependencyInjector {
      * class
      */
     public static CodeLocationConnectionHandler makeCodeLocationConnectionHandler(){
-        return CodeLocationConnectionHandler.makeInstance(new FireStoreHelper(), new CodeLocationDocumentConverter(),
+        return CodeLocationConnectionHandler.makeInstance(new FireStoreHelper(), new CodeLocationDataAdapter(),
                 FirebaseFirestore.getInstance());
     }
 

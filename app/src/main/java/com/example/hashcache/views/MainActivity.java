@@ -18,11 +18,10 @@ import android.widget.TextView;
 
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
-import com.example.hashcache.controllers.hashInfo.HashInfoGenerator;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.models.database.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.context.Context;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
@@ -104,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 .setProjectId("hashcache2")
                 .build());
 
-        AppStore.get();
+        Context.get();
 
         getOrMakeScannableCodesConnectionHandler();
         // Initializes the AddUserCommand and PlayerList instances

@@ -2,7 +2,7 @@ package com.example.hashcache.controllers;
 
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
 
 import java.util.concurrent.CompletableFuture;
 /**
@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
  The update is executed asynchronously using CompletableFuture.runAsync() method to avoid blocking the main thread.
  @see ContactInfo
  @see Database
- @see AppStore
+ @see Context
  @see CompletableFuture
  */
 public class UpdateContactInfoCommand {
@@ -29,8 +29,8 @@ public class UpdateContactInfoCommand {
     public static CompletableFuture<Boolean> updateContactInfoCommand(String userId, ContactInfo contactInfo){
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
-        if(userId.equals(AppStore.get().getCurrentPlayer().getUserId())){
-            AppStore.get().getCurrentPlayer().setContactInfo(contactInfo);
+        if(userId.equals(Context.get().getCurrentPlayer().getUserId())){
+            Context.get().getCurrentPlayer().setContactInfo(contactInfo);
         }
 
         CompletableFuture.runAsync(()->{

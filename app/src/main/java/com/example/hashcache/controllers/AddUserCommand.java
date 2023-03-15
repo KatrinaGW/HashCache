@@ -2,12 +2,8 @@ package com.example.hashcache.controllers;
 
 import android.util.Log;
 
-import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database.PlayerDatabase;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.concurrent.CompletableFuture;
@@ -52,8 +48,8 @@ public class AddUserCommand {
     private void setupUser(String userName, CompletableFuture<Void> cf) {
         Database.getInstance().getIdByUsername(userName).thenAccept(userId -> {
             Database.getInstance().getPlayer(userId).thenAccept(player -> {
-                AppStore.get().setCurrentPlayer(player);
-                AppStore.get().setupListeners();
+                Context.get().setCurrentPlayer(player);
+                Context.get().setupListeners();
                 cf.complete(null);
             }).exceptionally(new Function<Throwable, Void>() {
                 @Override

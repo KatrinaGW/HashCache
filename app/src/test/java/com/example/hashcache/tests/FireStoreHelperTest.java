@@ -8,9 +8,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.hashcache.models.database_connections.FireStoreHelper;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.google.android.gms.tasks.OnCanceledListener;
+import com.example.hashcache.models.database.database_connections.FireStoreHelper;
+import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;

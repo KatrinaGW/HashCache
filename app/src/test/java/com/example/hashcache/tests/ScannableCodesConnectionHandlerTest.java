@@ -13,12 +13,12 @@ import static org.mockito.Mockito.when;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database_connections.FireStoreHelper;
-import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
-import com.example.hashcache.models.database_connections.converters.ScannableCodeDocumentConverter;
-import com.example.hashcache.models.database_connections.values.CollectionNames;
+import com.example.hashcache.models.database.database_connections.FireStoreHelper;
+import com.example.hashcache.models.database.database_connections.ScannableCodesConnectionHandler;
+import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database.data_adapters.ScannableCodeDataAdapter;
+import com.example.hashcache.models.database.values.CollectionNames;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class ScannableCodesConnectionHandlerTest {
-        ScannableCodeDocumentConverter mockScannableCodeDocumentConverter;
+        ScannableCodeDataAdapter mockScannableCodeDocumentConverter;
         FireStoreHelper mockFireStoreHelper;
         FirebaseFirestore mockDb;
 
@@ -43,7 +43,7 @@ public class ScannableCodesConnectionHandlerTest {
         @BeforeEach
         void initializeMocks(){
             ScannableCodesConnectionHandler.resetInstance();
-            this.mockScannableCodeDocumentConverter = Mockito.mock(ScannableCodeDocumentConverter.class);
+            this.mockScannableCodeDocumentConverter = Mockito.mock(ScannableCodeDataAdapter.class);
             this.mockFireStoreHelper = Mockito.mock(FireStoreHelper.class);
             this.mockDb = Mockito.mock(FirebaseFirestore.class);
         }

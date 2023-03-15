@@ -5,16 +5,12 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
-
-import org.checkerframework.checker.units.qual.A;
+import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 /**
  * 
@@ -24,9 +20,9 @@ import java.util.function.Function;
  * can be performed on the database.
  */
 
-public class TestPlayerDatabase implements IPlayerDatabase {
+public class TestDatabaseMapper implements DatabasePort {
 
-    private static PlayerDatabase instance;
+    private static DatabaseMapper instance;
     private HashMap<String, Player> players;
     private HashMap<String, String> userNameToIdMapper;
     private HashMap<String, ScannableCode> scannableCodeHashMap;
@@ -35,7 +31,7 @@ public class TestPlayerDatabase implements IPlayerDatabase {
      * Constructs a new TestPlayerDatabase object with empty maps for players,
      * usernames, and scannable codes.
      */
-    public TestPlayerDatabase() {
+    public TestDatabaseMapper() {
         userNameToIdMapper = new HashMap<>();
         players = new HashMap<>();
         scannableCodeHashMap = new HashMap<>();

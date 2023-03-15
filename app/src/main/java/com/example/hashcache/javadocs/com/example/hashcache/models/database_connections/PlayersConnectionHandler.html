@@ -123,7 +123,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>com.example.hashcache.models.database_connections.PlayersConnectionHandler</li>
+<li>com.example.hashcache.models.database.database_connections.PlayersConnectionHandler</li>
 </ul>
 </li>
 </ul>
@@ -208,8 +208,8 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>static <a href="PlayersConnectionHandler.html" title="class in com.example.hashcache.models.database_connections">PlayersConnectionHandler</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#makeInstance(java.util.HashMap,com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter,com.example.hashcache.models.database_connections.FireStoreHelper,com.google.firebase.firestore.FirebaseFirestore,com.example.hashcache.models.database_connections.PlayerWalletConnectionHandler)">makeInstance</a></span>&#8203;(java.util.HashMap&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;inAppNamesIds,
-            <a href="converters/PlayerDocumentConverter.html" title="class in com.example.hashcache.models.database_connections.converters">PlayerDocumentConverter</a>&nbsp;playerDocumentConverter,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#makeInstance(java.util.HashMap,com.example.hashcache.models.database.data_adapters.PlayerDataAdapter,com.example.hashcache.models.database.database_connections.FireStoreHelper,com.google.firebase.firestore.FirebaseFirestore,com.example.hashcache.models.database_connections.PlayerWalletConnectionHandler)">makeInstance</a></span>&#8203;(java.util.HashMap&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;inAppNamesIds,
+            <a href="converters/PlayerDocumentConverter.html" title="class in com.example.hashcache.models.database_connections.converters">PlayerDocumentConverter</a>&nbsp;playerDataAdapter,
             <a href="FireStoreHelper.html" title="class in com.example.hashcache.models.database_connections">FireStoreHelper</a>&nbsp;fireStoreHelper,
             com.google.firebase.firestore.FirebaseFirestore&nbsp;db,
             <a href="PlayerWalletConnectionHandler.html" title="class in com.example.hashcache.models.database_connections">PlayerWalletConnectionHandler</a>&nbsp;playerWalletConnectionHandler)</code></th>
@@ -325,14 +325,14 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a id="makeInstance(java.util.HashMap,com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter,com.example.hashcache.models.database_connections.FireStoreHelper,com.google.firebase.firestore.FirebaseFirestore,com.example.hashcache.models.database_connections.PlayerWalletConnectionHandler)">
+<a id="makeInstance(java.util.HashMap,com.example.hashcache.models.database.data_adapters.PlayerDataAdapter,com.example.hashcache.models.database.database_connections.FireStoreHelper,com.google.firebase.firestore.FirebaseFirestore,com.example.hashcache.models.database_connections.PlayerWalletConnectionHandler)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>makeInstance</h4>
 <pre class="methodSignature">public static&nbsp;<a href="PlayersConnectionHandler.html" title="class in com.example.hashcache.models.database_connections">PlayersConnectionHandler</a>&nbsp;makeInstance&#8203;(java.util.HashMap&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;inAppNamesIds,
-                                                    <a href="converters/PlayerDocumentConverter.html" title="class in com.example.hashcache.models.database_connections.converters">PlayerDocumentConverter</a>&nbsp;playerDocumentConverter,
+                                                    <a href="converters/PlayerDocumentConverter.html" title="class in com.example.hashcache.models.database_connections.converters">PlayerDocumentConverter</a>&nbsp;playerDataAdapter,
                                                     <a href="FireStoreHelper.html" title="class in com.example.hashcache.models.database_connections">FireStoreHelper</a>&nbsp;fireStoreHelper,
                                                     com.google.firebase.firestore.FirebaseFirestore&nbsp;db,
                                                     <a href="PlayerWalletConnectionHandler.html" title="class in com.example.hashcache.models.database_connections">PlayerWalletConnectionHandler</a>&nbsp;playerWalletConnectionHandler)</pre>
@@ -341,7 +341,7 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>inAppNamesIds</code> - a mapping of userIds to their usernames</dd>
-<dd><code>playerDocumentConverter</code> - the instance of the
+<dd><code>playerDataAdapter</code> - the instance of the
                                       PlayerDocumentConverter class
                                       to use to convert documents into Player
                                       objects</dd>

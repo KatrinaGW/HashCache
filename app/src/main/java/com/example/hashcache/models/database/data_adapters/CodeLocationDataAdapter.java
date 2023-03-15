@@ -1,8 +1,8 @@
-package com.example.hashcache.models.database_connections.converters;
+package com.example.hashcache.models.database.data_adapters;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.database_connections.callbacks.GetCodeLocationCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetCodeLocationCallback;
 import com.example.hashcache.models.CodeLocation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -14,7 +14,7 @@ import java.lang.reflect.Array;
 /**
  * Handles the conversion between a DocumentReference and a CodeLocation
  */
-public class CodeLocationDocumentConverter {
+public class CodeLocationDataAdapter {
     final String TAG = "Sample";
 
     /**

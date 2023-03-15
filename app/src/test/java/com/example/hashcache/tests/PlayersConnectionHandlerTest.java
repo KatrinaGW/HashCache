@@ -8,29 +8,21 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import android.util.Log;
-
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
-import com.example.hashcache.models.PlayerWallet;
-import com.example.hashcache.models.database_connections.FireStoreHelper;
-import com.example.hashcache.models.database_connections.PlayerWalletConnectionHandler;
-import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
-import com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter;
-import com.example.hashcache.models.database_connections.values.CollectionNames;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.hashcache.models.database.data_adapters.PlayerDataAdapter;
+import com.example.hashcache.models.database.database_connections.FireStoreHelper;
+import com.example.hashcache.models.database.database_connections.PlayerWalletConnectionHandler;
+import com.example.hashcache.models.database.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -39,25 +31,23 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.mockito.verification.VerificationMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PlayersConnectionHandlerTest {
     private HashMap<String, String> mockInAppNamesIds;
-    private PlayerDocumentConverter mockPlayerDocumentConverter;
+    private PlayerDataAdapter mockPlayerDataAdapter;
     private FireStoreHelper mockFireStoreHelper;
     private FirebaseFirestore mockDB;
     private PlayerWalletConnectionHandler mockPlayerWalletConnectionHandler;
     private CollectionReference mockCollectionReference;
 
     private PlayersConnectionHandler getMockPlayersConnectionHandler(){
-        return PlayersConnectionHandler.makeInstance(mockInAppNamesIds, mockPlayerDocumentConverter,
+        return PlayersConnectionHandler.makeInstance(mockInAppNamesIds, mockPlayerDataAdapter,
                 mockFireStoreHelper, mockDB, mockPlayerWalletConnectionHandler);
     }
 
@@ -65,7 +55,7 @@ public class PlayersConnectionHandlerTest {
     void resetMocks(){
         PlayersConnectionHandler.resetInstance();
         mockInAppNamesIds = new HashMap<>();
-        mockPlayerDocumentConverter = Mockito.mock(PlayerDocumentConverter.class);
+        mockPlayerDataAdapter = Mockito.mock(PlayerDataAdapter.class);
         mockFireStoreHelper = Mockito.mock(FireStoreHelper.class);
         mockDB = Mockito.mock(FirebaseFirestore.class);
         mockPlayerWalletConnectionHandler = Mockito.mock(PlayerWalletConnectionHandler.class);
@@ -122,7 +112,7 @@ public class PlayersConnectionHandlerTest {
             getPlayerCallback.onCallback(mockPlayer);
             return null;
         })
-                .when(mockPlayerDocumentConverter)
+                .when(mockPlayerDataAdapter)
                 .getPlayerFromDocument(any(DocumentReference.class), any(GetPlayerCallback.class));
 
         PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();

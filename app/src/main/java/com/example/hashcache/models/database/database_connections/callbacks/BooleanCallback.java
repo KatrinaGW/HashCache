@@ -1,4 +1,4 @@
-package com.example.hashcache.models.database_connections.callbacks;
+package com.example.hashcache.models.database.database_connections.callbacks;
 
 /**
  * Used to get a callback response with a boolean value after an asynchronous operation has finished

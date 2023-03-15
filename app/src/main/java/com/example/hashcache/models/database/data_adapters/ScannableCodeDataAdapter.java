@@ -1,15 +1,16 @@
-package com.example.hashcache.models.database_connections.converters;
+package com.example.hashcache.models.database.data_adapters;
 
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.database_connections.values.CollectionNames;
-import com.example.hashcache.models.database_connections.callbacks.GetCommentsCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database.values.CollectionNames;
+import com.example.hashcache.models.database.database_connections.callbacks.GetCommentsCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetScannableCodeCallback;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 /**
  * Handles the conversion between a DocumentReference and a ScannableCode object
  */
-public class ScannableCodeDocumentConverter {
+public class ScannableCodeDataAdapter {
     final String TAG = "Sample";
 
     /**
@@ -46,10 +47,10 @@ public class ScannableCodeDocumentConverter {
                     if (document.exists()) {
                         try{
                             scannableCodeId[0] = document.getId();
-                            codeLocationId[0] = (String) document.getData().get("codeLocationId");
-                            generatedName[0] = (String) document.getData().get("generatedName");
+                            codeLocationId[0] = (String) document.getData().get(FieldNames.CODE_LOCATION_ID.fieldName);
+                            generatedName[0] = (String) document.getData().get(FieldNames.GENERATED_NAME.fieldName);
                             generatedScore[0] = Integer.parseInt((String) document.getData()
-                                                                            .get("generatedScore"));
+                                                                            .get(FieldNames.GENERATED_SCORE.fieldName));
                             getAllComments(documentReference
                                             .collection(CollectionNames.COMMENTS.collectionName),
                                     new GetCommentsCallback() {

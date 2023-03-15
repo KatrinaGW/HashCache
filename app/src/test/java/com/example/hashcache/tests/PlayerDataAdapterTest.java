@@ -8,31 +8,27 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.Player;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter;
-import com.example.hashcache.models.database_connections.values.CollectionNames;
-import com.example.hashcache.models.database_connections.values.FieldNames;
+import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.data_adapters.PlayerDataAdapter;
+import com.example.hashcache.models.database.values.CollectionNames;
+import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class PlayerDocumentConverterTest {
+public class PlayerDataAdapterTest {
 
-    private PlayerDocumentConverter getPlayerDocumentConverter(){
-        return new PlayerDocumentConverter();
+    private PlayerDataAdapter getPlayerDocumentConverter(){
+        return new PlayerDataAdapter();
     }
 
     @Test
@@ -81,9 +77,9 @@ public class PlayerDocumentConverterTest {
             return mockQueryTask;
         }).when(mockQueryTask).addOnCompleteListener(any(OnCompleteListener.class));
 
-        PlayerDocumentConverter playerDocumentConverter = getPlayerDocumentConverter();
+        PlayerDataAdapter playerDataAdapter = getPlayerDocumentConverter();
 
-        playerDocumentConverter.getPlayerFromDocument(mockDocumentReference, mockGetPlayerCallback);
+        playerDataAdapter.getPlayerFromDocument(mockDocumentReference, mockGetPlayerCallback);
 
         verify(mockGetPlayerCallback, times(1)).onCallback(any(Player.class));
     }

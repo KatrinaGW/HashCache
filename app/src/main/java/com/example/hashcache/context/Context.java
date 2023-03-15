@@ -1,22 +1,20 @@
-package com.example.hashcache.store;
+package com.example.hashcache.context;
 
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
 
 import java.util.Observable;
 
 /**
- * Represents a store for holding global state information in the app
+ * Holds the global state information for the app
  */
-public class AppStore extends Observable {
-    private static AppStore instance;
+public class Context extends Observable {
+    private static Context instance;
 
-    private AppStore() {
-
-    }
+    private Context() {}
 
     boolean isLoggedIn;
     private Player currentPlayer;
@@ -30,11 +28,11 @@ public class AppStore extends Observable {
      *
      * @return instance The singleton instance of the AppStore
      */
-    public static AppStore get() {
+    public static Context get() {
         if (instance == null) {
-            synchronized (AppStore.class) {
+            synchronized (Context.class) {
                 if (instance == null) {
-                    instance = new AppStore();
+                    instance = new Context();
                 }
 
             }

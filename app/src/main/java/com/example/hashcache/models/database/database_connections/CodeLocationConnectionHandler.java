@@ -1,22 +1,15 @@
-package com.example.hashcache.models.database_connections;
+package com.example.hashcache.models.database.database_connections;
 
 import android.util.Log;
 
-import androidx.annotation.Nullable;
-
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetCodeLocationCallback;
-import com.example.hashcache.models.database_connections.converters.CodeLocationDocumentConverter;
-import com.example.hashcache.models.database_connections.converters.PlayerDocumentConverter;
-import com.example.hashcache.models.database_connections.values.CollectionNames;
+import com.example.hashcache.models.database.data_adapters.CodeLocationDataAdapter;
+import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.database_connections.callbacks.GetCodeLocationCallback;
+import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.CodeLocation;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.lang.reflect.Array;
 import java.util.HashMap;
@@ -30,7 +23,7 @@ public class CodeLocationConnectionHandler {
     private HashMap<String, CodeLocation> cachedCodeLocations;
     final String TAG = "Sample";
     private FireStoreHelper fireStoreHelper;
-    private CodeLocationDocumentConverter codeLocationDocumentConverter;
+    private CodeLocationDataAdapter codeLocationDataAdapter;
     private static CodeLocationConnectionHandler INSTANCE;
 
     /**
@@ -39,17 +32,17 @@ public class CodeLocationConnectionHandler {
      *
      * @param fireStoreHelper the instance of the FireStoreHelper class to call upon to perform
      *                        common firestore actions
-     * @param codeLocationDocumentConverter the instance of the CodeLocationDocumentConverter to
+     * @param codeLocationDataAdapter the instance of the CodeLocationDocumentConverter to
      *                                      use when converting a document to a CodeLocation object
      * @param db the instance of the database to use to get connections to the CodeLocation collection
      *           and its documents
      */
     private CodeLocationConnectionHandler(FireStoreHelper fireStoreHelper,
-                                          CodeLocationDocumentConverter codeLocationDocumentConverter,
+                                          CodeLocationDataAdapter codeLocationDataAdapter,
                                           FirebaseFirestore db){
         this.cachedCodeLocations = new HashMap<>();
         this.fireStoreHelper = fireStoreHelper;
-        this.codeLocationDocumentConverter = codeLocationDocumentConverter;
+        this.codeLocationDataAdapter = codeLocationDataAdapter;
         this.db = db;
 
         collectionReference = db.collection(CollectionNames.CODE_LOCATIONS.collectionName);
@@ -60,7 +53,7 @@ public class CodeLocationConnectionHandler {
      * Create the static instance of the CodeLocationConnectionHandler class
      * @param fireStoreHelper the instance of the FireStoreHelper class to call upon to perform
      *                        common firestore actions
-     * @param codeLocationDocumentConverter the instance of the CodeLocationDocumentConverter to
+     * @param codeLocationDataAdapter the instance of the CodeLocationDocumentConverter to
      *                                      use when converting a document to a CodeLocation object
      * @param db the instance of the database to use to get connections to the CodeLocation collection
      *           and its documents
@@ -70,14 +63,14 @@ public class CodeLocationConnectionHandler {
      * @throws IllegalArgumentException if the INSTANCE has already been initialized
      */
     public static CodeLocationConnectionHandler makeInstance(FireStoreHelper fireStoreHelper,
-                                                      CodeLocationDocumentConverter codeLocationDocumentConverter,
+                                                      CodeLocationDataAdapter codeLocationDataAdapter,
                                                       FirebaseFirestore db){
         if(INSTANCE != null){
             throw new IllegalArgumentException("CodeLocationConnectionHandler INSTANCE already " +
                     "exists!");
         }
 
-        INSTANCE = new CodeLocationConnectionHandler(fireStoreHelper, codeLocationDocumentConverter,
+        INSTANCE = new CodeLocationConnectionHandler(fireStoreHelper, codeLocationDataAdapter,
                 db);
 
         return INSTANCE;
@@ -190,7 +183,7 @@ public class CodeLocationConnectionHandler {
              * Get and cache a CodeLocation object from the document, and then call the
              * callback function with it
              */
-            codeLocationDocumentConverter.getCodeLocationFromDocument(documentReference,
+            codeLocationDataAdapter.getCodeLocationFromDocument(documentReference,
                     new GetCodeLocationCallback() {
                         @Override
                         public void onCallback(CodeLocation codeLocation) {

@@ -1,4 +1,4 @@
-package com.example.hashcache.models.database_connections.callbacks;
+package com.example.hashcache.models.database.database_connections.callbacks;
 
 import com.example.hashcache.models.PlayerPreferences;
 

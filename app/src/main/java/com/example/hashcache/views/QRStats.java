@@ -21,8 +21,7 @@ import androidx.appcompat.widget.PopupMenu;
 import com.example.hashcache.R;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -138,7 +137,7 @@ public class QRStats extends AppCompatActivity implements Observer {
             }
         });
         init();
-        AppStore.get().addObserver(this);
+        Context.get().addObserver(this);
     }
 
     @Override
@@ -148,10 +147,10 @@ public class QRStats extends AppCompatActivity implements Observer {
     }
 
     private void updateValues() {
-        PlayerWallet curWallet = AppStore.get().getCurrentPlayer().getPlayerWallet();
-        ScannableCode lowestScan = AppStore.get().getLowestScannableCode();
-        ScannableCode highestScan = AppStore.get().getHighestScannableCode();
-        long totalScore = AppStore.get().getCurrentPlayer().getTotalScore();
+        PlayerWallet curWallet = Context.get().getCurrentPlayer().getPlayerWallet();
+        ScannableCode lowestScan = Context.get().getLowestScannableCode();
+        ScannableCode highestScan = Context.get().getHighestScannableCode();
+        long totalScore = Context.get().getCurrentPlayer().getTotalScore();
         setMyCodesValue(curWallet.getSize());
         setLowScoreValue(lowestScan.getHashInfo().getGeneratedScore());
         setHighScoreValue(highestScan.getHashInfo().getGeneratedScore());
@@ -159,13 +158,13 @@ public class QRStats extends AppCompatActivity implements Observer {
     }
 
     private void highestScoringCodeClicked() {
-        ScannableCode highestScan = AppStore.get().getHighestScannableCode();
-        AppStore.get().setCurrentScannableCode(highestScan);
+        ScannableCode highestScan = Context.get().getHighestScannableCode();
+        Context.get().setCurrentScannableCode(highestScan);
         startActivity(new Intent(QRStats.this, DisplayMonsterActivity.class));
     }
 
     private void lowestScoringCodeClicked() {
-        ScannableCode lowestScan = AppStore.get().getLowestScannableCode();
+        ScannableCode lowestScan = Context.get().getLowestScannableCode();
         startActivity(new Intent(QRStats.this, DisplayMonsterActivity.class));
     }
 

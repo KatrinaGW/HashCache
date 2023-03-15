@@ -1,16 +1,14 @@
-package com.example.hashcache.models.database_connections;
+package com.example.hashcache.models.database.database_connections;
 
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.example.hashcache.models.Player;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
-import com.example.hashcache.models.database_connections.converters.ScannableCodeDocumentConverter;
-import com.example.hashcache.models.database_connections.values.CollectionNames;
-import com.example.hashcache.models.database_connections.values.FieldNames;
+import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.data_adapters.ScannableCodeDataAdapter;
+import com.example.hashcache.models.database.database_connections.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database.values.CollectionNames;
+import com.example.hashcache.models.database.values.FieldNames;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
@@ -19,12 +17,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +33,7 @@ public class ScannableCodesConnectionHandler {
     private CollectionReference collectionReference;
     private HashMap<String, ScannableCode> cachedScannableCodes;
     final String TAG = "Sample";
-    private ScannableCodeDocumentConverter scannableCodeDocumentConverter;
+    private ScannableCodeDataAdapter scannableCodeDocumentConverter;
     private FireStoreHelper fireStoreHelper;
     private static ScannableCodesConnectionHandler INSTANCE;
 
@@ -60,8 +55,8 @@ public class ScannableCodesConnectionHandler {
      *         instance of the
      *         ScannableCodesConnectionHandler class
      */
-    private ScannableCodesConnectionHandler(ScannableCodeDocumentConverter scannableCodeDocumentConverter,
-            FireStoreHelper fireStoreHelper, FirebaseFirestore db) {
+    private ScannableCodesConnectionHandler(ScannableCodeDataAdapter scannableCodeDocumentConverter,
+                                            FireStoreHelper fireStoreHelper, FirebaseFirestore db) {
         this.cachedScannableCodes = new HashMap<>();
         this.scannableCodeDocumentConverter = scannableCodeDocumentConverter;
         this.fireStoreHelper = fireStoreHelper;
@@ -94,7 +89,7 @@ public class ScannableCodesConnectionHandler {
      *                                  class has already been initialized
      */
     public static ScannableCodesConnectionHandler makeInstance(
-            ScannableCodeDocumentConverter scannableCodeDocumentConverter,
+            ScannableCodeDataAdapter scannableCodeDocumentConverter,
             FireStoreHelper fireStoreHelper,
             FirebaseFirestore db) {
         if (INSTANCE != null) {
