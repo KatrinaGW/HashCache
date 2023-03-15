@@ -2,7 +2,7 @@ package com.example.hashcache.controllers;
 
 import android.util.Log;
 
-import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.data_exchange.database.Database;
 import com.example.hashcache.context.Context;
 import com.google.firebase.firestore.FirebaseFirestore;
 

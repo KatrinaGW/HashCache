@@ -20,7 +20,7 @@ import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.context.Context;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;

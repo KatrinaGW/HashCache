@@ -1,7 +1,7 @@
 package com.example.hashcache.controllers;
 
 import com.example.hashcache.models.Player;
-import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.data_exchange.database.Database;
 import com.example.hashcache.context.Context;
 /**
  * The UpdateUserPreferencesCommand class provides methods for updating a user's preferences.

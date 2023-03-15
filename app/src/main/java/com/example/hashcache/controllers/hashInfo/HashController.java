@@ -3,7 +3,7 @@ package com.example.hashcache.controllers.hashInfo;
 
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.data_exchange.database.Database;
 import com.example.hashcache.context.Context;
 
 import java.math.BigInteger;

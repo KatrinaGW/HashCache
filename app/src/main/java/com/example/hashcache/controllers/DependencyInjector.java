@@ -1,13 +1,13 @@
 package com.example.hashcache.controllers;
 
-import com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
-import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
-import com.example.hashcache.models.database.data_exchange.data_adapters.CodeLocationDataAdapter;
-import com.example.hashcache.models.database.data_exchange.data_adapters.PlayerDataAdapter;
-import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
-import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletConnectionHandler;
-import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
-import com.example.hashcache.models.database.data_exchange.data_adapters.ScannableCodeDataAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
+import com.example.hashcache.models.data_exchange.data_adapters.CodeLocationDataAdapter;
+import com.example.hashcache.models.data_exchange.data_adapters.PlayerDataAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.FireStoreHelper;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayerWalletConnectionHandler;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
+import com.example.hashcache.models.data_exchange.data_adapters.ScannableCodeDataAdapter;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -65,7 +65,7 @@ public class DependencyInjector {
      * class
      */
     public static CodeLocationDatabaseAdapter makeCodeLocationConnectionHandler(){
-        return CodeLocationDatabaseAdapter.makeInstance(new FireStoreHelper(), new CodeLocationDataAdapter(),
+        return CodeLocationDatabaseAdapter.makeInstance(new FireStoreHelper(),
                 FirebaseFirestore.getInstance());
     }
 
