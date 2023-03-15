@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/rounded_rect_white_transparent"
+    android:paddingHorizontal="48dp"
+    android:paddingVertical="36dp">
+    <TextView
+        android:id="@+id/delete_frag_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:text="Delete monster forever?"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:layout_centerHorizontal="true"/>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_rect_purple"
+        android:layout_below="@+id/delete_frag_textview"
+        android:layout_alignStart="@+id/delete_frag_textview"
+        android:text="CANCEL"/>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_rect_green"
+        android:layout_below="@+id/delete_frag_textview"
+        android:layout_alignEnd="@+id/delete_frag_textview"
+        android:text="DELETE"/>
+
+</RelativeLayout>
