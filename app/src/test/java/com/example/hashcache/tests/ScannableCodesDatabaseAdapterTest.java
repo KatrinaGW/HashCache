@@ -13,11 +13,11 @@ import static org.mockito.Mockito.when;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.database_connections.FireStoreHelper;
-import com.example.hashcache.models.database.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database.database_connections.callbacks.GetScannableCodeCallback;
-import com.example.hashcache.models.database.data_adapters.ScannableCodeDataAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
+import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database.data_exchange.data_adapters.ScannableCodeDataAdapter;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -30,19 +30,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class ScannableCodesConnectionHandlerTest {
+public class ScannableCodesDatabaseAdapterTest {
         ScannableCodeDataAdapter mockScannableCodeDocumentConverter;
         FireStoreHelper mockFireStoreHelper;
         FirebaseFirestore mockDb;
 
-        private ScannableCodesConnectionHandler getMockScannableCodesConnectionHandler(){
-            return ScannableCodesConnectionHandler.makeInstance(mockScannableCodeDocumentConverter,
+        private ScannableCodesDatabaseAdapter getMockScannableCodesConnectionHandler(){
+            return ScannableCodesDatabaseAdapter.makeInstance(mockScannableCodeDocumentConverter,
                     mockFireStoreHelper, mockDb);
         }
 
         @BeforeEach
         void initializeMocks(){
-            ScannableCodesConnectionHandler.resetInstance();
+            ScannableCodesDatabaseAdapter.resetInstance();
             this.mockScannableCodeDocumentConverter = Mockito.mock(ScannableCodeDataAdapter.class);
             this.mockFireStoreHelper = Mockito.mock(FireStoreHelper.class);
             this.mockDb = Mockito.mock(FirebaseFirestore.class);
@@ -63,9 +63,9 @@ public class ScannableCodesConnectionHandlerTest {
             }).when(mockScannableCodeDocumentConverter).getScannableCodeFromDocument(mockDocument,
                     mockGetScannableCodeCallback);
 
-            ScannableCodesConnectionHandler scannableCodesConnectionHandler = getMockScannableCodesConnectionHandler();
+            ScannableCodesDatabaseAdapter scannableCodesDatabaseAdapter = getMockScannableCodesConnectionHandler();
 
-            scannableCodesConnectionHandler.getScannableCode("id", mockGetScannableCodeCallback);
+            scannableCodesDatabaseAdapter.getScannableCode("id", mockGetScannableCodeCallback);
             verify(mockScannableCodeDocumentConverter, times(1))
                     .getScannableCodeFromDocument(mockDocument, mockGetScannableCodeCallback);
         }
@@ -105,9 +105,9 @@ public class ScannableCodesConnectionHandlerTest {
             }).when(mockFireStoreHelper).setDocumentReference(any(DocumentReference.class), any(),
                     any(BooleanCallback.class));
 
-            ScannableCodesConnectionHandler scannableCodesConnectionHandler = getMockScannableCodesConnectionHandler();
+            ScannableCodesDatabaseAdapter scannableCodesDatabaseAdapter = getMockScannableCodesConnectionHandler();
 
-            scannableCodesConnectionHandler.addScannableCode(mockScannableCode, new BooleanCallback() {
+            scannableCodesDatabaseAdapter.addScannableCode(mockScannableCode, new BooleanCallback() {
                 @Override
                 public void onCallback(Boolean isTrue) {
                     assertTrue(isTrue);
@@ -138,10 +138,10 @@ public class ScannableCodesConnectionHandlerTest {
         }).when(mockFireStoreHelper).documentWithIDExists(any(CollectionReference.class), anyString(),
                 any(BooleanCallback.class));
 
-        ScannableCodesConnectionHandler scannableCodesConnectionHandler = getMockScannableCodesConnectionHandler();
+        ScannableCodesDatabaseAdapter scannableCodesDatabaseAdapter = getMockScannableCodesConnectionHandler();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            scannableCodesConnectionHandler.addScannableCode(mockScannableCode, new BooleanCallback() {
+            scannableCodesDatabaseAdapter.addScannableCode(mockScannableCode, new BooleanCallback() {
                 @Override
                 public void onCallback(Boolean isTrue) {}
             });
@@ -181,8 +181,8 @@ public class ScannableCodesConnectionHandlerTest {
         }).when(mockFireStoreHelper).documentWithIDExists(any(CollectionReference.class), anyString(),
                 any(BooleanCallback.class));
 
-        ScannableCodesConnectionHandler scannableCodesConnectionHandler = getMockScannableCodesConnectionHandler();
-        scannableCodesConnectionHandler.addComment(mockId, mockComment, mockBooleanCallback);
+        ScannableCodesDatabaseAdapter scannableCodesDatabaseAdapter = getMockScannableCodesConnectionHandler();
+        scannableCodesDatabaseAdapter.addComment(mockId, mockComment, mockBooleanCallback);
     }
 
     @Test
@@ -208,9 +208,9 @@ public class ScannableCodesConnectionHandlerTest {
         }).when(mockFireStoreHelper).documentWithIDExists(any(CollectionReference.class), anyString(),
                 any(BooleanCallback.class));
 
-        ScannableCodesConnectionHandler scannableCodesConnectionHandler = getMockScannableCodesConnectionHandler();
+        ScannableCodesDatabaseAdapter scannableCodesDatabaseAdapter = getMockScannableCodesConnectionHandler();
         assertThrows(IllegalArgumentException.class, () -> {
-            scannableCodesConnectionHandler.addComment(mockId, mockComment, mockBooleanCallback);
+            scannableCodesDatabaseAdapter.addComment(mockId, mockComment, mockBooleanCallback);
         });
     }
 
@@ -246,9 +246,9 @@ public class ScannableCodesConnectionHandlerTest {
         }).when(mockFireStoreHelper).documentWithIDExists(any(CollectionReference.class), anyString(),
                 any(BooleanCallback.class));
 
-        ScannableCodesConnectionHandler scannableCodesConnectionHandler = getMockScannableCodesConnectionHandler();
+        ScannableCodesDatabaseAdapter scannableCodesDatabaseAdapter = getMockScannableCodesConnectionHandler();
 
-        scannableCodesConnectionHandler.deleteComment(mockCodeId, mockCommentId, new BooleanCallback() {
+        scannableCodesDatabaseAdapter.deleteComment(mockCodeId, mockCommentId, new BooleanCallback() {
             @Override
             public void onCallback(Boolean isTrue) {
                 assertTrue(isTrue);
@@ -276,10 +276,10 @@ public class ScannableCodesConnectionHandlerTest {
         }).when(mockFireStoreHelper).documentWithIDExists(any(CollectionReference.class), anyString(),
                 any(BooleanCallback.class));
 
-        ScannableCodesConnectionHandler scannableCodesConnectionHandler = getMockScannableCodesConnectionHandler();
+        ScannableCodesDatabaseAdapter scannableCodesDatabaseAdapter = getMockScannableCodesConnectionHandler();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            scannableCodesConnectionHandler.deleteComment(mockCodeId, mockCommentId, new BooleanCallback() {
+            scannableCodesDatabaseAdapter.deleteComment(mockCodeId, mockCommentId, new BooleanCallback() {
                 @Override
                 public void onCallback(Boolean isTrue) {
                 }
@@ -309,10 +309,10 @@ public class ScannableCodesConnectionHandlerTest {
         }).when(mockFireStoreHelper).documentWithIDExists(any(CollectionReference.class), anyString(),
                 any(BooleanCallback.class));
 
-        ScannableCodesConnectionHandler scannableCodesConnectionHandler = getMockScannableCodesConnectionHandler();
+        ScannableCodesDatabaseAdapter scannableCodesDatabaseAdapter = getMockScannableCodesConnectionHandler();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            scannableCodesConnectionHandler.deleteComment(mockCodeId, mockCommentId, new BooleanCallback() {
+            scannableCodesDatabaseAdapter.deleteComment(mockCodeId, mockCommentId, new BooleanCallback() {
                 @Override
                 public void onCallback(Boolean isTrue) {
                 }

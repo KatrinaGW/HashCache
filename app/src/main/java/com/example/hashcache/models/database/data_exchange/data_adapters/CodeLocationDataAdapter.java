@@ -1,8 +1,8 @@
-package com.example.hashcache.models.database.data_adapters;
+package com.example.hashcache.models.database.data_exchange.data_adapters;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.database.database_connections.callbacks.GetCodeLocationCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetCodeLocationCallback;
 import com.example.hashcache.models.CodeLocation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

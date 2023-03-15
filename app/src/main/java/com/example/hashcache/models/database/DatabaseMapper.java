@@ -7,13 +7,13 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.database_connections.PlayerWalletConnectionHandler;
-import com.example.hashcache.models.database.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database.database_connections.callbacks.GetScannableCodeCallback;
-import com.example.hashcache.models.database.database_connections.callbacks.GetStringCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletConnectionHandler;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetStringCallback;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
      */
     @Override
     public CompletableFuture<Boolean> usernameExists(String username) {
-        return PlayersConnectionHandler.getInstance().usernameExists(username);
+        return PlayersDatabaseAdapter.getInstance().usernameExists(username);
 
     }
 
@@ -74,7 +74,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     @Override
     public CompletableFuture<String> getIdByUsername(String username) {
 
-        return PlayersConnectionHandler.getInstance().getPlayerIdByUsername(username);
+        return PlayersDatabaseAdapter.getInstance().getPlayerIdByUsername(username);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
         CompletableFuture.runAsync(() -> {
             usernameExists(username).thenAccept(exists -> {
                 if (!exists) {
-                    PlayersConnectionHandler.getInstance().createPlayer(username, new GetStringCallback() {
+                    PlayersDatabaseAdapter.getInstance().createPlayer(username, new GetStringCallback() {
                         @Override
                         public void onCallback(String callbackString) {
                             cf.complete(null);
@@ -108,7 +108,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            ScannableCodesConnectionHandler.getInstance()
+            ScannableCodesDatabaseAdapter.getInstance()
                     .getScannableCodesByIdInList(scannableCodeIds).thenAccept(scannableCodes -> {
                         cf.complete(scannableCodes);
                     }).exceptionally(new Function<Throwable, Void>() {
@@ -138,7 +138,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     public CompletableFuture<Player> getPlayer(String userId) {
         CompletableFuture<Player> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().getPlayerAsync(userId).thenAccept(playa -> {
+            PlayersDatabaseAdapter.getInstance().getPlayerAsync(userId).thenAccept(playa -> {
                 cf.complete(playa);
             }).exceptionally(new Function<Throwable, Void>() {
                 @Override
@@ -165,7 +165,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
         CompletableFuture<HashMap<String, String>> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().getPlayers().thenAccept(
+            PlayersDatabaseAdapter.getInstance().getPlayers().thenAccept(
                     players -> {
                         cf.complete(players);
                     });
@@ -219,7 +219,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     public CompletableFuture<Void> addComment(String scannableCodeId, Comment comment) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            ScannableCodesConnectionHandler.getInstance().addComment(scannableCodeId, comment, new BooleanCallback() {
+            ScannableCodesDatabaseAdapter.getInstance().addComment(scannableCodeId, comment, new BooleanCallback() {
                 @Override
                 public void onCallback(Boolean isTrue) {
                     if (isTrue) {
@@ -246,7 +246,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     public CompletableFuture<Void> updatePlayerPreferences(String userId, PlayerPreferences playerPreferences) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().updatePlayerPreferences(userId, playerPreferences,
+            PlayersDatabaseAdapter.getInstance().updatePlayerPreferences(userId, playerPreferences,
                     new BooleanCallback() {
                         @Override
                         public void onCallback(Boolean isTrue) {
@@ -266,7 +266,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
         System.out.println("[[ Trying to add to wallet...");
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().playerScannedCodeAdded(userId, scannableCodeId, null,
+            PlayersDatabaseAdapter.getInstance().playerScannedCodeAdded(userId, scannableCodeId, null,
                     new BooleanCallback() {
                         @Override
                         public void onCallback(Boolean isTrue) {
@@ -297,7 +297,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
 
     @Override
     public CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId) {
-        return ScannableCodesConnectionHandler.getInstance().scannableCodeIdExists(scannableCodeId);
+        return ScannableCodesDatabaseAdapter.getInstance().scannableCodeIdExists(scannableCodeId);
     }
 
     /**
@@ -311,7 +311,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     public CompletableFuture<String> addScannableCode(ScannableCode scannableCode) {
         CompletableFuture<String> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            ScannableCodesConnectionHandler.getInstance().addScannableCode(scannableCode, new BooleanCallback() {
+            ScannableCodesDatabaseAdapter.getInstance().addScannableCode(scannableCode, new BooleanCallback() {
                 @Override
                 public void onCallback(Boolean isTrue) {
                     if (isTrue) {
@@ -339,7 +339,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     public CompletableFuture<Boolean> removeScannableCode(String userId, String scannableCodeId) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().playerScannedCodeDeleted(userId, scannableCodeId,
+            PlayersDatabaseAdapter.getInstance().playerScannedCodeDeleted(userId, scannableCodeId,
                     new BooleanCallback() {
                         @Override
                         public void onCallback(Boolean isTrue) {
@@ -390,7 +390,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().updateContactInfo(userId, contactInfo,
+            PlayersDatabaseAdapter.getInstance().updateContactInfo(userId, contactInfo,
                     new BooleanCallback() {
                         @Override
                         public void onCallback(Boolean isTrue) {
@@ -409,7 +409,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
 
     @Override
     public void onPlayerDataChanged(String playerId, GetPlayerCallback callback) {
-        playerListener = PlayersConnectionHandler.getInstance().setupPlayerListener(playerId, callback);
+        playerListener = PlayersDatabaseAdapter.getInstance().setupPlayerListener(playerId, callback);
     }
 
     @Override
@@ -509,7 +509,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     public CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            ScannableCodesConnectionHandler.getInstance().getScannableCode(scannableCodeId,
+            ScannableCodesDatabaseAdapter.getInstance().getScannableCode(scannableCodeId,
                     new GetScannableCodeCallback() {
                         @Override
                         public void onCallback(ScannableCode scannableCode) {

@@ -1,13 +1,13 @@
 package com.example.hashcache.controllers;
 
-import com.example.hashcache.models.database.data_adapters.CodeLocationDataAdapter;
-import com.example.hashcache.models.database.data_adapters.PlayerDataAdapter;
-import com.example.hashcache.models.database.database_connections.CodeLocationConnectionHandler;
-import com.example.hashcache.models.database.database_connections.FireStoreHelper;
-import com.example.hashcache.models.database.database_connections.PlayerWalletConnectionHandler;
-import com.example.hashcache.models.database.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.models.database.data_adapters.ScannableCodeDataAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
+import com.example.hashcache.models.database.data_exchange.data_adapters.CodeLocationDataAdapter;
+import com.example.hashcache.models.database.data_exchange.data_adapters.PlayerDataAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletConnectionHandler;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
+import com.example.hashcache.models.database.data_exchange.data_adapters.ScannableCodeDataAdapter;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -23,8 +23,8 @@ public class DependencyInjector {
      * @return ScannableCodesConnectionHandler.INSTANCE the static INSTANCE of the ScannableCodesConnectionHandler
      * class
      */
-    public static ScannableCodesConnectionHandler makeScannableCodesConnectionHandler(){
-        return ScannableCodesConnectionHandler.makeInstance(new ScannableCodeDataAdapter(),
+    public static ScannableCodesDatabaseAdapter makeScannableCodesConnectionHandler(){
+        return ScannableCodesDatabaseAdapter.makeInstance(new ScannableCodeDataAdapter(),
                 new FireStoreHelper(), FirebaseFirestore.getInstance());
     }
 
@@ -32,15 +32,15 @@ public class DependencyInjector {
      * Create or get a current instance of the ScannableCodesConnectionHandlers
      * @return scannableCodesConnectionHandler a static instance of the ScannableCodesConnectionHandler class
      */
-    public static ScannableCodesConnectionHandler getOrMakeScannableCodesConnectionHandler(){
-        ScannableCodesConnectionHandler scannableCodesConnectionHandler;
+    public static ScannableCodesDatabaseAdapter getOrMakeScannableCodesConnectionHandler(){
+        ScannableCodesDatabaseAdapter scannableCodesDatabaseAdapter;
         try{
-            scannableCodesConnectionHandler = ScannableCodesConnectionHandler.getInstance();
+            scannableCodesDatabaseAdapter = ScannableCodesDatabaseAdapter.getInstance();
         }catch(IllegalArgumentException e){
-            scannableCodesConnectionHandler = makeScannableCodesConnectionHandler();
+            scannableCodesDatabaseAdapter = makeScannableCodesConnectionHandler();
         }
 
-        return scannableCodesConnectionHandler;
+        return scannableCodesDatabaseAdapter;
     }
 
     /**
@@ -50,11 +50,11 @@ public class DependencyInjector {
      * @return PlayersConnectionHandler.INSTANCE the static INSTANCE of the PlayersConnectionHandler
      *      class
      */
-    public static PlayersConnectionHandler makePlayersConnectionHandler(HashMap<String,
+    public static PlayersDatabaseAdapter makePlayersConnectionHandler(HashMap<String,
             String> inAppUsernamesIds){
         FireStoreHelper fireStoreHelper = new FireStoreHelper();
 
-        return PlayersConnectionHandler.makeInstance(inAppUsernamesIds, new PlayerDataAdapter(),
+        return PlayersDatabaseAdapter.makeInstance(inAppUsernamesIds, new PlayerDataAdapter(),
                 fireStoreHelper, FirebaseFirestore.getInstance(), new PlayerWalletConnectionHandler(fireStoreHelper));
     }
 
@@ -64,8 +64,8 @@ public class DependencyInjector {
      * @return CodeLocationConnectionHandler.INSTANCE the static INSTANCE of the CodeLocationConnectionHandler
      * class
      */
-    public static CodeLocationConnectionHandler makeCodeLocationConnectionHandler(){
-        return CodeLocationConnectionHandler.makeInstance(new FireStoreHelper(), new CodeLocationDataAdapter(),
+    public static CodeLocationDatabaseAdapter makeCodeLocationConnectionHandler(){
+        return CodeLocationDatabaseAdapter.makeInstance(new FireStoreHelper(), new CodeLocationDataAdapter(),
                 FirebaseFirestore.getInstance());
     }
 

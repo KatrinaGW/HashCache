@@ -1,4 +1,4 @@
-package com.example.hashcache.models.database.database_connections;
+package com.example.hashcache.models.database.DatabaseAdapters;
 
 import android.media.Image;
 import android.util.Log;
@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnFailureListener;

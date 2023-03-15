@@ -8,8 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.CodeLocation;
-import com.example.hashcache.models.database.data_adapters.CodeLocationDataAdapter;
-import com.example.hashcache.models.database.database_connections.callbacks.GetCodeLocationCallback;
+import com.example.hashcache.models.database.data_exchange.data_adapters.CodeLocationDataAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetCodeLocationCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;

@@ -1,10 +1,10 @@
-package com.example.hashcache.models.database.database_connections;
+package com.example.hashcache.models.database.DatabaseAdapters;
 
 import android.util.Log;
 
-import com.example.hashcache.models.database.data_adapters.CodeLocationDataAdapter;
-import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database.database_connections.callbacks.GetCodeLocationCallback;
+import com.example.hashcache.models.database.data_exchange.data_adapters.CodeLocationDataAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetCodeLocationCallback;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.CodeLocation;
 import com.google.firebase.firestore.CollectionReference;
@@ -17,14 +17,14 @@ import java.util.HashMap;
 /**
  * Handles all calls to the Firebase CodeLocations database
  */
-public class CodeLocationConnectionHandler {
+public class CodeLocationDatabaseAdapter {
     private FirebaseFirestore db;
     private CollectionReference collectionReference;
     private HashMap<String, CodeLocation> cachedCodeLocations;
     final String TAG = "Sample";
     private FireStoreHelper fireStoreHelper;
     private CodeLocationDataAdapter codeLocationDataAdapter;
-    private static CodeLocationConnectionHandler INSTANCE;
+    private static CodeLocationDatabaseAdapter INSTANCE;
 
     /**
      * Creates a connection to the CodeLocation collection in the database and keeps a cache
@@ -37,9 +37,9 @@ public class CodeLocationConnectionHandler {
      * @param db the instance of the database to use to get connections to the CodeLocation collection
      *           and its documents
      */
-    private CodeLocationConnectionHandler(FireStoreHelper fireStoreHelper,
-                                          CodeLocationDataAdapter codeLocationDataAdapter,
-                                          FirebaseFirestore db){
+    private CodeLocationDatabaseAdapter(FireStoreHelper fireStoreHelper,
+                                        CodeLocationDataAdapter codeLocationDataAdapter,
+                                        FirebaseFirestore db){
         this.cachedCodeLocations = new HashMap<>();
         this.fireStoreHelper = fireStoreHelper;
         this.codeLocationDataAdapter = codeLocationDataAdapter;
@@ -62,15 +62,15 @@ public class CodeLocationConnectionHandler {
      *
      * @throws IllegalArgumentException if the INSTANCE has already been initialized
      */
-    public static CodeLocationConnectionHandler makeInstance(FireStoreHelper fireStoreHelper,
-                                                      CodeLocationDataAdapter codeLocationDataAdapter,
-                                                      FirebaseFirestore db){
+    public static CodeLocationDatabaseAdapter makeInstance(FireStoreHelper fireStoreHelper,
+                                                           CodeLocationDataAdapter codeLocationDataAdapter,
+                                                           FirebaseFirestore db){
         if(INSTANCE != null){
             throw new IllegalArgumentException("CodeLocationConnectionHandler INSTANCE already " +
                     "exists!");
         }
 
-        INSTANCE = new CodeLocationConnectionHandler(fireStoreHelper, codeLocationDataAdapter,
+        INSTANCE = new CodeLocationDatabaseAdapter(fireStoreHelper, codeLocationDataAdapter,
                 db);
 
         return INSTANCE;
@@ -90,7 +90,7 @@ public class CodeLocationConnectionHandler {
      * @throws IllegalArgumentException if the CodeLocationConnectionHandler instance hasn't
      * been initialized yet
      */
-    public CodeLocationConnectionHandler getInstance(){
+    public CodeLocationDatabaseAdapter getInstance(){
         if(INSTANCE == null){
             throw new IllegalArgumentException("CodeLocationConnectionHandler INSTANCE does" +
                     "not exist!");

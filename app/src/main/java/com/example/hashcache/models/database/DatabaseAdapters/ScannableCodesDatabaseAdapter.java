@@ -1,12 +1,12 @@
-package com.example.hashcache.models.database.database_connections;
+package com.example.hashcache.models.database.DatabaseAdapters;
 
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database.data_adapters.ScannableCodeDataAdapter;
-import com.example.hashcache.models.database.database_connections.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.data_exchange.data_adapters.ScannableCodeDataAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.example.hashcache.models.Comment;
@@ -28,14 +28,14 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Handles all calls to the Firebase ScannableCodes database
  */
-public class ScannableCodesConnectionHandler {
+public class ScannableCodesDatabaseAdapter {
     private FirebaseFirestore db;
     private CollectionReference collectionReference;
     private HashMap<String, ScannableCode> cachedScannableCodes;
     final String TAG = "Sample";
     private ScannableCodeDataAdapter scannableCodeDocumentConverter;
     private FireStoreHelper fireStoreHelper;
-    private static ScannableCodesConnectionHandler INSTANCE;
+    private static ScannableCodesDatabaseAdapter INSTANCE;
 
     /**
      * Constructor for the ScannableCodeConnectionHandler class which takes in
@@ -55,8 +55,8 @@ public class ScannableCodesConnectionHandler {
      *         instance of the
      *         ScannableCodesConnectionHandler class
      */
-    private ScannableCodesConnectionHandler(ScannableCodeDataAdapter scannableCodeDocumentConverter,
-                                            FireStoreHelper fireStoreHelper, FirebaseFirestore db) {
+    private ScannableCodesDatabaseAdapter(ScannableCodeDataAdapter scannableCodeDocumentConverter,
+                                          FireStoreHelper fireStoreHelper, FirebaseFirestore db) {
         this.cachedScannableCodes = new HashMap<>();
         this.scannableCodeDocumentConverter = scannableCodeDocumentConverter;
         this.fireStoreHelper = fireStoreHelper;
@@ -88,7 +88,7 @@ public class ScannableCodesConnectionHandler {
      *                                  ScannableCodesConnectionHandler
      *                                  class has already been initialized
      */
-    public static ScannableCodesConnectionHandler makeInstance(
+    public static ScannableCodesDatabaseAdapter makeInstance(
             ScannableCodeDataAdapter scannableCodeDocumentConverter,
             FireStoreHelper fireStoreHelper,
             FirebaseFirestore db) {
@@ -97,7 +97,7 @@ public class ScannableCodesConnectionHandler {
                     "already exists!");
         }
 
-        INSTANCE = new ScannableCodesConnectionHandler(scannableCodeDocumentConverter,
+        INSTANCE = new ScannableCodesDatabaseAdapter(scannableCodeDocumentConverter,
                 fireStoreHelper, db);
         return INSTANCE;
     }
@@ -109,7 +109,7 @@ public class ScannableCodesConnectionHandler {
      * @throws IllegalArgumentException if the current INSTANCE hasn't been
      *                                  initialized
      */
-    public static ScannableCodesConnectionHandler getInstance() {
+    public static ScannableCodesDatabaseAdapter getInstance() {
         if (INSTANCE == null) {
             throw new IllegalArgumentException("ScannableCodesConnectionHandler INSTANCE does" +
                     "not exist!");

@@ -14,11 +14,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database.database_connections.PlayersConnectionHandler;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.models.database.database_connections.callbacks.GetStringCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetStringCallback;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ public class PlayerListTest {
     private String newPlayerUsername;
     private Player mockPlayer;
     private ArrayList<String> names;
-    private PlayersConnectionHandler mockPlayerConnectionHandler;
+    private PlayersDatabaseAdapter mockPlayerConnectionHandler;
     private GetStringCallback mockGetStringCallback;
 
     @BeforeEach
@@ -38,7 +38,7 @@ public class PlayerListTest {
         newPlayerUsername = "Stubby";
         mockPlayer = new Player(newPlayerUsername);
         names = new ArrayList<>();
-        mockPlayerConnectionHandler = Mockito.mock(PlayersConnectionHandler.class);
+        mockPlayerConnectionHandler = Mockito.mock(PlayersDatabaseAdapter.class);
         mockGetStringCallback = Mockito.mock(GetStringCallback.class);
         PlayerList.resetInstance();
     }

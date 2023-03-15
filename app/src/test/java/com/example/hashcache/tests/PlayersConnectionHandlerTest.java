@@ -17,12 +17,12 @@ import static org.mockito.Mockito.when;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
-import com.example.hashcache.models.database.data_adapters.PlayerDataAdapter;
-import com.example.hashcache.models.database.database_connections.FireStoreHelper;
-import com.example.hashcache.models.database.database_connections.PlayerWalletConnectionHandler;
-import com.example.hashcache.models.database.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.data_exchange.data_adapters.PlayerDataAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletConnectionHandler;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -46,14 +46,14 @@ public class PlayersConnectionHandlerTest {
     private PlayerWalletConnectionHandler mockPlayerWalletConnectionHandler;
     private CollectionReference mockCollectionReference;
 
-    private PlayersConnectionHandler getMockPlayersConnectionHandler(){
-        return PlayersConnectionHandler.makeInstance(mockInAppNamesIds, mockPlayerDataAdapter,
+    private PlayersDatabaseAdapter getMockPlayersConnectionHandler(){
+        return PlayersDatabaseAdapter.makeInstance(mockInAppNamesIds, mockPlayerDataAdapter,
                 mockFireStoreHelper, mockDB, mockPlayerWalletConnectionHandler);
     }
 
     @BeforeEach
     void resetMocks(){
-        PlayersConnectionHandler.resetInstance();
+        PlayersDatabaseAdapter.resetInstance();
         mockInAppNamesIds = new HashMap<>();
         mockPlayerDataAdapter = Mockito.mock(PlayerDataAdapter.class);
         mockFireStoreHelper = Mockito.mock(FireStoreHelper.class);
@@ -65,21 +65,21 @@ public class PlayersConnectionHandlerTest {
     @Test
     void getInstanceThrowsTest(){
         assertThrows(IllegalArgumentException.class, () -> {
-            PlayersConnectionHandler.getInstance();
+            PlayersDatabaseAdapter.getInstance();
         });
     }
 
     @Test
     void getInstanceSuccessTest(){
         when(mockDB.collection(anyString())).thenReturn(mockCollectionReference);
-        PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();
-        assertEquals(PlayersConnectionHandler.getInstance(), playersConnectionHandler);
+        PlayersDatabaseAdapter playersConnectionHandler = getMockPlayersConnectionHandler();
+        assertEquals(PlayersDatabaseAdapter.getInstance(), playersConnectionHandler);
     }
 
     @Test
     void getInAppUserNamesTest(){
         when(mockDB.collection(anyString())).thenReturn(mockCollectionReference);
-        PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();
+        PlayersDatabaseAdapter playersConnectionHandler = getMockPlayersConnectionHandler();
         mockInAppNamesIds.put("first", "1");
         mockInAppNamesIds.put("second", "2");
 
@@ -115,7 +115,7 @@ public class PlayersConnectionHandlerTest {
                 .when(mockPlayerDataAdapter)
                 .getPlayerFromDocument(any(DocumentReference.class), any(GetPlayerCallback.class));
 
-        PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();
+        PlayersDatabaseAdapter playersConnectionHandler = getMockPlayersConnectionHandler();
         playersConnectionHandler.getPlayer("name", mockGetPlayerCallback);
 
         verify(mockThing, times(1)).addOnCompleteListener(any());
@@ -133,7 +133,7 @@ public class PlayersConnectionHandlerTest {
             return null;
         }).when(mockFireStoreHelper).addBooleanFieldToDocument(any(DocumentReference.class), anyString(), anyBoolean(), any(BooleanCallback.class));
 
-        PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();
+        PlayersDatabaseAdapter playersConnectionHandler = getMockPlayersConnectionHandler();
 
         playersConnectionHandler.updatePlayerPreferences("blah", new PlayerPreferences(), new BooleanCallback() {
             @Override
@@ -158,7 +158,7 @@ public class PlayersConnectionHandlerTest {
             return null;
         }).when(mockFireStoreHelper).addStringFieldToDocument(any(DocumentReference.class), anyString(), anyString(), any(BooleanCallback.class));
 
-        PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();
+        PlayersDatabaseAdapter playersConnectionHandler = getMockPlayersConnectionHandler();
 
         playersConnectionHandler.updateContactInfo("blah", new ContactInfo(), new BooleanCallback() {
             @Override
@@ -184,7 +184,7 @@ public class PlayersConnectionHandlerTest {
             return null;
         }).when(mockFireStoreHelper).addStringFieldToDocument(any(DocumentReference.class), anyString(), anyString(), any(BooleanCallback.class));
 
-        PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();
+        PlayersDatabaseAdapter playersConnectionHandler = getMockPlayersConnectionHandler();
 
         playersConnectionHandler.updateUserName("old", "new", new BooleanCallback() {
             @Override
@@ -208,7 +208,7 @@ public class PlayersConnectionHandlerTest {
         String  mockScannableCodeId = "scannableCodeId";
         mockInAppNamesIds.put("name", mockUserId);
 
-        PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();
+        PlayersDatabaseAdapter playersConnectionHandler = getMockPlayersConnectionHandler();
 
         playersConnectionHandler.playerScannedCodeAdded(mockUserId, mockScannableCodeId, null, new BooleanCallback() {
             @Override
@@ -230,7 +230,7 @@ public class PlayersConnectionHandlerTest {
         String  mockScannableCodeId = "scannableCodeId";
         mockInAppNamesIds.put("name", mockUserId);
 
-        PlayersConnectionHandler playersConnectionHandler = getMockPlayersConnectionHandler();
+        PlayersDatabaseAdapter playersConnectionHandler = getMockPlayersConnectionHandler();
 
         playersConnectionHandler.playerScannedCodeDeleted(mockUserId, mockScannableCodeId,  new BooleanCallback() {
             @Override

@@ -1,14 +1,14 @@
-package com.example.hashcache.models.database.database_connections;
+package com.example.hashcache.models.database.DatabaseAdapters;
 
 import android.media.Image;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.database.data_adapters.PlayerDataAdapter;
-import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database.database_connections.callbacks.GetStringCallback;
+import com.example.hashcache.models.database.data_exchange.data_adapters.PlayerDataAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetStringCallback;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;
@@ -34,7 +34,7 @@ import java.util.function.Function;
 /**
  * Handles all calls to the Firebase Players database
  */
-public class PlayersConnectionHandler {
+public class PlayersDatabaseAdapter {
     private FirebaseFirestore db;
     private CollectionReference collectionReference;
     private HashMap<String, String> inAppUsernamesIds;
@@ -43,7 +43,7 @@ public class PlayersConnectionHandler {
     private PlayerDataAdapter playerDataAdapter;
     private FireStoreHelper fireStoreHelper;
     private PlayerWalletConnectionHandler playerWalletConnectionHandler;
-    private static PlayersConnectionHandler INSTANCE;
+    private static PlayersDatabaseAdapter INSTANCE;
 
     /**
      * Creates a new instance of the class and initializes the connection to the
@@ -63,10 +63,10 @@ public class PlayersConnectionHandler {
      *                                      class to use to interact with a player's
      *                                      wallet collection
      */
-    private PlayersConnectionHandler(HashMap<String, String> inAppNamesIds,
-            PlayerDataAdapter playerDataAdapter,
-            FireStoreHelper fireStoreHelper,
-            FirebaseFirestore db, PlayerWalletConnectionHandler playerWalletConnectionHandler) {
+    private PlayersDatabaseAdapter(HashMap<String, String> inAppNamesIds,
+                                   PlayerDataAdapter playerDataAdapter,
+                                   FireStoreHelper fireStoreHelper,
+                                   FirebaseFirestore db, PlayerWalletConnectionHandler playerWalletConnectionHandler) {
         this.inAppUsernamesIds = inAppNamesIds;
         this.cachedPlayers = new HashMap<>();
         this.playerDataAdapter = playerDataAdapter;
@@ -84,7 +84,7 @@ public class PlayersConnectionHandler {
      *         PlayersConnectionHandler class
      * @throws IllegalArgumentException if the INSTANCE hasn't been initialized yet
      */
-    public static PlayersConnectionHandler getInstance() {
+    public static PlayersDatabaseAdapter getInstance() {
         if (INSTANCE == null) {
             throw new IllegalArgumentException("No instance of PlayersConnectionHandler currently exists!");
         }
@@ -114,14 +114,14 @@ public class PlayersConnectionHandler {
      *
      * @throws IllegalArgumentException if the INSTANCE has already been initialized
      */
-    public static PlayersConnectionHandler makeInstance(HashMap<String, String> inAppNamesIds,
-            PlayerDataAdapter playerDataAdapter,
-            FireStoreHelper fireStoreHelper,
-            FirebaseFirestore db, PlayerWalletConnectionHandler playerWalletConnectionHandler) {
+    public static PlayersDatabaseAdapter makeInstance(HashMap<String, String> inAppNamesIds,
+                                                      PlayerDataAdapter playerDataAdapter,
+                                                      FireStoreHelper fireStoreHelper,
+                                                      FirebaseFirestore db, PlayerWalletConnectionHandler playerWalletConnectionHandler) {
         if (INSTANCE != null) {
             throw new IllegalArgumentException("Instance of PlayersConnectionHandler already exists!");
         }
-        INSTANCE = new PlayersConnectionHandler(inAppNamesIds, playerDataAdapter,
+        INSTANCE = new PlayersDatabaseAdapter(inAppNamesIds, playerDataAdapter,
                 fireStoreHelper, db, playerWalletConnectionHandler);
         return INSTANCE;
     }

@@ -1,12 +1,12 @@
-package com.example.hashcache.models.database.data_adapters;
+package com.example.hashcache.models.database.data_exchange.data_adapters;
 
 import android.media.Image;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerWalletCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerWalletCallback;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;

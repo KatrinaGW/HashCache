@@ -44,9 +44,6 @@ public class QRStats extends AppCompatActivity implements Observer {
     private TextView topScoreValueTextView;
     private TextView lowScoreValueTextView;
     private AppCompatButton myProfileButton;
-    private ScannableCode lowestScoring;
-    private ScannableCode highestScoring;
-    private PlayerWallet playerWallet;
 
     /**
      * Initializes the activity and sets the layout. Also adds functionality to the

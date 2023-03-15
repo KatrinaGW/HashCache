@@ -2,8 +2,8 @@ package com.example.hashcache.tests;
 
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.models.database.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ public class SearchTest {
     private String newPlayerUsername;
     private Player mockPlayer;
     private ArrayList<String> names;
-    private PlayersConnectionHandler mockPlayerConnectionHandler;
+    private PlayersDatabaseAdapter mockPlayerConnectionHandler;
     private BooleanCallback mockBooleanCallback;
 
     @BeforeEach
@@ -24,7 +24,7 @@ public class SearchTest {
         newPlayerUsername = "Stubby";
         mockPlayer = new Player(newPlayerUsername);
         names = new ArrayList<>();
-        mockPlayerConnectionHandler = Mockito.mock(PlayersConnectionHandler.class);
+        mockPlayerConnectionHandler = Mockito.mock(PlayersDatabaseAdapter.class);
         mockBooleanCallback = Mockito.mock(BooleanCallback.class);
         PlayerList.resetInstance();
     }

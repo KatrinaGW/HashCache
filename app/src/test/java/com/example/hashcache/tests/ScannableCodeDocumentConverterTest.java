@@ -7,8 +7,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.database_connections.callbacks.GetScannableCodeCallback;
-import com.example.hashcache.models.database.data_adapters.ScannableCodeDataAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database.data_exchange.data_adapters.ScannableCodeDataAdapter;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

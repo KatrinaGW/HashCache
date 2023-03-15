@@ -2,9 +2,9 @@ package com.example.hashcache.models;
 
 import com.example.hashcache.controllers.DependencyInjector;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database.database_connections.callbacks.GetStringCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetStringCallback;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +19,7 @@ public class PlayerList {
     private static PlayerList INSTANCE;
     private ArrayList<String> playerUserNames;
     private HashMap<String, String> playerIdsNamesMapping;
-    private PlayersConnectionHandler playersConnectionHandler;
+    private PlayersDatabaseAdapter playersConnectionHandler;
     /**
      * Private constructor for creating a new instance of PlayerList
      */
@@ -34,7 +34,7 @@ public class PlayerList {
      *
      * @param playersConnectionHandler The PlayersConnectionHandler used to interact with the database
      */
-    private PlayerList(PlayersConnectionHandler playersConnectionHandler){
+    private PlayerList(PlayersDatabaseAdapter playersConnectionHandler){
         this.playersConnectionHandler = playersConnectionHandler;
         playerUserNames = playersConnectionHandler.getInAppPlayerUserNames();
     }
@@ -57,7 +57,7 @@ public class PlayerList {
      *
      * @return INSTANCE The singleton instance of the PlayerList
      */
-    public static PlayerList getInstance(PlayersConnectionHandler playersConnectionHandler) {
+    public static PlayerList getInstance(PlayersDatabaseAdapter playersConnectionHandler) {
         if(INSTANCE == null) {
             INSTANCE = new PlayerList(playersConnectionHandler);
         }

@@ -1,10 +1,10 @@
-package com.example.hashcache.models.database.database_connections;
+package com.example.hashcache.models.database.DatabaseAdapters;
 
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.database.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
