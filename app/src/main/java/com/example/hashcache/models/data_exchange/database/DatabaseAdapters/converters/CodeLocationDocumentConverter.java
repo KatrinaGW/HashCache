@@ -15,9 +15,9 @@ import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-public class DocumentToCodeLocationConverter {
+public class CodeLocationDocumentConverter {
 
-    public static CompletableFuture<Boolean> addCodeLocationToCollection(CodeLocation codeLocation,
+    public CompletableFuture<Boolean> addCodeLocationToCollection(CodeLocation codeLocation,
                                                                          CollectionReference collectionReference,
                                                                          FireStoreHelper fireStoreHelper){
         CompletableFuture<Boolean> cf = new CompletableFuture<>();

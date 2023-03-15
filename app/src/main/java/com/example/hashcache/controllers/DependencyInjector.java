@@ -8,7 +8,10 @@ import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.Fire
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayerWalletConnectionHandler;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.data_exchange.data_adapters.ScannableCodeDataAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.HashMap;
 
@@ -66,7 +69,7 @@ public class DependencyInjector {
      */
     public static CodeLocationDatabaseAdapter makeCodeLocationConnectionHandler(){
         return CodeLocationDatabaseAdapter.makeInstance(new FireStoreHelper(),
-                FirebaseFirestore.getInstance());
+                FirebaseFirestore.getInstance(), new CodeLocationDocumentConverter());
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.hashcache.tests;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
@@ -9,90 +10,46 @@ import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.CodeLocation;
 import com.example.hashcache.models.data_exchange.data_adapters.CodeLocationDataAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetCodeLocationCallback;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.checkerframework.checker.units.qual.C;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.concurrent.CompletableFuture;
+
 public class CodeLocationDataAdapterTest {
-    private CodeLocationDataAdapter getCodeLocationDocumentConverter(){
+    private CodeLocationDatabaseAdapter mockCodeLocationDatabaseAdapter;
+
+    private CodeLocationDataAdapter getCodeLocationDataAdapter(){
         return new CodeLocationDataAdapter();
     }
 
-    @Test
-    void getCodeLocationFromDocumentSuccessfulTest(){
-        DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
-        Task<DocumentSnapshot> mockTask = Mockito.mock(Task.class);
-        DocumentSnapshot mockDocumentSnapshot = Mockito.mock(DocumentSnapshot.class);
-        GetCodeLocationCallback mockGetCodeLocationCallback = Mockito.mock(GetCodeLocationCallback.class);
-        Task mockTask2 = Mockito.mock(Task.class);
-
-        when(mockDocumentReference.get()).thenReturn(mockTask);
-        doAnswer(invocation -> {
-            OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
-            onCompleteListener.onComplete(mockTask);
-            return null;
-        }).when(mockTask).addOnCompleteListener(any(OnCompleteListener.class));
-        when(mockTask.isSuccessful()).thenReturn(true);
-        when(mockTask.getResult()).thenReturn(mockDocumentSnapshot);
-        when(mockDocumentSnapshot.exists()).thenReturn(true);
-
-        CodeLocationDataAdapter codeLocationDataAdapter = getCodeLocationDocumentConverter();
-        codeLocationDataAdapter.getCodeLocationFromDocument(mockDocumentReference,
-                mockGetCodeLocationCallback);
-
-        verify(mockGetCodeLocationCallback, times(1)).onCallback(
-                any(CodeLocation.class)
-        );
+    @BeforeEach
+    void initializeMocking(){
+        mockCodeLocationDatabaseAdapter = Mockito.mock(CodeLocationDatabaseAdapter.class);
     }
 
     @Test
-    void getCodeLocationFromDocumentTaskFailureTest(){
-        DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
-        Task<DocumentSnapshot> mockTask = Mockito.mock(Task.class);
-        GetCodeLocationCallback mockGetCodeLocationCallback = Mockito.mock(GetCodeLocationCallback.class);
+    void addCodeLocationTest(){
+        CompletableFuture<Boolean> mockCF = new CompletableFuture<>();
+        CodeLocation testCodeLocation = new CodeLocation("name", 1, 2, 3);
 
-        when(mockDocumentReference.get()).thenReturn(mockTask);
-        when(mockTask.isSuccessful()).thenReturn(false);
-        doAnswer(invocation -> {
-            OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
-            onCompleteListener.onComplete(mockTask);
-            return null;
-        }).when(mockTask).addOnCompleteListener(any(OnCompleteListener.class));
+        when(mockCodeLocationDatabaseAdapter.addCodeLocation(testCodeLocation)).thenReturn(mockCF);
 
-        CodeLocationDataAdapter codeLocationDataAdapter = getCodeLocationDocumentConverter();
+        CodeLocationDataAdapter codeLocationDataAdapter = getCodeLocationDataAdapter();
+        codeLocationDataAdapter.addCodeLocation(testCodeLocation, mockCodeLocationDatabaseAdapter);
 
-        codeLocationDataAdapter.getCodeLocationFromDocument(mockDocumentReference, mockGetCodeLocationCallback);
-        verify(mockGetCodeLocationCallback, times(1)).onCallback(null);
-    }
-
-    @Test
-    void getCodeLocationFromDocumentNonExistantFailureTest(){
-        DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
-        Task<DocumentSnapshot> mockTask = Mockito.mock(Task.class);
-        DocumentSnapshot mockDocumentSnapshot = Mockito.mock(DocumentSnapshot.class);
-        GetCodeLocationCallback mockGetCodeLocationCallback = Mockito.mock(GetCodeLocationCallback.class);
-
-
-        when(mockDocumentReference.get()).thenReturn(mockTask);
-        doAnswer(invocation -> {
-            OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
-            onCompleteListener.onComplete(mockTask);
-            return null;
-        }).when(mockTask).addOnCompleteListener(any(OnCompleteListener.class));
-        when(mockTask.isSuccessful()).thenReturn(true);
-        when(mockTask.getResult()).thenReturn(mockDocumentSnapshot);
-        when(mockDocumentSnapshot.exists()).thenReturn(false);
-
-        CodeLocationDataAdapter codeLocationDataAdapter = getCodeLocationDocumentConverter();
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            codeLocationDataAdapter.getCodeLocationFromDocument(mockDocumentReference, mockGetCodeLocationCallback);
-        });
+        verify(mockCodeLocationDatabaseAdapter, times(1)).addCodeLocation(testCodeLocation);
     }
 
 

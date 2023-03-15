@@ -2,6 +2,10 @@ package com.example.hashcache.models.data_exchange;
 
 import com.example.hashcache.models.CodeLocation;
 import com.example.hashcache.models.data_exchange.data_adapters.CodeLocationDataAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.FireStoreHelper;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -39,7 +43,17 @@ public interface DataExchangePort {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            CodeLocationDataAdapter.addCodeLocation(codeLocation).thenAccept(success ->{
+            CodeLocationDatabaseAdapter codeLocationDatabaseAdapterInstance;
+            CodeLocationDataAdapter codeLocationDataAdapter = new CodeLocationDataAdapter();
+
+            try{
+                codeLocationDatabaseAdapterInstance = CodeLocationDatabaseAdapter.getInstance();
+            }catch(IllegalArgumentException e){
+                codeLocationDatabaseAdapterInstance = CodeLocationDatabaseAdapter.makeInstance(new FireStoreHelper(),
+                        FirebaseFirestore.getInstance(), new CodeLocationDocumentConverter());
+            }
+
+            codeLocationDataAdapter.addCodeLocation(codeLocation, codeLocationDatabaseAdapterInstance).thenAccept(success ->{
                 cf.complete(true);
             }).exceptionally(new Function<Throwable, Void>() {
                 @Override

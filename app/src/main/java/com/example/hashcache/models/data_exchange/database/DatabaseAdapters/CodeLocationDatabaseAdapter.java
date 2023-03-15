@@ -2,18 +2,14 @@ package com.example.hashcache.models.data_exchange.database.DatabaseAdapters;
 
 import android.util.Log;
 
-import com.example.hashcache.models.data_exchange.data_adapters.CodeLocationDataAdapter;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.BooleanCallback;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetCodeLocationCallback;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.DocumentToCodeLocationConverter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
 import com.example.hashcache.models.data_exchange.database.values.CollectionNames;
 import com.example.hashcache.models.CodeLocation;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.lang.reflect.Array;
-import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -26,6 +22,7 @@ public class CodeLocationDatabaseAdapter {
     final String TAG = "Sample";
     private FireStoreHelper fireStoreHelper;
     private static CodeLocationDatabaseAdapter INSTANCE;
+    private CodeLocationDocumentConverter codeLocationDocumentConverter;
 
     /**
      * Creates a connection to the CodeLocation collection in the database and keeps a cache
@@ -37,9 +34,10 @@ public class CodeLocationDatabaseAdapter {
      *           and its documents
      */
     private CodeLocationDatabaseAdapter(FireStoreHelper fireStoreHelper,
-                                        FirebaseFirestore db){
+                                        FirebaseFirestore db, CodeLocationDocumentConverter codeLocationDocumentConverter){
         this.fireStoreHelper = fireStoreHelper;
         this.db = db;
+        this.codeLocationDocumentConverter = codeLocationDocumentConverter;
 
         collectionReference = db.collection(CollectionNames.CODE_LOCATIONS.collectionName);
 
@@ -57,13 +55,13 @@ public class CodeLocationDatabaseAdapter {
      * @throws IllegalArgumentException if the INSTANCE has already been initialized
      */
     public static CodeLocationDatabaseAdapter makeInstance(FireStoreHelper fireStoreHelper,
-                                                           FirebaseFirestore db){
+                                                           FirebaseFirestore db, CodeLocationDocumentConverter codeLocationDocumentConverter){
         if(INSTANCE != null){
             throw new IllegalArgumentException("CodeLocationConnectionHandler INSTANCE already " +
                     "exists!");
         }
 
-        INSTANCE = new CodeLocationDatabaseAdapter(fireStoreHelper, db);
+        INSTANCE = new CodeLocationDatabaseAdapter(fireStoreHelper, db, codeLocationDocumentConverter);
 
         return INSTANCE;
     }
@@ -113,8 +111,8 @@ public class CodeLocationDatabaseAdapter {
                 codeLocationExists[0] = isTrue;
 
                 if(!codeLocationExists[0]){
-                    DocumentToCodeLocationConverter.addCodeLocationToCollection(codeLocation,
-                            collectionReference, new FireStoreHelper()).thenAccept(success -> {
+                    codeLocationDocumentConverter.addCodeLocationToCollection(codeLocation,
+                            collectionReference, fireStoreHelper).thenAccept(success -> {
                                 cf.complete(true);
                     }).exceptionally(new Function<Throwable, Void>() {
                         @Override
@@ -144,7 +142,7 @@ public class CodeLocationDatabaseAdapter {
         CompletableFuture<CodeLocation> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            DocumentToCodeLocationConverter.convertDocumentReferenceToCodeLocation(documentReference);
+            CodeLocationDocumentConverter.convertDocumentReferenceToCodeLocation(documentReference);
         }).exceptionally(new Function<Throwable, Void>() {
             @Override
             public Void apply(Throwable throwable) {
