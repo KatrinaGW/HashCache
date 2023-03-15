@@ -31,7 +31,6 @@ import java.util.concurrent.CompletableFuture;
 public class CodeLocationDatabaseAdapterTest {
     FireStoreHelper mockFireStoreHelper;
     FirebaseFirestore mockDb;
-    CodeLocationDataAdapter mockCodeLocationDataAdapter;
     CodeLocationDocumentConverter mockCodeLocationDocumentConverter;
     CollectionReference mockCollectionReference;
 
