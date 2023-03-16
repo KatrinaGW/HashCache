@@ -139,17 +139,9 @@ public class CodeLocationDatabaseAdapter {
     public CompletableFuture<CodeLocation> getCodeLocation(String id){
         DocumentReference documentReference = collectionReference.document(id);
 
-        CompletableFuture<CodeLocation> cf = new CompletableFuture<>();
+        CompletableFuture<CodeLocation> cf;
 
-        CompletableFuture.runAsync(() -> {
-            CodeLocationDocumentConverter.convertDocumentReferenceToCodeLocation(documentReference);
-        }).exceptionally(new Function<Throwable, Void>() {
-            @Override
-            public Void apply(Throwable throwable) {
-                cf.completeExceptionally(throwable);
-                return null;
-            }
-        });
+        cf = CodeLocationDocumentConverter.convertDocumentReferenceToCodeLocation(documentReference);
 
         return cf;
     }

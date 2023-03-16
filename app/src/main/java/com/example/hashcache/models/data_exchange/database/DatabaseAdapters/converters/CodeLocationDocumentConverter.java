@@ -70,7 +70,8 @@ public class CodeLocationDocumentConverter {
         double[] coordinates = new double[3];
         String[] locationName = new String[1];
 
-        CompletableFuture.runAsync(()->{        /**
+        //CompletableFuture.runAsync(()->{
+        /**
          * If the document exists, convert it into a CodeLocation object
          */
             documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -105,7 +106,7 @@ public class CodeLocationDocumentConverter {
                     }
                 }
             });
-        });
+        //});
 
         return cf;
     }
