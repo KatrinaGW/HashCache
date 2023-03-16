@@ -20,6 +20,8 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
@@ -152,13 +154,12 @@ public class PlayerWalletConnectionHandler {
      *                               scananble codes
      * @param scannableCodeId        the id of the scannable code to delete from the
      *                               PlayerWallet collection
-     * @param booleanCallback        the callback function to call once the
-     *                               operation has finished. Calls
-     *                               with true if the operation was successful, and
-     *                               false otherwise
+     * @return cf the CompletableFuture indicating if the operation was a success or not
      */
-    public void deleteScannableCodeFromWallet(CollectionReference playerWalletCollection,
-            String scannableCodeId, BooleanCallback booleanCallback) {
+    public CompletableFuture<Boolean> deleteScannableCodeFromWallet(CollectionReference playerWalletCollection,
+            String scannableCodeId) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
         fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId,
                 new BooleanCallback() {
                     @Override
@@ -169,14 +170,15 @@ public class PlayerWalletConnectionHandler {
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                                            booleanCallback.onCallback(true);
+                                            cf.complete(true);
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             Log.w(TAG, "Error deleting document", e);
-                                            booleanCallback.onCallback(false);
+                                            cf.completeExceptionally(new Exception("Error deleting" +
+                                                    "document"));
                                         }
                                     });
                         } else {
@@ -184,6 +186,7 @@ public class PlayerWalletConnectionHandler {
                         }
                     }
                 });
+        return cf;
     }
 
     /**

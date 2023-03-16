@@ -278,7 +278,7 @@ public class TestDatabaseMapper implements DatabasePort {
      *         or an exception if the userId does not exist in the database
      */
     @Override
-    public CompletableFuture<Boolean> removeScannableCode(String userId, String scannableCodeId) {
+    public CompletableFuture<Boolean> removeScannableCodeFromWallet(String userId, String scannableCodeId) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             if (players.containsKey(userId)) {

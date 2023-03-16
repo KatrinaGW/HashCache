@@ -277,21 +277,6 @@ public class DatabaseMapper extends Observable implements DatabasePort {
                             return null;
                         }
                     });
-
-//            PlayersDatabaseAdapter.getInstance().playerScannedCodeAdded(userId, scannableCodeId, null,
-//                    new BooleanCallback() {
-//                        @Override
-//                        public void onCallback(Boolean isTrue) {
-//                            System.out.println("[[ Got response!!!");
-//                            if (isTrue) {
-//                                cf.complete(null);
-//                            } else {
-//                                cf.completeExceptionally(
-//                                        new Exception("Could not add scannable to player wallet, userId: " + userId
-//                                                + " codeId " + scannableCodeId));
-//                            }
-//                        }
-//                    });
         }).exceptionally(new Function<Throwable, Void>() {
             @Override
             public Void apply(Throwable throwable) {
@@ -347,16 +332,20 @@ public class DatabaseMapper extends Observable implements DatabasePort {
      *         or an exception if the userId does not exist in the database
      */
     @Override
-    public CompletableFuture<Boolean> removeScannableCode(String userId, String scannableCodeId) {
+    public CompletableFuture<Boolean> removeScannableCodeFromWallet(String userId, String scannableCodeId) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersDatabaseAdapter.getInstance().playerScannedCodeDeleted(userId, scannableCodeId,
-                    new BooleanCallback() {
-                        @Override
-                        public void onCallback(Boolean isTrue) {
-                            cf.complete(isTrue);
-                        }
-                    });
+            PlayersDatabaseAdapter.getInstance().playerScannedCodeDeleted(userId, scannableCodeId)
+                            .thenAccept(success -> {
+                                cf.complete(success);
+                            })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
         });
         return cf;
     }

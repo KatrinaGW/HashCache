@@ -435,24 +435,18 @@ public class PlayersDatabaseAdapter {
      * 
      * @param userId          the id of the user whose PlayerWallet must be updated
      * @param scannableCodeId the id of the scannable code to delete
-     * @param booleanCallback the callback function to call once the operation has
-     *                        finished. Calls
-     *                        with true if it was successful, and false otherwise
-     *
-     * @throws IllegalArgumentException if there are no users with the given Id
+     * @return cf the CompletableFuture indicating if the operation was successful or not
      */
-    public void playerScannedCodeDeleted(String userId, String scannableCodeId,
-            BooleanCallback booleanCallback) {
+    public CompletableFuture<Boolean> playerScannedCodeDeleted(String userId, String scannableCodeId) {
+        CompletableFuture<Boolean> cf;
 
         CollectionReference scannedCodeCollection = collectionReference
                 .document(userId)
                 .collection(CollectionNames.PLAYER_WALLET.collectionName);
 
-        playerWalletConnectionHandler.deleteScannableCodeFromWallet(scannedCodeCollection,
-                scannableCodeId, booleanCallback);
-    }
+        cf = playerWalletConnectionHandler.deleteScannableCodeFromWallet(scannedCodeCollection,
+                scannableCodeId);
 
-    public void getAppUserNames() {
-
+        return cf;
     }
 }

@@ -115,7 +115,7 @@ public class HashController {
             @Override
             public void run() {
                 // Remove the scannable code from the player's wallet in the database
-                Database.getInstance().removeScannableCode(userId, scannableCodeId)
+                Database.getInstance().removeScannableCodeFromWallet(userId, scannableCodeId)
                         .thenAccept(completed -> {
                             // If the scannable code was deleted successfully, update the current player's wallet
                             if(completed){
