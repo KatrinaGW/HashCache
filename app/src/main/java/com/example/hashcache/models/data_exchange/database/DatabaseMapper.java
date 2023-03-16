@@ -390,18 +390,17 @@ public class DatabaseMapper extends Observable implements DatabasePort {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            PlayersDatabaseAdapter.getInstance().updateContactInfo(userId, contactInfo,
-                    new BooleanCallback() {
-                        @Override
-                        public void onCallback(Boolean isTrue) {
-                            if (isTrue) {
+            PlayersDatabaseAdapter.getInstance().updateContactInfo(userId, contactInfo)
+                            .thenAccept(success -> {
                                 cf.complete(true);
-                            } else {
-                                cf.completeExceptionally(new Exception("Something went wrong " +
-                                        "while updating the contact information"));
-                            }
-                        }
-                    });
+                            })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
         });
 
         return cf;

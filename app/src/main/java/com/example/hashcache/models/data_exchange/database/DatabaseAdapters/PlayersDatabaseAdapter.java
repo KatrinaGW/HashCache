@@ -1,5 +1,6 @@
 package com.example.hashcache.models.data_exchange.database.DatabaseAdapters;
 
+import android.icu.number.CompactNotation;
 import android.media.Image;
 import android.util.Log;
 
@@ -24,6 +25,8 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -240,10 +243,7 @@ public class PlayersDatabaseAdapter {
      * 
      * @param userId            the id of the user to update the preferences for
      * @param playerPreferences the preferences to set for the user
-     * @param booleanCallback   the callback function to call once the operation has
-     *                          finished. Calls
-     *                          with true if the operation was successful, and false
-     *                          otherwise
+     * @return cf the CompletableFuture indicating if the operation was successful or not
      */
     public CompletableFuture<Boolean> updatePlayerPreferences(String userId, PlayerPreferences playerPreferences) {
         DocumentReference documentReference = collectionReference.document(userId);
@@ -286,15 +286,13 @@ public class PlayersDatabaseAdapter {
      * 
      * @param userId          the id of the user to update the preferences for
      * @param contactInfo     the contact information to set for the user
-     * @param booleanCallback the callback function to call once the operation has
-     *                        finished. Calls
-     *                        with true if the operation was successful, and false
-     *                        otherwise
+     * @return cf the CompletableFuture indicating if the operation was successful or not
      */
-    public void updateContactInfo(String userId, ContactInfo contactInfo,
-            BooleanCallback booleanCallback) {
+    public CompletableFuture<Boolean> updateContactInfo(String userId, ContactInfo contactInfo) {
         DocumentReference documentReference = collectionReference.document(userId);
-        setContactInfo(documentReference, contactInfo, booleanCallback);
+        CompletableFuture<Boolean> cf = setContactInfo(documentReference, contactInfo);
+
+        return cf;
     }
 
     /**
@@ -303,15 +301,12 @@ public class PlayersDatabaseAdapter {
      * @param playerDocument  the document of the player to change the preferences
      *                        on
      * @param contactInfo     the contact information to set for the user
-     * @param booleanCallback the callback function to call once the operation has
-     *                        finished. Calls
-     *                        with true if the operation was successful, and false
-     *                        otherwise
+     * @return cf the CompletableFuture indicating if the operation was successful
      *
      *
      */
-    private void setContactInfo(DocumentReference playerDocument, ContactInfo contactInfo,
-            BooleanCallback booleanCallback) {
+    private CompletableFuture<Boolean> setContactInfo(DocumentReference playerDocument, ContactInfo contactInfo) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
         fireStoreHelper.addStringFieldToDocument(playerDocument, FieldNames.EMAIL.fieldName,
                 contactInfo.getEmail(),
                 new BooleanCallback() {
@@ -323,17 +318,19 @@ public class PlayersDatabaseAdapter {
                                         @Override
                                         public void onCallback(Boolean isTrue) {
                                             if (isTrue) {
-                                                booleanCallback.onCallback(true);
+                                                cf.complete(true);
                                             }
                                         }
                                     });
                         } else {
                             Log.e(TAG, "Something went wrong while setting the contact information" +
                                     "of the player document");
-                            booleanCallback.onCallback(false);
+                            cf.completeExceptionally(new Exception("Something went wrong while setting" +
+                                    "the contact information"));
                         }
                     }
                 });
+        return cf;
     }
 
     public ListenerRegistration setupPlayerListener(String userId, GetPlayerCallback callback) {

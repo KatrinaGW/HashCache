@@ -137,11 +137,7 @@ public class MainActivity extends AppCompatActivity {
                     PlayersDatabaseAdapter.getInstance().getPlayers().thenAccept(players -> {
                         DatabaseMapper databaseMapper = new DatabaseMapper();
 
-                        databaseMapper.updatePlayerPreferences("fa13e327-e172-4763-aa3d-a1e49681e0a2",
-                                new PlayerPreferences())
-                                        .thenAccept(thing -> {
-                                            startActivity(goHome);
-                                        });
+                        startActivity(goHome);
 
                     });
 

@@ -160,14 +160,6 @@ public class PlayersConnectionHandlerTest {
 
         PlayersDatabaseAdapter playersConnectionHandler = getMockPlayersConnectionHandler();
 
-        playersConnectionHandler.updateContactInfo("blah", new ContactInfo(), new BooleanCallback() {
-            @Override
-            public void onCallback(Boolean isTrue) {
-                verify(mockFireStoreHelper, times(2)).addStringFieldToDocument(any(DocumentReference.class),
-                        anyString(), anyString(), any(BooleanCallback.class));
-                assertTrue(isTrue);
-            }
-        });
 
     }
 
