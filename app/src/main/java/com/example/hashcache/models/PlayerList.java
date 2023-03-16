@@ -92,27 +92,6 @@ public class PlayerList {
     }
 
     /**
-     * Adds a player to the database
-     * @param username the username of the player to add
-     * @return success indicates if the user was successfully added or not
-     */
-    public boolean addPlayer(String username, GetStringCallback getStringCallback){
-        boolean success = true;
-
-        if(!this.playerUserNames.contains(username)){
-            try{
-                this.playersConnectionHandler.createPlayer(username, getStringCallback);
-            }catch (IllegalArgumentException e){
-                success = false;
-            }
-        }else{
-            throw new IllegalArgumentException("Given username already exists!");
-        }
-
-        return success;
-    }
-
-    /**
      * Will return a sorted list of players of those who in some since match the search term.
      * Will sort by how closely the players match the term.
      * Will

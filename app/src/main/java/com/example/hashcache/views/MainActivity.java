@@ -137,15 +137,7 @@ public class MainActivity extends AppCompatActivity {
                     PlayersDatabaseAdapter.getInstance().getPlayers().thenAccept(players -> {
                         DatabaseMapper databaseMapper = new DatabaseMapper();
 
-                        databaseMapper.removeScannableCodeFromWallet("fa13e327-e172-4763-aa3d-a1e49681e0a2",
-                                "fakeID").thenAccept(
-                                        thiung->{startActivity(goHome);}
-                        ).exceptionally(new Function<Throwable, Void>() {
-                            @Override
-                            public Void apply(Throwable throwable) {
-                                return null;
-                            }
-                        });
+                        startActivity(goHome);
 
                     });
 

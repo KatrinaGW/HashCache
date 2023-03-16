@@ -84,12 +84,17 @@ public class DatabaseMapper extends Observable implements DatabasePort {
         CompletableFuture.runAsync(() -> {
             usernameExists(username).thenAccept(exists -> {
                 if (!exists) {
-                    PlayersDatabaseAdapter.getInstance().createPlayer(username, new GetStringCallback() {
-                        @Override
-                        public void onCallback(String callbackString) {
-                            cf.complete(null);
-                        }
-                    });
+                    PlayersDatabaseAdapter.getInstance().createPlayer(username)
+                                    .thenAccept(userId -> {
+                                        cf.complete(null);
+                                    }).exceptionally(new Function<Throwable, Void>() {
+                                @Override
+                                public Void apply(Throwable throwable) {
+                                    System.out.println("There was an error getting the scannableCodes.");
+                                    cf.completeExceptionally(throwable);
+                                    return null;
+                                }
+                            });
                 } else {
                     cf.completeExceptionally(new Exception("Username already exists"));
                 }

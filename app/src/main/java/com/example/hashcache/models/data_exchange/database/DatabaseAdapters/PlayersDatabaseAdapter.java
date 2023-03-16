@@ -353,35 +353,15 @@ public class PlayersDatabaseAdapter {
         });
         return registration;
     }
-    /**
-     * Set the username field on a player's document
-     * 
-     * @param playerDocument  the document of the player to set the username field
-     *                        on
-     * @param username        the username to set on the document
-     * @param booleanCallback the callback function to call once the operation has
-     *                        finished, calls
-     *                        with true if successful, and false otherwise
-     * @throws IllegalArgumentException if there already is a user with the username
-     */
-    private void setUserName(DocumentReference playerDocument, String username,
-            BooleanCallback booleanCallback) {
-        this.fireStoreHelper.addStringFieldToDocument(playerDocument, FieldNames.USERNAME.fieldName,
-                username, booleanCallback);
-    }
 
     /**
      * Sets the id of a new document with the userId
      * 
      * @param username          the username of the user
-     * @param getStringCallback the callback function to call once the operation has
-     *                          finished. Calls
-     *                          with the userId if the operation was successful, and
-     *                          null otherwise
-     * @throws IllegalArgumentException if there already is a document with the
-     *                                  given userId
+     * @return cf the CompletableFuture with the new userId
      */
-    public void createPlayer(String username, GetStringCallback getStringCallback) {
+    public CompletableFuture<String> createPlayer(String username) {
+        CompletableFuture<String> cf = new CompletableFuture<>();
         HashMap<String, String> data = new HashMap<>();
         data.put(FieldNames.USERNAME.fieldName, username);
         data.put(FieldNames.EMAIL.fieldName, "");
@@ -393,14 +373,17 @@ public class PlayersDatabaseAdapter {
                     @Override
                     public void onCallback(Boolean isTrue) {
                         if (isTrue) {
-                            getStringCallback.onCallback(userId);
+                            cf.complete(userId);
                         } else {
                             Log.e(TAG, "Something went wrong while setting the userId" +
                                     "on a new Playerdocument");
-                            getStringCallback.onCallback(null);
+                            cf.completeExceptionally(new Exception("Something went wrong while " +
+                                    "setting the userId on the new PlayerDocument"));
                         }
                     }
                 });
+
+        return cf;
     }
 
     /**
@@ -410,11 +393,7 @@ public class PlayersDatabaseAdapter {
      * @param scannableCodeId the id of the scannable code to add
      * @param locationImage   the image of the location where the user scanned the
      *                        code
-     * @param booleanCallback the callback function to call once the operation has
-     *                        finished. Calls
-     *                        with true if it was successful, and false otherwise
-     *
-     * @throws IllegalArgumentException if there are no users with the given Id
+     * @return cf the CompletableFuture indicating if the operation was a success or not
      */
     public CompletableFuture<Void> playerScannedCodeAdded(String userId, String scannableCodeId,
             Image locationImage) {
