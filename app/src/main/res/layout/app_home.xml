@@ -57,11 +57,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/header">
-        <View
-            android:id="@+id/temp_map"
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            android:background="#BCC4C8" />
+            tools:context=".MapsActivity" />
         <ImageButton
             android:id="@+id/map_button"
             android:layout_width="55dp"
@@ -81,7 +84,7 @@
             app:tint="@color/black"
             android:src="@android:drawable/ic_menu_myplaces"
             android:layout_alignParentEnd="true"
-            android:layout_alignBottom="@id/temp_map"
+            android:layout_alignBottom="@id/map"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             android:layout_marginEnd="24dp"

@@ -141,7 +141,7 @@ public class AppHome extends AppCompatActivity implements Observer {
         mMenuButton = findViewById(R.id.menu_button);
         mMapButton = findViewById(R.id.map_button);
         mCommunityButton = findViewById(R.id.community_button);
-        mTempMap = findViewById(R.id.temp_map);
+        mTempMap = findViewById(R.id.map);
         mScanQrButton = findViewById(R.id.scan_qr_button);
     }
 
