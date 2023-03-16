@@ -1,5 +1,7 @@
 package com.example.hashcache.models.database;
 
+import java.util.Observable;
+
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
@@ -16,6 +18,7 @@ import com.example.hashcache.models.database_connections.callbacks.GetStringCall
 import com.example.hashcache.models.database_connections.values.CollectionNames;
 import com.example.hashcache.store.AppStore;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import org.checkerframework.checker.units.qual.C;
 
@@ -31,7 +34,7 @@ import java.util.function.Function;
  * It implements the IPlayerDatabase interface which defines the methods that
  * can be performed on the database.
  */
-public class PlayerDatabase implements IPlayerDatabase {
+public class PlayerDatabase extends Observable implements IPlayerDatabase {
     /**
      * Singleton instance of the PlayerDatabase class.
      */
@@ -48,6 +51,9 @@ public class PlayerDatabase implements IPlayerDatabase {
      * HashMap that contains all the scannable codes in the database.
      */
     private HashMap<String, ScannableCode> scannableCodeHashMap;
+
+    private ListenerRegistration playerListener;
+    private ListenerRegistration walletListener;
 
     /**
      * Checks if a username already exists in the database.
@@ -101,23 +107,24 @@ public class PlayerDatabase implements IPlayerDatabase {
 
     /**
      * Get all the Scannable Codes whose ids are in a given list
+     * 
      * @param scannableCodeIds the list of ids of scannable codes to get
      * @return cf the CompleteableFuture with the list of ScannableCodes
      */
-    public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds){
+    public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             ScannableCodesConnectionHandler.getInstance()
                     .getScannableCodesByIdInList(scannableCodeIds).thenAccept(scannableCodes -> {
-                cf.complete(scannableCodes);
-            }).exceptionally(new Function<Throwable, Void>() {
-                @Override
-                public Void apply(Throwable throwable) {
-                    System.out.println("There was an error getting the scannableCodes.");
-                    cf.completeExceptionally(throwable);
-                    return null;
-                }
-            });
+                        cf.complete(scannableCodes);
+                    }).exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            System.out.println("There was an error getting the scannableCodes.");
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
 
         });
         return cf;
@@ -163,12 +170,11 @@ public class PlayerDatabase implements IPlayerDatabase {
     public CompletableFuture<HashMap<String, String>> getPlayers() {
         CompletableFuture<HashMap<String, String>> cf = new CompletableFuture<>();
 
-        CompletableFuture.runAsync(()->{
+        CompletableFuture.runAsync(() -> {
             PlayersConnectionHandler.getInstance().getPlayers().thenAccept(
                     players -> {
                         cf.complete(players);
-                    }
-            );
+                    });
         });
 
         return cf;
@@ -266,18 +272,20 @@ public class PlayerDatabase implements IPlayerDatabase {
         System.out.println("[[ Trying to add to wallet...");
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-           PlayersConnectionHandler.getInstance().playerScannedCodeAdded(userId, scannableCodeId, null, new BooleanCallback() {
-               @Override
-               public void onCallback(Boolean isTrue) {
-                   System.out.println("[[ Got response!!!");
-                   if(isTrue){
-                       cf.complete(null);
-                   }
-                   else{
-                       cf.completeExceptionally(new Exception("Could not add scannable to player wallet, userId: " + userId + " codeId " + scannableCodeId));
-                   }
-               }
-           });
+            PlayersConnectionHandler.getInstance().playerScannedCodeAdded(userId, scannableCodeId, null,
+                    new BooleanCallback() {
+                        @Override
+                        public void onCallback(Boolean isTrue) {
+                            System.out.println("[[ Got response!!!");
+                            if (isTrue) {
+                                cf.complete(null);
+                            } else {
+                                cf.completeExceptionally(
+                                        new Exception("Could not add scannable to player wallet, userId: " + userId
+                                                + " codeId " + scannableCodeId));
+                            }
+                        }
+                    });
         }).exceptionally(new Function<Throwable, Void>() {
             @Override
             public Void apply(Throwable throwable) {
@@ -286,6 +294,11 @@ public class PlayerDatabase implements IPlayerDatabase {
             }
         });
         return cf;
+    }
+
+    @Override
+    public CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId) {
+        return PlayerWalletConnectionHandler.getInstance().scannableCodeExistsOnPlayerWallet(userId, scannableCodeId);
     }
 
     @Override
@@ -307,11 +320,11 @@ public class PlayerDatabase implements IPlayerDatabase {
             ScannableCodesConnectionHandler.getInstance().addScannableCode(scannableCode, new BooleanCallback() {
                 @Override
                 public void onCallback(Boolean isTrue) {
-                    if(isTrue){
+                    if (isTrue) {
                         cf.complete(scannableCode.getScannableCodeId());
-                    }
-                    else{
-                        cf.completeExceptionally(new Exception("Could not add ScannableCode ID: " + scannableCode.getScannableCodeId()));
+                    } else {
+                        cf.completeExceptionally(
+                                new Exception("Could not add ScannableCode ID: " + scannableCode.getScannableCodeId()));
                     }
                 }
             });
@@ -372,12 +385,14 @@ public class PlayerDatabase implements IPlayerDatabase {
 
     /**
      * Update a user's contact information
+     * 
      * @param contactInfo the contact information to set for the user
-     * @param userId the id of the user to update the contact information of
-     * @return cf the CompleteableFuture with a boolean value indicating if it was successful
+     * @param userId      the id of the user to update the contact information of
+     * @return cf the CompleteableFuture with a boolean value indicating if it was
+     *         successful
      */
     @Override
-    public CompletableFuture<Boolean> updateContactInfo(ContactInfo contactInfo, String userId){
+    public CompletableFuture<Boolean> updateContactInfo(ContactInfo contactInfo, String userId) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
@@ -385,9 +400,9 @@ public class PlayerDatabase implements IPlayerDatabase {
                     new BooleanCallback() {
                         @Override
                         public void onCallback(Boolean isTrue) {
-                            if(isTrue){
+                            if (isTrue) {
                                 cf.complete(true);
-                            }else{
+                            } else {
                                 cf.completeExceptionally(new Exception("Something went wrong " +
                                         "while updating the contact information"));
                             }
@@ -396,40 +411,56 @@ public class PlayerDatabase implements IPlayerDatabase {
         });
 
         return cf;
-    };
+    }
+
+    @Override
+    public void onPlayerDataChanged(String playerId, GetPlayerCallback callback) {
+        playerListener = PlayersConnectionHandler.getInstance().setupPlayerListener(playerId, callback);
+    }
+
+    @Override
+    public void onPlayerWalletChanged(String playerId, BooleanCallback callback) {
+        walletListener = PlayerWalletConnectionHandler.getInstance().getPlayerWalletChangeListener(playerId, callback);
+    }
+
+    ;
 
     /**
      * Get the player's highest scoring QR code
-     * @param scannableCodeIds the scannableIds to find the highest scoring scannableId
+     * 
+     * @param scannableCodeIds the scannableIds to find the highest scoring
+     *                         scannableId
      * @return cf the CompletableFuture with the QR Stats
      */
     @Override
-    public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds){
+    public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-        PlayerWalletConnectionHandler.getInstance()
-                .getPlayerWalletTopScore(scannableCodeIds)
-                .thenAccept(topScore -> {
-                    cf.complete(topScore);
-                })
-                .exceptionally(new Function<Throwable, Void>() {
-                    @Override
-                    public Void apply(Throwable throwable) {
-                        cf.completeExceptionally(throwable);
-                        return null;
-                    }
-                });
+            PlayerWalletConnectionHandler.getInstance()
+                    .getPlayerWalletTopScore(scannableCodeIds)
+                    .thenAccept(topScore -> {
+                        cf.complete(topScore);
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
         });
         return cf;
     }
 
     /**
      * Get the player's lowest scoring QR code
-     * @param scannableCodeIds the scannableIds to find the lowest scoring scannableId
+     * 
+     * @param scannableCodeIds the scannableIds to find the lowest scoring
+     *                         scannableId
      * @return cf the CompletableFuture with the QR Stats
      */
     @Override
-    public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds){
+    public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             PlayerWalletConnectionHandler.getInstance()
@@ -450,11 +481,12 @@ public class PlayerDatabase implements IPlayerDatabase {
 
     /**
      * Gets the total score of all scannableCodeIds in a list
+     * 
      * @param scannableCodeIds the ids of codes to sum
      * @return cf the CompletableFuture that contains the total score
      */
     @Override
-    public CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds){
+    public CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<Long> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             PlayerWalletConnectionHandler.getInstance()
@@ -476,26 +508,32 @@ public class PlayerDatabase implements IPlayerDatabase {
     /**
      * Gets a scannable code from the database with a specific id
      *
-     * @param scannableCodeId          the id of the scannable code to get
+     * @param scannableCodeId the id of the scannable code to get
      * @return cf the CompleteableFuture with the found scannableCode
      */
     @Override
-    public CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId){
+    public CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            ScannableCodesConnectionHandler.getInstance().getScannableCode(scannableCodeId, new GetScannableCodeCallback() {
-                @Override
-                public void onCallback(ScannableCode scannableCode) {
-                    if(scannableCode!=null){
-                        cf.complete(scannableCode);
-                    }else{
-                        cf.completeExceptionally(new Exception("Something went wrong while " +
-                                "getting the scannableCode!"));
-                    }
-                }
-            });
+            ScannableCodesConnectionHandler.getInstance().getScannableCode(scannableCodeId,
+                    new GetScannableCodeCallback() {
+                        @Override
+                        public void onCallback(ScannableCode scannableCode) {
+                            if (scannableCode != null) {
+                                cf.complete(scannableCode);
+                            } else {
+                                cf.completeExceptionally(new Exception("Something went wrong while " +
+                                        "getting the scannableCode!"));
+                            }
+                        }
+                    });
         });
         return cf;
+    }
+
+    private void triggerObservers() {
+        setChanged();
+        notifyObservers();
     }
 
 }

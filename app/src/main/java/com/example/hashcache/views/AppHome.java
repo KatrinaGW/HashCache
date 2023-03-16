@@ -22,6 +22,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
@@ -32,7 +35,7 @@ import com.example.hashcache.store.AppStore;
 
  Displays a map centered on the user's location, with pins indicating QR codes scanned by the user and others.
  */
-public class AppHome extends AppCompatActivity {
+public class AppHome extends AppCompatActivity implements Observer {
 
     private ImageButton mLogoButton;
     private TextView mUsernameTextView;
@@ -51,10 +54,6 @@ public class AppHome extends AppCompatActivity {
         setContentView(R.layout.app_home);
         initView();
 
-        TextView playerName = findViewById(R.id.username_textview);
-
-        playerInfo = AppStore.get().getCurrentPlayer();
-        setUsername(playerInfo.getUsername());
         // add functionality to logo button
         ImageButton logoButton = findViewById(R.id.logo_button);
         logoButton.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +104,9 @@ public class AppHome extends AppCompatActivity {
                 bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
         });
+        playerInfo = AppStore.get().getCurrentPlayer();
+        setUIParams();
+        AppStore.get().addObserver(this);
     }
 
     private void initView() {
@@ -121,11 +123,7 @@ public class AppHome extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Database.getInstance()
-                .getPlayerWalletTotalScore(playerInfo.getPlayerWallet().getScannedCodeIds())
-                .thenAccept(totalScore -> {
-                    this.setScore(totalScore);
-                });
+        setUIParams();
     }
     /**
 
@@ -209,4 +207,20 @@ public class AppHome extends AppCompatActivity {
         mTempMap.setOnClickListener(listener);
     }
 
+    @Override
+    public void update(Observable observable, Object o) {
+        setUIParams();
+    }
+
+    public void setUIParams(){
+        Player currentPlayer = AppStore.get().getCurrentPlayer();
+        setUsername(currentPlayer.getUsername());
+        setScore(currentPlayer.getTotalScore());
+
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        super.onPointerCaptureChanged(hasCapture);
+    }
 }

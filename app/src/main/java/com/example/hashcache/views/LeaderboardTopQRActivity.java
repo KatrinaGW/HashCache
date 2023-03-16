@@ -51,7 +51,12 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
         Database.getInstance()
                 .getTotalScore(AppStore.get().getCurrentPlayer().getUserId())
                 .thenAccept( score -> {
-                    playerTopQrScore.set(score);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            playerTopQrScore.set(score);
+                        }
+                    });
                 });
         playersTopQrCode.setText(String.valueOf(playerTopQrScore));
 

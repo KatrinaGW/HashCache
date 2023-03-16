@@ -53,6 +53,7 @@ public class AddUserCommand {
         Database.getInstance().getIdByUsername(userName).thenAccept(userId -> {
             Database.getInstance().getPlayer(userId).thenAccept(player -> {
                 AppStore.get().setCurrentPlayer(player);
+                AppStore.get().setupListeners();
                 cf.complete(null);
             }).exceptionally(new Function<Throwable, Void>() {
                 @Override

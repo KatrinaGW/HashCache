@@ -10,9 +10,10 @@ import java.util.UUID;
  * Represents a user with an id, username, contact info, preferences, and scannable codes
  */
 public class Player{
-    private static Player INSTANCE;
     private String username;
     private String userId;
+    private long totalScore;
+    private long lowestScore;
     private ContactInfo contactInfo;
     private PlayerPreferences playerPreferences;
     private PlayerWallet playerWallet;
@@ -27,6 +28,8 @@ public class Player{
         this.contactInfo = new ContactInfo();
         this.playerPreferences = new PlayerPreferences();
         this.playerWallet = new PlayerWallet();
+        this.totalScore = 0;
+        this.lowestScore = 0;
     }
 
 
@@ -44,14 +47,8 @@ public class Player{
         this.contactInfo = contactInfo;
         this.playerPreferences = playerPreferences;
         this.playerWallet = playerWallet;
-    }
-
-    public static Player getInstance() {
-        if(INSTANCE == null) {
-            throw new IllegalArgumentException("INSTANCE is not defined");
-        }
-
-        return INSTANCE;
+        this.totalScore = 0;
+        this.lowestScore = 0;
     }
 
 
@@ -79,6 +76,22 @@ public class Player{
         return this.username;
     }
 
+    public long getTotalScore(){
+        return this.totalScore;
+    }
+
+    public void setTotalScore(long score){
+        this.totalScore = score;
+    }
+
+    public long getLowestScore(){
+        return this.lowestScore;
+    }
+
+    public void setLowestScore(long score){
+        this.totalScore = score;
+    }
+
     /**
      * Gets the player's current contact information
      * @return contactInfo The player's current contact information
@@ -96,6 +109,10 @@ public class Player{
         return this.playerPreferences;
     }
 
+    /**
+     * Sets the player's current preferences
+     * @param preferences the preferences to use for the user
+     */
     public void setPlayerPreferences(PlayerPreferences preferences){
         this.playerPreferences = preferences;
     }

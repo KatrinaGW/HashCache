@@ -20,6 +20,13 @@ import com.example.hashcache.store.AppStore;
 
 import java.util.ArrayList;
 import java.util.function.Function;
+/**
+
+ The OtherCacheActivity displays a view of another player's cache.
+ The activity displays the username of the other player, a list of their scannable codes,
+ and the total score of the scannable codes.
+ It also allows the user to navigate to other pages within the application via a popup menu.
+ */
 
 public class OtherCacheActivity extends AppCompatActivity {
     private TextView otherUsernameHeader;
@@ -30,6 +37,11 @@ public class OtherCacheActivity extends AppCompatActivity {
     private ListView scannableCodesList;
     Player player;
     private boolean afterOnCreate;
+    /**
+     * Called when the activity is starting. Initializes the activity and its associated layout.
+     *
+     * @param savedInstanceState Bundle object containing the activity's previously saved state, if any.
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_other_cache);
@@ -55,7 +67,10 @@ public class OtherCacheActivity extends AppCompatActivity {
             }
         });
     }
-
+    /**
+     * Called when the activity has become visible and is in the foreground.
+     * Updates the adapter values if the activity is not after the onCreate method.
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -66,7 +81,14 @@ public class OtherCacheActivity extends AppCompatActivity {
             afterOnCreate = false;
         }
     }
+    /**
 
+     Sets the click listener for the scannable codes list view.
+
+     When a scannable code is clicked, the current scannable code in the AppStore is set to the clicked code,
+
+     and the DisplayMonsterActivity is launched with the "belongsToCurrentUser" flag set to false.
+     */
     private void setListViewButtonListener(){
         scannableCodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -81,7 +103,16 @@ public class OtherCacheActivity extends AppCompatActivity {
             }
         });
     }
+    /**
 
+     Sets the adapter values for the scannable codes list view and the user score header.
+
+     Retrieves the list of scannable codes from the player's wallet, sets the adapter for the scannable codes list view,
+
+     and sets the click listener for the list view.
+
+     Retrieves the total score for the player's wallet and updates the user score header.
+     */
     private void setAdapterValues(){
 
         Database.getInstance()
@@ -95,7 +126,6 @@ public class OtherCacheActivity extends AppCompatActivity {
                 }).exceptionally(new Function<Throwable, Void>() {
                     @Override
                     public Void apply(Throwable throwable) {
-                        System.out.println(throwable);
                         return null;
                     }
                 });
@@ -103,7 +133,12 @@ public class OtherCacheActivity extends AppCompatActivity {
         Database.getInstance()
                 .getPlayerWalletTotalScore(player.getPlayerWallet().getScannedCodeIds())
                 .thenAccept(totalScore -> {
-                    this.otherUserScoreHeader.setText(Long.toString(totalScore));
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            otherUserScoreHeader.setText(Long.toString(totalScore));
+                        }
+                    });
                 });
     }
 }

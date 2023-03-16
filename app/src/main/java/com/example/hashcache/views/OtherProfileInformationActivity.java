@@ -15,14 +15,23 @@ import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
+/**
 
+ OtherProfileInformationActivity displays the public profile information of another player.
+ It includes their username, email, and phone number if available.
+ It also allows the current user to view the scannable codes of the selected player.
+ */
 public class OtherProfileInformationActivity extends AppCompatActivity {
     private TextView otherUsernameView;
     private TextView otherEmailView;
     private TextView otherPhoneNumberView;
     private Player otherPlayer;
     private Button viewCacheButton;
-
+    /**
+     * Called when the activity is starting. Initializes the activity and its associated layout.
+     *
+     * @param savedInstanceState Bundle object containing the activity's previously saved state, if any.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +79,9 @@ public class OtherProfileInformationActivity extends AppCompatActivity {
             }
         });
     }
-
+    /**
+     * Sets the public profile information of the selected player in the appropriate views.
+     */
     private void setValues(){
         this.otherUsernameView.setText(otherPlayer.getUsername());
 
