@@ -9,12 +9,15 @@
 
 package com.example.hashcache.views;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,12 +25,14 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -41,10 +46,18 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
+import com.google.android.libraries.places.api.net.PlacesClient;
 
 /**
 
@@ -64,19 +77,33 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
     private AppCompatButton mScanQrButton;
     private Player playerInfo;
 
-    private boolean locationPermissionGranted;
-
+    private static final String TAG = AppHome.class.getSimpleName();
     private GoogleMap map;
+    private CameraPosition cameraPosition;
 
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
-    private Location lastKnownLocation;
 
+    // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient fusedLocationProviderClient;
 
+    // A default location (Sydney, Australia) and default zoom to use when location permission is
+    // not granted.
+    private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 15;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private boolean locationPermissionGranted;
 
-    private final LatLng defaultLocation = new LatLng(45.56312107881602, -81.46643526230866);
+    // The geographical location where the device is currently located. That is, the last-known
+    // location retrieved by the Fused Location Provider.
+    private Location lastKnownLocation;
+
+    // Keys for storing activity state.
+    private static final String KEY_CAMERA_POSITION = "camera_position";
+    private static final String KEY_LOCATION = "location";
+
+    SharedPreferences settings;
+
+
 
 
     @Override
@@ -85,9 +112,24 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         setContentView(R.layout.app_home);
         initView();
 
+        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
+        SharedPreferences.Editor editor = settings.edit();
 
 
-        //get the map fragment
+        // Retrieve location and camera position from saved instance state.
+        if (savedInstanceState != null) {
+            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+        }
+
+        // Retrieve the content view that renders the map
+
+
+
+        // Construct a FusedLocationProviderClient.
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Build the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -168,22 +210,40 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                 menu.show();
             }
         });
+
         playerInfo = AppStore.get().getCurrentPlayer();
         setUIParams();
         AppStore.get().addObserver(this);
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
     }
+
+
+
+    /**
+     * Saves the state of the map when the activity is paused.
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (map != null) {
+            outState.putParcelable(KEY_CAMERA_POSITION, map.getCameraPosition());
+            outState.putParcelable(KEY_LOCATION, lastKnownLocation);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+
 
     //runs when the map is ready to receive user input
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.map = googleMap;
-        googleMap.addMarker(new MarkerOptions()
-                .position(new LatLng(0, 0))
-                .title("Marker"));
+
+
         getLocationPermission();
+
         updateLocationUI();
-        getDeviceLocation();
+
+        //getDeviceLocation();
     }
 
 
@@ -220,7 +280,6 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
         updateLocationUI();
-        getDeviceLocation();
     }
     //Updates the map's UI settings based on whether the user has granted location permission.
     private void updateLocationUI() {
@@ -241,6 +300,8 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
             Log.e("Exception: %s", e.getMessage());
         }
     }
+
+
 
 
     private void getDeviceLocation() {
