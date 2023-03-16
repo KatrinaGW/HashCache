@@ -114,15 +114,6 @@ public class PlayerList {
     }
 
     /**
-     * Gets a player with a given username
-     * @param username the username of the player to find
-     * @param getPlayerCallback callback function to get username after asynchronous firestore call
-     */
-    public void getPlayer(String username, GetPlayerCallback getPlayerCallback){
-        this.playersConnectionHandler.getPlayer(username, getPlayerCallback);
-    }
-
-    /**
      * Will return a sorted list of players of those who in some since match the search term.
      * Will sort by how closely the players match the term.
      * Will

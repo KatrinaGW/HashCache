@@ -250,63 +250,6 @@ public class PlayersDatabaseAdapter {
     }
 
     /**
-     * Gets a Player with a given username from the Players database
-     *
-     * @param userName          the username to use to pull the player with
-     * @param getPlayerCallback the callback function to call with the player once
-     *                          it has
-     *                          been found
-     * @throws IllegalArgumentException if the given username does not belong to a
-     *                                  player
-     */
-    public void getPlayer(String userName, GetPlayerCallback getPlayerCallback) {
-        final Player[] player = new Player[1];
-
-        if (cachedPlayers.keySet().contains(userName)) {
-            player[0] = cachedPlayers.get(userName);
-        } else {
-            DocumentReference documentReference = collectionReference.document(
-                    inAppUsernamesIds.get(userName));
-
-            /**
-             * Gets the document from the collection with the given userId, and throws an
-             * error
-             * if a document with the id cannot be found
-             */
-            documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            Log.d(TAG, "Document exists!");
-
-                            /**
-                             * Converts the document into a Player object, and calls the given
-                             * callback function with it
-                             */
-                            playerDataAdapter.getPlayerFromDocument(documentReference,
-                                    new GetPlayerCallback() {
-                                        @Override
-                                        public void onCallback(Player player) {
-                                            cachedPlayers.put(userName, player);
-                                            Log.d(TAG, "FIND DONE");
-                                            getPlayerCallback.onCallback(player);
-                                        }
-                                    });
-                        } else {
-                            Log.d(TAG, "Document does not exist!");
-                            throw new IllegalArgumentException("Given username does not exist!");
-                        }
-                    } else {
-                        Log.d(TAG, "Failed with: ", task.getException());
-                    }
-                }
-            });
-        }
-    }
-
-    /**
      * Updates the player preferences of an existing user
      * 
      * @param userId            the id of the user to update the preferences for
