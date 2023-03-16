@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
+import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.ScannableCode;
@@ -132,13 +133,17 @@ public class MainActivity extends AppCompatActivity {
 
                     PlayersDatabaseAdapter.getInstance().getPlayers().thenAccept(players -> {
                         DatabaseMapper databaseMapper = new DatabaseMapper();
-                        ScannableCode scannableCode = new ScannableCode("blah blad", new HashInfo(
-                                null, "name!!!!", 123), "hifsjkfdskjsdf"
-                        );
-                        databaseMapper.addScannableCode(scannableCode)
-                                        .thenAccept(id -> {
-                                            startActivity(goHome);
-                                        });
+                        Comment newComment = new Comment("userId", "frankie");
+//                        databaseMapper.addComment("106ad662b78db086d0168f18a6a0dbcc4fe1df41bb6df94413d490b5c02daf84",
+//                                newComment).
+//                                thenAccept(success -> {
+//                                    startActivity(goHome);
+//                                });
+                        databaseMapper.deleteComment("106ad662b78db086d0168f18a6a0dbcc4fe1df41bb6df94413d490b5c02daf84",
+                                "798b20b7-e2c6-4d9a-a4ff-63ba276bb005")
+                                .thenAccept(success -> {
+                                    startActivity(goHome);
+                                });
 
                     });
 

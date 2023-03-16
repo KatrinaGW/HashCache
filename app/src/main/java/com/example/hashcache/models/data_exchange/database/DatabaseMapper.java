@@ -220,19 +220,21 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     public CompletableFuture<Void> addComment(String scannableCodeId, Comment comment) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            ScannableCodesDatabaseAdapter.getInstance().addComment(scannableCodeId, comment, new BooleanCallback() {
-                @Override
-                public void onCallback(Boolean isTrue) {
-                    if (isTrue) {
-                        cf.complete(null);
-                    } else {
-                        cf.completeExceptionally(new Exception("Could not add comment."));
-                    }
-                }
-            });
+            ScannableCodesDatabaseAdapter.getInstance().addComment(scannableCodeId, comment)
+                            .thenAccept(success -> {
+                                cf.complete(null);
+                            }).exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
         });
         return cf;
     }
+
+
 
     /**
      * Updates the player preferences for a given user.
@@ -415,6 +417,14 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     @Override
     public void onPlayerWalletChanged(String playerId, BooleanCallback callback) {
         walletListener = PlayerWalletConnectionHandler.getInstance().getPlayerWalletChangeListener(playerId, callback);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> deleteComment(String scannableCodeId, String commentId){
+        CompletableFuture<Boolean> cf = ScannableCodesDatabaseAdapter.getInstance().deleteComment(
+                scannableCodeId, commentId
+        );
+        return cf;
     }
 
     ;
