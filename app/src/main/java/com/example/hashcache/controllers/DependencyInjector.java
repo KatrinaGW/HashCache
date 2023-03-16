@@ -2,17 +2,13 @@ package com.example.hashcache.controllers;
 
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
-import com.example.hashcache.models.data_exchange.data_adapters.CodeLocationDataAdapter;
-import com.example.hashcache.models.data_exchange.data_adapters.PlayerDataAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.PlayerDocumentConverter;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayerWalletConnectionHandler;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
-import com.example.hashcache.models.data_exchange.data_adapters.ScannableCodeDataAdapter;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.ScannableCodeDocumentConverter;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.HashMap;
 
@@ -58,7 +54,7 @@ public class DependencyInjector {
             String> inAppUsernamesIds){
         FireStoreHelper fireStoreHelper = new FireStoreHelper();
 
-        return PlayersDatabaseAdapter.makeInstance(inAppUsernamesIds, new PlayerDataAdapter(),
+        return PlayersDatabaseAdapter.makeInstance(inAppUsernamesIds, new PlayerDocumentConverter(),
                 fireStoreHelper, FirebaseFirestore.getInstance(), new PlayerWalletConnectionHandler(fireStoreHelper));
     }
 

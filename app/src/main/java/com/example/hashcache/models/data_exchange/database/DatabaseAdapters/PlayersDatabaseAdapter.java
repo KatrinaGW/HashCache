@@ -1,15 +1,13 @@
 package com.example.hashcache.models.data_exchange.database.DatabaseAdapters;
 
-import android.icu.number.CompactNotation;
 import android.media.Image;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.data_exchange.data_adapters.PlayerDataAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.PlayerDocumentConverter;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetStringCallback;
 import com.example.hashcache.models.data_exchange.database.values.CollectionNames;
 import com.example.hashcache.models.data_exchange.database.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;
@@ -26,8 +24,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.checkerframework.checker.units.qual.C;
-
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -41,7 +37,7 @@ public class PlayersDatabaseAdapter {
     private CollectionReference collectionReference;
     private HashMap<String, Player> cachedPlayers;
     final String TAG = "Sample";
-    private PlayerDataAdapter playerDataAdapter;
+    private PlayerDocumentConverter playerDocumentConverter;
     private FireStoreHelper fireStoreHelper;
     private PlayerWalletConnectionHandler playerWalletConnectionHandler;
     private static PlayersDatabaseAdapter INSTANCE;
@@ -51,7 +47,7 @@ public class PlayersDatabaseAdapter {
      * database
      * 
      * @param inAppNamesIds                 a mapping of userIds to their usernames
-     * @param playerDataAdapter       the instance of the
+     * @param playerDocumentConverter       the instance of the
      *                                      PlayerDocumentConverter class
      *                                      to use to convert documents into Player
      *                                      objects
@@ -65,11 +61,11 @@ public class PlayersDatabaseAdapter {
      *                                      wallet collection
      */
     private PlayersDatabaseAdapter(HashMap<String, String> inAppNamesIds,
-                                   PlayerDataAdapter playerDataAdapter,
+                                   PlayerDocumentConverter playerDocumentConverter,
                                    FireStoreHelper fireStoreHelper,
                                    FirebaseFirestore db, PlayerWalletConnectionHandler playerWalletConnectionHandler) {
         this.cachedPlayers = new HashMap<>();
-        this.playerDataAdapter = playerDataAdapter;
+        this.playerDocumentConverter = playerDocumentConverter;
         this.fireStoreHelper = fireStoreHelper;
         this.playerWalletConnectionHandler = playerWalletConnectionHandler;
         this.db = db;
@@ -97,7 +93,7 @@ public class PlayersDatabaseAdapter {
      * its dependencies
      * 
      * @param inAppNamesIds                 a mapping of userIds to their usernames
-     * @param playerDataAdapter       the instance of the
+     * @param playerDocumentConverter       the instance of the
      *                                      PlayerDocumentConverter class
      *                                      to use to convert documents into Player
      *                                      objects
@@ -115,14 +111,14 @@ public class PlayersDatabaseAdapter {
      * @throws IllegalArgumentException if the INSTANCE has already been initialized
      */
     public static PlayersDatabaseAdapter makeInstance(HashMap<String, String> inAppNamesIds,
-                                                      PlayerDataAdapter playerDataAdapter,
+                                                      PlayerDocumentConverter playerDocumentConverter,
                                                       FireStoreHelper fireStoreHelper,
                                                       FirebaseFirestore db,
                                                       PlayerWalletConnectionHandler playerWalletConnectionHandler) {
         if (INSTANCE != null) {
             throw new IllegalArgumentException("Instance of PlayersConnectionHandler already exists!");
         }
-        INSTANCE = new PlayersDatabaseAdapter(inAppNamesIds, playerDataAdapter,
+        INSTANCE = new PlayersDatabaseAdapter(inAppNamesIds, playerDocumentConverter,
                 fireStoreHelper, db, playerWalletConnectionHandler);
         return INSTANCE;
     }
@@ -221,10 +217,18 @@ public class PlayersDatabaseAdapter {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        playerDataAdapter.getPlayerFromDocument(documentReference,
-                                player -> {
-                                    cf.complete(player);
-                                });
+                        playerDocumentConverter.getPlayerFromDocument(documentReference)
+                                        .thenAccept(player -> {
+                                            cf.complete(player);
+                                        })
+                                                .exceptionally(new Function<Throwable, Void>() {
+                                                    @Override
+                                                    public Void apply(Throwable throwable) {
+                                                        System.out.println("There was an error getting the scannableCodes.");
+                                                        cf.completeExceptionally(throwable);
+                                                        return null;
+                                                    }
+                                                });
                     } else {
                         cf.completeExceptionally(new IllegalArgumentException("Given username does not exist!"));
                     }

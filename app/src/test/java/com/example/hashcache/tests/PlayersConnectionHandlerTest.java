@@ -14,10 +14,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
-import com.example.hashcache.models.PlayerPreferences;
-import com.example.hashcache.models.data_exchange.data_adapters.PlayerDataAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.PlayerDocumentConverter;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayerWalletConnectionHandler;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
@@ -40,14 +38,14 @@ import java.util.HashMap;
 
 public class PlayersConnectionHandlerTest {
     private HashMap<String, String> mockInAppNamesIds;
-    private PlayerDataAdapter mockPlayerDataAdapter;
+    private PlayerDocumentConverter mockPlayerDocumentConverter;
     private FireStoreHelper mockFireStoreHelper;
     private FirebaseFirestore mockDB;
     private PlayerWalletConnectionHandler mockPlayerWalletConnectionHandler;
     private CollectionReference mockCollectionReference;
 
     private PlayersDatabaseAdapter getMockPlayersConnectionHandler(){
-        return PlayersDatabaseAdapter.makeInstance(mockInAppNamesIds, mockPlayerDataAdapter,
+        return PlayersDatabaseAdapter.makeInstance(mockInAppNamesIds, mockPlayerDocumentConverter,
                 mockFireStoreHelper, mockDB, mockPlayerWalletConnectionHandler);
     }
 
@@ -55,7 +53,7 @@ public class PlayersConnectionHandlerTest {
     void resetMocks(){
         PlayersDatabaseAdapter.resetInstance();
         mockInAppNamesIds = new HashMap<>();
-        mockPlayerDataAdapter = Mockito.mock(PlayerDataAdapter.class);
+        mockPlayerDocumentConverter = Mockito.mock(PlayerDocumentConverter.class);
         mockFireStoreHelper = Mockito.mock(FireStoreHelper.class);
         mockDB = Mockito.mock(FirebaseFirestore.class);
         mockPlayerWalletConnectionHandler = Mockito.mock(PlayerWalletConnectionHandler.class);
@@ -112,7 +110,7 @@ public class PlayersConnectionHandlerTest {
             getPlayerCallback.onCallback(mockPlayer);
             return null;
         })
-                .when(mockPlayerDataAdapter)
+                .when(mockPlayerDocumentConverter)
                 .getPlayerFromDocument(any(DocumentReference.class), any(GetPlayerCallback.class));
 
         PlayersDatabaseAdapter playersConnectionHandler = getMockPlayersConnectionHandler();

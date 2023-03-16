@@ -1,4 +1,4 @@
-package com.example.hashcache.models.data_exchange.data_adapters;
+package com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters;
 
 import android.media.Image;
 import android.util.Log;
@@ -22,57 +22,62 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * Handles the conversion between a DocumentReference and a PlayerObject
  */
-public class PlayerDataAdapter {
+public class PlayerDocumentConverter {
     final String TAG = "Sample";
 
     /**
      * Converts a DocumentReference into a PlayerObject
      * @param documentReference
-     * @param getPlayerCallback
+     * @return cf the CompletableFuture with the PlayerObject
      */
-    public void getPlayerFromDocument(DocumentReference documentReference, GetPlayerCallback getPlayerCallback){
+    public CompletableFuture<Player> getPlayerFromDocument(DocumentReference documentReference){
+        CompletableFuture<Player> cf = new CompletableFuture<>();
         /**
          * Gets a player with everything but their PlayerWallet object
          */
-        getPersonalDetails(documentReference, new GetPlayerCallback() {
-            @Override
-            public void onCallback(Player player) {
-                /**
-                 * Get the PlayerWallet object from the Document reference, after the
-                 * previous callback has finished
-                 */
-                getPlayerWallet(documentReference.collection(CollectionNames.PLAYER_WALLET.collectionName),
-                    new GetPlayerWalletCallback() {
-                        @Override
-                        public void onCallback(PlayerWallet playerWallet) {
-                            if(playerWallet != null){
-                                getPlayerCallback.onCallback(new Player(player.getUserId(), player.getUsername(),
-                                        player.getContactInfo(), player.getPlayerPreferences(),
-                                        playerWallet));
-                            }else{
-                                getPlayerCallback.onCallback(player);
+        getPersonalDetails(documentReference)
+                .thenAccept(playerDetails -> {
+                    getPlayerWallet(documentReference.collection(CollectionNames.PLAYER_WALLET.collectionName))
+                            .thenAccept(playerWallet -> {
+                                cf.complete(new Player(playerDetails.getUserId(),
+                                        playerDetails.getUsername(), playerDetails.getContactInfo(),
+                                        playerDetails.getPlayerPreferences(), playerWallet));
+                            })
+                            .exceptionally(new Function<Throwable, Void>() {
+                                @Override
+                                public Void apply(Throwable throwable) {
+                                    System.out.println("There was an error getting the scannableCodes.");
+                                    cf.completeExceptionally(throwable);
+                                    return null;
+                                }
+                            });
+                })
+                        .exceptionally(new Function<Throwable, Void>() {
+                            @Override
+                            public Void apply(Throwable throwable) {
+                                System.out.println("There was an error getting the scannableCodes.");
+                                cf.completeExceptionally(throwable);
+                                return null;
                             }
+                        });
 
-                        }
-                    });
-            }
-        });
-
+        return cf;
     }
 
     /**
      * Get the PlayerWallet object from the player's PlayerWallet collection
      * @param collectionReference the PlayerWallet collection with the scannable code ids and their
      *                            images in it
-     * @param getPlayerWalletCallback the callback function to call with the PlayerWallet object. Calls
-     *                                with null if the extraction is not successful
+     * @return cf the CompletableFuture with the PlayerWallet
      */
-    private void getPlayerWallet(CollectionReference collectionReference,
-                                 GetPlayerWalletCallback getPlayerWalletCallback){
+    private CompletableFuture<PlayerWallet> getPlayerWallet(CollectionReference collectionReference){
+        CompletableFuture<PlayerWallet> cf = new CompletableFuture<>();
         PlayerWallet playerWallet = new PlayerWallet();
         collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -91,21 +96,23 @@ public class PlayerDataAdapter {
                                 }
                             }
 
-                            getPlayerWalletCallback.onCallback(playerWallet);
+                            cf.complete(playerWallet);
                         } else {
-                            getPlayerWalletCallback.onCallback(null);
+                            cf.completeExceptionally(new Exception("Something went wrong " +
+                                    "while getting the player wallet"));
                         }
                     }
                 });
+        return cf;
     }
 
     /**
      * Gets everything but the PlayerWallet from the player's Document Reference
      * @param playerDocument the document with the Player's personal details
-     * @param getPlayerCallback the callback function to call with the new Player object
+     * @return cf the CompleteableFuture with the Player object without its wallet
      */
-    private void getPersonalDetails(DocumentReference playerDocument,
-                                GetPlayerCallback getPlayerCallback){
+    private CompletableFuture<Player> getPersonalDetails(DocumentReference playerDocument){
+        CompletableFuture<Player> cf = new CompletableFuture<>();
         ContactInfo contactInfo = new ContactInfo();
         PlayerPreferences playerPreferences = new PlayerPreferences();
         String[] username = new String[1];
@@ -144,17 +151,18 @@ public class PlayerDataAdapter {
                             Log.e(TAG, "User does not have a username!");
                         }
 
-                        getPlayerCallback.onCallback(new Player(document.getId(), username[0],
+                        cf.complete(new Player(document.getId(), username[0],
                                 contactInfo, playerPreferences, null));
 
                     } else {
-                        getPlayerCallback.onCallback(null);
+                        cf.completeExceptionally(new Exception("No player document exists"));
                         Log.d(TAG, "No such document");
                     }
                 } else {
-                    getPlayerCallback.onCallback(null);
+                    cf.completeExceptionally(new Exception(task.getException()));
                 }
             }
         });
+        return cf;
     }
 }

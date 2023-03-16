@@ -8,8 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.Player;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.PlayerDocumentConverter;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.data_exchange.data_adapters.PlayerDataAdapter;
 import com.example.hashcache.models.data_exchange.database.values.CollectionNames;
 import com.example.hashcache.models.data_exchange.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -25,10 +25,10 @@ import org.mockito.Mockito;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerDataAdapterTest {
+public class PlayerDocumentConverterTest {
 
-    private PlayerDataAdapter getPlayerDocumentConverter(){
-        return new PlayerDataAdapter();
+    private PlayerDocumentConverter getPlayerDocumentConverter(){
+        return new PlayerDocumentConverter();
     }
 
     @Test
@@ -77,9 +77,9 @@ public class PlayerDataAdapterTest {
             return mockQueryTask;
         }).when(mockQueryTask).addOnCompleteListener(any(OnCompleteListener.class));
 
-        PlayerDataAdapter playerDataAdapter = getPlayerDocumentConverter();
+        PlayerDocumentConverter playerDocumentConverter = getPlayerDocumentConverter();
 
-        playerDataAdapter.getPlayerFromDocument(mockDocumentReference, mockGetPlayerCallback);
+        playerDocumentConverter.getPlayerFromDocument(mockDocumentReference, mockGetPlayerCallback);
 
         verify(mockGetPlayerCallback, times(1)).onCallback(any(Player.class));
     }
