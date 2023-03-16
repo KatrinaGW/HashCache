@@ -30,6 +30,8 @@ import com.example.hashcache.models.data_exchange.database.DatabaseMapper;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.List;
 import java.util.function.Function;
 import java.io.InputStream;
@@ -134,20 +136,11 @@ public class MainActivity extends AppCompatActivity {
                     PlayersDatabaseAdapter.getInstance().getPlayers().thenAccept(players -> {
                         DatabaseMapper databaseMapper = new DatabaseMapper();
 
-                        ScannableCode newScannableCOde = new ScannableCode("this is definitely a hash",
-                                new HashInfo(null, "notAName", 2497));
-                        newScannableCOde.addComment(new Comment("body1", "commentator1"));
-
-                        databaseMapper.addScannableCode(newScannableCOde)
-                                        .thenAccept(thing -> {
-                                            startActivity(goHome);
-                                        });
-
-//                        databaseMapper.deleteComment("106ad662b78db086d0168f18a6a0dbcc4fe1df41bb6df94413d490b5c02daf84",
-//                                "798b20b7-e2c6-4d9a-a4ff-63ba276bb005")
-//                                .thenAccept(success -> {
-//                                    startActivity(goHome);
-//                                });
+                        databaseMapper.addComment("this is definitely a hash",
+                                new Comment("a", "b"))
+                                .thenAccept(thing -> {
+                                    startActivity(goHome);
+                                });
 
                     });
 
