@@ -19,9 +19,13 @@ import android.widget.TextView;
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
+import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.PlayerList;
+import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.context.Context;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
+import com.example.hashcache.models.data_exchange.database.DatabaseMapper;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
@@ -127,7 +131,15 @@ public class MainActivity extends AppCompatActivity {
                     Intent goHome = new Intent(MainActivity.this, AppHome.class);
 
                     PlayersDatabaseAdapter.getInstance().getPlayers().thenAccept(players -> {
-                        startActivity(goHome);
+                        DatabaseMapper databaseMapper = new DatabaseMapper();
+                        ScannableCode scannableCode = new ScannableCode("blah blad", new HashInfo(
+                                null, "name!!!!", 123), "hifsjkfdskjsdf"
+                        );
+                        databaseMapper.addScannableCode(scannableCode)
+                                        .thenAccept(id -> {
+                                            startActivity(goHome);
+                                        });
+
                     });
 
                 }).exceptionally(new Function<Throwable, Void>() {

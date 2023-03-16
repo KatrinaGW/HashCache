@@ -9,6 +9,7 @@ import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.Play
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.data_exchange.data_adapters.ScannableCodeDataAdapter;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.ScannableCodeDocumentConverter;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.checkerframework.checker.units.qual.C;
@@ -27,7 +28,7 @@ public class DependencyInjector {
      * class
      */
     public static ScannableCodesDatabaseAdapter makeScannableCodesConnectionHandler(){
-        return ScannableCodesDatabaseAdapter.makeInstance(new ScannableCodeDataAdapter(),
+        return ScannableCodesDatabaseAdapter.makeInstance(new ScannableCodeDocumentConverter(),
                 new FireStoreHelper(), FirebaseFirestore.getInstance());
     }
 

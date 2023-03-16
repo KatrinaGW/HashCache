@@ -14,6 +14,7 @@ import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.call
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.ScannableCodeDocumentConverter;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
@@ -311,17 +312,16 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     public CompletableFuture<String> addScannableCode(ScannableCode scannableCode) {
         CompletableFuture<String> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            ScannableCodesDatabaseAdapter.getInstance().addScannableCode(scannableCode, new BooleanCallback() {
-                @Override
-                public void onCallback(Boolean isTrue) {
-                    if (isTrue) {
+            ScannableCodesDatabaseAdapter.getInstance().addScannableCode(scannableCode)
+                    .thenAccept(scannableCodeId -> {
                         cf.complete(scannableCode.getScannableCodeId());
-                    } else {
-                        cf.completeExceptionally(
-                                new Exception("Could not add ScannableCode ID: " + scannableCode.getScannableCodeId()));
-                    }
-                }
-            });
+                    }).exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
         });
         return cf;
     }
@@ -509,16 +509,14 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     public CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            ScannableCodesDatabaseAdapter.getInstance().getScannableCode(scannableCodeId,
-                    new GetScannableCodeCallback() {
+            ScannableCodesDatabaseAdapter.getInstance().getScannableCode(scannableCodeId)
+                    .thenAccept(scannableCode -> {
+                        cf.complete(scannableCode);
+                    }).exceptionally(new Function<Throwable, Void>() {
                         @Override
-                        public void onCallback(ScannableCode scannableCode) {
-                            if (scannableCode != null) {
-                                cf.complete(scannableCode);
-                            } else {
-                                cf.completeExceptionally(new Exception("Something went wrong while " +
-                                        "getting the scannableCode!"));
-                            }
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
                         }
                     });
         });

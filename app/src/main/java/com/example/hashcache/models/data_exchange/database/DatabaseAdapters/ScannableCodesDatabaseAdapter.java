@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.data_exchange.data_adapters.ScannableCodeDataAdapter;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.ScannableCodeDocumentConverter;
 import com.example.hashcache.models.data_exchange.database.values.CollectionNames;
 import com.example.hashcache.models.data_exchange.database.values.FieldNames;
 import com.example.hashcache.models.Comment;
@@ -21,9 +22,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * Handles all calls to the Firebase ScannableCodes database
@@ -33,7 +37,7 @@ public class ScannableCodesDatabaseAdapter {
     private CollectionReference collectionReference;
     private HashMap<String, ScannableCode> cachedScannableCodes;
     final String TAG = "Sample";
-    private ScannableCodeDataAdapter scannableCodeDocumentConverter;
+    private ScannableCodeDocumentConverter scannableCodeDocumentConverter;
     private FireStoreHelper fireStoreHelper;
     private static ScannableCodesDatabaseAdapter INSTANCE;
 
@@ -55,7 +59,7 @@ public class ScannableCodesDatabaseAdapter {
      *         instance of the
      *         ScannableCodesConnectionHandler class
      */
-    private ScannableCodesDatabaseAdapter(ScannableCodeDataAdapter scannableCodeDocumentConverter,
+    private ScannableCodesDatabaseAdapter(ScannableCodeDocumentConverter scannableCodeDocumentConverter,
                                           FireStoreHelper fireStoreHelper, FirebaseFirestore db) {
         this.cachedScannableCodes = new HashMap<>();
         this.scannableCodeDocumentConverter = scannableCodeDocumentConverter;
@@ -89,7 +93,7 @@ public class ScannableCodesDatabaseAdapter {
      *                                  class has already been initialized
      */
     public static ScannableCodesDatabaseAdapter makeInstance(
-            ScannableCodeDataAdapter scannableCodeDocumentConverter,
+            ScannableCodeDocumentConverter scannableCodeDocumentConverter,
             FireStoreHelper fireStoreHelper,
             FirebaseFirestore db) {
         if (INSTANCE != null) {
@@ -151,17 +155,14 @@ public class ScannableCodesDatabaseAdapter {
      * Gets a scannable code from the database with a specific id
      *
      * @param scannableCodeId          the id of the scannable code to get
-     * @param getScannableCodeCallback the callback function to be called with the
-     *                                 found scnnablecode
+     * @return cf the CompleteableFuture with the ScannableCode
      */
-    public void getScannableCode(String scannableCodeId, GetScannableCodeCallback getScannableCodeCallback) {
-        if (this.cachedScannableCodes.containsKey(scannableCodeId)) {
-            getScannableCodeCallback.onCallback(cachedScannableCodes.get(scannableCodeId));
-        } else {
-            DocumentReference documentReference = this.collectionReference.document(scannableCodeId);
-            this.scannableCodeDocumentConverter.getScannableCodeFromDocument(documentReference,
-                    getScannableCodeCallback);
-        }
+    public CompletableFuture<ScannableCode> getScannableCode(String scannableCodeId) {
+        CompletableFuture<ScannableCode> cf;
+        DocumentReference documentReference = this.collectionReference.document(scannableCodeId);
+        cf = scannableCodeDocumentConverter.getScannableCodeFromDocument(documentReference);
+
+        return cf;
     }
 
     /**
@@ -185,16 +186,21 @@ public class ScannableCodesDatabaseAdapter {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             if (scannableCodeIds.contains(document.getId())) {
                                 matches++;
-                                scannableCodeDocumentConverter.getScannableCodeFromDocument(document.getReference(),
-                                        new GetScannableCodeCallback() {
-                                            @Override
-                                            public void onCallback(ScannableCode scannableCode) {
-                                                scannableCodes.add(scannableCode);
-                                                if (scannableCodes.size() == scannableCodeIds.size()) {
-                                                    cf.complete(scannableCodes);
-                                                }
-                                            }
-                                        });
+
+                                ScannableCodeDocumentConverter.getScannableCodeFromDocument(
+                                        document.getReference()
+                                ).thenAccept(scannableCode -> {
+                                    scannableCodes.add(scannableCode);
+                                    if(scannableCodes.size() == scannableCodeIds.size()){
+                                        cf.complete(scannableCodes);
+                                    }
+                                }).exceptionally(new Function<Throwable, Void>() {
+                                    @Override
+                                    public Void apply(Throwable throwable) {
+                                        cf.completeExceptionally(throwable);
+                                        return null;
+                                    }
+                                });
                             }
                         }
 
@@ -218,18 +224,10 @@ public class ScannableCodesDatabaseAdapter {
      * database
      *
      * @param scannableCode   the scannable code to add to the database
-     * @param booleanCallback the function to call back with once the addition has
-     *                        succeeded
-     * @throws IllegalArgumentException when there already exists a scannable code
-     *                                  with the given id
+     * @return cf the CompleteableFuture once the operation has finished
      */
-    public void addScannableCode(ScannableCode scannableCode, BooleanCallback booleanCallback) {
-        if (this.cachedScannableCodes.containsKey(scannableCode.getScannableCodeId())) {
-            Log.d(TAG, "scannable code already exists with given id!");
-            booleanCallback.onCallback(false);
-            return;
-        }
-
+    public CompletableFuture<String> addScannableCode(ScannableCode scannableCode) {
+        CompletableFuture<String> cf = new CompletableFuture<>();
         /**
          * If a document with the id doesn't already exist, add it to the collection.
          * Otherwise,
@@ -266,23 +264,28 @@ public class ScannableCodesDatabaseAdapter {
                                                                 @Override
                                                                 public void onCallback(Boolean isTrue) {
                                                                     if (isTrue) {
-                                                                        booleanCallback.onCallback(true);
+                                                                        cf.complete(scannableCode
+                                                                                .getScannableCodeId());
                                                                     } else {
-                                                                        booleanCallback.onCallback(false);
+                                                                        cf.completeExceptionally(new
+                                                                                Exception("something " +
+                                                                                "went wrong while adding" +
+                                                                                "the scananbleCode"));
                                                                     }
                                                                 }
                                                             });
                                                 } else {
-                                                    booleanCallback.onCallback(true);
+                                                    cf.complete(scannableCode.getScannableCodeId());
                                                 }
                                             }
                                         }
                                     });
                         } else {
-                            throw new IllegalArgumentException("Scannable code with id already exists!");
+                            cf.completeExceptionally(new Exception("Scannable code with id already exists!"));
                         }
                     };
                 });
+        return cf;
     }
 
     /**
