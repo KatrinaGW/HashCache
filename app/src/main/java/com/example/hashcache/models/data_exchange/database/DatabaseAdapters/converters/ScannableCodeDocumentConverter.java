@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.FireStoreHelper;
+import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetCommentsCallback;
 import com.example.hashcache.models.data_exchange.database.values.CollectionNames;
 import com.example.hashcache.models.data_exchange.database.values.FieldNames;
@@ -18,11 +20,79 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class ScannableCodeDocumentConverter {
+
+    public static CompletableFuture<String> addScannableCodeToCollection(ScannableCode scannableCode,
+                                                                       CollectionReference collectionReference,
+                                                                       FireStoreHelper fireStoreHelper){
+        CompletableFuture<String> cf = new CompletableFuture<>();
+        HashInfo hashInfo = scannableCode.getHashInfo();
+        ArrayList<Comment> comments = scannableCode.getComments();
+
+        HashMap<String, String> data = new HashMap<>();
+        data.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCode.getScannableCodeId());
+        data.put(FieldNames.CODE_LOCATION_ID.fieldName, scannableCode.getCodeLocationId());
+        data.put(FieldNames.GENERATED_NAME.fieldName, hashInfo.getGeneratedName());
+        data.put(FieldNames.GENERATED_SCORE.fieldName, Long.toString(hashInfo.getGeneratedScore()));
+
+        /**
+         * Create a new document with the ScannableCode data and whose id is the
+         * scannableCodeId, and put the document into the scannableCodes collection
+         */
+        fireStoreHelper.setDocumentReference(collectionReference
+                .document(scannableCode.getScannableCodeId()), data, new BooleanCallback() {
+            @Override
+            public void onCallback(Boolean isTrue) {
+                if (isTrue) {
+                    if (comments.size() > 0) {
+
+                        addCommentToScannableCodeDocument(comments.get(0),
+                                collectionReference.document(scannableCode.getScannableCodeId()));
+                        cf.complete(scannableCode.getScannableCodeId());
+                    } else {
+                        cf.complete(scannableCode.getScannableCodeId());
+                    }
+                }
+            }
+        });
+        return cf;
+    }
+
+    /**
+     * Add a comment to a scananbleCodeDocument
+     * @param comment the comment to add to the document
+     * @param documentReference the reference to the scannableCodeDocument
+     */
+    public static void addCommentToScannableCodeDocument(Comment comment,
+                                                         DocumentReference documentReference){
+        documentReference
+                .collection(CollectionNames.COMMENTS.collectionName)
+                .document(comment.getCommentId())
+                .set(getCommentData(comment));
+    }
+
+    /**
+     * Creates the data map to put onto a scannableCode document
+     *
+     * @param comment the comment to convert into fields for a document
+     * @return commentData a HashMap which maps the comment values to field names
+     * that
+     * match the variable names
+     */
+    private static HashMap<String, String> getCommentData(Comment comment) {
+        HashMap<String, String> commentData = new HashMap<>();
+        commentData.put(FieldNames.COMMENTATOR_ID.fieldName, comment.getCommentatorId());
+        commentData.put(FieldNames.COMMENT_BODY.fieldName, comment.getBody());
+
+        return commentData;
+    }
 
     /**
      * Get a scannableCode from a document reference

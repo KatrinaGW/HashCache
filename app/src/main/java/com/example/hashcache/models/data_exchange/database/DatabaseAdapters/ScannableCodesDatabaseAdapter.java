@@ -238,44 +238,56 @@ public class ScannableCodesDatabaseAdapter {
                     @Override
                     public void onCallback(Boolean documentExists) {
                         if (!documentExists) {
-                            HashInfo hashInfo = scannableCode.getHashInfo();
-                            ArrayList<Comment> comments = scannableCode.getComments();
-
-                            HashMap<String, String> data = new HashMap<>();
-                            data.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCode.getScannableCodeId());
-                            data.put(FieldNames.CODE_LOCATION_ID.fieldName, scannableCode.getCodeLocationId());
-                            data.put(FieldNames.GENERATED_NAME.fieldName, hashInfo.getGeneratedName());
-                            data.put(FieldNames.GENERATED_SCORE.fieldName, Long.toString(hashInfo.getGeneratedScore()));
-
-                            /**
-                             * Create a new document with the ScannableCode data and whose id is the
-                             * scannableCodeId, and put the document into the scannableCodes collection
-                             */
-                            fireStoreHelper.setDocumentReference(collectionReference
-                                    .document(scannableCode.getScannableCodeId()), data, new BooleanCallback() {
-                                @Override
-                                public void onCallback(Boolean isTrue) {
-                                    if (isTrue) {
-                                        if (comments.size() > 0) {
-
-                                            addComment(scannableCode.getScannableCodeId(),
-                                                    comments.get(0))
-                                                    .thenAccept(success -> {
-                                                        cf.complete(scannableCode.getScannableCodeId());
-                                                    })
-                                                    .exceptionally(new Function<Throwable, Void>() {
-                                                        @Override
-                                                        public Void apply(Throwable throwable) {
-                                                            cf.completeExceptionally(throwable);
-                                                            return null;
-                                                        }
-                                                    });
-                                        } else {
-                                            cf.complete(scannableCode.getScannableCodeId());
+//                            HashInfo hashInfo = scannableCode.getHashInfo();
+//                            ArrayList<Comment> comments = scannableCode.getComments();
+//
+//                            HashMap<String, String> data = new HashMap<>();
+//                            data.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCode.getScannableCodeId());
+//                            data.put(FieldNames.CODE_LOCATION_ID.fieldName, scannableCode.getCodeLocationId());
+//                            data.put(FieldNames.GENERATED_NAME.fieldName, hashInfo.getGeneratedName());
+//                            data.put(FieldNames.GENERATED_SCORE.fieldName, Long.toString(hashInfo.getGeneratedScore()));
+//
+//                            /**
+//                             * Create a new document with the ScannableCode data and whose id is the
+//                             * scannableCodeId, and put the document into the scannableCodes collection
+//                             */
+//                            fireStoreHelper.setDocumentReference(collectionReference
+//                                    .document(scannableCode.getScannableCodeId()), data, new BooleanCallback() {
+//                                @Override
+//                                public void onCallback(Boolean isTrue) {
+//                                    if (isTrue) {
+//                                        if (comments.size() > 0) {
+//
+//                                            addComment(scannableCode.getScannableCodeId(),
+//                                                    comments.get(0))
+//                                                    .thenAccept(success -> {
+//                                                        cf.complete(scannableCode.getScannableCodeId());
+//                                                    })
+//                                                    .exceptionally(new Function<Throwable, Void>() {
+//                                                        @Override
+//                                                        public Void apply(Throwable throwable) {
+//                                                            cf.completeExceptionally(throwable);
+//                                                            return null;
+//                                                        }
+//                                                    });
+//                                        } else {
+//                                            cf.complete(scannableCode.getScannableCodeId());
+//                                        }
+//                                    }
+//                                }
+//                            });
+                            ScannableCodeDocumentConverter.addScannableCodeToCollection(scannableCode,
+                                    collectionReference, fireStoreHelper)
+                                    .thenAccept(scannableCodeId -> {
+                                        cf.complete(scannableCodeId);
+                                    })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
                                         }
-                                    }
-                                }
-                            });
+                                    });
                         } else {
                             cf.completeExceptionally(new Exception("Scannable code with id already exists!"));
                         }
@@ -284,22 +296,6 @@ public class ScannableCodesDatabaseAdapter {
                     ;
                 });
         return cf;
-    }
-
-    /**
-     * Creates the data map to put onto a scannableCode document
-     *
-     * @param comment the comment to convert into fields for a document
-     * @return commentData a HashMap which maps the comment values to field names
-     * that
-     * match the variable names
-     */
-    private HashMap<String, String> getCommentData(Comment comment) {
-        HashMap<String, String> commentData = new HashMap<>();
-        commentData.put(FieldNames.COMMENTATOR_ID.fieldName, comment.getCommentatorId());
-        commentData.put(FieldNames.COMMENT_BODY.fieldName, comment.getBody());
-
-        return commentData;
     }
 
     /**
@@ -315,12 +311,14 @@ public class ScannableCodesDatabaseAdapter {
             @Override
             public void onCallback(Boolean isTrue) {
                 if (isTrue) {
-                    HashMap<String, String> commentData;
-                    collectionReference
-                            .document(scannableCodeId)
-                            .collection(CollectionNames.COMMENTS.collectionName)
-                            .document(newComment.getCommentId())
-                            .set(getCommentData(newComment));
+//                    collectionReference
+//                            .document(scannableCodeId)
+//                            .collection(CollectionNames.COMMENTS.collectionName)
+//                            .document(newComment.getCommentId())
+//                            .set(getCommentData(newComment));
+
+                    ScannableCodeDocumentConverter.addCommentToScannableCodeDocument(newComment,
+                            collectionReference.document(scannableCodeId));
                     cf.complete(true);
                 } else {
                     cf.completeExceptionally(new Exception("ScannableCode does not exist!"));
