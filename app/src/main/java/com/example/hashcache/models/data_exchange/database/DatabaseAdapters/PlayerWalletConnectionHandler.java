@@ -84,17 +84,13 @@ public class PlayerWalletConnectionHandler {
      * @param scannableCodeId        the id of the scannable code to add to the
      *                               PlayerWallet collection
      * @param locationImage          the image of where the user scanned the code
-     * @param booleanCallback        the callback function to call once the
-     *                               operation has finished. Calls
-     *                               with true if the operation was successful, and
-     *                               false otherwise
+     * @return cf the CompletableFuture indicating if the operation was successful or not
      * @throws IllegalArgumentException if the PlayerWallet already has a
      *                                  scananbleCode with the given id
      */
-    public void addScannableCodeDocument(CollectionReference playerWalletCollection,
-            String scannableCodeId, Image locationImage,
-            BooleanCallback booleanCallback) {
-
+    public CompletableFuture<Void> addScannableCodeDocument(CollectionReference playerWalletCollection,
+            String scannableCodeId, Image locationImage) {
+        CompletableFuture<Void> cf = new CompletableFuture<>();
         fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId,
                 new BooleanCallback() {
                     @Override
@@ -111,10 +107,23 @@ public class PlayerWalletConnectionHandler {
                         DocumentReference playerWalletReference = playerWalletCollection.document(scannableCodeId);
 
                         fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData,
-                                booleanCallback);
+                                new BooleanCallback() {
+                                    @Override
+                                    public void onCallback(Boolean isTrue) {
+                                        if(isTrue){
+                                            cf.complete(null);
+                                        }else{
+                                            cf.completeExceptionally(new Exception(
+                                                    "Something went wrong while adding the scananble" +
+                                                            "code document"
+                                            ));
+                                        }
+                                    }
+                                });
 
                     }
                 });
+        return cf;
     }
 
     public CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId) {

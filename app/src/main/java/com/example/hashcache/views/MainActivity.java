@@ -137,7 +137,10 @@ public class MainActivity extends AppCompatActivity {
                     PlayersDatabaseAdapter.getInstance().getPlayers().thenAccept(players -> {
                         DatabaseMapper databaseMapper = new DatabaseMapper();
 
-                        startActivity(goHome);
+                        databaseMapper.addScannableCodeToPlayerWallet("fa13e327-e172-4763-aa3d-a1e49681e0a2",
+                                "fakeID").thenAccept(
+                                        thiung->{startActivity(goHome);}
+                        );
 
                     });
 

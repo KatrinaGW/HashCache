@@ -416,15 +416,18 @@ public class PlayersDatabaseAdapter {
      *
      * @throws IllegalArgumentException if there are no users with the given Id
      */
-    public void playerScannedCodeAdded(String userId, String scannableCodeId,
-            Image locationImage, BooleanCallback booleanCallback) {
+    public CompletableFuture<Void> playerScannedCodeAdded(String userId, String scannableCodeId,
+            Image locationImage) {
+        CompletableFuture<Void> cf;
 
         CollectionReference scannedCodeCollection = collectionReference
                 .document(userId)
                 .collection(CollectionNames.PLAYER_WALLET.collectionName);
 
-        playerWalletConnectionHandler.addScannableCodeDocument(scannedCodeCollection,
-                scannableCodeId, locationImage, booleanCallback);
+        cf = playerWalletConnectionHandler.addScannableCodeDocument(scannedCodeCollection,
+                scannableCodeId, locationImage);
+
+        return cf;
     }
 
     /**

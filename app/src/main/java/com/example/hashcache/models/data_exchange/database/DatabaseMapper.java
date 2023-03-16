@@ -267,20 +267,31 @@ public class DatabaseMapper extends Observable implements DatabasePort {
         System.out.println("[[ Trying to add to wallet...");
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersDatabaseAdapter.getInstance().playerScannedCodeAdded(userId, scannableCodeId, null,
-                    new BooleanCallback() {
-                        @Override
-                        public void onCallback(Boolean isTrue) {
-                            System.out.println("[[ Got response!!!");
-                            if (isTrue) {
+            PlayersDatabaseAdapter.getInstance().playerScannedCodeAdded(userId, scannableCodeId, null)
+                            .thenAccept(success -> {
                                 cf.complete(null);
-                            } else {
-                                cf.completeExceptionally(
-                                        new Exception("Could not add scannable to player wallet, userId: " + userId
-                                                + " codeId " + scannableCodeId));
-                            }
+                            }).exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
                         }
                     });
+
+//            PlayersDatabaseAdapter.getInstance().playerScannedCodeAdded(userId, scannableCodeId, null,
+//                    new BooleanCallback() {
+//                        @Override
+//                        public void onCallback(Boolean isTrue) {
+//                            System.out.println("[[ Got response!!!");
+//                            if (isTrue) {
+//                                cf.complete(null);
+//                            } else {
+//                                cf.completeExceptionally(
+//                                        new Exception("Could not add scannable to player wallet, userId: " + userId
+//                                                + " codeId " + scannableCodeId));
+//                            }
+//                        }
+//                    });
         }).exceptionally(new Function<Throwable, Void>() {
             @Override
             public Void apply(Throwable throwable) {
