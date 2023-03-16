@@ -22,6 +22,7 @@ import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.PlayerList;
+import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.context.Context;
@@ -136,11 +137,11 @@ public class MainActivity extends AppCompatActivity {
                     PlayersDatabaseAdapter.getInstance().getPlayers().thenAccept(players -> {
                         DatabaseMapper databaseMapper = new DatabaseMapper();
 
-                        databaseMapper.addComment("this is definitely a hash",
-                                new Comment("a", "b"))
-                                .thenAccept(thing -> {
-                                    startActivity(goHome);
-                                });
+                        databaseMapper.updatePlayerPreferences("fa13e327-e172-4763-aa3d-a1e49681e0a2",
+                                new PlayerPreferences())
+                                        .thenAccept(thing -> {
+                                            startActivity(goHome);
+                                        });
 
                     });
 

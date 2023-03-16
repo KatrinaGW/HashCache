@@ -25,7 +25,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -135,19 +134,6 @@ public class PlayersDatabaseAdapter {
     }
 
     /**
-     * Gets all of the current usernames across the app
-     * 
-     * @return inAppPlayerUserNames the usernames of all players in the app
-     */
-    public ArrayList<String> getInAppPlayerUserNames() {
-        ArrayList<String> inAppUserNames = new ArrayList<>();
-        for (String username : inAppUsernamesIds.keySet()) {
-            inAppUserNames.add(username);
-        }
-        return inAppUserNames;
-    }
-
-    /**
      * Returns a boolean CompletableFuture indicating if the username exists or not.
      *
      * @param username the username to use to pull the player with
@@ -225,7 +211,7 @@ public class PlayersDatabaseAdapter {
      * @param userId the userid of the player object to get
      * @return cf the CompleteableFuture with the searched for player
      */
-    public CompletableFuture<Player> getPlayerAsync(String userId) {
+    public CompletableFuture<Player> getPlayer(String userId) {
         DocumentReference documentReference = collectionReference.document(userId);
         CompletableFuture<Player> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
@@ -259,10 +245,10 @@ public class PlayersDatabaseAdapter {
      *                          with true if the operation was successful, and false
      *                          otherwise
      */
-    public void updatePlayerPreferences(String userId, PlayerPreferences playerPreferences,
-            BooleanCallback booleanCallback) {
+    public CompletableFuture<Boolean> updatePlayerPreferences(String userId, PlayerPreferences playerPreferences) {
         DocumentReference documentReference = collectionReference.document(userId);
-        setPlayerPreferences(documentReference, playerPreferences, booleanCallback);
+        CompletableFuture<Boolean> cf = setPlayerPreferences(documentReference, playerPreferences);
+        return cf;
     }
 
     /**
@@ -271,28 +257,28 @@ public class PlayersDatabaseAdapter {
      * @param playerDocument    the document of the player to change the preferences
      *                          on
      * @param playerPreferences the preferences to set for the user
-     * @param booleanCallback   the callback function to call once the operation has
-     *                          finished. Calls
-     *                          with true if the operation was successful, and false
-     *                          otherwise
+     * @return cf the CompleteableFuture which indicate that the operation was successful
      *
      *
      */
-    private void setPlayerPreferences(DocumentReference playerDocument, PlayerPreferences playerPreferences,
-            BooleanCallback booleanCallback) {
+    private CompletableFuture<Boolean> setPlayerPreferences(DocumentReference playerDocument,
+                                                            PlayerPreferences playerPreferences) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
         fireStoreHelper.addBooleanFieldToDocument(playerDocument, FieldNames.RECORD_GEOLOCATION.fieldName,
                 playerPreferences.getRecordGeolocationPreference(),
                 new BooleanCallback() {
                     @Override
                     public void onCallback(Boolean isTrue) {
                         if (isTrue) {
-                            booleanCallback.onCallback(true);
+                            cf.complete(true);
                         } else {
                             Log.e(TAG, "Something went wrong while setting the player preferences");
-                            booleanCallback.onCallback(false);
+                            cf.completeExceptionally(new Exception("Something went wrong while " +
+                                    "setting the player preferences"));
                         }
                     }
                 });
+        return cf;
     }
 
     /**
@@ -355,7 +341,7 @@ public class PlayersDatabaseAdapter {
         ListenerRegistration registration = documentReference.addSnapshotListener((snapshot, e) -> {
             Log.d("Player Firestore Listener", "PLAYER DATA HAS BEEN UPDATED.");
             if (snapshot != null && snapshot.exists()) {
-                getPlayerAsync(userId).thenAccept(playa -> {
+                getPlayer(userId).thenAccept(playa -> {
                     Log.d("Player Firestore Listener", "PLAYER DATA HAS BEEN FETCHED.");
                     callback.onCallback(playa);
                 }).exceptionally(new Function<Throwable, Void>() {

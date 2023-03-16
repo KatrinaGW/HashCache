@@ -13,8 +13,6 @@ import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.call
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetStringCallback;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.ScannableCodeDocumentConverter;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
@@ -139,7 +137,7 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     public CompletableFuture<Player> getPlayer(String userId) {
         CompletableFuture<Player> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersDatabaseAdapter.getInstance().getPlayerAsync(userId).thenAccept(playa -> {
+            PlayersDatabaseAdapter.getInstance().getPlayer(userId).thenAccept(playa -> {
                 cf.complete(playa);
             }).exceptionally(new Function<Throwable, Void>() {
                 @Override
@@ -249,17 +247,17 @@ public class DatabaseMapper extends Observable implements DatabasePort {
     public CompletableFuture<Void> updatePlayerPreferences(String userId, PlayerPreferences playerPreferences) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersDatabaseAdapter.getInstance().updatePlayerPreferences(userId, playerPreferences,
-                    new BooleanCallback() {
-                        @Override
-                        public void onCallback(Boolean isTrue) {
-                            if (isTrue) {
+            PlayersDatabaseAdapter.getInstance().updatePlayerPreferences(userId, playerPreferences)
+                            .thenAccept(success -> {
                                 cf.complete(null);
-                            } else {
-                                cf.completeExceptionally(new Exception("Could not update player preferences"));
-                            }
-                        }
-                    });
+                            })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
         });
         return cf;
     }

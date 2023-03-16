@@ -36,7 +36,6 @@ public class PlayerList {
      */
     private PlayerList(PlayersDatabaseAdapter playersConnectionHandler){
         this.playersConnectionHandler = playersConnectionHandler;
-        playerUserNames = playersConnectionHandler.getInAppPlayerUserNames();
     }
     /**
      * Gets the singleton instance of the PlayerList
