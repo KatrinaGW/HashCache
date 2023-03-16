@@ -29,13 +29,19 @@ import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 /**
 
  Represents the main landing page of the app.
 
  Displays a map centered on the user's location, with pins indicating QR codes scanned by the user and others.
  */
-public class AppHome extends AppCompatActivity implements Observer {
+public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCallback {
 
     private ImageButton mLogoButton;
     private TextView mUsernameTextView;
@@ -43,7 +49,7 @@ public class AppHome extends AppCompatActivity implements Observer {
     private ImageButton mMenuButton;
     private ImageButton mMapButton;
     private ImageButton mCommunityButton;
-    private View mTempMap;
+    private View mMap;
     private AppCompatButton mScanQrButton;
     private Player playerInfo;
 
@@ -53,6 +59,14 @@ public class AppHome extends AppCompatActivity implements Observer {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_home);
         initView();
+
+
+
+        //get the map fragment
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
 
         // add functionality to logo button
         ImageButton logoButton = findViewById(R.id.logo_button);
@@ -134,6 +148,13 @@ public class AppHome extends AppCompatActivity implements Observer {
         AppStore.get().addObserver(this);
     }
 
+    //runs when the map is ready to receive user input
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(0, 0))
+                .title("Marker"));
+    }
     private void initView() {
         mLogoButton = findViewById(R.id.logo_button);
         mUsernameTextView = findViewById(R.id.username_textview);
@@ -141,7 +162,7 @@ public class AppHome extends AppCompatActivity implements Observer {
         mMenuButton = findViewById(R.id.menu_button);
         mMapButton = findViewById(R.id.map_button);
         mCommunityButton = findViewById(R.id.community_button);
-        mTempMap = findViewById(R.id.map);
+        mMap = findViewById(R.id.map);
         mScanQrButton = findViewById(R.id.scan_qr_button);
     }
 
@@ -229,7 +250,7 @@ public class AppHome extends AppCompatActivity implements Observer {
      @param listener the listener to set
      */
     public void setMapTempViewClickListener(OnClickListener listener) {
-        mTempMap.setOnClickListener(listener);
+        mMap.setOnClickListener(listener);
     }
 
     @Override
