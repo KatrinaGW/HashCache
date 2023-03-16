@@ -50,7 +50,7 @@ public class QRStats extends AppCompatActivity implements Observer {
 
     /**
      * Initializes the activity and sets the layout. Also adds functionality to the
-     * menu button and my profile button.
+     * menu button.
      *
      * @param savedInstanceState a Bundle object containing the activity's
      *                           previously saved state, if any
@@ -162,9 +162,6 @@ public class QRStats extends AppCompatActivity implements Observer {
         return scoreIcon;
     }
 
-    public AppCompatButton getMyProfileButton() {
-        return myProfileButton;
-    }
 
     @Override
     public void update(Observable observable, Object o) {
