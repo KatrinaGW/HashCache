@@ -39,7 +39,6 @@ import java.util.function.Function;
 public class PlayersDatabaseAdapter {
     private FirebaseFirestore db;
     private CollectionReference collectionReference;
-    private HashMap<String, String> inAppUsernamesIds;
     private HashMap<String, Player> cachedPlayers;
     final String TAG = "Sample";
     private PlayerDataAdapter playerDataAdapter;
@@ -69,7 +68,6 @@ public class PlayersDatabaseAdapter {
                                    PlayerDataAdapter playerDataAdapter,
                                    FireStoreHelper fireStoreHelper,
                                    FirebaseFirestore db, PlayerWalletConnectionHandler playerWalletConnectionHandler) {
-        this.inAppUsernamesIds = inAppNamesIds;
         this.cachedPlayers = new HashMap<>();
         this.playerDataAdapter = playerDataAdapter;
         this.fireStoreHelper = fireStoreHelper;
@@ -119,7 +117,8 @@ public class PlayersDatabaseAdapter {
     public static PlayersDatabaseAdapter makeInstance(HashMap<String, String> inAppNamesIds,
                                                       PlayerDataAdapter playerDataAdapter,
                                                       FireStoreHelper fireStoreHelper,
-                                                      FirebaseFirestore db, PlayerWalletConnectionHandler playerWalletConnectionHandler) {
+                                                      FirebaseFirestore db,
+                                                      PlayerWalletConnectionHandler playerWalletConnectionHandler) {
         if (INSTANCE != null) {
             throw new IllegalArgumentException("Instance of PlayersConnectionHandler already exists!");
         }
@@ -354,38 +353,6 @@ public class PlayersDatabaseAdapter {
         });
         return registration;
     }
-
-    /**
-     * Updates a user's username
-     * 
-     * @param oldUsername     the user's current username
-     * @param newUsername     the username to set for the user
-     * @param booleanCallback the callback function to call once the operation has
-     *                        finished. Calls
-     *                        with true if the operation was successful, and false
-     *                        otherwise
-     *
-     * @throws IllegalArgumentException if the current username does not exist
-     */
-    public void updateUserName(String oldUsername, String newUsername, BooleanCallback booleanCallback) {
-        this.setUserName(this.collectionReference.document(inAppUsernamesIds.get(oldUsername)),
-                newUsername, new BooleanCallback() {
-                    @Override
-                    public void onCallback(Boolean isTrue) {
-                        if (isTrue) {
-                            if (cachedPlayers.containsKey(oldUsername)) {
-                                cachedPlayers.put(newUsername, cachedPlayers.get(oldUsername));
-                                cachedPlayers.remove(oldUsername);
-                            }
-                            booleanCallback.onCallback(true);
-                        } else {
-                            Log.e(TAG, "something went wrong while updating the user's username");
-                            booleanCallback.onCallback(false);
-                        }
-                    }
-                });
-    }
-
     /**
      * Set the username field on a player's document
      * 
@@ -399,10 +366,6 @@ public class PlayersDatabaseAdapter {
      */
     private void setUserName(DocumentReference playerDocument, String username,
             BooleanCallback booleanCallback) {
-        if (this.inAppUsernamesIds.keySet().contains(username)) {
-            throw new IllegalArgumentException("Given username already exists!");
-        }
-
         this.fireStoreHelper.addStringFieldToDocument(playerDocument, FieldNames.USERNAME.fieldName,
                 username, booleanCallback);
     }
