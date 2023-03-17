@@ -15,6 +15,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -136,11 +138,12 @@ public class FireStoreHelper {
      * Checks if a document exists in a certain collection
      * @param collectionReference the collection to scan for a document
      * @param id the id of the document that's being searched for
-     * @param booleanCallback the callback function to call once the scan has finished. Call
-     *                        with true if a document is found, and false otherwise
+     * @return cf the CompletableFuture with a boolean value indicating if the
+     *          document exists in the collection or not
      */
-    public void documentWithIDExists(CollectionReference collectionReference, String id,
-                                        BooleanCallback booleanCallback){
+    public CompletableFuture<Boolean> documentWithIDExists(CollectionReference collectionReference,
+                                                           String id){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
         final boolean[] exists = new boolean[1];
 
         DocumentReference documentReference = collectionReference.document(id);
@@ -151,15 +154,16 @@ public class FireStoreHelper {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         exists[0] = true;
-                        booleanCallback.onCallback(exists[0]);
+                        cf.complete(exists[0]);
                     } else {
                         exists[0] = false;
-                        booleanCallback.onCallback(exists[0]);
+                        cf.complete(exists[0]);
                     }
                 } else {
-                    booleanCallback.onCallback(false);
+                    cf.complete(false);
                 }
             }
         });
+        return cf;
     }
 }

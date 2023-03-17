@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.ScannableCodeDocumentConverter;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.Comment;
@@ -227,13 +226,12 @@ public class ScannableCodesDatabaseAdapter {
          * Otherwise,
          * throw an error
          */
-        fireStoreHelper.documentWithIDExists(collectionReference, scannableCode.getScannableCodeId(),
-                new BooleanCallback() {
-                    @Override
-                    public void onCallback(Boolean documentExists) {
-                        if (!documentExists) {
+        CompletableFuture.runAsync(() -> {
+            fireStoreHelper.documentWithIDExists(collectionReference, scannableCode.getScannableCodeId())
+                    .thenAccept(exists -> {
+                        if (!exists) {
                             ScannableCodeDocumentConverter.addScannableCodeToCollection(scannableCode,
-                                    collectionReference, fireStoreHelper)
+                                            collectionReference, fireStoreHelper)
                                     .thenAccept(scannableCodeId -> {
                                         cf.complete(scannableCodeId);
                                     })
@@ -247,10 +245,15 @@ public class ScannableCodesDatabaseAdapter {
                         } else {
                             cf.completeExceptionally(new Exception("Scannable code with id already exists!"));
                         }
-                    }
-
-                    ;
-                });
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
         return cf;
     }
 
@@ -263,17 +266,24 @@ public class ScannableCodesDatabaseAdapter {
      */
     public CompletableFuture<Boolean> addComment(String scannableCodeId, Comment newComment) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
-        fireStoreHelper.documentWithIDExists(this.collectionReference, scannableCodeId, new BooleanCallback() {
-            @Override
-            public void onCallback(Boolean isTrue) {
-                if (isTrue) {
-                    ScannableCodeDocumentConverter.addCommentToScannableCodeDocument(newComment,
-                            collectionReference.document(scannableCodeId));
-                    cf.complete(true);
-                } else {
-                    cf.completeExceptionally(new Exception("ScannableCode does not exist!"));
-                }
-            }
+        CompletableFuture.runAsync(()->{
+            fireStoreHelper.documentWithIDExists(this.collectionReference, scannableCodeId)
+                    .thenAccept(exists -> {
+                        if(exists){
+                            ScannableCodeDocumentConverter.addCommentToScannableCodeDocument(newComment,
+                                    collectionReference.document(scannableCodeId));
+                            cf.complete(true);
+                        }else{
+                            cf.completeExceptionally(new Exception("ScannableCode does not exist!"));
+                        }
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
         });
         return cf;
     }
@@ -293,51 +303,59 @@ public class ScannableCodesDatabaseAdapter {
          * If the scananbleCode exists, then try to delete the comment from the
          * collection
          */
-        fireStoreHelper.documentWithIDExists(collectionReference, scannableCodeId, new BooleanCallback() {
+        CompletableFuture.runAsync(()->{
+            fireStoreHelper.documentWithIDExists(collectionReference, scannableCodeId)
+                    .thenAccept(exists -> {
+                        if (exists) {
+                            CollectionReference commentCollection = collectionReference
+                                    .document(scannableCodeId)
+                                    .collection(CollectionNames.COMMENTS.collectionName);
 
-            @Override
-            public void onCallback(Boolean isTrue) {
-                if (isTrue) {
-                    CollectionReference commentCollection = collectionReference
-                            .document(scannableCodeId)
-                            .collection(CollectionNames.COMMENTS.collectionName);
-
-                    /**
-                     * If a comment with the commentId exists, delete it from the collection
-                     */
-                    fireStoreHelper.documentWithIDExists(commentCollection, commentId,
-                            new BooleanCallback() {
-                                @Override
-                                public void onCallback(Boolean isTrue) {
-                                    if (isTrue) {
-                                        commentCollection.document(commentId)
-                                                .delete()
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                                                        cf.complete(true);
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        cf.completeExceptionally(new Exception("" +
-                                                                "An error occurred while deleting" +
-                                                                "the comment"));
-                                                    }
-                                                });
-                                    } else {
-                                        cf.completeExceptionally(new Exception("No such comment with the" +
-                                                "given id exists!"));
-                                    }
-                                }
-                            });
-                } else {
-                    cf.completeExceptionally(new Exception("No such document with the given scannableCodeId exists!"));
-                }
-            }
+                            /**
+                             * If a comment with the commentId exists, delete it from the collection
+                             */
+                            fireStoreHelper.documentWithIDExists(commentCollection, commentId)
+                                    .thenAccept(commentExists -> {
+                                        if (commentExists) {
+                                            commentCollection.document(commentId)
+                                                    .delete()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                                            cf.complete(true);
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            cf.completeExceptionally(e);
+                                                        }
+                                                    });
+                                        } else {
+                                            cf.completeExceptionally(new Exception("No such comment with the" +
+                                                    "given id exists!"));
+                                        }
+                                    })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
+                        } else {
+                            cf.completeExceptionally(new Exception("No such document with the given scannableCodeId exists!"));
+                        }
+                    }).exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
         });
+
         return cf;
     }
 

@@ -105,29 +105,35 @@ public class CodeLocationDatabaseAdapter {
          * Check if the a codeLocation document already exists with the given id, and add it
          * to the collection if it doesn't
          */
-        fireStoreHelper.documentWithIDExists(collectionReference, id, new BooleanCallback() {
-            @Override
-            public void onCallback(Boolean isTrue) {
-                codeLocationExists[0] = isTrue;
 
-                if(!codeLocationExists[0]){
-                    codeLocationDocumentConverter.addCodeLocationToCollection(codeLocation,
-                            collectionReference, fireStoreHelper).thenAccept(success -> {
-                                cf.complete(true);
-                    }).exceptionally(new Function<Throwable, Void>() {
-                        @Override
-                        public Void apply(Throwable throwable) {
-                            cf.completeExceptionally(throwable);
-                            return null;
-                        }
-                    });
-                }else{
-                    Log.e(TAG, "Code Location already exists!");
-                    cf.completeExceptionally(new Exception("Code location already exists!"));
-                }
-            }
-        });
+        fireStoreHelper.documentWithIDExists(collectionReference, id)
+                        .thenAccept(exists -> {
+                            if(!exists){
+                                CompletableFuture.runAsync(() -> {
+                                    codeLocationDocumentConverter.addCodeLocationToCollection(codeLocation,
+                                            collectionReference, fireStoreHelper).thenAccept(success -> {
+                                        cf.complete(true);
+                                    }).exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
+                                });
 
+                            }else{
+                                Log.e(TAG, "Code Location already exists!");
+                                cf.completeExceptionally(new Exception("Code location already exists!"));
+                            }
+                        })
+                                .exceptionally(new Function<Throwable, Void>() {
+                                    @Override
+                                    public Void apply(Throwable throwable) {
+                                        cf.completeExceptionally(throwable);
+                                        return null;
+                                    }
+                                });
         return cf;
     }
 
