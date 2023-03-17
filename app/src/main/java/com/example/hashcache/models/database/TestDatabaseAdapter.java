@@ -20,9 +20,9 @@ import java.util.concurrent.CompletableFuture;
  * can be performed on the database.
  */
 
-public class TestDatabaseMapper implements DatabasePort {
+public class TestDatabaseAdapter implements DatabasePort {
 
-    private static DatabaseMapper instance;
+    private static DatabaseAdapter instance;
     private HashMap<String, Player> players;
     private HashMap<String, String> userNameToIdMapper;
     private HashMap<String, ScannableCode> scannableCodeHashMap;
@@ -31,7 +31,7 @@ public class TestDatabaseMapper implements DatabasePort {
      * Constructs a new TestPlayerDatabase object with empty maps for players,
      * usernames, and scannable codes.
      */
-    public TestDatabaseMapper() {
+    public TestDatabaseAdapter() {
         userNameToIdMapper = new HashMap<>();
         players = new HashMap<>();
         scannableCodeHashMap = new HashMap<>();

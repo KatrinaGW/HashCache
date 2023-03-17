@@ -26,11 +26,11 @@ import java.util.function.Function;
  * It implements the IPlayerDatabase interface which defines the methods that
  * can be performed on the database.
  */
-public class DatabaseMapper extends Observable implements DatabasePort {
+public class DatabaseAdapter extends Observable implements DatabasePort {
     /**
      * Singleton instance of the PlayerDatabase class.
      */
-    private static DatabaseMapper instance;
+    private static DatabaseAdapter instance;
     /**
      * HashMap that contains all the players in the database.
      */

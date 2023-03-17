@@ -18,7 +18,6 @@ import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlaye
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetStringCallback;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

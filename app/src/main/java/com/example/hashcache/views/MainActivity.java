@@ -22,7 +22,7 @@ import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.context.Context;
-import com.example.hashcache.models.database.DatabaseMapper;
+import com.example.hashcache.models.database.DatabaseAdapter;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent goHome = new Intent(MainActivity.this, AppHome.class);
 
                     PlayersDatabaseAdapter.getInstance().getPlayers().thenAccept(players -> {
-                        DatabaseMapper databaseMapper = new DatabaseMapper();
+                        DatabaseAdapter databaseAdapter = new DatabaseAdapter();
 
                         startActivity(goHome);
 

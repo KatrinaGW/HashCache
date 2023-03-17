@@ -12,9 +12,9 @@ public class Database {
      */
     public static DatabasePort getInstance(){
         if(instance == null){
-            synchronized(DatabaseMapper.class) {
+            synchronized(DatabaseAdapter.class) {
                 if(instance == null){
-                    instance = new DatabaseMapper();
+                    instance = new DatabaseAdapter();
                 }
             }
         }
