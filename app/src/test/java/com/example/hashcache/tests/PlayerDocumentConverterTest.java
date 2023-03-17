@@ -13,6 +13,7 @@ import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlaye
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -36,8 +37,8 @@ public class PlayerDocumentConverterTest {
         DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
         CollectionReference mockCollectionReference = Mockito.mock(CollectionReference.class);
         String mockUserId = "123";
-        String mockEmail = "fakeEmail";
-        String mockPhoneNumber = "fakePhoneNumber";
+        String mockEmail = "fakeEmail@gmail.com";
+        String mockPhoneNumber = "111-111-1111";
         String mockUsername = "name";
         String mockGeolocationPreference = "true";
         String mockScannableCodeId = "321";
@@ -57,30 +58,21 @@ public class PlayerDocumentConverterTest {
         mockData.put(FieldNames.USERNAME.fieldName, mockUsername);
         mockWalletData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, mockScannableCodeId);
 
-        when(mockDocumentReference.getId()).thenReturn(mockUserId);
         when(mockDocumentReference.get()).thenReturn(mockTask);
-        when(mockTask.getResult()).thenReturn(mockDocumentSnapshot);
-        when(mockDocumentSnapshot.getData()).thenReturn(mockData);
-        when(mockDocumentReference.collection(CollectionNames.PLAYER_WALLET.collectionName))
-                .thenReturn(mockCollectionReference);
-        when(mockCollectionReference.get()).thenReturn(mockQueryTask);
-        when(mockQueryTask.isSuccessful()).thenReturn(false);
-        when(mockQueryTask.getResult()).thenReturn(mockQuerySnapshot);
         doAnswer(invocation -> {
             OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
             onCompleteListener.onComplete(mockTask);
             return null;
         }).when(mockTask).addOnCompleteListener(any(OnCompleteListener.class));
-        doAnswer(invocation -> {
-            OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
-            onCompleteListener.onComplete(mockQueryTask);
-            return mockQueryTask;
-        }).when(mockQueryTask).addOnCompleteListener(any(OnCompleteListener.class));
+        when(mockTask.isSuccessful()).thenReturn(true);
+        when(mockTask.getResult()).thenReturn(mockDocumentSnapshot);
+        when(mockDocumentSnapshot.exists()).thenReturn(true);
+        when(mockDocumentSnapshot.getData()).thenReturn(mockData);
 
         PlayerDocumentConverter playerDocumentConverter = getPlayerDocumentConverter();
 
-        playerDocumentConverter.getPlayerFromDocument(mockDocumentReference, mockGetPlayerCallback);
+        playerDocumentConverter.getPlayerFromDocument(mockDocumentReference);
 
-        verify(mockGetPlayerCallback, times(1)).onCallback(any(Player.class));
+        verify(mockDocumentSnapshot, times(4)).getData();
     }
 }

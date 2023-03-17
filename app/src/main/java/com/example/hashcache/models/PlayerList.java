@@ -69,27 +69,6 @@ public class PlayerList {
     }
 
     /**
-     * Gets the usernames of all players
-     * @return playerUserNames the usernames of all players
-     */
-    public CompletableFuture<ArrayList<String>> getPlayerUserNames(){
-        CompletableFuture<ArrayList<String>> cf = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
-            ArrayList<String> usernames = new ArrayList<>();
-            Database.getInstance().getPlayers()
-                    .thenAccept(map -> {
-                                Object[] list = map.keySet().toArray();
-                                for (int i = 0; i < list.length; i++) {
-                                    usernames.add(list[i].toString());
-                                }
-                                cf.complete(usernames);
-                            }
-                    );
-        });
-        return cf;
-    }
-
-    /**
      * Will return a sorted list of players of those who in some since match the search term.
      * Will sort by how closely the players match the term.
      * Will

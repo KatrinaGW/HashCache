@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.CodeLocation;
 import com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
-import com.example.hashcache.models.data_exchange.data_adapters.CodeLocationDataAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
@@ -64,8 +63,7 @@ public class CodeLocationDatabaseAdapterTest {
             BooleanCallback booleanCallback = invocation.getArgumentAt(2, BooleanCallback.class);
             booleanCallback.onCallback(false);
             return null;
-        }).when(mockFireStoreHelper).documentWithIDExists(any(CollectionReference.class), anyString(),
-                any(BooleanCallback.class));
+        }).when(mockFireStoreHelper).documentWithIDExists(any(CollectionReference.class), anyString());
 
         CodeLocationDatabaseAdapter codeLocationDatabaseAdapter = getMockCodeLocationConnectionHandler();
         codeLocationDatabaseAdapter.addCodeLocation(mockCodeLocation).thenAccept(success-> {
@@ -73,7 +71,7 @@ public class CodeLocationDatabaseAdapterTest {
         });
 
         verify(mockFireStoreHelper, times(1)).documentWithIDExists(any(CollectionReference.class),
-                anyString(), any(BooleanCallback.class));
+                anyString());
         verify(mockCodeLocationDocumentConverter, times(1)).addCodeLocationToCollection(
                 mockCodeLocation, mockCollectionReference, mockFireStoreHelper);
     }
