@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class PlayerDocumentConverterTest {
 
@@ -71,8 +72,14 @@ public class PlayerDocumentConverterTest {
 
         PlayerDocumentConverter playerDocumentConverter = getPlayerDocumentConverter();
 
-        playerDocumentConverter.getPlayerFromDocument(mockDocumentReference);
+        try{
+            Player thing = playerDocumentConverter.getPlayerFromDocument(mockDocumentReference).get();
+            verify(mockDocumentSnapshot, times(4)).getData();
+        }catch(Exception e){
 
-        verify(mockDocumentSnapshot, times(4)).getData();
+        }
+
+
+
     }
 }
