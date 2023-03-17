@@ -65,17 +65,16 @@
             android:layout_width="match_parent"
             android:layout_height="400dp"
             tools:context=".MapsActivity" />
-        <ImageButton
-            android:id="@+id/map_button"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:background="@drawable/circle_button"
-            app:tint="@color/black"
-            android:src="@android:drawable/ic_dialog_map"
-            android:layout_alignParentEnd="true"
-            android:layout_above="@+id/community_button"
-            android:layout_marginEnd="24dp"
-            android:elevation="6dp"/>
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/idSearchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="#BFBFBF"
+            android:elevation="5dp"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search Here" />
+
         <ImageButton
             android:id="@+id/community_button"
             android:layout_width="55dp"

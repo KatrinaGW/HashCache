@@ -71,7 +71,6 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
     private TextView mUsernameTextView;
     private TextView mScoreTextView;
     private ImageButton mMenuButton;
-    private ImageButton mMapButton;
     private ImageButton mCommunityButton;
     private View mMap;
     private AppCompatButton mScanQrButton;
@@ -146,16 +145,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
             }
         });
 
-        // add functionality to map button
-        ImageButton qrLocationButton = findViewById(R.id.map_button);
-        qrLocationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                // go to page showing QR codes near the user (as list)
-                startActivity(new Intent(AppHome.this, QRByLocation.class));
-            }
-        });
 
         // add functionality to community button
         ImageButton communityButton = findViewById(R.id.community_button);
@@ -343,7 +333,6 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         mUsernameTextView = findViewById(R.id.username_textview);
         mScoreTextView = findViewById(R.id.score_textview);
         mMenuButton = findViewById(R.id.menu_button);
-        mMapButton = findViewById(R.id.map_button);
         mCommunityButton = findViewById(R.id.community_button);
         mMap = findViewById(R.id.map);
         mScanQrButton = findViewById(R.id.scan_qr_button);
@@ -370,14 +359,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
     public void setMenuButtonListener(View.OnClickListener listener) {
         mMenuButton.setOnClickListener(listener);
     }
-    /**
 
-     Sets the listener for the map button.
-     @param listener the listener to set
-     */
-    public void setMapButtonListener(View.OnClickListener listener) {
-        mMapButton.setOnClickListener(listener);
-    }
     /**
 
      Sets the listener for the community button.
