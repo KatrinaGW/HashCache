@@ -69,8 +69,7 @@ public class FireStoreHelper {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        cf.completeExceptionally(new Exception("Something went wrong" +
-                                "while adding a boolean field to the document"));
+                        cf.completeExceptionally(e);
                     }
                 });
         return cf;
@@ -81,25 +80,28 @@ public class FireStoreHelper {
      * @param documentReference the document to add the field to
      * @param key the name of the field to add
      * @param value the value of the field to add
-     * @param booleanCallback the callback function to call once the operation has finished. Call with
-     *                        true if the operation was successful, and false otherwise
+     * @return cf the CompletableFuture with a boolean value indicating if the operation was
+     *          successful or not
      */
-    public void addStringFieldToDocument(DocumentReference documentReference, String key, String value,
-                                          BooleanCallback booleanCallback){
+    public CompletableFuture<Boolean> addStringFieldToDocument(DocumentReference documentReference,
+                                                               String key, String value){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
         documentReference
                 .update(key, value)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        booleanCallback.onCallback(true);
+                        cf.complete(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        booleanCallback.onCallback(false);
+                        cf.completeExceptionally(e);
                     }
                 });
+        return cf;
     }
 
     /**

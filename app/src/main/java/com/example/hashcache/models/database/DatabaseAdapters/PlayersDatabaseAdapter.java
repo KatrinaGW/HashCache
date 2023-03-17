@@ -299,29 +299,46 @@ public class PlayersDatabaseAdapter {
      */
     private CompletableFuture<Boolean> setContactInfo(DocumentReference playerDocument, ContactInfo contactInfo) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
         fireStoreHelper.addStringFieldToDocument(playerDocument, FieldNames.EMAIL.fieldName,
-                contactInfo.getEmail(),
-                new BooleanCallback() {
-                    @Override
-                    public void onCallback(Boolean isTrue) {
-                        if (isTrue) {
-                            fireStoreHelper.addStringFieldToDocument(playerDocument, FieldNames.PHONE_NUMBER.fieldName,
-                                    contactInfo.getPhoneNumber(), new BooleanCallback() {
-                                        @Override
-                                        public void onCallback(Boolean isTrue) {
-                                            if (isTrue) {
-                                                cf.complete(true);
-                                            }
-                                        }
-                                    });
-                        } else {
-                            Log.e(TAG, "Something went wrong while setting the contact information" +
-                                    "of the player document");
-                            cf.completeExceptionally(new Exception("Something went wrong while setting" +
-                                    "the contact information"));
-                        }
-                    }
-                });
+                contactInfo.getEmail()).thenAccept(success -> {
+            if (success) {
+                fireStoreHelper.addStringFieldToDocument(playerDocument,
+                                FieldNames.PHONE_NUMBER.fieldName, contactInfo.getPhoneNumber())
+                        .thenAccept(successful->{
+                            if(successful){
+                                cf.complete(true);
+                            }else{
+                                cf.completeExceptionally(new Exception(
+                                        "Something went wrong while setting the " +
+                                                "phone number!"
+                                ));
+                            }
+                        })
+                        .exceptionally(new Function<Throwable, Void>() {
+                            @Override
+                            public Void apply(Throwable throwable) {
+                                Log.d("Update contact info",
+                                        "Could not set the phone number");
+                                return null;
+                            }
+                        });
+
+            } else {
+                Log.e(TAG, "Something went wrong while setting the contact information" +
+                        "of the player document");
+                cf.completeExceptionally(new Exception("Something went wrong while setting" +
+                        "the contact information"));
+            }
+        })
+                .exceptionally(new Function<Throwable, Void>() {
+            @Override
+            public Void apply(Throwable throwable) {
+                Log.d("Update contact info",
+                        "Could not set the email");
+                return null;
+            }
+        });
         return cf;
     }
 
