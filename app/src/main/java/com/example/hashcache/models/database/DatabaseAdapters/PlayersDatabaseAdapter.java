@@ -266,21 +266,10 @@ public class PlayersDatabaseAdapter {
      */
     private CompletableFuture<Boolean> setPlayerPreferences(DocumentReference playerDocument,
                                                             PlayerPreferences playerPreferences) {
-        CompletableFuture<Boolean> cf = new CompletableFuture<>();
-        fireStoreHelper.addBooleanFieldToDocument(playerDocument, FieldNames.RECORD_GEOLOCATION.fieldName,
-                playerPreferences.getRecordGeolocationPreference(),
-                new BooleanCallback() {
-                    @Override
-                    public void onCallback(Boolean isTrue) {
-                        if (isTrue) {
-                            cf.complete(true);
-                        } else {
-                            Log.e(TAG, "Something went wrong while setting the player preferences");
-                            cf.completeExceptionally(new Exception("Something went wrong while " +
-                                    "setting the player preferences"));
-                        }
-                    }
-                });
+        CompletableFuture<Boolean> cf;
+        cf = fireStoreHelper.addBooleanFieldToDocument(playerDocument,
+                FieldNames.RECORD_GEOLOCATION.fieldName, playerPreferences.getRecordGeolocationPreference());
+
         return cf;
     }
 

@@ -5,7 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
-import com.example.hashcache.models.data_exchange.data_adapters.ScannableCodeDataAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.ScannableCodeDocumentConverter;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.Comment;
