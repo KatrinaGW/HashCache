@@ -238,12 +238,13 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
     public void onMapReady(GoogleMap googleMap) {
         this.map = googleMap;
 
+        Log.d("TEST", "Granted entry, permission is ok");
 
         getLocationPermission();
 
         updateLocationUI();
 
-        //getDeviceLocation();
+        getDeviceLocation();
     }
 
 
@@ -258,6 +259,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true;
+
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -290,11 +292,12 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
             if (locationPermissionGranted) {
                 map.setMyLocationEnabled(true);
                 map.getUiSettings().setMyLocationButtonEnabled(true);
+                getDeviceLocation();
             } else {
                 map.setMyLocationEnabled(false);
                 map.getUiSettings().setMyLocationButtonEnabled(false);
                 lastKnownLocation = null;
-                getLocationPermission();
+                //getLocationPermission();
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
