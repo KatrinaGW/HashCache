@@ -1,10 +1,8 @@
 package com.example.hashcache.models;
 
 import com.example.hashcache.controllers.DependencyInjector;
-import com.example.hashcache.models.data_exchange.database.Database;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetStringCallback;
+import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,13 +1,13 @@
 package com.example.hashcache.controllers;
 
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.PlayerDocumentConverter;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.FireStoreHelper;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayerWalletConnectionHandler;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.ScannableCodeDocumentConverter;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.converters.PlayerDocumentConverter;
+import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletConnectionHandler;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
+import com.example.hashcache.models.database.DatabaseAdapters.converters.ScannableCodeDocumentConverter;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;

@@ -19,19 +19,12 @@ import android.widget.TextView;
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
-import com.example.hashcache.models.Comment;
-import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.models.PlayerPreferences;
-import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.PlayersDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.context.Context;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
-import com.example.hashcache.models.data_exchange.database.DatabaseMapper;
+import com.example.hashcache.models.database.DatabaseMapper;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.List;
 import java.util.function.Function;

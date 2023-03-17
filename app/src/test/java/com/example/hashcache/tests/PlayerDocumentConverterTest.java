@@ -8,10 +8,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.Player;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.PlayerDocumentConverter;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.data_exchange.database.values.CollectionNames;
-import com.example.hashcache.models.data_exchange.database.values.FieldNames;
+import com.example.hashcache.models.database.DatabaseAdapters.converters.PlayerDocumentConverter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.values.CollectionNames;
+import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;

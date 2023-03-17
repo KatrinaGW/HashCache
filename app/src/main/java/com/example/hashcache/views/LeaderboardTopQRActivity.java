@@ -12,7 +12,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
-import com.example.hashcache.models.data_exchange.database.Database;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.context.Context;
 
 import java.util.ArrayList;

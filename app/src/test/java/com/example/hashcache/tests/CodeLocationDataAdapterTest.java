@@ -3,24 +3,14 @@ package com.example.hashcache.tests;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.CodeLocation;
 import com.example.hashcache.models.data_exchange.data_adapters.CodeLocationDataAdapter;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.FireStoreHelper;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.callbacks.GetCodeLocationCallback;
-import com.example.hashcache.models.data_exchange.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
 
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
