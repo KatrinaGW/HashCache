@@ -39,31 +39,33 @@ public class PlayerDocumentConverter {
         /**
          * Gets a player with everything but their PlayerWallet object
          */
-        getPersonalDetails(documentReference)
-                .thenAccept(playerDetails -> {
-                    getPlayerWallet(documentReference.collection(CollectionNames.PLAYER_WALLET.collectionName))
-                            .thenAccept(playerWallet -> {
-                                cf.complete(new Player(playerDetails.getUserId(),
-                                        playerDetails.getUsername(), playerDetails.getContactInfo(),
-                                        playerDetails.getPlayerPreferences(), playerWallet));
-                            })
-                            .exceptionally(new Function<Throwable, Void>() {
-                                @Override
-                                public Void apply(Throwable throwable) {
-                                    System.out.println("There was an error getting the scannableCodes.");
-                                    cf.completeExceptionally(throwable);
-                                    return null;
-                                }
-                            });
-                })
-                        .exceptionally(new Function<Throwable, Void>() {
-                            @Override
-                            public Void apply(Throwable throwable) {
-                                System.out.println("There was an error getting the scannableCodes.");
-                                cf.completeExceptionally(throwable);
-                                return null;
-                            }
-                        });
+        CompletableFuture.runAsync(()->{
+            CompletableFuture<Player> thing = getPersonalDetails(documentReference);
+                    thing.thenAccept(playerDetails -> {
+                        getPlayerWallet(documentReference.collection(CollectionNames.PLAYER_WALLET.collectionName))
+                                .thenAccept(playerWallet -> {
+                                    cf.complete(new Player(playerDetails.getUserId(),
+                                            playerDetails.getUsername(), playerDetails.getContactInfo(),
+                                            playerDetails.getPlayerPreferences(), playerWallet));
+                                })
+                                .exceptionally(new Function<Throwable, Void>() {
+                                    @Override
+                                    public Void apply(Throwable throwable) {
+                                        System.out.println("There was an error getting the scannableCodes.");
+                                        cf.completeExceptionally(throwable);
+                                        return null;
+                                    }
+                                });
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            System.out.println("There was an error getting the scannableCodes.");
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
 
         return cf;
     }
