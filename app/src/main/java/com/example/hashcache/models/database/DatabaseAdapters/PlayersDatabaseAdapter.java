@@ -378,20 +378,25 @@ public class PlayersDatabaseAdapter {
         data.put(FieldNames.PHONE_NUMBER.fieldName, "");
         data.put(FieldNames.RECORD_GEOLOCATION.fieldName, "");
         String userId = UUID.randomUUID().toString();
-        fireStoreHelper.setDocumentReference(collectionReference.document(userId),
-                data, new BooleanCallback() {
-                    @Override
-                    public void onCallback(Boolean isTrue) {
-                        if (isTrue) {
-                            cf.complete(userId);
-                        } else {
-                            Log.e(TAG, "Something went wrong while setting the userId" +
-                                    "on a new Playerdocument");
-                            cf.completeExceptionally(new Exception("Something went wrong while " +
-                                    "setting the userId on the new PlayerDocument"));
-                        }
-                    }
-                });
+
+        fireStoreHelper.setDocumentReference(collectionReference.document(userId), data)
+                        .thenAccept(successful -> {
+                            if (successful) {
+                                cf.complete(userId);
+                            } else {
+                                Log.e(TAG, "Something went wrong while setting the userId" +
+                                        "on a new Playerdocument");
+                                cf.completeExceptionally(new Exception("Something went wrong while " +
+                                        "setting the userId on the new PlayerDocument"));
+                            }
+                        })
+                                .exceptionally(new Function<Throwable, Void>() {
+                                    @Override
+                                    public Void apply(Throwable throwable) {
+                                        cf.completeExceptionally(throwable);
+                                        return null;
+                                    }
+                                });
 
         return cf;
     }

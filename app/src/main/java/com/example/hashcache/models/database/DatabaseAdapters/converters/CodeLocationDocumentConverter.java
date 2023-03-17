@@ -14,6 +14,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class CodeLocationDocumentConverter {
 
@@ -43,17 +44,22 @@ public class CodeLocationDocumentConverter {
              * the codeLocation and call the callback function with a true value,
              * otherwise call the callback function with false.
              */
-            fireStoreHelper.setDocumentReference(documentReference, data, new BooleanCallback() {
-                @Override
-                public void onCallback(Boolean isTrue) {
-                    if(isTrue){
-                        cf.complete(true);
-                    }else{
-                        cf.completeExceptionally(new Exception("Something went wrong while" +
-                                "adding the code location to the Collection"));
-                    }
-                }
-            });
+            fireStoreHelper.setDocumentReference(documentReference, data)
+                            .thenAccept(successful -> {
+                                if(successful){
+                                    cf.complete(true);
+                                }else{
+                                    cf.completeExceptionally(new Exception("Something went wrong while" +
+                                            "adding the code location to the Collection"));
+                                }
+                            })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
         });
 
         return cf;

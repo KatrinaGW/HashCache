@@ -41,22 +41,27 @@ public class ScannableCodeDocumentConverter {
          * Create a new document with the ScannableCode data and whose id is the
          * scannableCodeId, and put the document into the scannableCodes collection
          */
-        fireStoreHelper.setDocumentReference(collectionReference
-                .document(scannableCode.getScannableCodeId()), data, new BooleanCallback() {
-            @Override
-            public void onCallback(Boolean isTrue) {
-                if (isTrue) {
-                    if (comments.size() > 0) {
-
-                        addCommentToScannableCodeDocument(comments.get(0),
-                                collectionReference.document(scannableCode.getScannableCodeId()));
-                        cf.complete(scannableCode.getScannableCodeId());
-                    } else {
-                        cf.complete(scannableCode.getScannableCodeId());
+        fireStoreHelper.setDocumentReference(
+                collectionReference.document(scannableCode.getScannableCodeId()), data)
+                        .thenAccept(successful -> {
+                            if(successful){
+                                if(comments.size()>0){
+                                    addCommentToScannableCodeDocument(comments.get(0),
+                                            collectionReference.document(scannableCode.getScannableCodeId()));
+                                }
+                                cf.complete(scannableCode.getScannableCodeId());
+                            }else{
+                                cf.completeExceptionally(new Exception("Something went wrong" +
+                                        "while adding a scannable code to the collection"));
+                            }
+                        })
+                .exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        cf.completeExceptionally(throwable);
+                        return null;
                     }
-                }
-            }
-        });
+                });
         return cf;
     }
 

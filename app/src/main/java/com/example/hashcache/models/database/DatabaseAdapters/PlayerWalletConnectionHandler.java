@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 /**
  * Handles the database operations on a player's PlayerWallet collection
@@ -106,20 +107,25 @@ public class PlayerWalletConnectionHandler {
                         }
                         DocumentReference playerWalletReference = playerWalletCollection.document(scannableCodeId);
 
-                        fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData,
-                                new BooleanCallback() {
-                                    @Override
-                                    public void onCallback(Boolean isTrue) {
-                                        if(isTrue){
-                                            cf.complete(null);
-                                        }else{
-                                            cf.completeExceptionally(new Exception(
-                                                    "Something went wrong while adding the scananble" +
-                                                            "code document"
-                                            ));
-                                        }
-                                    }
-                                });
+                        fireStoreHelper.setDocumentReference(playerWalletReference,
+                                scannableCodeIdData)
+                                        .thenAccept(successful -> {
+                                            if(successful){
+                                                cf.complete(null);
+                                            }else{
+                                                cf.completeExceptionally(new Exception(
+                                                        "Something went wrong while adding the scananble" +
+                                                                "code document"
+                                                ));
+                                            }
+                                        })
+                                                .exceptionally(new Function<Throwable, Void>() {
+                                                    @Override
+                                                    public Void apply(Throwable throwable) {
+                                                        cf.completeExceptionally(throwable);
+                                                        return null;
+                                                    }
+                                                });
 
                     }
                 });

@@ -108,24 +108,27 @@ public class FireStoreHelper {
      * Sets the id reference and initial data for a specific document
      * @param documentReference the document to set the id and initial data on
      * @param data the initial fields, with String values, to add to the document
-     * @param booleanCallback the callback function to call once the operation has finished. Call
-     *                        with true if the operation was successful, and false otherwise
+     * @return cf the CompletableFuture with a boolean value indicating if the operation was
+     *          successful or not
      */
-    public void setDocumentReference(DocumentReference documentReference,
-                                     HashMap<String, String> data, BooleanCallback booleanCallback){
+    public CompletableFuture<Boolean> setDocumentReference(DocumentReference documentReference,
+                                     HashMap<String, String> data){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
         documentReference.set(data)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        booleanCallback.onCallback(true);
+                        cf.complete(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        booleanCallback.onCallback(false);
+                        cf.completeExceptionally(e);
                     }
                 });
+        return cf;
     }
 
 
