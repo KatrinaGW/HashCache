@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -20,6 +21,7 @@ import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.DatabaseAdapter;
@@ -127,9 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 addUserCommand.loginUser(getUsername()).thenAccept(res -> {
                     Intent goHome = new Intent(MainActivity.this, AppHome.class);
 
-                    PlayersDatabaseAdapter.getInstance().getPlayers().thenAccept(players -> {
-                        DatabaseAdapter databaseAdapter = new DatabaseAdapter();
-
+                    Database.getInstance().getPlayers().thenAccept(players -> {
                         startActivity(goHome);
 
                     });

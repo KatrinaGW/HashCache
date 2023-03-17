@@ -18,6 +18,7 @@ public class UpdateUserPreferencesCommand {
         // Set the geo-location recording preference for the current player
         currentPlayer.getPlayerPreferences().setGeoLocationRecording(enabled);
         // Update the player preferences in the database
-        Database.getInstance().updatePlayerPreferences(currentPlayer.getUserId(), currentPlayer.getPlayerPreferences());
+        Database.getInstance().updatePlayerPreferences(currentPlayer.getUserId(),
+                currentPlayer.getPlayerPreferences());
     }
 }

@@ -39,10 +39,6 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
      * HashMap that maps usernames to userIds.
      */
     private HashMap<String, String> userNameToIdMapper;
-    /**
-     * HashMap that contains all the scannable codes in the database.
-     */
-    private HashMap<String, ScannableCode> scannableCodeHashMap;
 
     private ListenerRegistration playerListener;
     private ListenerRegistration walletListener;
