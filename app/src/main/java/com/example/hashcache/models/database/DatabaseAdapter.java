@@ -266,6 +266,12 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return cf;
     }
 
+    /**
+     * Add a scannableCode to the player's wallet
+     * @param userId the id of the user whose wallet will have the scannable code added to it
+     * @param scannableCodeId the id of the scannable code to add
+     * @return cf the CompleteableFuture which returns once the operation has been completed
+     */
     @Override
     public CompletableFuture<Void> addScannableCodeToPlayerWallet(String userId, String scannableCodeId) {
         System.out.println("[[ Trying to add to wallet...");
@@ -291,11 +297,24 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return cf;
     }
 
+    /**
+     * Check if a scannableCode already exists in a player's wallet
+     * @param userId the id of the user whose wallet needs to be checked for the scannable code
+     * @param scannableCodeId the id of the scannable code to check for
+     * @return cf the CompletableFuture with a boolean value indicating if the scannable code already
+     *          exists in the wallet or not
+     */
     @Override
     public CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId) {
         return PlayerWalletConnectionHandler.getInstance().scannableCodeExistsOnPlayerWallet(userId, scannableCodeId);
     }
 
+    /**
+     * Check if the scannableCode already exists in the database
+     * @param scannableCodeId the scannable code to check for
+     * @return cf the CompletableFuture with a boolean value indicating if the scananble
+     *          code already exists or not
+     */
     @Override
     public CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId) {
         return ScannableCodesDatabaseAdapter.getInstance().scannableCodeIdExists(scannableCodeId);
@@ -410,16 +429,33 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return cf;
     }
 
+    /**
+     * Called when the player's data changes
+     * @param playerId the id of the player whose data changed
+     * @param callback the callback function which will be called with the player hwose data changed
+     */
     @Override
     public void onPlayerDataChanged(String playerId, GetPlayerCallback callback) {
         playerListener = PlayersDatabaseAdapter.getInstance().setupPlayerListener(playerId, callback);
     }
 
+    /**
+     * Called when a player's wallet changes
+     * @param playerId the id of the player whose wallet changed
+     * @param callback the callback to call once the changes have been processed
+     */
     @Override
     public void onPlayerWalletChanged(String playerId, BooleanCallback callback) {
         walletListener = PlayerWalletConnectionHandler.getInstance().getPlayerWalletChangeListener(playerId, callback);
     }
 
+    /**
+     * Deletes a comment from a scananble code
+     * @param scannableCodeId the id of the scannable code to delete the comment from
+     * @param commentId the id of the comment to delete
+     * @return cf the CompletableFuture with a boolean value indicating if the operation was successful
+     * or not
+     */
     @Override
     public CompletableFuture<Boolean> deleteComment(String scannableCodeId, String commentId){
         CompletableFuture<Boolean> cf = ScannableCodesDatabaseAdapter.getInstance().deleteComment(
@@ -532,11 +568,6 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
                     });
         });
         return cf;
-    }
-
-    private void triggerObservers() {
-        setChanged();
-        notifyObservers();
     }
 
 }
