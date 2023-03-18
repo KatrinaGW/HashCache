@@ -37,9 +37,7 @@ public class PlayerDocumentConverterTest {
     @Test
     void getPlayerFromDocumentTaskFailureTest(){
         DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
-        CollectionReference mockCollectionReference = Mockito.mock(CollectionReference.class);
         CollectionReference mockWalletCollection = Mockito.mock(CollectionReference.class);
-        String mockUserId = "123";
         String mockEmail = "fakeEmail@gmail.com";
         String mockPhoneNumber = "111-111-1111";
         String mockUsername = "name";
@@ -50,8 +48,6 @@ public class PlayerDocumentConverterTest {
         Task<DocumentSnapshot> mockTask = Mockito.mock(Task.class);
         Task<QuerySnapshot> mockQueryTask = Mockito.mock(Task.class);
         DocumentSnapshot mockDocumentSnapshot = Mockito.mock(DocumentSnapshot.class);
-        GetPlayerCallback mockGetPlayerCallback = Mockito.mock(GetPlayerCallback.class);
-        Task mockTaskAgain = Mockito.mock(Task.class);
 
         QuerySnapshot mockQuerySnapshot = Mockito.mock(QuerySnapshot.class);
         when(mockQuerySnapshot.size()).thenReturn(0);
@@ -83,8 +79,6 @@ public class PlayerDocumentConverterTest {
         when(mockQueryTask.isSuccessful()).thenReturn(false);
 
         PlayerDocumentConverter playerDocumentConverter = getPlayerDocumentConverter();
-
-
 
         assertThrows(Exception.class, () -> {
             playerDocumentConverter.getPlayerFromDocument(mockDocumentReference).join();
