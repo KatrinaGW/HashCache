@@ -18,6 +18,7 @@ import com.example.hashcache.models.database.values.CollectionNames;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.rpc.Code;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ public class CodeLocationDatabaseAdapterTest {
     CodeLocationDocumentConverter mockCodeLocationDocumentConverter;
     CollectionReference mockCollectionReference;
 
-    private CodeLocationDatabaseAdapter getMockCodeLocationConnectionHandler(){
+    private CodeLocationDatabaseAdapter getCodeLocationDatabaseAdapter(){
         return CodeLocationDatabaseAdapter.makeInstance(mockFireStoreHelper, mockDb, mockCodeLocationDocumentConverter);
     }
 
@@ -48,31 +49,39 @@ public class CodeLocationDatabaseAdapterTest {
 
     @Test
     void addCodeLocationTest(){
-        CollectionReference mockCollectionReference = Mockito.mock(CollectionReference.class);
+        CompletableFuture<Boolean> fireStoreCF = new CompletableFuture<>();
+        fireStoreCF.complete(false);
+        CompletableFuture<Boolean> converterCF = new CompletableFuture<>();
+        converterCF.complete(true);
+        CodeLocation testCodeLocation = new CodeLocation("My Swamp!", 1, 2, 3);
+
+        when(mockFireStoreHelper.documentWithIDExists(mockCollectionReference, testCodeLocation.getId()))
+                .thenReturn(fireStoreCF);
+        when(mockCodeLocationDocumentConverter.addCodeLocationToCollection(testCodeLocation,
+                mockCollectionReference, mockFireStoreHelper)).thenReturn(converterCF);
+
+        CodeLocationDatabaseAdapter codeLocationDatabaseAdapter = getCodeLocationDatabaseAdapter();
+        boolean success = codeLocationDatabaseAdapter.addCodeLocation(testCodeLocation).join();
+
+        assertTrue(success);
+    }
+
+    @Test
+    void getCodeLocationTest(){
+        String mockId = "This is not the ID you are looking for";
+        CodeLocation mockCodeLocation = Mockito.mock(CodeLocation.class);
         DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
-        CodeLocation mockCodeLocation = new CodeLocation("fakeName", 1, 2, 3);
-        CompletableFuture<Boolean> mockCF = new CompletableFuture<>();
-        mockCF.complete(true);
+        CompletableFuture<CodeLocation> testCF = new CompletableFuture<>();
+        testCF.complete(mockCodeLocation);
 
-        when(mockDb.collection(CollectionNames.CODE_LOCATIONS.collectionName)).thenReturn(mockCollectionReference);
-        when(mockCollectionReference.document(mockCodeLocation.getId())).thenReturn(mockDocumentReference);
-        when(mockCodeLocationDocumentConverter.addCodeLocationToCollection(mockCodeLocation,
-                mockCollectionReference, mockFireStoreHelper)).thenReturn(mockCF);
+        when(mockCollectionReference.document(mockId)).thenReturn(mockDocumentReference);
+        when(mockCodeLocationDocumentConverter.convertDocumentReferenceToCodeLocation(mockDocumentReference))
+                .thenReturn(testCF);
 
-        doAnswer(invocation -> {
-            BooleanCallback booleanCallback = invocation.getArgumentAt(2, BooleanCallback.class);
-            booleanCallback.onCallback(false);
-            return null;
-        }).when(mockFireStoreHelper).documentWithIDExists(any(CollectionReference.class), anyString());
+        CodeLocationDatabaseAdapter codeLocationDatabaseAdapter = getCodeLocationDatabaseAdapter();
 
-        CodeLocationDatabaseAdapter codeLocationDatabaseAdapter = getMockCodeLocationConnectionHandler();
-        codeLocationDatabaseAdapter.addCodeLocation(mockCodeLocation).thenAccept(success-> {
-            assertTrue(success);
-        });
+        CodeLocation result = codeLocationDatabaseAdapter.getCodeLocation(mockId).join();
 
-        verify(mockFireStoreHelper, times(1)).documentWithIDExists(any(CollectionReference.class),
-                anyString());
-        verify(mockCodeLocationDocumentConverter, times(1)).addCodeLocationToCollection(
-                mockCodeLocation, mockCollectionReference, mockFireStoreHelper);
+        assertEquals(result, mockCodeLocation);
     }
 }

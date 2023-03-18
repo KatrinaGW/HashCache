@@ -71,12 +71,11 @@ public class CodeLocationDocumentConverter {
      * @return cf the CompleteableFuture with the CodeLocation
      * @throws IllegalArgumentException if the document does not exist
      */
-    public static CompletableFuture<CodeLocation> convertDocumentReferenceToCodeLocation(DocumentReference documentReference){
+    public CompletableFuture<CodeLocation> convertDocumentReferenceToCodeLocation(DocumentReference documentReference){
         CompletableFuture<CodeLocation> cf = new CompletableFuture<>();
         double[] coordinates = new double[3];
         String[] locationName = new String[1];
 
-        //CompletableFuture.runAsync(()->{
         /**
          * If the document exists, convert it into a CodeLocation object
          */
@@ -112,7 +111,6 @@ public class CodeLocationDocumentConverter {
                     }
                 }
             });
-        //});
 
         return cf;
     }

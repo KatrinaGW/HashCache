@@ -99,8 +99,6 @@ public class CodeLocationDatabaseAdapter {
         String id = codeLocation.getId();
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
-        final boolean[] codeLocationExists = new boolean[1];
-
         /**
          * Check if the a codeLocation document already exists with the given id, and add it
          * to the collection if it doesn't
@@ -147,7 +145,7 @@ public class CodeLocationDatabaseAdapter {
 
         CompletableFuture<CodeLocation> cf;
 
-        cf = CodeLocationDocumentConverter.convertDocumentReferenceToCodeLocation(documentReference);
+        cf = codeLocationDocumentConverter.convertDocumentReferenceToCodeLocation(documentReference);
 
         return cf;
     }
