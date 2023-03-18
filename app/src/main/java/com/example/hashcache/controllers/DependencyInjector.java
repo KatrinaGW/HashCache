@@ -46,15 +46,14 @@ public class DependencyInjector {
     /**
      * Create and return an instance of the PlayersConnectionHandler with its necessary
      * dependencies
-     * @param inAppUsernamesIds the ids of all users mapped to their usernames
+     *
      * @return PlayersConnectionHandler.INSTANCE the static INSTANCE of the PlayersConnectionHandler
      *      class
      */
-    public static PlayersDatabaseAdapter makePlayersConnectionHandler(HashMap<String,
-            String> inAppUsernamesIds){
+    public static PlayersDatabaseAdapter makePlayersConnectionHandler(){
         FireStoreHelper fireStoreHelper = new FireStoreHelper();
 
-        return PlayersDatabaseAdapter.makeInstance(inAppUsernamesIds, new PlayerDocumentConverter(),
+        return PlayersDatabaseAdapter.makeInstance(new PlayerDocumentConverter(),
                 fireStoreHelper, FirebaseFirestore.getInstance(), new PlayerWalletConnectionHandler(fireStoreHelper));
     }
 

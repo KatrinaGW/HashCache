@@ -71,6 +71,11 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return PlayersDatabaseAdapter.getInstance().getPlayerIdByUsername(username);
     }
 
+    /**
+     * Create a new player with the given username
+     * @param username the username to use for the new player
+     * @return cf the CompletableFuture that completes once the user is created
+     */
     @Override
     public CompletableFuture<Void> createPlayer(String username) {
 

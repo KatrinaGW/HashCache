@@ -35,7 +35,6 @@ import java.util.function.Function;
 public class PlayersDatabaseAdapter {
     private FirebaseFirestore db;
     private CollectionReference collectionReference;
-    private HashMap<String, Player> cachedPlayers;
     final String TAG = "Sample";
     private PlayerDocumentConverter playerDocumentConverter;
     private FireStoreHelper fireStoreHelper;
@@ -45,8 +44,7 @@ public class PlayersDatabaseAdapter {
     /**
      * Creates a new instance of the class and initializes the connection to the
      * database
-     * 
-     * @param inAppNamesIds                 a mapping of userIds to their usernames
+     *
      * @param playerDocumentConverter       the instance of the
      *                                      PlayerDocumentConverter class
      *                                      to use to convert documents into Player
@@ -60,11 +58,9 @@ public class PlayersDatabaseAdapter {
      *                                      class to use to interact with a player's
      *                                      wallet collection
      */
-    private PlayersDatabaseAdapter(HashMap<String, String> inAppNamesIds,
-                                   PlayerDocumentConverter playerDocumentConverter,
+    private PlayersDatabaseAdapter(PlayerDocumentConverter playerDocumentConverter,
                                    FireStoreHelper fireStoreHelper,
                                    FirebaseFirestore db, PlayerWalletConnectionHandler playerWalletConnectionHandler) {
-        this.cachedPlayers = new HashMap<>();
         this.playerDocumentConverter = playerDocumentConverter;
         this.fireStoreHelper = fireStoreHelper;
         this.playerWalletConnectionHandler = playerWalletConnectionHandler;
@@ -91,8 +87,7 @@ public class PlayersDatabaseAdapter {
     /**
      * Create and get the static instance of the PlayersConnectinoHandler class with
      * its dependencies
-     * 
-     * @param inAppNamesIds                 a mapping of userIds to their usernames
+     *
      * @param playerDocumentConverter       the instance of the
      *                                      PlayerDocumentConverter class
      *                                      to use to convert documents into Player
@@ -110,15 +105,14 @@ public class PlayersDatabaseAdapter {
      *
      * @throws IllegalArgumentException if the INSTANCE has already been initialized
      */
-    public static PlayersDatabaseAdapter makeInstance(HashMap<String, String> inAppNamesIds,
-                                                      PlayerDocumentConverter playerDocumentConverter,
+    public static PlayersDatabaseAdapter makeInstance(PlayerDocumentConverter playerDocumentConverter,
                                                       FireStoreHelper fireStoreHelper,
                                                       FirebaseFirestore db,
                                                       PlayerWalletConnectionHandler playerWalletConnectionHandler) {
         if (INSTANCE != null) {
             throw new IllegalArgumentException("Instance of PlayersConnectionHandler already exists!");
         }
-        INSTANCE = new PlayersDatabaseAdapter(inAppNamesIds, playerDocumentConverter,
+        INSTANCE = new PlayersDatabaseAdapter(playerDocumentConverter,
                 fireStoreHelper, db, playerWalletConnectionHandler);
         return INSTANCE;
     }
@@ -176,6 +170,10 @@ public class PlayersDatabaseAdapter {
         return cf;
     }
 
+    /**
+     * Get all the players in the app
+     * @return cf the CompletableFuture with a mapping of user's ids to their usernames
+     */
     public CompletableFuture<HashMap<String, String>> getPlayers() {
         CompletableFuture<HashMap<String, String>> cf = new CompletableFuture<>();
         HashMap<String, String> usernamesIds = new HashMap<>();

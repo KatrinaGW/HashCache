@@ -15,17 +15,13 @@ import java.util.concurrent.CompletableFuture;
  */
 public class PlayerList {
     private static PlayerList INSTANCE;
-    private ArrayList<String> playerUserNames;
-    private HashMap<String, String> playerIdsNamesMapping;
     private PlayersDatabaseAdapter playersConnectionHandler;
     /**
      * Private constructor for creating a new instance of PlayerList
      */
     private PlayerList(){
-        playerUserNames = new ArrayList<>();
-        playerIdsNamesMapping = new HashMap<>();
         playersConnectionHandler = DependencyInjector
-                .makePlayersConnectionHandler(playerIdsNamesMapping);
+                .makePlayersConnectionHandler();
     }
     /**
      * Private constructor for creating a new instance of PlayerList with a given PlayersConnectionHandler
