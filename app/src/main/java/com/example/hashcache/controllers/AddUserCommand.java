@@ -18,6 +18,8 @@ public class AddUserCommand {
      * Logs in the user with the given username or creates a new user with the given username if the user does not exist.
      *
      * @param userName the username of the user to log in or create
+     * @param db the database instance of the DatabasePort to interface with the Firestore collection
+     * @param context the current app context
      * @return a CompletableFuture that completes when the user has been logged in or created
      */
     public CompletableFuture<Void> loginUser(String userName, DatabasePort db, Context context){
@@ -44,6 +46,8 @@ public class AddUserCommand {
      * Sets up the user with the given username after the user has been logged in or created.
      *
      * @param userName the username of the user to set up
+     * @param db the interface to use to conenct to the firestore collection
+     * @param context the current context of the app
      * @param cf the CompletableFuture to complete when the user has been set up
      */
     private void setupUser(String userName, CompletableFuture<Void> cf, DatabasePort db,

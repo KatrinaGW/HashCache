@@ -19,6 +19,7 @@ import com.example.hashcache.R;
 import com.example.hashcache.controllers.UpdateContactInfoCommand;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.context.Context;
+import com.example.hashcache.models.database.Database;
 
 public class EditPlayerInfoActivity extends AppCompatActivity {
     private EditText editEmail;
@@ -84,7 +85,7 @@ public class EditPlayerInfoActivity extends AppCompatActivity {
         newContactInfo.setEmail(emailText);
 
         UpdateContactInfoCommand.updateContactInfoCommand(Context.get().getCurrentPlayer().getUserId(),
-                        newContactInfo)
+                        newContactInfo, Database.getInstance(), Context.get())
                 .thenAccept(isComplete->{
                     if(isComplete){
                         runOnUiThread(new Runnable() {
