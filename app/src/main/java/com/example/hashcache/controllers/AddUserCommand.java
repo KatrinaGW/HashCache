@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.context.Context;
+import com.example.hashcache.models.database.DatabasePort;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.concurrent.CompletableFuture;
@@ -19,15 +20,15 @@ public class AddUserCommand {
      * @param userName the username of the user to log in or create
      * @return a CompletableFuture that completes when the user has been logged in or created
      */
-    public CompletableFuture<Void> loginUser(String userName){
+    public CompletableFuture<Void> loginUser(String userName, DatabasePort db, Context context){
         CompletableFuture<Void> cf = new CompletableFuture<>();
-        Database.getInstance().usernameExists(userName).thenAccept(exists -> {
+        db.usernameExists(userName).thenAccept(exists -> {
             if(exists){
-                setupUser(userName, cf);
+                setupUser(userName, cf, db, context);
             }
             else{
-                Database.getInstance().createPlayer(userName).thenAccept(result -> {
-                    setupUser(userName, cf);
+                db.createPlayer(userName).thenAccept(result -> {
+                    setupUser(userName, cf, db, context);
                 }).exceptionally(new Function<Throwable, Void>() {
                     @Override
                     public Void apply(Throwable throwable) {
@@ -45,11 +46,12 @@ public class AddUserCommand {
      * @param userName the username of the user to set up
      * @param cf the CompletableFuture to complete when the user has been set up
      */
-    private void setupUser(String userName, CompletableFuture<Void> cf) {
-        Database.getInstance().getIdByUsername(userName).thenAccept(userId -> {
-            Database.getInstance().getPlayer(userId).thenAccept(player -> {
-                Context.get().setCurrentPlayer(player);
-                Context.get().setupListeners();
+    private void setupUser(String userName, CompletableFuture<Void> cf, DatabasePort db,
+                           Context context) {
+        db.getIdByUsername(userName).thenAccept(userId -> {
+            db.getPlayer(userId).thenAccept(player -> {
+                context.setCurrentPlayer(player);
+                context.setupListeners();
                 cf.complete(null);
             }).exceptionally(new Function<Throwable, Void>() {
                 @Override

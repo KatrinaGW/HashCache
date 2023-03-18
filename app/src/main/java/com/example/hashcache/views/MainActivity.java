@@ -126,13 +126,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                addUserCommand.loginUser(getUsername()).thenAccept(res -> {
-                    Intent goHome = new Intent(MainActivity.this, AppHome.class);
+                addUserCommand.loginUser(getUsername(), Database.getInstance(), Context.get())
+                        .thenAccept(res -> {
+                            Intent goHome = new Intent(MainActivity.this, AppHome.class);
 
-                    Database.getInstance().getPlayers().thenAccept(players -> {
-                        startActivity(goHome);
+                            Database.getInstance().getPlayers().thenAccept(players -> {
+                                startActivity(goHome);
 
-                    });
+                            });
 
                 }).exceptionally(new Function<Throwable, Void>() {
                     @Override
