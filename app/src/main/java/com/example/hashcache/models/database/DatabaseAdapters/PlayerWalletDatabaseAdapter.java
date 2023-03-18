@@ -106,37 +106,39 @@ public class PlayerWalletDatabaseAdapter {
         fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId)
                         .thenAccept(exists -> {
                             if (exists) {
-                                throw new IllegalArgumentException("A document already exists in the " +
-                                        "PlayerWallet with the given scananbleCodeId!");
+                                cf.completeExceptionally(new Exception("The scannable code with" +
+                                        "the given id already exists!"));
                             }
-                            HashMap<String, String> scannableCodeIdData = new HashMap<>();
-                            scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
-                            if (locationImage != null) {
-                                // TODO: insert the image
-                            }
-                            DocumentReference playerWalletReference = playerWalletCollection.document(scannableCodeId);
+                            else{
+                                HashMap<String, String> scannableCodeIdData = new HashMap<>();
+                                scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
+                                if (locationImage != null) {
+                                    // TODO: insert the image
+                                }
+                                DocumentReference playerWalletReference = playerWalletCollection.document(scannableCodeId);
 
-                            CompletableFuture.runAsync(() -> {
-                                fireStoreHelper.setDocumentReference(playerWalletReference,
-                                                scannableCodeIdData)
-                                        .thenAccept(successful -> {
-                                            if(successful){
-                                                cf.complete(null);
-                                            }else{
-                                                cf.completeExceptionally(new Exception(
-                                                        "Something went wrong while adding the scananble" +
-                                                                "code document"
-                                                ));
-                                            }
-                                        })
-                                        .exceptionally(new Function<Throwable, Void>() {
-                                            @Override
-                                            public Void apply(Throwable throwable) {
-                                                cf.completeExceptionally(throwable);
-                                                return null;
-                                            }
-                                        });
-                            });
+                                CompletableFuture.runAsync(() -> {
+                                    fireStoreHelper.setDocumentReference(playerWalletReference,
+                                                    scannableCodeIdData)
+                                            .thenAccept(successful -> {
+                                                if (successful) {
+                                                    cf.complete(null);
+                                                } else {
+                                                    cf.completeExceptionally(new Exception(
+                                                            "Something went wrong while adding the scananble" +
+                                                                    "code document"
+                                                    ));
+                                                }
+                                            })
+                                            .exceptionally(new Function<Throwable, Void>() {
+                                                @Override
+                                                public Void apply(Throwable throwable) {
+                                                    cf.completeExceptionally(throwable);
+                                                    return null;
+                                                }
+                                            });
+                                });
+                            }
 
                         })
                 .exceptionally(new Function<Throwable, Void>() {

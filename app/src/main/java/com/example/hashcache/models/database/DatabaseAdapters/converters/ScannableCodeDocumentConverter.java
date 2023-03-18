@@ -99,7 +99,7 @@ public class ScannableCodeDocumentConverter {
      * @param documentReference the document reference to get the scannableCode object from
      * @return cf the CompleteableFuture with the ScannableCode object
      */
-    public static CompletableFuture<ScannableCode> getScannableCodeFromDocument(DocumentReference documentReference){
+    public CompletableFuture<ScannableCode> getScannableCodeFromDocument(DocumentReference documentReference){
         String[] scannableCodeId = new String[1];
         String[] codeLocationId  = new String[1];
         String[] generatedName = new String[1];

@@ -176,13 +176,10 @@ public class QRStats extends AppCompatActivity implements Observer {
     }
 
     private void init() {
-
         menuButton = findViewById(R.id.menu_button);
         scoreIcon = findViewById(R.id.score_icon);
         totalScoreTextView = findViewById(R.id.total_score_value);
         myCodesTextView = findViewById(R.id.my_codes_value);
-        topScoreTextView = findViewById(R.id.top_score_value);
-        lowScoreTextView = findViewById(R.id.low_score_value);
         myProfileButton = findViewById(R.id.my_profile_button);
     }
 

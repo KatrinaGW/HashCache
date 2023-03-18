@@ -180,7 +180,7 @@ public class ScannableCodesDatabaseAdapter {
                             if (scannableCodeIds.contains(document.getId())) {
                                 matches++;
 
-                                ScannableCodeDocumentConverter.getScannableCodeFromDocument(
+                                scannableCodeDocumentConverter.getScannableCodeFromDocument(
                                         document.getReference()
                                 ).thenAccept(scannableCode -> {
                                     scannableCodes.add(scannableCode);
