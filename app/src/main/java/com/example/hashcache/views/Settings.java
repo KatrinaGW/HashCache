@@ -31,6 +31,7 @@ import com.example.hashcache.R;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.context.Context;
+import com.example.hashcache.models.database.Database;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -142,7 +143,8 @@ public class Settings extends AppCompatActivity implements Observer {
 
         boolean checked = ((CheckBox) view).isChecked();
 
-        UpdateUserPreferencesCommand.toggleGeoLocationPreference(checked);
+        UpdateUserPreferencesCommand.toggleGeoLocationPreference(checked, Context.get(),
+                Database.getInstance());
     }
     /**
      * Sets the username of the current user in the username view.
