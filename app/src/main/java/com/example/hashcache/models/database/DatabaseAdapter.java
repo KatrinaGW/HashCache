@@ -7,7 +7,7 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletConnectionHandler;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
@@ -191,7 +191,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         CompletableFuture.runAsync(() -> {
             if (players.containsKey(userId)) {
                 Player p = players.get(userId);
-                PlayerWalletConnectionHandler.getInstance()
+                PlayerWalletDatabaseAdapter.getInstance()
                         .getPlayerWalletTotalScore(p.getPlayerWallet().getScannedCodeIds())
                         .thenAccept(totalScore -> {
                             cf.complete(totalScore);
@@ -307,7 +307,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
      */
     @Override
     public CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId) {
-        return PlayerWalletConnectionHandler.getInstance().scannableCodeExistsOnPlayerWallet(userId, scannableCodeId);
+        return PlayerWalletDatabaseAdapter.getInstance().scannableCodeExistsOnPlayerWallet(userId, scannableCodeId);
     }
 
     /**
@@ -447,7 +447,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
      */
     @Override
     public void onPlayerWalletChanged(String playerId, BooleanCallback callback) {
-        walletListener = PlayerWalletConnectionHandler.getInstance().getPlayerWalletChangeListener(playerId, callback);
+        walletListener = PlayerWalletDatabaseAdapter.getInstance().getPlayerWalletChangeListener(playerId, callback);
     }
 
     /**
@@ -478,7 +478,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayerWalletConnectionHandler.getInstance()
+            PlayerWalletDatabaseAdapter.getInstance()
                     .getPlayerWalletTopScore(scannableCodeIds)
                     .thenAccept(topScore -> {
                         cf.complete(topScore);
@@ -505,7 +505,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayerWalletConnectionHandler.getInstance()
+            PlayerWalletDatabaseAdapter.getInstance()
                     .getPlayerWalletLowScore(scannableCodeIds)
                     .thenAccept(lowScore -> {
                         cf.complete(lowScore);
@@ -531,7 +531,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     public CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<Long> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayerWalletConnectionHandler.getInstance()
+            PlayerWalletDatabaseAdapter.getInstance()
                     .getPlayerWalletTotalScore(scannableCodeIds)
                     .thenAccept(totalScore -> {
                         cf.complete(totalScore);

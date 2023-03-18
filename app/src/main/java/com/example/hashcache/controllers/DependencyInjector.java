@@ -1,16 +1,14 @@
 package com.example.hashcache.controllers;
 
 import com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.PlayerDocumentConverter;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
-import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletConnectionHandler;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.ScannableCodeDocumentConverter;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
 
 /**
  * Creates and returns instances of classes that require dependencies
@@ -54,7 +52,7 @@ public class DependencyInjector {
         FireStoreHelper fireStoreHelper = new FireStoreHelper();
 
         return PlayersDatabaseAdapter.makeInstance(new PlayerDocumentConverter(),
-                fireStoreHelper, FirebaseFirestore.getInstance(), new PlayerWalletConnectionHandler(fireStoreHelper));
+                fireStoreHelper, FirebaseFirestore.getInstance(), new PlayerWalletDatabaseAdapter(fireStoreHelper));
     }
 
     /**

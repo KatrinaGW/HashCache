@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
-import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletConnectionHandler;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.PlayerDocumentConverter;
 import com.example.hashcache.models.database.values.CollectionNames;
@@ -35,19 +35,19 @@ public class PlayersDatabaseAdapterTest {
     private PlayerDocumentConverter mockPlayerDocumentConverter;
     private FireStoreHelper mockFireStoreHelper;
     private FirebaseFirestore mockDB;
-    private PlayerWalletConnectionHandler mockPlayerWalletConnectionHandler;
+    private PlayerWalletDatabaseAdapter mockPlayerWalletDatabaseAdapter;
     private CollectionReference mockCollectionReference;
 
     private PlayersDatabaseAdapter getPlayersDatabaseAdapter(){
         return PlayersDatabaseAdapter.makeInstance(mockPlayerDocumentConverter,
-                mockFireStoreHelper, mockDB, mockPlayerWalletConnectionHandler);
+                mockFireStoreHelper, mockDB, mockPlayerWalletDatabaseAdapter);
     }
 
     @BeforeEach
     void resetMocks(){
         mockDB = Mockito.mock(FirebaseFirestore.class);
         mockFireStoreHelper = Mockito.mock(FireStoreHelper.class);
-        mockPlayerWalletConnectionHandler = Mockito.mock(PlayerWalletConnectionHandler.class);
+        mockPlayerWalletDatabaseAdapter = Mockito.mock(PlayerWalletDatabaseAdapter.class);
         mockPlayerDocumentConverter = Mockito.mock(PlayerDocumentConverter.class);
         mockCollectionReference = Mockito.mock(CollectionReference.class);
         when(mockDB.collection(CollectionNames.PLAYERS.collectionName)).thenReturn(mockCollectionReference);

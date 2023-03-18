@@ -6,7 +6,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.database.DatabaseAdapters.converters.PlayerDocumentConverter;
-import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
@@ -38,7 +37,7 @@ public class PlayersDatabaseAdapter {
     final String TAG = "Sample";
     private PlayerDocumentConverter playerDocumentConverter;
     private FireStoreHelper fireStoreHelper;
-    private PlayerWalletConnectionHandler playerWalletConnectionHandler;
+    private PlayerWalletDatabaseAdapter playerWalletDatabaseAdapter;
     private static PlayersDatabaseAdapter INSTANCE;
 
     /**
@@ -53,17 +52,17 @@ public class PlayersDatabaseAdapter {
      *                                      class to use to perform
      *                                      general FireStore actions
      * @param db                            an instance of the Firestore database
-     * @param playerWalletConnectionHandler the instance of the
+     * @param playerWalletDatabaseAdapter the instance of the
      *                                      PlayerWalletConnectionHandler
      *                                      class to use to interact with a player's
      *                                      wallet collection
      */
     private PlayersDatabaseAdapter(PlayerDocumentConverter playerDocumentConverter,
                                    FireStoreHelper fireStoreHelper,
-                                   FirebaseFirestore db, PlayerWalletConnectionHandler playerWalletConnectionHandler) {
+                                   FirebaseFirestore db, PlayerWalletDatabaseAdapter playerWalletDatabaseAdapter) {
         this.playerDocumentConverter = playerDocumentConverter;
         this.fireStoreHelper = fireStoreHelper;
-        this.playerWalletConnectionHandler = playerWalletConnectionHandler;
+        this.playerWalletDatabaseAdapter = playerWalletDatabaseAdapter;
         this.db = db;
 
         collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
@@ -96,7 +95,7 @@ public class PlayersDatabaseAdapter {
      *                                      class to use to perform
      *                                      general FireStore actions
      * @param db                            an instance of the Firestore database
-     * @param playerWalletConnectionHandler the instance of the
+     * @param playerWalletDatabaseAdapter the instance of the
      *                                      PlayerWalletConnectionHandler
      *                                      class to use to interact with a player's
      *                                      wallet collection
@@ -108,12 +107,12 @@ public class PlayersDatabaseAdapter {
     public static PlayersDatabaseAdapter makeInstance(PlayerDocumentConverter playerDocumentConverter,
                                                       FireStoreHelper fireStoreHelper,
                                                       FirebaseFirestore db,
-                                                      PlayerWalletConnectionHandler playerWalletConnectionHandler) {
+                                                      PlayerWalletDatabaseAdapter playerWalletDatabaseAdapter) {
         if (INSTANCE != null) {
             throw new IllegalArgumentException("Instance of PlayersConnectionHandler already exists!");
         }
         INSTANCE = new PlayersDatabaseAdapter(playerDocumentConverter,
-                fireStoreHelper, db, playerWalletConnectionHandler);
+                fireStoreHelper, db, playerWalletDatabaseAdapter);
         return INSTANCE;
     }
 
@@ -416,7 +415,7 @@ public class PlayersDatabaseAdapter {
                 .document(userId)
                 .collection(CollectionNames.PLAYER_WALLET.collectionName);
 
-        cf = playerWalletConnectionHandler.addScannableCodeDocument(scannedCodeCollection,
+        cf = playerWalletDatabaseAdapter.addScannableCodeDocument(scannedCodeCollection,
                 scannableCodeId, locationImage);
 
         return cf;
@@ -436,7 +435,7 @@ public class PlayersDatabaseAdapter {
                 .document(userId)
                 .collection(CollectionNames.PLAYER_WALLET.collectionName);
 
-        cf = playerWalletConnectionHandler.deleteScannableCodeFromWallet(scannedCodeCollection,
+        cf = playerWalletDatabaseAdapter.deleteScannableCodeFromWallet(scannedCodeCollection,
                 scannableCodeId);
 
         return cf;

@@ -29,16 +29,26 @@ import java.util.function.Function;
 /**
  * Handles the database operations on a player's PlayerWallet collection
  */
-public class PlayerWalletConnectionHandler {
+public class PlayerWalletDatabaseAdapter {
     final String TAG = "Sample";
     private FirebaseFirestore db;
     private FireStoreHelper fireStoreHelper;
-    private static PlayerWalletConnectionHandler INSTANCE;
+    private static PlayerWalletDatabaseAdapter INSTANCE;
 
-    public PlayerWalletConnectionHandler(FireStoreHelper fireStoreHelper) {
+    /**
+     * Create a new PlayerWalletDatabaseAdapter
+     * @param fireStoreHelper the firestore helper to use with the new PlayerWalletDatabaseAdapter
+     */
+    public PlayerWalletDatabaseAdapter(FireStoreHelper fireStoreHelper) {
         this.fireStoreHelper = fireStoreHelper;
     }
 
+    /**
+     * Get the listener for the Player Wallet
+     * @param userId the userId to get the wallet listener for
+     * @param callback the callback function to call once the listener has been added
+     * @return the listener now attached to the user's wallet
+     */
     public ListenerRegistration getPlayerWalletChangeListener(String userId, BooleanCallback callback) {
         CompletableFuture<ArrayList<String>> cf = new CompletableFuture<>();
         CollectionReference scannedCodeCollection = db.collection(CollectionNames.PLAYERS.collectionName)
@@ -52,27 +62,27 @@ public class PlayerWalletConnectionHandler {
         return reg;
     }
 
-    public PlayerWalletConnectionHandler(FirebaseFirestore db) {
+    public PlayerWalletDatabaseAdapter(FirebaseFirestore db) {
         this.db = db;
     }
 
-    public static PlayerWalletConnectionHandler getInstance(FireStoreHelper fireStoreHelper) {
+    public static PlayerWalletDatabaseAdapter getInstance(FireStoreHelper fireStoreHelper) {
         if (INSTANCE == null) {
-            INSTANCE = new PlayerWalletConnectionHandler(fireStoreHelper);
+            INSTANCE = new PlayerWalletDatabaseAdapter(fireStoreHelper);
         }
         return INSTANCE;
     }
 
-    public static PlayerWalletConnectionHandler getInstance(FirebaseFirestore db) {
+    public static PlayerWalletDatabaseAdapter getInstance(FirebaseFirestore db) {
         if (INSTANCE == null) {
-            INSTANCE = new PlayerWalletConnectionHandler(db);
+            INSTANCE = new PlayerWalletDatabaseAdapter(db);
         }
         return INSTANCE;
     }
 
-    public static PlayerWalletConnectionHandler getInstance() {
+    public static PlayerWalletDatabaseAdapter getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new PlayerWalletConnectionHandler(FirebaseFirestore.getInstance());
+            INSTANCE = new PlayerWalletDatabaseAdapter(FirebaseFirestore.getInstance());
         }
         return INSTANCE;
     }
@@ -139,6 +149,13 @@ public class PlayerWalletConnectionHandler {
         return cf;
     }
 
+    /**
+     * Checks if a player has a scananbleCode
+     * @param userId the player to check the scannable code on
+     * @param scannableCodeId the scannable code to check for on the player
+     * @return cf the CompletableFuture with a boolean value indicating if the player has the
+     * scannableCode or not
+     */
     public CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId) {
         DocumentReference documentReference = db.collection(CollectionNames.PLAYERS.collectionName).document(userId)
                 .collection(CollectionNames.PLAYER_WALLET.collectionName).document(scannableCodeId);
@@ -244,7 +261,6 @@ public class PlayerWalletConnectionHandler {
      */
     public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
-        HashMap<String, Integer> scoreStats = new HashMap<>();
 
         CompletableFuture.runAsync(() -> {
             Database.getInstance().getScannableCodesByIdInList(scannableCodeIds).thenAccept(
@@ -262,11 +278,16 @@ public class PlayerWalletConnectionHandler {
                             }
                             cf.complete(highestScoring);
                         } else {
-                            cf.completeExceptionally(new Exception("No scannablecodes could be found" +
-                                    "for the given IDs!"));
+                            cf.complete(null);
                         }
 
-                    });
+                    }).exceptionally(new Function<Throwable, Void>() {
+                @Override
+                public Void apply(Throwable throwable) {
+                    cf.completeExceptionally(throwable);
+                    return null;
+                }
+            });
         });
         return cf;
     }
@@ -279,7 +300,6 @@ public class PlayerWalletConnectionHandler {
      */
     public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
-        HashMap<String, Integer> scoreStats = new HashMap<>();
 
         CompletableFuture.runAsync(() -> {
             Database.getInstance().getScannableCodesByIdInList(scannableCodeIds).thenAccept(
@@ -297,11 +317,16 @@ public class PlayerWalletConnectionHandler {
                             }
                             cf.complete(lowestScoring);
                         } else {
-                            cf.completeExceptionally(new Exception("No scannablecodes could be found" +
-                                    "for the given IDs!"));
+                            cf.complete(null);
                         }
 
-                    });
+                    }).exceptionally(new Function<Throwable, Void>() {
+                @Override
+                public Void apply(Throwable throwable) {
+                    cf.completeExceptionally(throwable);
+                    return null;
+                }
+            });
         });
         return cf;
     }

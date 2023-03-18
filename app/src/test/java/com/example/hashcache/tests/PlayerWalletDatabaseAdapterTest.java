@@ -3,34 +3,21 @@ package com.example.hashcache.tests;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
-import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletConnectionHandler;
-import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
-import com.example.hashcache.models.database.values.FieldNames;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.HashMap;
-
-public class PlayerWalletConnectionHandlerTest {
+public class PlayerWalletDatabaseAdapterTest {
     private FireStoreHelper mockFireStoreHelper;
 
-    private PlayerWalletConnectionHandler getMockPlayerWalletConnectionHandler(){
-        return new PlayerWalletConnectionHandler(mockFireStoreHelper);
+    private PlayerWalletDatabaseAdapter getMockPlayerWalletConnectionHandler(){
+        return new PlayerWalletDatabaseAdapter(mockFireStoreHelper);
     }
 
     @BeforeEach
