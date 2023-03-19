@@ -1,11 +1,10 @@
-package com.example.hashcache.models.database_connections;
+package com.example.hashcache.models.database.DatabaseAdapters;
 
-import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -16,6 +15,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -24,53 +25,34 @@ import java.util.concurrent.CompletableFuture;
  * Performs common actions on a Firestore database
  */
 public class FireStoreHelper {
-    final String TAG = "Sample";
-
-    public static Pair<CompletableFuture<Map<String, Object>>, ListenerRegistration> setupFirebaseDocListener(FirebaseFirestore db, String collectionName, String documentId){
-
-        CompletableFuture<Map<String, Object>> cf = new CompletableFuture<>();
-        final DocumentReference documentReference = db.collection(collectionName).document(documentId);
-        ListenerRegistration registration = documentReference.addSnapshotListener((snapshot, e) -> {
-                    cf.complete(null);
-                    if (e != null) {
-                        cf.completeExceptionally(e);
-                        return;
-                    }
-
-                    if (snapshot != null && snapshot.exists()) {
-                        cf.complete(snapshot.getData());
-                    } else {
-                        cf.complete(null);
-                    }
-                }
-        );
-        return new Pair(cf, registration);
-    }
 
     /**
      * Adds a field with a boolean value to a given Firestore document
      * @param documentReference the document to add the field to
      * @param key the name of the field to add
      * @param value the value of the field to add
-     * @param booleanCallback the callback function to call once the operation has finished. Call with
-     *                        true if the operation was successful, and false otherwise
+     * @return cf the CompleteableFuture with a boolean value indicating if the operation was
+     *         successful or not
      */
-    public void addBooleanFieldToDocument(DocumentReference documentReference, String key, boolean value,
-                                   BooleanCallback booleanCallback){
+    public CompletableFuture<Boolean> addBooleanFieldToDocument(DocumentReference documentReference,
+                                                                String key, boolean value){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
         documentReference
                 .update(key, value)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        booleanCallback.onCallback(true);
+                        cf.complete(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        booleanCallback.onCallback(false);
+                        cf.completeExceptionally(e);
                     }
                 });
+        return cf;
     }
 
     /**
@@ -78,49 +60,55 @@ public class FireStoreHelper {
      * @param documentReference the document to add the field to
      * @param key the name of the field to add
      * @param value the value of the field to add
-     * @param booleanCallback the callback function to call once the operation has finished. Call with
-     *                        true if the operation was successful, and false otherwise
+     * @return cf the CompletableFuture with a boolean value indicating if the operation was
+     *          successful or not
      */
-    public void addStringFieldToDocument(DocumentReference documentReference, String key, String value,
-                                          BooleanCallback booleanCallback){
+    public CompletableFuture<Boolean> addStringFieldToDocument(DocumentReference documentReference,
+                                                               String key, String value){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
         documentReference
                 .update(key, value)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        booleanCallback.onCallback(true);
+                        cf.complete(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        booleanCallback.onCallback(false);
+                        cf.completeExceptionally(e);
                     }
                 });
+        return cf;
     }
 
     /**
      * Sets the id reference and initial data for a specific document
      * @param documentReference the document to set the id and initial data on
      * @param data the initial fields, with String values, to add to the document
-     * @param booleanCallback the callback function to call once the operation has finished. Call
-     *                        with true if the operation was successful, and false otherwise
+     * @return cf the CompletableFuture with a boolean value indicating if the operation was
+     *          successful or not
      */
-    public void setDocumentReference(DocumentReference documentReference,
-                                     HashMap<String, String> data, BooleanCallback booleanCallback){
+    public CompletableFuture<Boolean> setDocumentReference(DocumentReference documentReference,
+                                     HashMap<String, String> data){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
         documentReference.set(data)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        booleanCallback.onCallback(true);
+                        cf.complete(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        booleanCallback.onCallback(false);
+                        cf.completeExceptionally(e);
                     }
                 });
+        return cf;
     }
 
 
@@ -128,11 +116,12 @@ public class FireStoreHelper {
      * Checks if a document exists in a certain collection
      * @param collectionReference the collection to scan for a document
      * @param id the id of the document that's being searched for
-     * @param booleanCallback the callback function to call once the scan has finished. Call
-     *                        with true if a document is found, and false otherwise
+     * @return cf the CompletableFuture with a boolean value indicating if the
+     *          document exists in the collection or not
      */
-    public void documentWithIDExists(CollectionReference collectionReference, String id,
-                                        BooleanCallback booleanCallback){
+    public CompletableFuture<Boolean> documentWithIDExists(CollectionReference collectionReference,
+                                                           String id){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
         final boolean[] exists = new boolean[1];
 
         DocumentReference documentReference = collectionReference.document(id);
@@ -143,15 +132,16 @@ public class FireStoreHelper {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         exists[0] = true;
-                        booleanCallback.onCallback(exists[0]);
+                        cf.complete(exists[0]);
                     } else {
                         exists[0] = false;
-                        booleanCallback.onCallback(exists[0]);
+                        cf.complete(exists[0]);
                     }
                 } else {
-                    booleanCallback.onCallback(false);
+                    cf.complete(false);
                 }
             }
         });
+        return cf;
     }
 }

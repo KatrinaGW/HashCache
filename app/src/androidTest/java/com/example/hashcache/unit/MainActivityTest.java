@@ -12,12 +12,8 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.example.hashcache.R;
-import com.example.hashcache.models.database_connections.CodeLocationConnectionHandler;
-import com.example.hashcache.models.database_connections.FireStoreHelper;
-import com.example.hashcache.models.database_connections.converters.CodeLocationDocumentConverter;
 import com.example.hashcache.views.AppHome;
 import com.example.hashcache.views.MainActivity;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.robotium.solo.Solo;
 
 

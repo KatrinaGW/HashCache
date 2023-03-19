@@ -1,21 +1,20 @@
 package com.example.hashcache.models.database;
 
-import java.util.HashMap;
 /**
 
  This class represents a singleton object that returns an instance of a player database.
  */
 public class Database {
-    private static IPlayerDatabase instance;
+    private static DatabasePort instance;
     /**
      Returns an instance of a player database. If no instance has been created, it will create an instance of TestPlayerDatabase.
      @return The instance of the player database.
      */
-    public static IPlayerDatabase getInstance(){
+    public static DatabasePort getInstance(){
         if(instance == null){
-            synchronized(PlayerDatabase.class) {
+            synchronized(DatabaseAdapter.class) {
                 if(instance == null){
-                    instance = new PlayerDatabase();
+                    instance = new DatabaseAdapter();
                 }
             }
         }

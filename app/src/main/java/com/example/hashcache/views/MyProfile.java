@@ -27,9 +27,7 @@ import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
-
-import org.w3c.dom.Text;
+import com.example.hashcache.context.Context;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -54,7 +52,7 @@ import java.util.Observer;
  * @see PopupMenu
  * @see MenuItem
  * @see Player
- * @see AppStore
+ * @see Context
  * @see Settings
  * @see QRStats
  * @see Community
@@ -79,7 +77,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
      *
      * @param savedInstanceState the saved state of the activity, if it was
      *                           previously closed
-     * @see AppStore
+     * @see Context
      * @see Player
      */
 
@@ -131,7 +129,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
             }
         });
 
-        AppStore.get().addObserver(this);
+        Context.get().addObserver(this);
         setUIParams();
     }
 
@@ -141,7 +139,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
         Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
         intent.putExtra("belongsToCurrentUser", true);
 
-        AppStore.get().setCurrentScannableCode(clickedScannableCode);
+        Context.get().setCurrentScannableCode(clickedScannableCode);
         startActivity(intent);
     }
 
@@ -229,7 +227,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
     }
 
     public void setUIParams() {
-        Player currentPlayer = AppStore.get().getCurrentPlayer();
+        Player currentPlayer = Context.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
         setScore(currentPlayer.getTotalScore());
         Database.getInstance()

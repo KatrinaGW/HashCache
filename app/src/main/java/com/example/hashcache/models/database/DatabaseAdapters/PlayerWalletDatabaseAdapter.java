@@ -1,24 +1,17 @@
-package com.example.hashcache.models.database_connections;
-
-import static com.example.hashcache.models.database_connections.FireStoreHelper.setupFirebaseDocListener;
+package com.example.hashcache.models.database.DatabaseAdapters;
 
 import android.media.Image;
-import android.provider.ContactsContract;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
-import com.example.hashcache.models.database_connections.converters.ScannableCodeDocumentConverter;
-import com.example.hashcache.models.database_connections.values.CollectionNames;
-import com.example.hashcache.models.database_connections.values.FieldNames;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.example.hashcache.models.database.values.CollectionNames;
+import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -26,31 +19,36 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 /**
  * Handles the database operations on a player's PlayerWallet collection
  */
-public class PlayerWalletConnectionHandler {
+public class PlayerWalletDatabaseAdapter {
     final String TAG = "Sample";
     private FirebaseFirestore db;
     private FireStoreHelper fireStoreHelper;
-    private static PlayerWalletConnectionHandler INSTANCE;
+    private static PlayerWalletDatabaseAdapter INSTANCE;
 
-    public PlayerWalletConnectionHandler(FireStoreHelper fireStoreHelper) {
+    /**
+     * Create a new PlayerWalletDatabaseAdapter
+     * @param fireStoreHelper the firestore helper to use with the new PlayerWalletDatabaseAdapter
+     */
+    public PlayerWalletDatabaseAdapter(FireStoreHelper fireStoreHelper) {
         this.fireStoreHelper = fireStoreHelper;
     }
 
+    /**
+     * Get the listener for the Player Wallet
+     * @param userId the userId to get the wallet listener for
+     * @param callback the callback function to call once the listener has been added
+     * @return the listener now attached to the user's wallet
+     */
     public ListenerRegistration getPlayerWalletChangeListener(String userId, BooleanCallback callback) {
         CompletableFuture<ArrayList<String>> cf = new CompletableFuture<>();
         CollectionReference scannedCodeCollection = db.collection(CollectionNames.PLAYERS.collectionName)
@@ -64,27 +62,27 @@ public class PlayerWalletConnectionHandler {
         return reg;
     }
 
-    public PlayerWalletConnectionHandler(FirebaseFirestore db) {
+    public PlayerWalletDatabaseAdapter(FirebaseFirestore db) {
         this.db = db;
     }
 
-    public static PlayerWalletConnectionHandler getInstance(FireStoreHelper fireStoreHelper) {
+    public static PlayerWalletDatabaseAdapter getInstance(FireStoreHelper fireStoreHelper) {
         if (INSTANCE == null) {
-            INSTANCE = new PlayerWalletConnectionHandler(fireStoreHelper);
+            INSTANCE = new PlayerWalletDatabaseAdapter(fireStoreHelper);
         }
         return INSTANCE;
     }
 
-    public static PlayerWalletConnectionHandler getInstance(FirebaseFirestore db) {
+    public static PlayerWalletDatabaseAdapter getInstance(FirebaseFirestore db) {
         if (INSTANCE == null) {
-            INSTANCE = new PlayerWalletConnectionHandler(db);
+            INSTANCE = new PlayerWalletDatabaseAdapter(db);
         }
         return INSTANCE;
     }
 
-    public static PlayerWalletConnectionHandler getInstance() {
+    public static PlayerWalletDatabaseAdapter getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new PlayerWalletConnectionHandler(FirebaseFirestore.getInstance());
+            INSTANCE = new PlayerWalletDatabaseAdapter(FirebaseFirestore.getInstance());
         }
         return INSTANCE;
     }
@@ -97,39 +95,69 @@ public class PlayerWalletConnectionHandler {
      * @param scannableCodeId        the id of the scannable code to add to the
      *                               PlayerWallet collection
      * @param locationImage          the image of where the user scanned the code
-     * @param booleanCallback        the callback function to call once the
-     *                               operation has finished. Calls
-     *                               with true if the operation was successful, and
-     *                               false otherwise
+     * @return cf the CompletableFuture indicating if the operation was successful or not
      * @throws IllegalArgumentException if the PlayerWallet already has a
      *                                  scananbleCode with the given id
      */
-    public void addScannableCodeDocument(CollectionReference playerWalletCollection,
-            String scannableCodeId, Image locationImage,
-            BooleanCallback booleanCallback) {
+    public CompletableFuture<Void> addScannableCodeDocument(CollectionReference playerWalletCollection,
+            String scannableCodeId, Image locationImage) {
+        CompletableFuture<Void> cf = new CompletableFuture<>();
 
-        fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId,
-                new BooleanCallback() {
+        fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId)
+                        .thenAccept(exists -> {
+                            if (exists) {
+                                cf.completeExceptionally(new Exception("The scannable code with" +
+                                        "the given id already exists!"));
+                            }
+                            else{
+                                HashMap<String, String> scannableCodeIdData = new HashMap<>();
+                                scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
+                                if (locationImage != null) {
+                                    // TODO: insert the image
+                                }
+                                DocumentReference playerWalletReference = playerWalletCollection.document(scannableCodeId);
+
+                                CompletableFuture.runAsync(() -> {
+                                    fireStoreHelper.setDocumentReference(playerWalletReference,
+                                                    scannableCodeIdData)
+                                            .thenAccept(successful -> {
+                                                if (successful) {
+                                                    cf.complete(null);
+                                                } else {
+                                                    cf.completeExceptionally(new Exception(
+                                                            "Something went wrong while adding the scananble" +
+                                                                    "code document"
+                                                    ));
+                                                }
+                                            })
+                                            .exceptionally(new Function<Throwable, Void>() {
+                                                @Override
+                                                public Void apply(Throwable throwable) {
+                                                    cf.completeExceptionally(throwable);
+                                                    return null;
+                                                }
+                                            });
+                                });
+                            }
+
+                        })
+                .exceptionally(new Function<Throwable, Void>() {
                     @Override
-                    public void onCallback(Boolean isTrue) {
-                        if (isTrue) {
-                            throw new IllegalArgumentException("A document already exists in the " +
-                                    "PlayerWallet with the given scananbleCodeId!");
-                        }
-                        HashMap<String, String> scannableCodeIdData = new HashMap<>();
-                        scannableCodeIdData.put(FieldNames.SCANNABLE_CODE_ID.fieldName, scannableCodeId);
-                        if (locationImage != null) {
-                            // TODO: insert the image
-                        }
-                        DocumentReference playerWalletReference = playerWalletCollection.document(scannableCodeId);
-
-                        fireStoreHelper.setDocumentReference(playerWalletReference, scannableCodeIdData,
-                                booleanCallback);
-
+                    public Void apply(Throwable throwable) {
+                        cf.completeExceptionally(throwable);
+                        return null;
                     }
                 });
+        return cf;
     }
 
+    /**
+     * Checks if a player has a scananbleCode
+     * @param userId the player to check the scannable code on
+     * @param scannableCodeId the scannable code to check for on the player
+     * @return cf the CompletableFuture with a boolean value indicating if the player has the
+     * scannableCode or not
+     */
     public CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId) {
         DocumentReference documentReference = db.collection(CollectionNames.PLAYERS.collectionName).document(userId)
                 .collection(CollectionNames.PLAYER_WALLET.collectionName).document(scannableCodeId);
@@ -156,38 +184,44 @@ public class PlayerWalletConnectionHandler {
      *                               scananble codes
      * @param scannableCodeId        the id of the scannable code to delete from the
      *                               PlayerWallet collection
-     * @param booleanCallback        the callback function to call once the
-     *                               operation has finished. Calls
-     *                               with true if the operation was successful, and
-     *                               false otherwise
+     * @return cf the CompletableFuture indicating if the operation was a success or not
      */
-    public void deleteScannableCodeFromWallet(CollectionReference playerWalletCollection,
-            String scannableCodeId, BooleanCallback booleanCallback) {
-        fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId,
-                new BooleanCallback() {
-                    @Override
-                    public void onCallback(Boolean isTrue) {
-                        if (isTrue) {
-                            playerWalletCollection.document(scannableCodeId).delete()
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                                            booleanCallback.onCallback(true);
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w(TAG, "Error deleting document", e);
-                                            booleanCallback.onCallback(false);
-                                        }
-                                    });
-                        } else {
-                            throw new IllegalArgumentException("No scannable code exists with the given id!");
-                        }
-                    }
-                });
+    public CompletableFuture<Boolean> deleteScannableCodeFromWallet(CollectionReference playerWalletCollection,
+            String scannableCodeId) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+           fireStoreHelper.documentWithIDExists(playerWalletCollection, scannableCodeId)
+                   .thenAccept(exists -> {
+                       if (exists) {
+                           playerWalletCollection.document(scannableCodeId).delete()
+                                   .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                       @Override
+                                       public void onSuccess(Void aVoid) {
+                                           Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                           cf.complete(true);
+                                       }
+                                   })
+                                   .addOnFailureListener(new OnFailureListener() {
+                                       @Override
+                                       public void onFailure(@NonNull Exception e) {
+                                           Log.w(TAG, "Error deleting document", e);
+                                           cf.completeExceptionally(e);
+                                       }
+                                   });
+                       } else {
+                           throw new IllegalArgumentException("No scannable code exists with the given id!");
+                       }
+                   })
+                   .exceptionally(new Function<Throwable, Void>() {
+                       @Override
+                       public Void apply(Throwable throwable) {
+                           cf.completeExceptionally(throwable);
+                           return null;
+                       }
+                   });
+        });
+        return cf;
     }
 
     /**
@@ -229,7 +263,6 @@ public class PlayerWalletConnectionHandler {
      */
     public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
-        HashMap<String, Integer> scoreStats = new HashMap<>();
 
         CompletableFuture.runAsync(() -> {
             Database.getInstance().getScannableCodesByIdInList(scannableCodeIds).thenAccept(
@@ -247,11 +280,16 @@ public class PlayerWalletConnectionHandler {
                             }
                             cf.complete(highestScoring);
                         } else {
-                            cf.completeExceptionally(new Exception("No scannablecodes could be found" +
-                                    "for the given IDs!"));
+                            cf.complete(null);
                         }
 
-                    });
+                    }).exceptionally(new Function<Throwable, Void>() {
+                @Override
+                public Void apply(Throwable throwable) {
+                    cf.completeExceptionally(throwable);
+                    return null;
+                }
+            });
         });
         return cf;
     }
@@ -264,7 +302,6 @@ public class PlayerWalletConnectionHandler {
      */
     public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
-        HashMap<String, Integer> scoreStats = new HashMap<>();
 
         CompletableFuture.runAsync(() -> {
             Database.getInstance().getScannableCodesByIdInList(scannableCodeIds).thenAccept(
@@ -282,11 +319,16 @@ public class PlayerWalletConnectionHandler {
                             }
                             cf.complete(lowestScoring);
                         } else {
-                            cf.completeExceptionally(new Exception("No scannablecodes could be found" +
-                                    "for the given IDs!"));
+                            cf.complete(null);
                         }
 
-                    });
+                    }).exceptionally(new Function<Throwable, Void>() {
+                @Override
+                public Void apply(Throwable throwable) {
+                    cf.completeExceptionally(throwable);
+                    return null;
+                }
+            });
         });
         return cf;
     }

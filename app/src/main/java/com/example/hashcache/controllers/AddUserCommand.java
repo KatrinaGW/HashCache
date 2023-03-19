@@ -2,12 +2,9 @@ package com.example.hashcache.controllers;
 
 import android.util.Log;
 
-import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database.PlayerDatabase;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
+import com.example.hashcache.models.database.DatabasePort;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.concurrent.CompletableFuture;
@@ -21,17 +18,19 @@ public class AddUserCommand {
      * Logs in the user with the given username or creates a new user with the given username if the user does not exist.
      *
      * @param userName the username of the user to log in or create
+     * @param db the database instance of the DatabasePort to interface with the Firestore collection
+     * @param context the current app context
      * @return a CompletableFuture that completes when the user has been logged in or created
      */
-    public CompletableFuture<Void> loginUser(String userName){
+    public CompletableFuture<Void> loginUser(String userName, DatabasePort db, Context context){
         CompletableFuture<Void> cf = new CompletableFuture<>();
-        Database.getInstance().usernameExists(userName).thenAccept(exists -> {
+        db.usernameExists(userName).thenAccept(exists -> {
             if(exists){
-                setupUser(userName, cf);
+                setupUser(userName, cf, db, context);
             }
             else{
-                Database.getInstance().createPlayer(userName).thenAccept(result -> {
-                    setupUser(userName, cf);
+                db.createPlayer(userName).thenAccept(result -> {
+                    setupUser(userName, cf, db, context);
                 }).exceptionally(new Function<Throwable, Void>() {
                     @Override
                     public Void apply(Throwable throwable) {
@@ -47,13 +46,16 @@ public class AddUserCommand {
      * Sets up the user with the given username after the user has been logged in or created.
      *
      * @param userName the username of the user to set up
+     * @param db the interface to use to conenct to the firestore collection
+     * @param context the current context of the app
      * @param cf the CompletableFuture to complete when the user has been set up
      */
-    private void setupUser(String userName, CompletableFuture<Void> cf) {
-        Database.getInstance().getIdByUsername(userName).thenAccept(userId -> {
-            Database.getInstance().getPlayer(userId).thenAccept(player -> {
-                AppStore.get().setCurrentPlayer(player);
-                AppStore.get().setupListeners();
+    private void setupUser(String userName, CompletableFuture<Void> cf, DatabasePort db,
+                           Context context) {
+        db.getIdByUsername(userName).thenAccept(userId -> {
+            db.getPlayer(userId).thenAccept(player -> {
+                context.setCurrentPlayer(player);
+                context.setupListeners();
                 cf.complete(null);
             }).exceptionally(new Function<Throwable, Void>() {
                 @Override
