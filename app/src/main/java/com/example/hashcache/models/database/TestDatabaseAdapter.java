@@ -446,4 +446,23 @@ public class TestDatabaseAdapter implements DatabasePort {
         });
         return cf;
     }
+
+    /**
+     * Gets the number of players who have scanned a specific QR code
+     * @param scannableCodeId the id of the scannable code to look for in players' wallets
+     * @return cf the CompletableFuture with the number of players who have scanned a specific QR code
+     */
+    @Override
+    public CompletableFuture<Integer> getNumPlayersWithScannableCode(String scannableCodeId){
+        CompletableFuture<Integer> cf = new CompletableFuture<>();
+        int count = 0;
+        for(Player player : players.values()){
+            if(player.getPlayerWallet().getScannedCodeIds().contains(scannableCodeId)){
+                count++;
+            }
+        }
+        cf.complete(count);
+
+        return cf;
+    }
 }

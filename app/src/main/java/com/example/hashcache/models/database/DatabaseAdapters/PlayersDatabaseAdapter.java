@@ -26,6 +26,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
@@ -439,5 +440,52 @@ public class PlayersDatabaseAdapter {
                 scannableCodeId);
 
         return cf;
+    }
+
+
+    /**
+     * Gets the number of players who have scanned a specific QR code
+     * @param scannableCodeId the id of the scannable code to look for in players' wallets
+     * @return cf the CompletableFuture with the number of players who have scanned a specific QR code
+     */
+    public CompletableFuture<Integer> getNumPlayersWithScannableCode(String scannableCodeId){
+        CompletableFuture<Integer> cf = new CompletableFuture<>();
+
+        collectionReference.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        AtomicInteger count = new AtomicInteger();
+                        if(task.isSuccessful()){
+                            if(task.getResult().size()>0){
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    if(document.get(CollectionNames.PLAYER_WALLET.collectionName) != null){
+                                        DocumentReference docRef = document.getReference();
+
+                                        CompletableFuture.runAsync(() -> {
+                                            fireStoreHelper.documentWithIDExists(docRef.collection(CollectionNames.PLAYER_WALLET.collectionName),
+                                                    scannableCodeId)
+                                                    .thenAccept(exists -> {
+                                                        count.getAndIncrement();
+                                                    })
+                                                    .exceptionally(new Function<Throwable, Void>() {
+                                                        @Override
+                                                        public Void apply(Throwable throwable) {
+                                                            cf.completeExceptionally(throwable);
+                                                            return null;
+                                                        }
+                                                    });
+                                        });
+                                    }
+                                }
+                            }
+                            cf.complete(count.intValue());
+                        }else{
+                            cf.completeExceptionally(new Exception("Something went wrong while " +
+                                    "getting all players"));
+                        }
+                    }
+                });
+                return cf;
     }
 }
