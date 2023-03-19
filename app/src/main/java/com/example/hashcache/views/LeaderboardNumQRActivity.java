@@ -12,10 +12,8 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
-import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
-import com.google.firebase.firestore.CollectionReference;
+import com.example.hashcache.context.Context;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
@@ -44,7 +42,7 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
         TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
         AtomicLong numQrCodes = new AtomicLong();
         Database.getInstance()
-                .getTotalScore(AppStore.get().getCurrentPlayer().getUserId())
+                .getTotalScore(Context.get().getCurrentPlayer().getUserId())
                 .thenAccept( score -> {
                     runOnUiThread(new Runnable() {
                         @Override

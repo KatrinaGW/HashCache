@@ -1,9 +1,5 @@
 package com.example.hashcache.models;
 
-import com.example.hashcache.controllers.DependencyInjector;
-import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
-
 import java.util.UUID;
 
 /**

@@ -1,4 +1,4 @@
-package com.example.hashcache.models.database_connections.values;
+package com.example.hashcache.models.database.values;
 
 /**
  * Names of all the fields in the Firestore database

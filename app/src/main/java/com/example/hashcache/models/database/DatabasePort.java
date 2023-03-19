@@ -5,14 +5,14 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-public interface IPlayerDatabase {
+public interface DatabasePort {
 
     CompletableFuture<Boolean> usernameExists(String username);
 
@@ -27,6 +27,8 @@ public interface IPlayerDatabase {
 
     CompletableFuture<Void> addComment(String scannableCodeId, Comment comment);
 
+    CompletableFuture<Boolean> deleteComment(String scannableCodeId, String commentId);
+
     CompletableFuture<Void> updatePlayerPreferences(String userId, PlayerPreferences playerPreferences);
 
     CompletableFuture<String> addScannableCode(ScannableCode scannableCode);
@@ -34,7 +36,7 @@ public interface IPlayerDatabase {
     CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId);
     CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId);
 
-    CompletableFuture<Boolean> removeScannableCode(String userId, String scannableCodeId);
+    CompletableFuture<Boolean> removeScannableCodeFromWallet(String userId, String scannableCodeId);
 
     CompletableFuture<Void> changeUserName(String userId, String newUsername);
 

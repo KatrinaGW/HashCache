@@ -123,7 +123,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>com.example.hashcache.models.database_connections.CodeLocationConnectionHandler</li>
+<li>com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter</li>
 </ul>
 </li>
 </ul>
@@ -179,8 +179,8 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>static <a href="CodeLocationConnectionHandler.html" title="class in com.example.hashcache.models.database_connections">CodeLocationConnectionHandler</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#makeInstance(com.example.hashcache.models.database_connections.FireStoreHelper,com.example.hashcache.models.database_connections.converters.CodeLocationDocumentConverter,com.google.firebase.firestore.FirebaseFirestore)">makeInstance</a></span>&#8203;(<a href="FireStoreHelper.html" title="class in com.example.hashcache.models.database_connections">FireStoreHelper</a>&nbsp;fireStoreHelper,
-            <a href="converters/CodeLocationDocumentConverter.html" title="class in com.example.hashcache.models.database_connections.converters">CodeLocationDocumentConverter</a>&nbsp;codeLocationDocumentConverter,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#makeInstance(com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper,com.example.hashcache.models.data_exchange.data_adapters.CodeLocationDataAdapter,com.google.firebase.firestore.FirebaseFirestore)">makeInstance</a></span>&#8203;(<a href="FireStoreHelper.html" title="class in com.example.hashcache.models.database_connections">FireStoreHelper</a>&nbsp;fireStoreHelper,
+            <a href="converters/CodeLocationDocumentConverter.html" title="class in com.example.hashcache.models.database_connections.converters">CodeLocationDocumentConverter</a>&nbsp;codeLocationDataAdapter,
             com.google.firebase.firestore.FirebaseFirestore&nbsp;db)</code></th>
 <td class="colLast">
 <div class="block">Create the static instance of the CodeLocationConnectionHandler class</div>
@@ -218,21 +218,21 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="makeInstance(com.example.hashcache.models.database_connections.FireStoreHelper,com.example.hashcache.models.database_connections.converters.CodeLocationDocumentConverter,com.google.firebase.firestore.FirebaseFirestore)">
+<a id="makeInstance(com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper,com.example.hashcache.models.data_exchange.data_adapters.CodeLocationDataAdapter,com.google.firebase.firestore.FirebaseFirestore)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>makeInstance</h4>
 <pre class="methodSignature">public static&nbsp;<a href="CodeLocationConnectionHandler.html" title="class in com.example.hashcache.models.database_connections">CodeLocationConnectionHandler</a>&nbsp;makeInstance&#8203;(<a href="FireStoreHelper.html" title="class in com.example.hashcache.models.database_connections">FireStoreHelper</a>&nbsp;fireStoreHelper,
-                                                         <a href="converters/CodeLocationDocumentConverter.html" title="class in com.example.hashcache.models.database_connections.converters">CodeLocationDocumentConverter</a>&nbsp;codeLocationDocumentConverter,
+                                                         <a href="converters/CodeLocationDocumentConverter.html" title="class in com.example.hashcache.models.database_connections.converters">CodeLocationDocumentConverter</a>&nbsp;codeLocationDataAdapter,
                                                          com.google.firebase.firestore.FirebaseFirestore&nbsp;db)</pre>
 <div class="block">Create the static instance of the CodeLocationConnectionHandler class</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>fireStoreHelper</code> - the instance of the FireStoreHelper class to call upon to perform
                         common firestore actions</dd>
-<dd><code>codeLocationDocumentConverter</code> - the instance of the CodeLocationDocumentConverter to
+<dd><code>codeLocationDataAdapter</code> - the instance of the CodeLocationDocumentConverter to
                                       use when converting a document to a CodeLocation object</dd>
 <dd><code>db</code> - the instance of the database to use to get connections to the CodeLocation collection
            and its documents</dd>

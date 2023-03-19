@@ -9,19 +9,17 @@ package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.hashcache.BuildConfig;
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.UpdateContactInfoCommand;
 import com.example.hashcache.models.ContactInfo;
+import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
 
 public class EditPlayerInfoActivity extends AppCompatActivity {
     private EditText editEmail;
@@ -58,7 +56,7 @@ public class EditPlayerInfoActivity extends AppCompatActivity {
      * with the current values of the user's email and phone number.
      */
     private void initValues(){
-        currentContactInfo = AppStore.get().getCurrentPlayer().getContactInfo();
+        currentContactInfo = Context.get().getCurrentPlayer().getContactInfo();
         System.out.println(currentContactInfo.getEmail());
         editEmail.setText(currentContactInfo.getEmail());
         editPhoneNumber.setText(currentContactInfo.getPhoneNumber());
@@ -86,8 +84,8 @@ public class EditPlayerInfoActivity extends AppCompatActivity {
         newContactInfo.setPhoneNumber(phoneNumberText);
         newContactInfo.setEmail(emailText);
 
-        UpdateContactInfoCommand.updateContactInfoCommand(AppStore.get().getCurrentPlayer().getUserId(),
-                        newContactInfo)
+        UpdateContactInfoCommand.updateContactInfoCommand(Context.get().getCurrentPlayer().getUserId(),
+                        newContactInfo, Database.getInstance(), Context.get())
                 .thenAccept(isComplete->{
                     if(isComplete){
                         runOnUiThread(new Runnable() {

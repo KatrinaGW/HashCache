@@ -21,8 +21,7 @@ import androidx.appcompat.widget.PopupMenu;
 import com.example.hashcache.R;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -45,9 +44,6 @@ public class QRStats extends AppCompatActivity implements Observer {
     private TextView topScoreValueTextView;
     private TextView lowScoreValueTextView;
     private AppCompatButton myProfileButton;
-    private ScannableCode lowestScoring;
-    private ScannableCode highestScoring;
-    private PlayerWallet playerWallet;
 
     /**
      * Initializes the activity and sets the layout. Also adds functionality to the
@@ -138,7 +134,7 @@ public class QRStats extends AppCompatActivity implements Observer {
             }
         });
         init();
-        AppStore.get().addObserver(this);
+        Context.get().addObserver(this);
     }
 
     @Override
@@ -148,49 +144,64 @@ public class QRStats extends AppCompatActivity implements Observer {
     }
 
     private void updateValues() {
-        PlayerWallet curWallet = AppStore.get().getCurrentPlayer().getPlayerWallet();
-        ScannableCode lowestScan = AppStore.get().getLowestScannableCode();
-        ScannableCode highestScan = AppStore.get().getHighestScannableCode();
-        long totalScore = AppStore.get().getCurrentPlayer().getTotalScore();
-        setMyCodesValue(curWallet.getSize());
-        setLowScoreValue(lowestScan.getHashInfo().getGeneratedScore());
-        setHighScoreValue(highestScan.getHashInfo().getGeneratedScore());
-        setTotalScoreValue(totalScore);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PlayerWallet curWallet = Context.get().getCurrentPlayer().getPlayerWallet();
+                ScannableCode lowestScan = Context.get().getLowestScannableCode();
+                ScannableCode highestScan = Context.get().getHighestScannableCode();
+                long totalScore = Context.get().getCurrentPlayer().getTotalScore();
+                setMyCodesValue(curWallet.getSize());
+                setLowScoreValue(lowestScan);
+                setHighScoreValue(highestScan);
+                setTotalScoreValue(totalScore);
+            }
+        });
     }
 
     private void highestScoringCodeClicked() {
-        ScannableCode highestScan = AppStore.get().getHighestScannableCode();
-        AppStore.get().setCurrentScannableCode(highestScan);
+        ScannableCode highestScan = Context.get().getHighestScannableCode();
+        Context.get().setCurrentScannableCode(highestScan);
         Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
         intent.putExtra("belongsToCurrentUser", true);
         startActivity(intent);
     }
 
     private void lowestScoringCodeClicked() {
-        ScannableCode lowestScan = AppStore.get().getLowestScannableCode();
-        AppStore.get().setCurrentScannableCode(lowestScan);
+        ScannableCode lowestScan = Context.get().getLowestScannableCode();
+        Context.get().setCurrentScannableCode(lowestScan);
         Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
         intent.putExtra("belongsToCurrentUser", true);
         startActivity(intent);
     }
 
     private void init() {
-
         menuButton = findViewById(R.id.menu_button);
         scoreIcon = findViewById(R.id.score_icon);
         totalScoreTextView = findViewById(R.id.total_score_value);
         myCodesTextView = findViewById(R.id.my_codes_value);
-        topScoreTextView = findViewById(R.id.top_score_value);
-        lowScoreTextView = findViewById(R.id.low_score_value);
         myProfileButton = findViewById(R.id.my_profile_button);
     }
 
-    public void setHighScoreValue(long score) {
-        topScoreTextView.setText(String.valueOf(score));
+    public void setHighScoreValue(ScannableCode highestScoring) {
+        if(highestScoring!=null){
+            topScoreValueTextView.setText(String.valueOf(highestScoring.getHashInfo().getGeneratedScore()));
+            topScoreValueTextView.setClickable(true);
+        }else{
+            topScoreValueTextView.setText(R.string.no_codes_scanned);
+            topScoreValueTextView.setClickable(false);
+        }
     }
 
-    public void setLowScoreValue(long score) {
-        lowScoreTextView.setText(String.valueOf(score));
+    public void setLowScoreValue(ScannableCode lowestScoring) {
+        if(lowestScoring!=null){
+            lowScoreValueTextView.setText(String.valueOf(lowestScoring.getHashInfo().getGeneratedScore()));
+            lowScoreValueTextView.setClickable(true);
+        }else{
+            lowScoreValueTextView.setText(R.string.no_codes_scanned);
+            lowScoreValueTextView.setClickable(false);
+        }
+
     }
 
     public void setTotalScoreValue(long score) {

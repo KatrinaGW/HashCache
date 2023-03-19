@@ -7,20 +7,12 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.IPlayerDatabase;
-import com.example.hashcache.models.database_connections.PlayerWalletConnectionHandler;
-import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database_connections.ScannableCodesConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.BooleanCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetScannableCodeCallback;
-import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
-import com.example.hashcache.models.database_connections.values.CollectionNames;
-import com.example.hashcache.store.AppStore;
-import com.google.firebase.firestore.CollectionReference;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.google.firebase.firestore.ListenerRegistration;
-
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,11 +26,11 @@ import java.util.function.Function;
  * It implements the IPlayerDatabase interface which defines the methods that
  * can be performed on the database.
  */
-public class PlayerDatabase extends Observable implements IPlayerDatabase {
+public class DatabaseAdapter extends Observable implements DatabasePort {
     /**
      * Singleton instance of the PlayerDatabase class.
      */
-    private static PlayerDatabase instance;
+    private static DatabaseAdapter instance;
     /**
      * HashMap that contains all the players in the database.
      */
@@ -47,10 +39,6 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
      * HashMap that maps usernames to userIds.
      */
     private HashMap<String, String> userNameToIdMapper;
-    /**
-     * HashMap that contains all the scannable codes in the database.
-     */
-    private HashMap<String, ScannableCode> scannableCodeHashMap;
 
     private ListenerRegistration playerListener;
     private ListenerRegistration walletListener;
@@ -64,7 +52,7 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
      */
     @Override
     public CompletableFuture<Boolean> usernameExists(String username) {
-        return PlayersConnectionHandler.getInstance().usernameExists(username);
+        return PlayersDatabaseAdapter.getInstance().usernameExists(username);
 
     }
 
@@ -80,9 +68,14 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
     @Override
     public CompletableFuture<String> getIdByUsername(String username) {
 
-        return PlayersConnectionHandler.getInstance().getPlayerIdByUsername(username);
+        return PlayersDatabaseAdapter.getInstance().getPlayerIdByUsername(username);
     }
 
+    /**
+     * Create a new player with the given username
+     * @param username the username to use for the new player
+     * @return cf the CompletableFuture that completes once the user is created
+     */
     @Override
     public CompletableFuture<Void> createPlayer(String username) {
 
@@ -91,12 +84,17 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
         CompletableFuture.runAsync(() -> {
             usernameExists(username).thenAccept(exists -> {
                 if (!exists) {
-                    PlayersConnectionHandler.getInstance().createPlayer(username, new GetStringCallback() {
-                        @Override
-                        public void onCallback(String callbackString) {
-                            cf.complete(null);
-                        }
-                    });
+                    PlayersDatabaseAdapter.getInstance().createPlayer(username)
+                                    .thenAccept(userId -> {
+                                        cf.complete(null);
+                                    }).exceptionally(new Function<Throwable, Void>() {
+                                @Override
+                                public Void apply(Throwable throwable) {
+                                    System.out.println("There was an error getting the scannableCodes.");
+                                    cf.completeExceptionally(throwable);
+                                    return null;
+                                }
+                            });
                 } else {
                     cf.completeExceptionally(new Exception("Username already exists"));
                 }
@@ -114,7 +112,7 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
     public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            ScannableCodesConnectionHandler.getInstance()
+            ScannableCodesDatabaseAdapter.getInstance()
                     .getScannableCodesByIdInList(scannableCodeIds).thenAccept(scannableCodes -> {
                         cf.complete(scannableCodes);
                     }).exceptionally(new Function<Throwable, Void>() {
@@ -144,7 +142,7 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
     public CompletableFuture<Player> getPlayer(String userId) {
         CompletableFuture<Player> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().getPlayerAsync(userId).thenAccept(playa -> {
+            PlayersDatabaseAdapter.getInstance().getPlayer(userId).thenAccept(playa -> {
                 cf.complete(playa);
             }).exceptionally(new Function<Throwable, Void>() {
                 @Override
@@ -171,7 +169,7 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
         CompletableFuture<HashMap<String, String>> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().getPlayers().thenAccept(
+            PlayersDatabaseAdapter.getInstance().getPlayers().thenAccept(
                     players -> {
                         cf.complete(players);
                     });
@@ -193,7 +191,7 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
         CompletableFuture.runAsync(() -> {
             if (players.containsKey(userId)) {
                 Player p = players.get(userId);
-                PlayerWalletConnectionHandler.getInstance()
+                PlayerWalletDatabaseAdapter.getInstance()
                         .getPlayerWalletTotalScore(p.getPlayerWallet().getScannedCodeIds())
                         .thenAccept(totalScore -> {
                             cf.complete(totalScore);
@@ -225,19 +223,21 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
     public CompletableFuture<Void> addComment(String scannableCodeId, Comment comment) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            ScannableCodesConnectionHandler.getInstance().addComment(scannableCodeId, comment, new BooleanCallback() {
-                @Override
-                public void onCallback(Boolean isTrue) {
-                    if (isTrue) {
-                        cf.complete(null);
-                    } else {
-                        cf.completeExceptionally(new Exception("Could not add comment."));
-                    }
-                }
-            });
+            ScannableCodesDatabaseAdapter.getInstance().addComment(scannableCodeId, comment)
+                            .thenAccept(success -> {
+                                cf.complete(null);
+                            }).exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
         });
         return cf;
     }
+
+
 
     /**
      * Updates the player preferences for a given user.
@@ -252,38 +252,40 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
     public CompletableFuture<Void> updatePlayerPreferences(String userId, PlayerPreferences playerPreferences) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().updatePlayerPreferences(userId, playerPreferences,
-                    new BooleanCallback() {
-                        @Override
-                        public void onCallback(Boolean isTrue) {
-                            if (isTrue) {
+            PlayersDatabaseAdapter.getInstance().updatePlayerPreferences(userId, playerPreferences)
+                            .thenAccept(success -> {
                                 cf.complete(null);
-                            } else {
-                                cf.completeExceptionally(new Exception("Could not update player preferences"));
-                            }
-                        }
-                    });
+                            })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
         });
         return cf;
     }
 
+    /**
+     * Add a scannableCode to the player's wallet
+     * @param userId the id of the user whose wallet will have the scannable code added to it
+     * @param scannableCodeId the id of the scannable code to add
+     * @return cf the CompleteableFuture which returns once the operation has been completed
+     */
     @Override
     public CompletableFuture<Void> addScannableCodeToPlayerWallet(String userId, String scannableCodeId) {
         System.out.println("[[ Trying to add to wallet...");
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().playerScannedCodeAdded(userId, scannableCodeId, null,
-                    new BooleanCallback() {
-                        @Override
-                        public void onCallback(Boolean isTrue) {
-                            System.out.println("[[ Got response!!!");
-                            if (isTrue) {
+            PlayersDatabaseAdapter.getInstance().playerScannedCodeAdded(userId, scannableCodeId, null)
+                            .thenAccept(success -> {
                                 cf.complete(null);
-                            } else {
-                                cf.completeExceptionally(
-                                        new Exception("Could not add scannable to player wallet, userId: " + userId
-                                                + " codeId " + scannableCodeId));
-                            }
+                            }).exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
                         }
                     });
         }).exceptionally(new Function<Throwable, Void>() {
@@ -296,14 +298,27 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
         return cf;
     }
 
+    /**
+     * Check if a scannableCode already exists in a player's wallet
+     * @param userId the id of the user whose wallet needs to be checked for the scannable code
+     * @param scannableCodeId the id of the scannable code to check for
+     * @return cf the CompletableFuture with a boolean value indicating if the scannable code already
+     *          exists in the wallet or not
+     */
     @Override
     public CompletableFuture<Boolean> scannableCodeExistsOnPlayerWallet(String userId, String scannableCodeId) {
-        return PlayerWalletConnectionHandler.getInstance().scannableCodeExistsOnPlayerWallet(userId, scannableCodeId);
+        return PlayerWalletDatabaseAdapter.getInstance().scannableCodeExistsOnPlayerWallet(userId, scannableCodeId);
     }
 
+    /**
+     * Check if the scannableCode already exists in the database
+     * @param scannableCodeId the scannable code to check for
+     * @return cf the CompletableFuture with a boolean value indicating if the scananble
+     *          code already exists or not
+     */
     @Override
     public CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId) {
-        return ScannableCodesConnectionHandler.getInstance().scannableCodeIdExists(scannableCodeId);
+        return ScannableCodesDatabaseAdapter.getInstance().scannableCodeIdExists(scannableCodeId);
     }
 
     /**
@@ -317,17 +332,16 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
     public CompletableFuture<String> addScannableCode(ScannableCode scannableCode) {
         CompletableFuture<String> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            ScannableCodesConnectionHandler.getInstance().addScannableCode(scannableCode, new BooleanCallback() {
-                @Override
-                public void onCallback(Boolean isTrue) {
-                    if (isTrue) {
+            ScannableCodesDatabaseAdapter.getInstance().addScannableCode(scannableCode)
+                    .thenAccept(scannableCodeId -> {
                         cf.complete(scannableCode.getScannableCodeId());
-                    } else {
-                        cf.completeExceptionally(
-                                new Exception("Could not add ScannableCode ID: " + scannableCode.getScannableCodeId()));
-                    }
-                }
-            });
+                    }).exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
         });
         return cf;
     }
@@ -342,16 +356,20 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
      *         or an exception if the userId does not exist in the database
      */
     @Override
-    public CompletableFuture<Boolean> removeScannableCode(String userId, String scannableCodeId) {
+    public CompletableFuture<Boolean> removeScannableCodeFromWallet(String userId, String scannableCodeId) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().playerScannedCodeDeleted(userId, scannableCodeId,
-                    new BooleanCallback() {
-                        @Override
-                        public void onCallback(Boolean isTrue) {
-                            cf.complete(isTrue);
-                        }
-                    });
+            PlayersDatabaseAdapter.getInstance().playerScannedCodeDeleted(userId, scannableCodeId)
+                            .thenAccept(success -> {
+                                cf.complete(success);
+                            })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
         });
         return cf;
     }
@@ -396,31 +414,55 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            PlayersConnectionHandler.getInstance().updateContactInfo(userId, contactInfo,
-                    new BooleanCallback() {
-                        @Override
-                        public void onCallback(Boolean isTrue) {
-                            if (isTrue) {
+            PlayersDatabaseAdapter.getInstance().updateContactInfo(userId, contactInfo)
+                            .thenAccept(success -> {
                                 cf.complete(true);
-                            } else {
-                                cf.completeExceptionally(new Exception("Something went wrong " +
-                                        "while updating the contact information"));
-                            }
-                        }
-                    });
+                            })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
         });
 
         return cf;
     }
 
+    /**
+     * Called when the player's data changes
+     * @param playerId the id of the player whose data changed
+     * @param callback the callback function which will be called with the player hwose data changed
+     */
     @Override
     public void onPlayerDataChanged(String playerId, GetPlayerCallback callback) {
-        playerListener = PlayersConnectionHandler.getInstance().setupPlayerListener(playerId, callback);
+        playerListener = PlayersDatabaseAdapter.getInstance().setupPlayerListener(playerId, callback);
     }
 
+    /**
+     * Called when a player's wallet changes
+     * @param playerId the id of the player whose wallet changed
+     * @param callback the callback to call once the changes have been processed
+     */
     @Override
     public void onPlayerWalletChanged(String playerId, BooleanCallback callback) {
-        walletListener = PlayerWalletConnectionHandler.getInstance().getPlayerWalletChangeListener(playerId, callback);
+        walletListener = PlayerWalletDatabaseAdapter.getInstance().getPlayerWalletChangeListener(playerId, callback);
+    }
+
+    /**
+     * Deletes a comment from a scananble code
+     * @param scannableCodeId the id of the scannable code to delete the comment from
+     * @param commentId the id of the comment to delete
+     * @return cf the CompletableFuture with a boolean value indicating if the operation was successful
+     * or not
+     */
+    @Override
+    public CompletableFuture<Boolean> deleteComment(String scannableCodeId, String commentId){
+        CompletableFuture<Boolean> cf = ScannableCodesDatabaseAdapter.getInstance().deleteComment(
+                scannableCodeId, commentId
+        );
+        return cf;
     }
 
     ;
@@ -436,7 +478,7 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
     public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayerWalletConnectionHandler.getInstance()
+            PlayerWalletDatabaseAdapter.getInstance()
                     .getPlayerWalletTopScore(scannableCodeIds)
                     .thenAccept(topScore -> {
                         cf.complete(topScore);
@@ -463,7 +505,7 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
     public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayerWalletConnectionHandler.getInstance()
+            PlayerWalletDatabaseAdapter.getInstance()
                     .getPlayerWalletLowScore(scannableCodeIds)
                     .thenAccept(lowScore -> {
                         cf.complete(lowScore);
@@ -489,7 +531,7 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
     public CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds) {
         CompletableFuture<Long> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            PlayerWalletConnectionHandler.getInstance()
+            PlayerWalletDatabaseAdapter.getInstance()
                     .getPlayerWalletTotalScore(scannableCodeIds)
                     .thenAccept(totalScore -> {
                         cf.complete(totalScore);
@@ -515,25 +557,18 @@ public class PlayerDatabase extends Observable implements IPlayerDatabase {
     public CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            ScannableCodesConnectionHandler.getInstance().getScannableCode(scannableCodeId,
-                    new GetScannableCodeCallback() {
+            ScannableCodesDatabaseAdapter.getInstance().getScannableCode(scannableCodeId)
+                    .thenAccept(scannableCode -> {
+                        cf.complete(scannableCode);
+                    }).exceptionally(new Function<Throwable, Void>() {
                         @Override
-                        public void onCallback(ScannableCode scannableCode) {
-                            if (scannableCode != null) {
-                                cf.complete(scannableCode);
-                            } else {
-                                cf.completeExceptionally(new Exception("Something went wrong while " +
-                                        "getting the scannableCode!"));
-                            }
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
                         }
                     });
         });
         return cf;
-    }
-
-    private void triggerObservers() {
-        setChanged();
-        notifyObservers();
     }
 
 }

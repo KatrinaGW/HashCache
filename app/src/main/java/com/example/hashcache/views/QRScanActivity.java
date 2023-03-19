@@ -18,8 +18,6 @@ import com.budiyev.android.codescanner.DecodeCallback;
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.hashInfo.HashController;
 import com.example.hashcache.controllers.hashInfo.HashExceptions;
-import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.store.AppStore;
 import com.google.zxing.Result;
 
 import java.util.function.Function;

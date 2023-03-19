@@ -14,7 +14,7 @@ import androidx.appcompat.widget.PopupMenu;
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
 /**
 
  OtherProfileInformationActivity displays the public profile information of another player.
@@ -64,7 +64,7 @@ public class OtherProfileInformationActivity extends AppCompatActivity {
         viewCacheButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppStore.get().setSelectedPlayer(otherPlayer);
+                Context.get().setSelectedPlayer(otherPlayer);
                 startActivity(new Intent(OtherProfileInformationActivity.this, OtherCacheActivity.class));
             }
         });

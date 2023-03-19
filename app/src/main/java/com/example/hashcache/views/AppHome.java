@@ -27,8 +27,7 @@ import java.util.Observer;
 
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
-import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
 /**
 
  Represents the main landing page of the app.
@@ -129,9 +128,9 @@ public class AppHome extends AppCompatActivity implements Observer {
                 menu.show();
             }
         });
-        playerInfo = AppStore.get().getCurrentPlayer();
+        playerInfo = Context.get().getCurrentPlayer();
         setUIParams();
-        AppStore.get().addObserver(this);
+        Context.get().addObserver(this);
     }
 
     private void initView() {
@@ -238,7 +237,7 @@ public class AppHome extends AppCompatActivity implements Observer {
     }
 
     public void setUIParams(){
-        Player currentPlayer = AppStore.get().getCurrentPlayer();
+        Player currentPlayer = Context.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
         setScore(currentPlayer.getTotalScore());
 

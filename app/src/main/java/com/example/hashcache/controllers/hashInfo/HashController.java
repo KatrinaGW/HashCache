@@ -1,32 +1,16 @@
 package com.example.hashcache.controllers.hashInfo;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
-import android.os.Build;
-import android.provider.ContactsContract;
 
-import androidx.annotation.RequiresApi;
-
-
-import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-
-import javax.net.ssl.HttpsURLConnection;
 
 /**
  * The HashController class provides methods for managing scannable codes and their associated hash information.
@@ -53,7 +37,7 @@ public class HashController {
                     // Generate hash information for the scannable code and check if it already exists in the database
                     HashInfoGenerator.generateHashInfo(byteArray).thenAccept(hashInfo -> {
                         Database.getInstance().scannableCodeExists(hash).thenAccept(exists -> {
-                            String userId = AppStore.get().getCurrentPlayer().getUserId();
+                            String userId = Context.get().getCurrentPlayer().getUserId();
                             ScannableCode sc = new ScannableCode(hash, hashInfo);
                             // If the scannable code already exists in the database, add it to the player's wallet
                             if(exists){
@@ -106,7 +90,7 @@ public class HashController {
     private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf, ScannableCode sc) {
         Database.getInstance().addScannableCodeToPlayerWallet(userId, hash).thenAccept(created->{
             // Set the current scannable code to the newly added scannable code
-            AppStore.get().setCurrentScannableCode(sc);
+            Context.get().setCurrentScannableCode(sc);
             cf.complete(null);
         }).exceptionally(new Function<Throwable, Void>() {
             @Override
@@ -131,12 +115,12 @@ public class HashController {
             @Override
             public void run() {
                 // Remove the scannable code from the player's wallet in the database
-                Database.getInstance().removeScannableCode(userId, scannableCodeId)
+                Database.getInstance().removeScannableCodeFromWallet(userId, scannableCodeId)
                         .thenAccept(completed -> {
                             // If the scannable code was deleted successfully, update the current player's wallet
                             if(completed){
                         cf.complete(completed);
-                        Player currentPlayer = AppStore.get().getCurrentPlayer();
+                        Player currentPlayer = Context.get().getCurrentPlayer();
                         // If the deleted scannable code belonged to the current player, remove it from their wallet
                         if(currentPlayer.getUserId() == userId){
                             currentPlayer.getPlayerWallet().deleteScannableCode(scannableCodeId);
