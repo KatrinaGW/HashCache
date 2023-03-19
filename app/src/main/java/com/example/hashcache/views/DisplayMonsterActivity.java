@@ -46,7 +46,6 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     private Button deleteButton;
     private ScannableCode currentScannableCode;
     private boolean belongToCurrentUser;
-    private TextView deleteLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,10 +110,8 @@ public class DisplayMonsterActivity extends AppCompatActivity {
         deleteButton = findViewById(R.id.delete_button);
 
         if(!belongToCurrentUser){
-            deleteLabel.setVisibility(View.GONE);
             deleteButton.setVisibility(View.GONE);
         }else{
-            deleteLabel.setVisibility(View.VISIBLE);
             deleteButton.setVisibility(View.VISIBLE);
         }
     }

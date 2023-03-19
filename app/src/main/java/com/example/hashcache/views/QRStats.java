@@ -37,16 +37,8 @@ public class QRStats extends AppCompatActivity implements Observer {
     private ImageButton scoreIcon;
     private TextView totalScoreTextView;
     private TextView myCodesTextView;
-    private TextView topScoreTextView;
-    private TextView lowScoreTextView;
-    private TextView totalScoreValueTextView;
-    private TextView myCodesValueTextView;
     private TextView topScoreValueTextView;
     private TextView lowScoreValueTextView;
-    private ScannableCode lowestScoring;
-    private ScannableCode highestScoring;
-    private PlayerWallet playerWallet;
-    private AppCompatButton myProfileButton;
 
     /**
      * Initializes the activity and sets the layout. Also adds functionality to the
@@ -62,8 +54,8 @@ public class QRStats extends AppCompatActivity implements Observer {
         setContentView(R.layout.qr_stats);
 
         menuButton = findViewById(R.id.menu_button);
-        totalScoreValueTextView = findViewById(R.id.total_score_value);
-        myCodesValueTextView = findViewById(R.id.my_codes_value);
+        totalScoreTextView = findViewById(R.id.total_score_value);
+        myCodesTextView = findViewById(R.id.total_score_value);
         topScoreValueTextView = findViewById(R.id.top_score_value);
         lowScoreValueTextView = findViewById(R.id.low_score_value);
 
@@ -138,7 +130,6 @@ public class QRStats extends AppCompatActivity implements Observer {
         scoreIcon = findViewById(R.id.score_icon);
         totalScoreTextView = findViewById(R.id.total_score_value);
         myCodesTextView = findViewById(R.id.my_codes_value);
-        myProfileButton = findViewById(R.id.my_profile_button);
     }
 
     public void setHighScoreValue(ScannableCode highestScoring) {
