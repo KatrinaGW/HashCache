@@ -37,17 +37,12 @@ public class QRStats extends AppCompatActivity implements Observer {
     private ImageButton scoreIcon;
     private TextView totalScoreTextView;
     private TextView myCodesTextView;
-    private TextView topScoreTextView;
-    private TextView lowScoreTextView;
-    private TextView totalScoreValueTextView;
-    private TextView myCodesValueTextView;
     private TextView topScoreValueTextView;
     private TextView lowScoreValueTextView;
-    private AppCompatButton myProfileButton;
 
     /**
      * Initializes the activity and sets the layout. Also adds functionality to the
-     * menu button and my profile button.
+     * menu button.
      *
      * @param savedInstanceState a Bundle object containing the activity's
      *                           previously saved state, if any
@@ -58,10 +53,9 @@ public class QRStats extends AppCompatActivity implements Observer {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.qr_stats);
 
-        // add functionality to menu button
-        ImageButton menuButton = findViewById(R.id.menu_button);
-        totalScoreValueTextView = findViewById(R.id.total_score_value);
-        myCodesValueTextView = findViewById(R.id.my_codes_value);
+        menuButton = findViewById(R.id.menu_button);
+        totalScoreTextView = findViewById(R.id.total_score_value);
+        myCodesTextView = findViewById(R.id.total_score_value);
         topScoreValueTextView = findViewById(R.id.top_score_value);
         lowScoreValueTextView = findViewById(R.id.low_score_value);
 
@@ -79,60 +73,16 @@ public class QRStats extends AppCompatActivity implements Observer {
             }
         });
 
+        // add functionality to menu button
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
 
-                // create main menu
-                PopupMenu menu = new PopupMenu(QRStats.this, menuButton);
-                menu.getMenuInflater()
-                        .inflate(R.menu.fragment_popup_menu, menu.getMenu());
-
-                // navigate to different activities based on menu item selected
-                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem item) {
-                        int id = item.getItemId();
-
-                        if (id == R.id.menu_home) { // go to AppHome page
-                            startActivity(new Intent(QRStats.this, AppHome.class));
-                            return true;
-
-                        } else if (id == R.id.menu_stats) { // remain on QRStats page
-                            return true;
-
-                        } else if (id == R.id.menu_profile) { // go to MyProfile
-                            startActivity(new Intent(QRStats.this, MyProfile.class));
-                            return true;
-
-                        } else if (id == R.id.menu_community) { // go to Community
-                            startActivity(new Intent(QRStats.this, Community.class));
-                            return true;
-                        }
-                        return QRStats.super.onOptionsItemSelected(item);
-                    }
-                });
-                menu.show();
+            public void onClick(View view) {
+                BottomMenuFragment bottomMenu = new BottomMenuFragment();
+                bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
         });
 
-        // add functionality to profile button
-        AppCompatButton loginButton = findViewById(R.id.my_profile_button);
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            /**
-             * 
-             * This method handles the click event of the My Profile button in the QRStats
-             * activity and starts the MyProfile activity.
-             * 
-             * @param v The view that was clicked
-             */
-            @Override
-            public void onClick(View v) {
-
-                // go to MyProfile page
-                Intent goHome = new Intent(QRStats.this, MyProfile.class);
-                startActivity(goHome);
-            }
-        });
         init();
         Context.get().addObserver(this);
     }
@@ -180,7 +130,6 @@ public class QRStats extends AppCompatActivity implements Observer {
         scoreIcon = findViewById(R.id.score_icon);
         totalScoreTextView = findViewById(R.id.total_score_value);
         myCodesTextView = findViewById(R.id.my_codes_value);
-        myProfileButton = findViewById(R.id.my_profile_button);
     }
 
     public void setHighScoreValue(ScannableCode highestScoring) {
@@ -220,9 +169,6 @@ public class QRStats extends AppCompatActivity implements Observer {
         return scoreIcon;
     }
 
-    public AppCompatButton getMyProfileButton() {
-        return myProfileButton;
-    }
 
     @Override
     public void update(Observable observable, Object o) {

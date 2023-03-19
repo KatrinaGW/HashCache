@@ -45,16 +45,6 @@
             android:textStyle="bold"
             android:layout_below="@id/other_username_header"
             android:layout_toEndOf="@id/logo_button"/>
-        <ImageButton
-            android:id="@+id/menu_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/menu_button_dark"
-            android:src="@android:drawable/ic_dialog_dialer"
-            android:padding="6dp"
-            android:layout_marginEnd="18dp"
-            android:layout_alignParentEnd="true"
-            android:elevation="6dp"/>
     </RelativeLayout>
 
     <ListView
@@ -62,6 +52,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/header"
+        android:layout_above="@+id/menu_button"
         android:layout_marginBottom="24dp"/>
+
+    <ImageButton
+        android:id="@+id/menu_button"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/semicircle_button"
+        android:elevation="6dp"
+        android:src="@drawable/half_logo"
+        android:scaleType="fitCenter"/>
 
 </RelativeLayout>

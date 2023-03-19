@@ -5,16 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.hashcache.views.DisplayMonsterActivity"
     android:background="@drawable/background_gradient_yellow">
-    <ImageButton
-        android:id="@+id/menu_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/menu_button_dark"
-        android:src="@android:drawable/ic_dialog_dialer"
-        android:padding="6dp"
-        android:layout_marginEnd="18dp"
-        android:layout_alignParentEnd="true"
-        android:elevation="6dp"/>
+
     <TextView
         android:id="@+id/monster_name"
         android:layout_width="match_parent"
@@ -24,7 +15,7 @@
         android:textStyle="bold"
         android:textColor="@color/black"
         android:layout_marginTop="36dp"
-        android:layout_marginStart="36dp" />
+        android:layout_marginStart="36dp"/>
     <TextView
         android:id="@+id/monster_score"
         android:layout_width="match_parent"
@@ -48,35 +39,27 @@
         android:layout_below="@+id/monster_image"
         android:layout_centerHorizontal="true"/>
 
-    <TextView
-        android:id="@+id/delete_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/mini_map"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp"
-        android:text="Delete?"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="24dp"
-        android:textStyle="bold" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/delete_text"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp">
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Yes, delete Monster"
+        android:layout_below="@id/mini_map"
+        android:layout_marginTop="24dp"
+        android:layout_centerHorizontal="true"
+        android:text="Delete Monster"
         android:textSize="22sp"
+        android:paddingHorizontal="12dp"
         android:background="@drawable/rounded_rect_green" />
 
-    </LinearLayout>
-
+    <ImageButton
+        android:id="@+id/menu_button"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/semicircle_button"
+        android:elevation="6dp"
+        android:src="@drawable/half_logo"
+        android:scaleType="fitCenter"/>
 
 </RelativeLayout>

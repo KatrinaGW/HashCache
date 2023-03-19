@@ -46,7 +46,6 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     private Button deleteButton;
     private ScannableCode currentScannableCode;
     private boolean belongToCurrentUser;
-    private TextView deleteLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,57 +67,11 @@ public class DisplayMonsterActivity extends AppCompatActivity {
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
-            /**
-             * Called when the menu button is clicked.
-             *
-             * Creates a popup menu and sets up the menu items. Navigates to different activities based on the menu item
-             * that was clicked.
-             *
-             * @param v the view that was clicked (the menu button)
-             */
             @Override
-            public void onClick(View v) {
-
-                // create menu
-                PopupMenu menu = new PopupMenu(DisplayMonsterActivity.this, menuButton);
-                menu.getMenuInflater()
-                        .inflate(R.menu.fragment_popup_menu, menu.getMenu());
-
-                // navigate to different activities based on menu item selected
-                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    /**
-                     * Called when a menu item is clicked.
-                     *
-                     * Navigates to the appropriate activity based on the menu item that was clicked.
-                     *
-                     * @param item the menu item that was clicked
-                     * @return true if the menu item was handled, false otherwise
-                     */
-                    public boolean onMenuItemClick(MenuItem item) {
-                        int id = item.getItemId();
-
-                        if (id == R.id.menu_home) {                 // go to AppHome page
-                            startActivity(new Intent(DisplayMonsterActivity.this, AppHome.class));
-                            return true;
-
-                        } else if (id == R.id.menu_stats) {         // go to QRStats page
-                            startActivity(new Intent(DisplayMonsterActivity.this, QRStats.class));
-                            return true;
-
-                        } else if (id == R.id.menu_profile) {       // go to MyProfile
-                            startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
-                            return true;
-
-                        } else if (id == R.id.menu_community) {     // go to Community
-                            startActivity(new Intent(DisplayMonsterActivity.this, Community.class));
-                            return true;
-                        }
-                        return DisplayMonsterActivity.super.onOptionsItemSelected(item);
-                    }
-                });
-                menu.show();
+            public void onClick(View view) {
+                BottomMenuFragment bottomMenu = new BottomMenuFragment();
+                bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
-
         });
     }
 
@@ -155,13 +108,10 @@ public class DisplayMonsterActivity extends AppCompatActivity {
         miniMap = findViewById(R.id.mini_map);
         menuButton = findViewById(R.id.menu_button);
         deleteButton = findViewById(R.id.delete_button);
-        deleteLabel = findViewById(R.id.delete_text);
 
         if(!belongToCurrentUser){
-            deleteLabel.setVisibility(View.GONE);
             deleteButton.setVisibility(View.GONE);
         }else{
-            deleteLabel.setVisibility(View.VISIBLE);
             deleteButton.setVisibility(View.VISIBLE);
         }
     }

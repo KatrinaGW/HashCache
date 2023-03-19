@@ -1,17 +1,25 @@
 package com.example.hashcache.unit;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.widget.EditText;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-
-import com.example.hashcache.R;
 import com.example.hashcache.views.AppHome;
 import com.example.hashcache.views.Community;
+import com.example.hashcache.views.DisplayMonsterActivity;
 import com.example.hashcache.views.MainActivity;
 import com.example.hashcache.views.MyProfile;
+import com.example.hashcache.views.QRByLocation;
+import com.example.hashcache.views.QRScanActivity;
 import com.example.hashcache.views.QRStats;
+import com.example.hashcache.R;
 import com.example.hashcache.views.Settings;
 import com.robotium.solo.Solo;
 
@@ -26,7 +34,7 @@ import java.util.Random;
  * Test class for AppHome. All the UI tests are written here. Robotium test framework is
  used
  */
-public class SettingsTest {
+public class PrivateDisplayMonsterActivityTest {
 
     private Solo solo;
     @Rule
@@ -41,26 +49,28 @@ public class SettingsTest {
     @Before
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        final String ALLOWED_CHARACTERS = "0123456789qwertyuiopasdfghjklzxcvbnm";
-        final Random random = new Random();
-        final StringBuilder sb = new StringBuilder(15);
-        for (int i = 0; i < 15; ++i)
-            sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
 
-        solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
+        solo.enterText((EditText) solo.getView(R.id.username_edittext), "Leon");
         solo.clickOnButton("START CACHING");
         solo.clickOnImageButton(0);
-        solo.clickOnImageButton(0);
+        solo.clickOnText("Blobulon Crorg the Fifth Alf");
 
     }
 
 
+    @Test
+    public void checkInfo(){
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
+        solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
+        solo.waitForText("Blobulon Crorg the Fifth Alf");
+        solo.waitForText("Delete?");
+    }
 
     @Test
     public void checkMenuButton1(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", Settings.class);
-        solo.clickOnImageButton(0);
+        solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
+        solo.clickOnImageButton(1);
         solo.clickOnText("Map");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
@@ -69,8 +79,8 @@ public class SettingsTest {
     @Test
     public void checkMenuButton2(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", Settings.class);
-        solo.clickOnImageButton(0);
+        solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
+        solo.clickOnImageButton(1);
         solo.clickOnText("My QR Codes");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
@@ -79,8 +89,8 @@ public class SettingsTest {
     @Test
     public void checkMenuButton3(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", Settings.class);
-        solo.clickOnImageButton(0);
+        solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
+        solo.clickOnImageButton(1);
         solo.clickOnText("Stats");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", QRStats.class);
@@ -89,20 +99,11 @@ public class SettingsTest {
     @Test
     public void checkMenuButton4(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", Settings.class);
-        solo.clickOnImageButton(0);
+        solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
+        solo.clickOnImageButton(1);
         solo.clickOnText("Community");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
-    }
-
-    @Test
-    public void checkEditPlayerInfoButton(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", Settings.class);
-        solo.clickOnImageButton(1);
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", EditPlayerInfoActivity.class);
     }
 
 
