@@ -2,6 +2,7 @@ package com.example.hashcache.models.database;
 
 import java.util.Observable;
 
+import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
@@ -578,7 +579,21 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
      */
     @Override
     public CompletableFuture<Integer> getNumPlayersWithScannableCode(String scannableCodeId){
-        return PlayersDatabaseAdapter.getInstance().getNumPlayersWithScannableCode(scannableCodeId);
+        CompletableFuture<Integer> cf = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            PlayersDatabaseAdapter.getInstance().getNumPlayersWithScannableCode(scannableCodeId)
+                    .thenAccept(count -> {
+                        cf.complete(count);
+                    }).exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
+        return cf;
     }
 
 }

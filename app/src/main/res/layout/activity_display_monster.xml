@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:textSize="28sp"
             android:layout_weight="1"
-            android:text="TextView" />
+            android:text="" />
 
         <TextView
             android:id="@+id/num_players_label_last"
