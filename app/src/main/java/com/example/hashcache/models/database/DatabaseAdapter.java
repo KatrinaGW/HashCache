@@ -571,4 +571,14 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return cf;
     }
 
+    /**
+     * Gets the number of players with the specified scananble code id in their wallets
+     * @param scannableCodeId the id of the scannable code to look for
+     * @return a completableFuture with the number of players who have the scannablecode
+     */
+    @Override
+    public CompletableFuture<Integer> getNumPlayersWithScannableCode(String scannableCodeId){
+        return PlayersDatabaseAdapter.getInstance().getNumPlayersWithScannableCode(scannableCodeId);
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.example.hashcache.models.database.DatabaseAdapters;
 
+import static java.util.stream.Collectors.toList;
+
 import android.media.Image;
 import android.util.Log;
 
@@ -23,7 +25,9 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -456,30 +460,34 @@ public class PlayersDatabaseAdapter {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         AtomicInteger count = new AtomicInteger();
+                        CompletableFuture<Boolean> newCf;
                         if(task.isSuccessful()){
-                            if(task.getResult().size()>0){
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    if(document.get(CollectionNames.PLAYER_WALLET.collectionName) != null){
-                                        DocumentReference docRef = document.getReference();
+                            int size = task.getResult().size();
+                            if(size>0){
+                                List<DocumentSnapshot> docs = task.getResult().getDocuments();
+                                ArrayList<CompletableFuture<Boolean>> futureCfs = new ArrayList<>();
+                                DocumentReference docRef;
+                                for(DocumentSnapshot doc : docs){
+                                    docRef = doc.getReference();
+                                    DocumentReference finalDocRef = docRef;
+                                        futureCfs.add(fireStoreHelper.documentWithIDExists(
+                                                finalDocRef.collection(CollectionNames.PLAYER_WALLET.collectionName),
+                                                scannableCodeId));
 
-                                        CompletableFuture.runAsync(() -> {
-                                            fireStoreHelper.documentWithIDExists(docRef.collection(CollectionNames.PLAYER_WALLET.collectionName),
-                                                    scannableCodeId)
-                                                    .thenAccept(exists -> {
-                                                        count.getAndIncrement();
-                                                    })
-                                                    .exceptionally(new Function<Throwable, Void>() {
-                                                        @Override
-                                                        public Void apply(Throwable throwable) {
-                                                            cf.completeExceptionally(throwable);
-                                                            return null;
+                                }
+                                CompletableFuture.allOf(futureCfs.toArray(new CompletableFuture[futureCfs.size()]))
+                                        .thenAccept(voidValue -> {
+                                            futureCfs.stream()
+                                                    .forEach(cf -> {
+                                                        if(cf.join()){
+                                                            count.getAndIncrement();
                                                         }
                                                     });
+                                            cf.complete(count.intValue());
                                         });
-                                    }
-                                }
+                            }else{
+                                cf.complete(count.intValue());
                             }
-                            cf.complete(count.intValue());
                         }else{
                             cf.completeExceptionally(new Exception("Something went wrong while " +
                                     "getting all players"));

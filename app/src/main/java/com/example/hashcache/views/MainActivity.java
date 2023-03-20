@@ -131,7 +131,12 @@ public class MainActivity extends AppCompatActivity {
                             Intent goHome = new Intent(MainActivity.this, AppHome.class);
 
                             Database.getInstance().getPlayers().thenAccept(players -> {
-                                startActivity(goHome);
+
+                                Database.getInstance().getNumPlayersWithScannableCode("31136a180fe960a8d753595ff3208fd0aeab6eb837c27c678d57dd22949cc95e")
+                                                .thenAccept(count -> {
+                                                    startActivity(goHome);
+                                                });
+
 
                             });
 
