@@ -119,7 +119,7 @@ public class Context extends Observable {
                         Database.getInstance()
                                 .getPlayerWalletTotalScore(playa.getPlayerWallet().getScannedCodeIds())
                                 .thenAccept(totalScore -> {
-                                    getCurrentPlayer().setTotalScore(totalScore.longValue());
+                                    getCurrentPlayer().getPlayerWallet().setTotalScore(totalScore.longValue());
                                     setChanged();
                                     notifyObservers();
                                 });
