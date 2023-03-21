@@ -100,6 +100,12 @@ public class DisplayMonsterActivity extends AppCompatActivity {
                 return null;
             }
         });
+        viewCacherButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onViewCacherCommentsButtonClicked();
+            }
+        });
     }
 
     private void init() {
@@ -119,12 +125,13 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     }
 
     private void onViewCacherCommentsButtonClicked(){
-//        Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
-//        intent.putExtra("belongsToCurrentUser", true);
-//
-//        Context.get().setCurrentScannableCode(clickedScannableCode);
-//        startActivity(intent);
+        Intent intent = new Intent(getApplicationContext(), DisplayCommentsActivity.class);
+        intent.putExtra("belongsToCurrentUser", true);
+
+        Context.get().setCurrentScannableCode(currentScannableCode);
+        startActivity(intent);
     }
+
     private void onDeleteButtonClicked(){
         runOnUiThread(new Runnable() {
             @Override

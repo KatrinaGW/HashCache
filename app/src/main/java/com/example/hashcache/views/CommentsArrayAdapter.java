@@ -1,7 +1,8 @@
-package com.example.hashcache.tests;
+package com.example.hashcache.views;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +21,8 @@ import com.example.hashcache.models.database.Database;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class CommentsArrayAdapter extends ArrayAdapter<Comment> {
-    public CommentsArrayAdapter(Context context, List<Comment> comments) {
+public class CommentsArrayAdapter extends ArrayAdapter<Pair<String, String>> {
+    public CommentsArrayAdapter(Context context, Pair<String, String> usernameBody) {
         super(context, 0, comments);
     }
 
@@ -41,19 +42,25 @@ public class CommentsArrayAdapter extends ArrayAdapter<Comment> {
 
         TextView commentatorNameView = view.findViewById(R.id.comment_commentator_listview_item);
         TextView commentBodyView = view.findViewById(R.id.comment_body_listview_item);
+        commentBodyView.setText(comment.getBody());
 
 
-        Database.getInstance().getUsernameById(comment.getCommentatorId())
-                .thenAccept(username -> {
-                    ((AppCompatActivity) getContext()).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d("CommentsArrayAdapter", "Setting name and body");
-                            commentBodyView.setText(comment.getBody());
-                            commentatorNameView.setText(username);
-                        }
+        CompletableFuture.runAsync(() -> {
+            Database.getInstance().getUsernameById(comment.getCommentatorId())
+                    .thenAccept(username -> {
+//                    ((AppCompatActivity) getContext()).runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+                        Log.d("CommentsArrayAdapter", "Setting name and body");
+//                    commentBodyView.setText(comment.getBody());
+                        commentatorNameView.setText(username);
+//                        }
+//                    });
+//                });
                     });
-                });
+
+        });
+
 
         return view;
     }
