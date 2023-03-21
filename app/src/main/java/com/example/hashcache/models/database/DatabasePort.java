@@ -37,9 +37,6 @@ public interface DatabasePort {
     CompletableFuture<Boolean> scannableCodeExists(String scannableCodeId);
 
     CompletableFuture<Boolean> removeScannableCodeFromWallet(String userId, String scannableCodeId);
-
-    CompletableFuture<Void> changeUserName(String userId, String newUsername);
-
     CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds);
     CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds);
     CompletableFuture<Long> getPlayerWalletTotalScore(ArrayList<String> scannableCodeIds);

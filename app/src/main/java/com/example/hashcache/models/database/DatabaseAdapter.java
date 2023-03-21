@@ -376,33 +376,6 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     }
 
     /**
-     * Changes the username for a given user.
-     *
-     * @param userId      the userId to change the username for
-     * @param newUsername the new username to set
-     * @return a CompletableFuture that will complete successfully if the username
-     *         was changed successfully,
-     *         or an exception if the userId does not exist in the database
-     */
-    @Override
-    public CompletableFuture<Void> changeUserName(String userId, String newUsername) {
-        CompletableFuture<Void> cf = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
-            if (players.containsKey(userId)) {
-                Player p = players.get(userId);
-                String oldUserName = p.getUsername();
-                userNameToIdMapper.remove(oldUserName);
-                userNameToIdMapper.put(newUsername, p.getUserId());
-                p.updateUserName(newUsername);
-                cf.complete(null);
-            } else {
-                cf.completeExceptionally(new Exception("UserId does not exist."));
-            }
-        });
-        return cf;
-    }
-
-    /**
      * Update a user's contact information
      * 
      * @param contactInfo the contact information to set for the user
