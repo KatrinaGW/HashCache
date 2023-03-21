@@ -1,6 +1,7 @@
 package com.example.hashcache.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.example.hashcache.models.PlayerPreferences;
@@ -22,6 +23,6 @@ public class PlayerPreferencesTest {
     void getGeoLocationRecordingTest(){
         PlayerPreferences playerPreferences = new PlayerPreferences();
 
-        assertNotNull(playerPreferences.getRecordGeolocationPreference());
+        assertFalse(playerPreferences.getRecordGeolocationPreference());
     }
 }
