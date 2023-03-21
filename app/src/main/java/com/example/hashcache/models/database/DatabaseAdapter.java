@@ -571,4 +571,14 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return cf;
     }
 
+    /**
+     * Gets the username of a player with a given userid
+     * @param userId the userid of the player whose username is needed
+     * @return cf the CompletableFuture with the specified user's username
+     */
+    @Override
+    public CompletableFuture<String> getUsernameById(String userId){
+        return PlayersDatabaseAdapter.getInstance().getUsernameById(userId);
+    }
+
 }

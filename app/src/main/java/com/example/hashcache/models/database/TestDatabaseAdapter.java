@@ -8,6 +8,8 @@ import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
@@ -403,6 +405,23 @@ public class TestDatabaseAdapter implements DatabasePort {
                 cf.complete(lowestScoring);
             }
         });
+        return cf;
+    }
+
+    /**
+     * Gets the username of a player with a given userid
+     * @param userId the userid of the player whose username is needed
+     * @return cf the CompletableFuture with the specified user's username
+     */
+    @Override
+    public CompletableFuture<String> getUsernameById(String userId){
+        CompletableFuture cf = new CompletableFuture();
+        if (players.containsKey(userId)){
+            cf.complete(players.get(userId));
+        }else{
+            cf.completeExceptionally(new Exception("No player exists with that userid!"));
+        }
+
         return cf;
     }
 

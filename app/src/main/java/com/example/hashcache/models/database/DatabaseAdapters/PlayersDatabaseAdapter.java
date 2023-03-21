@@ -440,4 +440,40 @@ public class PlayersDatabaseAdapter {
 
         return cf;
     }
+
+    /**
+     * Gets the username of a player with a given userid
+     * @param userId the userid of the player whose username is needed
+     * @return cf the CompletableFuture with the specified user's username
+     */
+    public CompletableFuture<String> getUsernameById(String userId){
+        CompletableFuture<String> cf = new CompletableFuture<>();
+
+        fireStoreHelper.documentWithIDExists(collectionReference, userId)
+                .thenAccept(exists -> {
+                    if(exists){
+                        collectionReference.document(userId).get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            cf.complete(task.getResult().get(FieldNames.USERNAME.fieldName).toString());
+                                        } else {
+                                            cf.completeExceptionally(new Exception("Something went wrong" +
+                                                    "in getUsernameById"));
+                                        }
+                                    }
+                                });
+                    }else{
+                        cf.completeExceptionally(new Exception("No player exists with given userId!"));
+                    }
+                }).exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        cf.completeExceptionally(throwable);
+                        return null;
+                    }
+                });
+        return cf;
+    }
 }
