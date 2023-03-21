@@ -43,6 +43,7 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     private ImageView monsterImage;
     private ImageView miniMap;
     private ImageButton menuButton;
+    private Button viewCacherButton;
     private Button deleteButton;
     private ScannableCode currentScannableCode;
     private boolean belongToCurrentUser;
@@ -108,6 +109,7 @@ public class DisplayMonsterActivity extends AppCompatActivity {
         miniMap = findViewById(R.id.mini_map);
         menuButton = findViewById(R.id.menu_button);
         deleteButton = findViewById(R.id.delete_button);
+        viewCacherButton = findViewById(R.id.view_comments_button);
 
         if(!belongToCurrentUser){
             deleteButton.setVisibility(View.GONE);
@@ -116,6 +118,13 @@ public class DisplayMonsterActivity extends AppCompatActivity {
         }
     }
 
+    private void onViewCacherCommentsButtonClicked(){
+//        Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
+//        intent.putExtra("belongsToCurrentUser", true);
+//
+//        Context.get().setCurrentScannableCode(clickedScannableCode);
+//        startActivity(intent);
+    }
     private void onDeleteButtonClicked(){
         runOnUiThread(new Runnable() {
             @Override

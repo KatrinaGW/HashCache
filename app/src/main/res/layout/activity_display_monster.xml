@@ -51,6 +51,18 @@
         android:paddingHorizontal="12dp"
         android:background="@drawable/rounded_rect_green" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/view_comments_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/delete_button"
+        android:layout_marginTop="5dp"
+        android:layout_centerHorizontal="true"
+        android:text="View Cacher Comments"
+        android:textSize="15sp"
+        android:paddingHorizontal="12dp"
+        android:background="@drawable/rounded_rect_green" />
+
     <ImageButton
         android:id="@+id/menu_button"
         android:layout_width="80dp"
