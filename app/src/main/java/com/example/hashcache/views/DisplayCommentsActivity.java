@@ -2,7 +2,9 @@ package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -14,10 +16,12 @@ import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.Player;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class DisplayCommentsActivity extends AppCompatActivity {
     private ListView commentsList;
-    private CommentsArrayAdapter commentsArrayAdapter;
+    private CommentsDataArrayAdapter commentsDataArrayAdapter;
     private ArrayList<Comment> comments;
     private boolean belongToCurrentUser;
 
@@ -54,13 +58,21 @@ public class DisplayCommentsActivity extends AppCompatActivity {
         });
     }
 
+    private CompletableFuture<ArrayList<Pair<String, String>>> getCommentData(){
+        CompletableFuture<ArrayList<Pair<String, String>>> cf = new CompletableFuture<>();
+        ArrayList<Pair<String, String>> commentData = new ArrayList<>();
+        for(Comment comment : comments){
+            commentData.add(new Pair<String, String>(comm))
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         comments = Context.get().getCurrentScannableCode().getComments();
         commentsList = findViewById(R.id.comment_listview_content);
-        commentsArrayAdapter = new CommentsArrayAdapter(this,
+        commentsDataArrayAdapter = new CommentsDataArrayAdapter(this,
                 comments);
-        commentsList.setAdapter(commentsArrayAdapter);
+        commentsList.setAdapter(commentsDataArrayAdapter);
     }
 }
