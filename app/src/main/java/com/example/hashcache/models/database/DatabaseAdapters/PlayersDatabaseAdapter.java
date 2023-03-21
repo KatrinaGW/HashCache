@@ -457,10 +457,14 @@ public class PlayersDatabaseAdapter {
 
         collectionReference.get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    /**
+                     * Get the number of players with the scananbleCodeId in their wallet
+                     * @param task the task that should have fetched all player documents in the database
+                     */
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        //Note that count is initialized to 0
                         AtomicInteger count = new AtomicInteger();
-                        CompletableFuture<Boolean> newCf;
                         if(task.isSuccessful()){
                             int size = task.getResult().size();
                             if(size>0){

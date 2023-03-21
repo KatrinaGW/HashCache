@@ -170,7 +170,7 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     }
 
     private void setNumPlayersCached(int numPlayers){
-        numPlayersValueView.setText(numPlayers);
+        numPlayersValueView.setText(Integer.toString(numPlayers));
     }
 
     public void setMiniMapImage(int imageRes) {
