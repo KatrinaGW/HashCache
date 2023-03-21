@@ -328,33 +328,6 @@ public class TestDatabaseAdapter implements DatabasePort {
     }
 
     /**
-     * Changes the username of a player.
-     *
-     * @param userId      the userId of the player to change the username for
-     * @param newUsername the new username for the player
-     * @return a CompletableFuture that will complete successfully if the username
-     *         was changed successfully,
-     *         or an exception if the userId does not exist in the database
-     */
-    @Override
-    public CompletableFuture<Void> changeUserName(String userId, String newUsername) {
-        CompletableFuture<Void> cf = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
-            if (players.containsKey(userId)) {
-                Player p = players.get(userId);
-                String oldUserName = p.getUsername();
-                userNameToIdMapper.remove(oldUserName);
-                userNameToIdMapper.put(newUsername, p.getUserId());
-                p.updateUserName(newUsername);
-                cf.complete(null);
-            } else {
-                cf.completeExceptionally(new Exception("UserId does not exist."));
-            }
-        });
-        return cf;
-    }
-
-    /**
      * Get the player's highest scoring QR code
      * @param scannableCodeIds the scannableIds to find the highest scoring scannableId
      * @return cf the CompletableFuture with the highest scoring code
@@ -444,6 +417,25 @@ public class TestDatabaseAdapter implements DatabasePort {
                 cf.completeExceptionally(new Exception("Could not find ScannableCode"));
             }
         });
+        return cf;
+    }
+
+    /**
+     * Gets the number of players who have scanned a specific QR code
+     * @param scannableCodeId the id of the scannable code to look for in players' wallets
+     * @return cf the CompletableFuture with the number of players who have scanned a specific QR code
+     */
+    @Override
+    public CompletableFuture<Integer> getNumPlayersWithScannableCode(String scannableCodeId){
+        CompletableFuture<Integer> cf = new CompletableFuture<>();
+        int count = 0;
+        for(Player player : players.values()){
+            if(player.getPlayerWallet().getScannedCodeIds().contains(scannableCodeId)){
+                count++;
+            }
+        }
+        cf.complete(count);
+
         return cf;
     }
 }

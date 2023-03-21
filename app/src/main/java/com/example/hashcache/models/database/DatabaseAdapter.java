@@ -2,6 +2,7 @@ package com.example.hashcache.models.database;
 
 import java.util.Observable;
 
+import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
@@ -375,33 +376,6 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     }
 
     /**
-     * Changes the username for a given user.
-     *
-     * @param userId      the userId to change the username for
-     * @param newUsername the new username to set
-     * @return a CompletableFuture that will complete successfully if the username
-     *         was changed successfully,
-     *         or an exception if the userId does not exist in the database
-     */
-    @Override
-    public CompletableFuture<Void> changeUserName(String userId, String newUsername) {
-        CompletableFuture<Void> cf = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
-            if (players.containsKey(userId)) {
-                Player p = players.get(userId);
-                String oldUserName = p.getUsername();
-                userNameToIdMapper.remove(oldUserName);
-                userNameToIdMapper.put(newUsername, p.getUserId());
-                p.updateUserName(newUsername);
-                cf.complete(null);
-            } else {
-                cf.completeExceptionally(new Exception("UserId does not exist."));
-            }
-        });
-        return cf;
-    }
-
-    /**
      * Update a user's contact information
      * 
      * @param contactInfo the contact information to set for the user
@@ -560,6 +534,30 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
             ScannableCodesDatabaseAdapter.getInstance().getScannableCode(scannableCodeId)
                     .thenAccept(scannableCode -> {
                         cf.complete(scannableCode);
+                    }).exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
+        return cf;
+    }
+
+    /**
+     * Gets the number of players with the specified scananble code id in their wallets
+     * @param scannableCodeId the id of the scannable code to look for
+     * @return a completableFuture with the number of players who have the scannablecode
+     */
+    @Override
+    public CompletableFuture<Integer> getNumPlayersWithScannableCode(String scannableCodeId){
+        CompletableFuture<Integer> cf = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            PlayersDatabaseAdapter.getInstance().getNumPlayersWithScannableCode(scannableCodeId)
+                    .thenAccept(count -> {
+                        cf.complete(count);
                     }).exceptionally(new Function<Throwable, Void>() {
                         @Override
                         public Void apply(Throwable throwable) {

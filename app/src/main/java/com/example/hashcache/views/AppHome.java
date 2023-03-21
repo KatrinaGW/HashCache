@@ -214,7 +214,7 @@ public class AppHome extends AppCompatActivity implements Observer {
     public void setUIParams(){
         Player currentPlayer = Context.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
-        setScore(currentPlayer.getTotalScore());
+        setScore(currentPlayer.getPlayerWallet().getTotalScore());
 
     }
 

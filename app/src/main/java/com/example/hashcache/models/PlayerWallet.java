@@ -10,6 +10,7 @@ import java.util.HashMap;
 public class PlayerWallet{
     private HashMap<String, Image> scannableCodes;
     private int size;
+    private long totalScore;
 
     public PlayerWallet(){
         this.size = 0;
@@ -43,6 +44,22 @@ public class PlayerWallet{
         ArrayList<String> scannedCodeIds = new ArrayList<>(this.scannableCodes.keySet());
 
         return scannedCodeIds;
+    }
+
+    /**
+     * Gets the total score of all of the scannable codes in the wallet
+     * @return totalScore the total score of all scannable codes in the wallet
+     */
+    public long getTotalScore(){
+        return totalScore;
+    }
+
+    /**
+     * Sets the total score in the wallet
+     * @param newTotalScore the new total score in the wallet
+     */
+    public void setTotalScore(long newTotalScore){
+        this.totalScore = newTotalScore;
     }
 
     /**

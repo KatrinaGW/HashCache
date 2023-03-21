@@ -58,7 +58,7 @@ public class CodeLocationTest {
     void getIdTest(){
         double x = 1;
         double y = 2;
-        double z = 3;
+        double z = 4;
 
         CodeLocation codeLocation = new CodeLocation("Lionel?", x, y, z);
 

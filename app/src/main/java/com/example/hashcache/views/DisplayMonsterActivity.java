@@ -20,6 +20,9 @@ import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.context.Context;
+import com.example.hashcache.models.database.Database;
+
+import org.w3c.dom.Text;
 
 import java.util.function.Function;
 
@@ -46,6 +49,7 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     private Button deleteButton;
     private ScannableCode currentScannableCode;
     private boolean belongToCurrentUser;
+    private TextView numPlayersValueView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +103,23 @@ public class DisplayMonsterActivity extends AppCompatActivity {
                 return null;
             }
         });
+
+        Database.getInstance().getNumPlayersWithScannableCode(currentScannableCode.getScannableCodeId())
+                .thenAccept(numPlayers -> {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setNumPlayersCached(numPlayers);
+                        }
+                    });
+                })
+                .exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        Log.d("NewMonsterActivity ERROR", throwable.getMessage());
+                        return null;
+                    }
+                });
     }
 
     private void init() {
@@ -108,6 +129,7 @@ public class DisplayMonsterActivity extends AppCompatActivity {
         miniMap = findViewById(R.id.mini_map);
         menuButton = findViewById(R.id.menu_button);
         deleteButton = findViewById(R.id.delete_button);
+        numPlayersValueView = findViewById(R.id.num_players_value);
 
         if(!belongToCurrentUser){
             deleteButton.setVisibility(View.GONE);
@@ -145,6 +167,10 @@ public class DisplayMonsterActivity extends AppCompatActivity {
 
     public void setMonsterImage(Drawable image) {
         monsterImage.setImageDrawable(image);
+    }
+
+    private void setNumPlayersCached(int numPlayers){
+        numPlayersValueView.setText(Integer.toString(numPlayers));
     }
 
     public void setMiniMapImage(int imageRes) {
