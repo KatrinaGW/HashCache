@@ -229,7 +229,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
     public void setUIParams() {
         Player currentPlayer = Context.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
-        setScore(currentPlayer.getTotalScore());
+        setScore(currentPlayer.getPlayerWallet().getTotalScore());
         Database.getInstance()
                 .getScannableCodesByIdInList(currentPlayer.getPlayerWallet().getScannedCodeIds())
                 .thenAccept(scannableCodes -> {

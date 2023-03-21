@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
+import com.example.hashcache.models.PlayerWallet;
 
 import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
@@ -40,16 +41,21 @@ public class PlayerTest {
 
     @Test
     void getContactInfoTest(){
-        Player testPlayer = new Player("words");
+        ContactInfo testContactInfo = new ContactInfo();
+        testContactInfo.setEmail("notAnEmail@gmail.com");
+        Player testPlayer = new Player("notARealId", "notARealName", testContactInfo,
+                new PlayerPreferences(), new PlayerWallet());
 
-        assertNotNull(testPlayer.getContactInfo());
+        assertEquals(testContactInfo, testPlayer.getContactInfo());
     }
 
     @Test
     void getPlayerPreferencesTest(){
-        Player testPlayer = new Player("more words");
+        PlayerPreferences testPlayerPreferences = new PlayerPreferences();
+        Player testPlayer = new Player("notARealId", "notARealName", new ContactInfo(),
+                testPlayerPreferences, new PlayerWallet());
 
-        assertNotNull(testPlayer.getPlayerPreferences());
+        assertEquals(testPlayerPreferences, testPlayer.getPlayerPreferences());
     }
 
     @Test
@@ -64,8 +70,10 @@ public class PlayerTest {
 
     @Test
     void getUserIdTest(){
-        Player testPlayer = new Player("Final words.");
+        String testId = "Hal";
+        Player testPlayer = new Player(testId, "Final words.", new ContactInfo(),
+                new PlayerPreferences(), new PlayerWallet());
 
-        assertNotNull(testPlayer.getUserId());
+        assertEquals(testId, testPlayer.getUserId());
     }
 }

@@ -1,5 +1,7 @@
 package com.example.hashcache.models.database.DatabaseAdapters;
 
+import static java.util.stream.Collectors.toList;
+
 import android.media.Image;
 import android.util.Log;
 
@@ -23,9 +25,12 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
@@ -475,5 +480,59 @@ public class PlayersDatabaseAdapter {
                     }
                 });
         return cf;
+    }
+
+    /**
+     * Gets the number of players who have scanned a specific QR code
+     * @param scannableCodeId the id of the scannable code to look for in players' wallets
+     * @return cf the CompletableFuture with the number of players who have scanned a specific QR code
+     */
+    public CompletableFuture<Integer> getNumPlayersWithScannableCode(String scannableCodeId){
+        CompletableFuture<Integer> cf = new CompletableFuture<>();
+
+        collectionReference.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    /**
+                     * Get the number of players with the scananbleCodeId in their wallet
+                     * @param task the task that should have fetched all player documents in the database
+                     */
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        //Note that count is initialized to 0
+                        AtomicInteger count = new AtomicInteger();
+                        if(task.isSuccessful()){
+                            int size = task.getResult().size();
+                            if(size>0){
+                                List<DocumentSnapshot> docs = task.getResult().getDocuments();
+                                ArrayList<CompletableFuture<Boolean>> futureCfs = new ArrayList<>();
+                                DocumentReference docRef;
+                                for(DocumentSnapshot doc : docs){
+                                    docRef = doc.getReference();
+                                    DocumentReference finalDocRef = docRef;
+                                        futureCfs.add(fireStoreHelper.documentWithIDExists(
+                                                finalDocRef.collection(CollectionNames.PLAYER_WALLET.collectionName),
+                                                scannableCodeId));
+
+                                }
+                                CompletableFuture.allOf(futureCfs.toArray(new CompletableFuture[futureCfs.size()]))
+                                        .thenAccept(voidValue -> {
+                                            futureCfs.stream()
+                                                    .forEach(cf -> {
+                                                        if(cf.join()){
+                                                            count.getAndIncrement();
+                                                        }
+                                                    });
+                                            cf.complete(count.intValue());
+                                        });
+                            }else{
+                                cf.complete(count.intValue());
+                            }
+                        }else{
+                            cf.completeExceptionally(new Exception("Something went wrong while " +
+                                    "getting all players"));
+                        }
+                    }
+                });
+                return cf;
     }
 }
