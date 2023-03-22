@@ -453,8 +453,8 @@ public class PlayersDatabaseAdapter {
      * @return userIdsNamesCF the completableFuture with the usernames and userIds of the
      * specified users
      */
-    public CompletableFuture<List<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds){
-        CompletableFuture<List<Pair<String, String>>> userIdsNamesCF = new CompletableFuture<>();
+    public CompletableFuture<ArrayList<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds){
+        CompletableFuture<ArrayList<Pair<String, String>>> userIdsNamesCF = new CompletableFuture<>();
         ArrayList<Pair<String, String>> userIdsNames = new ArrayList<>();
 
         ArrayList<CompletableFuture<Pair<String, String>>> futureCfs = new ArrayList<>();

@@ -14,8 +14,11 @@ import com.example.hashcache.R;
 import com.example.hashcache.context.Context;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.Player;
+import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.database.DatabaseAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -58,12 +61,34 @@ public class DisplayCommentsActivity extends AppCompatActivity {
         });
     }
 
-    private CompletableFuture<ArrayList<Pair<String, String>>> getCommentData(){
-        CompletableFuture<ArrayList<Pair<String, String>>> cf = new CompletableFuture<>();
-        ArrayList<Pair<String, String>> commentData = new ArrayList<>();
+    private void setCommentsAdapter(){
+        ArrayList<String> userIds = new ArrayList<>();
+        HashMap<String, String> commentatorIdTextBody = new HashMap<>();
+        ArrayList<Pair<String, String> >userNameTextBody = new ArrayList<>();
+
         for(Comment comment : comments){
-            commentData.add(new Pair<String, String>(comm))
+            userIds.add(comment.getCommentatorId());
+            commentatorIdTextBody.put(comment.getCommentatorId(), comment.getBody());
         }
+
+        DisplayCommentsActivity activityContext = this;
+
+        Database.getInstance().getUsernamesByIds(userIds)
+                .thenAccept(userIdsNames -> {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for(Pair<String, String> idName : userIdsNames){
+                                userNameTextBody.add(new Pair<>(idName.second,
+                                        commentatorIdTextBody.get(idName.first)));
+                            }
+
+                            commentsDataArrayAdapter = new CommentsDataArrayAdapter(activityContext,
+                                    userNameTextBody);
+                            commentsList.setAdapter(commentsDataArrayAdapter);
+                        }
+                    });
+                });
     }
 
     @Override
@@ -71,8 +96,6 @@ public class DisplayCommentsActivity extends AppCompatActivity {
         super.onResume();
         comments = Context.get().getCurrentScannableCode().getComments();
         commentsList = findViewById(R.id.comment_listview_content);
-        commentsDataArrayAdapter = new CommentsDataArrayAdapter(this,
-                comments);
-        commentsList.setAdapter(commentsDataArrayAdapter);
+        setCommentsAdapter();
     }
 }

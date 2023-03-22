@@ -408,9 +408,9 @@ public class TestDatabaseAdapter implements DatabasePort {
      * specified users
      */
     @Override
-    public CompletableFuture<List<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds){
-        List<Pair<String, String>> userIdsNames = new ArrayList<>();
-        CompletableFuture<List<Pair<String, String>>> userIdsNamesCF = new CompletableFuture<>();
+    public CompletableFuture<ArrayList<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds){
+        ArrayList<Pair<String, String>> userIdsNames = new ArrayList<>();
+        CompletableFuture<ArrayList<Pair<String, String>>> userIdsNamesCF = new CompletableFuture<>();
 
         for(String userId : userIds){
             if(players.containsKey(userId)){

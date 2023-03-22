@@ -2,6 +2,7 @@ package com.example.hashcache.models.database;
 
 import android.util.Pair;
 
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Observable;
 
@@ -565,7 +566,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
      * specified users
      */
     @Override
-    public CompletableFuture<List<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds){
+    public CompletableFuture<ArrayList<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds){
         return PlayersDatabaseAdapter.getInstance().getUsernamesByIds(userIds);
     }
     
