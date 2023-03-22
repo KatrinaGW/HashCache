@@ -74,7 +74,7 @@ public class Context extends Observable {
      */
     public void setCurrentScannableCode(ScannableCode currentScannableCode) {
         this.currentScannableCode = currentScannableCode;
-        this.setUpScannableCodeListener();
+        this.setUpScannableCodeCommentListener();
     }
 
     private void setHighestScannableCode(ScannableCode scanCode) {
@@ -97,16 +97,14 @@ public class Context extends Observable {
         return currentScannableCode;
     }
 
-    /**
-     * Set up a scannableCodeListener for only the current scananble code
-     */
-    public void setUpScannableCodeListener(){
+    private void setUpScannableCodeCommentListener(){
         if(currentScannableCode!=null){
             String scananbleCodeId = getCurrentScannableCode().getScannableCodeId();
             Database.getInstance().onScannableCodeCommentsChanged(scananbleCodeId, new GetScannableCodeCallback() {
                 @Override
                 public void onCallback(ScannableCode scannableCode) {
-                    if(scannableCode.getScannableCodeId()==scananbleCodeId){
+                    if(scannableCode != null &&
+                            scannableCode.getScannableCodeId()==currentScannableCode.getScannableCodeId()){
                         setCurrentScannableCode(scannableCode);
                         setChanged();
                         notifyObservers();
