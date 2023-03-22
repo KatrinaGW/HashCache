@@ -46,4 +46,5 @@ public interface DatabasePort {
     CompletableFuture<Integer> getNumPlayersWithScannableCode(String scannableCodeId);
     void onPlayerDataChanged(String userId, GetPlayerCallback callback);
     void onPlayerWalletChanged(String playerId, BooleanCallback callback);
+    CompletableFuture<String> getTopKUsers(String filter, int k);
 }

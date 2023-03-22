@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.PlayerDocumentConverter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.values.CollectionNames;
@@ -24,6 +25,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.zxing.PlanarYUVLuminanceSource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -256,17 +258,74 @@ public class PlayersDatabaseAdapter {
         return cf;
     }
 
-    /**
-     * Sets the player preferences of a user
-     * 
-     * @param playerDocument    the document of the player to change the preferences
-     *                          on
-     * @param playerPreferences the preferences to set for the user
-     * @return cf the CompleteableFuture which indicate that the operation was successful
-     *
-     *
-     */
-    private CompletableFuture<Boolean> setPlayerPreferences(DocumentReference playerDocument,
+    public CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet) {
+        DocumentReference playerDocument = collectionReference.document(userId);
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        fireStoreHelper.addStringFieldToDocument(playerDocument, FieldNames.EMAIL.fieldName,
+                        String.valueOf(playerWallet.getTotalScore())).thenAccept(success -> {
+                    if (success) {
+                        fireStoreHelper.addStringFieldToDocument(playerDocument,
+                                        FieldNames.MAX_SCORE.fieldName, String.valueOf(playerWallet.getMaxScore()))
+                                .thenAccept(successful->{
+                                    if(successful){
+
+                                        fireStoreHelper.addStringFieldToDocument(playerDocument, FieldNames.QR_COUNT.fieldName, String.valueOf(playerWallet.getQrCount()))
+                                                        .thenAccept(successfully -> {
+                                                            if(successfully) {
+                                                                cf.complete(true);
+                                                            } else {
+                                                                cf.completeExceptionally(new Exception(
+                                                                        "Something went wrong while setting the " +
+                                                                                "qr count!"
+                                                                ));
+                                                            }
+                                                        });
+                                    }else{
+                                        cf.completeExceptionally(new Exception(
+                                                "Something went wrong while setting the " +
+                                                        "max score!"
+                                        ));
+                                    }
+                                })
+                                .exceptionally(new Function<Throwable, Void>() {
+                                    @Override
+                                    public Void apply(Throwable throwable) {
+                                        Log.d("Update contact info",
+                                                "Could not set the total score");
+                                        return null;
+                                    }
+                                });
+
+                    } else {
+                        Log.e(TAG, "Something went wrong while setting the score information" +
+                                "of the player document");
+                        cf.completeExceptionally(new Exception("Something went wrong while setting" +
+                                "the contact information"));
+                    }
+                })
+                .exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        Log.d("Update contact info",
+                                "Could not set the email");
+                        return null;
+                    }
+                });
+
+        return cf;
+    }
+
+/**
+ * Sets the player preferences of a user
+ *
+ * @param playerDocument    the document of the player to change the preferences
+ *                          on
+ * @param playerPreferences the preferences to set for the user
+ * @return cf the CompleteableFuture which indicate that the operation was successful
+ *
+ *
+ */
+private CompletableFuture<Boolean> setPlayerPreferences(DocumentReference playerDocument,
                                                             PlayerPreferences playerPreferences) {
         CompletableFuture<Boolean> cf;
         cf = fireStoreHelper.addBooleanFieldToDocument(playerDocument,
@@ -288,6 +347,7 @@ public class PlayersDatabaseAdapter {
 
         return cf;
     }
+
 
     /**
      * Sets the contact information of a user
@@ -379,6 +439,10 @@ public class PlayersDatabaseAdapter {
         data.put(FieldNames.EMAIL.fieldName, "");
         data.put(FieldNames.PHONE_NUMBER.fieldName, "");
         data.put(FieldNames.RECORD_GEOLOCATION.fieldName, "");
+        data.put(FieldNames.TOTAL_SCORE.fieldName, "");
+        data.put(FieldNames.MAX_SCORE.fieldName, "");
+        data.put(FieldNames.QR_COUNT.fieldName, "");
+
         String userId = UUID.randomUUID().toString();
 
         fireStoreHelper.setDocumentReference(collectionReference.document(userId), data)

@@ -11,9 +11,14 @@ public class PlayerWallet{
     private HashMap<String, Image> scannableCodes;
     private int size;
     private long totalScore;
+    private long maxScore;
+    private long qrCount;
 
     public PlayerWallet(){
         this.size = 0;
+        this.totalScore = 0;
+        this.maxScore = 0;
+        this.qrCount = 0;
         this.scannableCodes = new HashMap<String, Image>();
     }
 
@@ -100,5 +105,21 @@ public class PlayerWallet{
             throw new IllegalArgumentException("Player wallet does not contain scannable" +
                     "code with given id");
         }
+    }
+
+    public long getMaxScore() {
+        return maxScore;
+    }
+
+    public long getQrCount() {
+        return qrCount;
+    }
+
+    public void setMaxScore(long maxScore) {
+        this.maxScore = maxScore;
+    }
+
+    public void setQrCount(long qrCount) {
+        this.qrCount = qrCount;
     }
 }

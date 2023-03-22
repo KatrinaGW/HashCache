@@ -14,7 +14,10 @@ public enum FieldNames {
     PHONE_NUMBER("phoneNumber"),
     RECORD_GEOLOCATION("recordGeoLocation"),
     USER_ID("userId"),
-    COMMENTATOR_ID("commentatorId");
+    COMMENTATOR_ID("commentatorId"),
+    QR_COUNT("qrCount"),
+    MAX_SCORE("maxScore"),
+    TOTAL_SCORE("totalScore");
 
     public final String fieldName;
 
