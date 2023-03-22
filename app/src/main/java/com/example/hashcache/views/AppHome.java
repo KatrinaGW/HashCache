@@ -45,7 +45,6 @@ import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
