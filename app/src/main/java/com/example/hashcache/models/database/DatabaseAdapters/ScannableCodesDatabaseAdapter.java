@@ -307,7 +307,10 @@ public class ScannableCodesDatabaseAdapter {
             Log.d("ScannableCodeComments Firestore Listener", "COMMENTS DATA HAS BEEN UPDATED.");
             if (snapshot != null) {
                 getScannableCode(scannableCodeId).thenAccept(scannableCode -> {
-                    Log.d("ScannableCode Firestore Listener", "SCANNABLE CODE  DATA HAS BEEN FETCHED.");
+                    Log.d("ScannableCode Firestore Listener", "SCANNABLE CODE  DATA  AFTER COMMENT" +
+                            "HAS BEEN FETCHED");
+                    Log.d("Number of Scannable Code Comments",
+                            Integer.toString(scannableCode.getComments().size()));
                     callback.onCallback(scannableCode);
                 }).exceptionally(new Function<Throwable, Void>() {
                     @Override

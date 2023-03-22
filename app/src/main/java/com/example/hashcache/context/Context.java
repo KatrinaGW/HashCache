@@ -1,5 +1,7 @@
 package com.example.hashcache.context;
 
+import android.util.Log;
+
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
@@ -103,6 +105,7 @@ public class Context extends Observable {
             Database.getInstance().onScannableCodeCommentsChanged(scananbleCodeId, new GetScannableCodeCallback() {
                 @Override
                 public void onCallback(ScannableCode scannableCode) {
+                    Log.d("Context onScannableCodeCommentsChanged callback", scannableCode.getScannableCodeId());
                     if(scannableCode != null &&
                             scannableCode.getScannableCodeId()==currentScannableCode.getScannableCodeId()){
                         setCurrentScannableCode(scannableCode);

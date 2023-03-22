@@ -200,7 +200,6 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         Intent intent = new Intent(getApplicationContext(), DisplayCommentsActivity.class);
         intent.putExtra("belongsToCurrentUser", belongToCurrentUser);
 
-        Context.get().setCurrentScannableCode(currentScannableCode);
         startActivity(intent);
     }
 
@@ -253,6 +252,8 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
 
     @Override
     public void update(Observable o, Object arg) {
+        currentScannableCode = Context.get().getCurrentScannableCode();
+        Log.d("DisplayMonsterActivity", "words");
         setViews();
     }
 }
