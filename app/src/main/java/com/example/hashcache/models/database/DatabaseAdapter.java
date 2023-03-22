@@ -1,5 +1,8 @@
 package com.example.hashcache.models.database;
 
+import android.util.Pair;
+
+import java.util.List;
 import java.util.Observable;
 
 import com.example.hashcache.controllers.hashInfo.ImageGenerator;
@@ -548,11 +551,22 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     /**
      * Gets the username of a player with a given userid
      * @param userId the userid of the player whose username is needed
-     * @return cf the CompletableFuture with the specified user's username
+     * @return cf the CompletableFuture with the specified user's username paired with their id
      */
     @Override
-    public CompletableFuture<String> getUsernameById(String userId){
+    public CompletableFuture<Pair<String, String>> getUsernameById(String userId){
         return PlayersDatabaseAdapter.getInstance().getUsernameById(userId);
+    }
+
+    /**
+     * Get all the usernames for the users in a given list of ids
+     * @param userIds the ids of the users whose usernames are wanted
+     * @return the completableFuture with the usernames and userIds of the
+     * specified users
+     */
+    @Override
+    public CompletableFuture<List<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds){
+        return PlayersDatabaseAdapter.getInstance().getUsernamesByIds(userIds);
     }
     
     /**

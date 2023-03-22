@@ -1,6 +1,7 @@
 package com.example.hashcache.models.database.DatabaseAdapters;
 
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
@@ -19,6 +20,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -358,5 +360,4 @@ public class ScannableCodesDatabaseAdapter {
 
         return cf;
     }
-
 }

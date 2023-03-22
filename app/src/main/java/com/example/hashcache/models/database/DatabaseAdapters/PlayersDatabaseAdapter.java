@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import android.media.Image;
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
@@ -447,12 +448,51 @@ public class PlayersDatabaseAdapter {
     }
 
     /**
+     * Get all the usernames for the users in a given list of ids
+     * @param userIds the ids of the users whose usernames are wanted
+     * @return userIdsNamesCF the completableFuture with the usernames and userIds of the
+     * specified users
+     */
+    public CompletableFuture<List<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds){
+        CompletableFuture<List<Pair<String, String>>> userIdsNamesCF = new CompletableFuture<>();
+        ArrayList<Pair<String, String>> userIdsNames = new ArrayList<>();
+
+        ArrayList<CompletableFuture<Pair<String, String>>> futureCfs = new ArrayList<>();
+
+        for(String userId : userIds){
+            futureCfs.add(getUsernameById(userId));
+        }
+
+        if(futureCfs.size()>0){
+            CompletableFuture.allOf(futureCfs.toArray(new CompletableFuture[futureCfs.size()]))
+                    .thenAccept(voidValue -> {
+                        futureCfs.stream()
+                                .forEach(cf -> {
+                                    userIdsNames.add(cf.join());
+                                });
+                        userIdsNamesCF.complete(userIdsNames);
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            userIdsNamesCF.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        }else{
+            userIdsNamesCF.complete(userIdsNames);
+        }
+
+        return userIdsNamesCF;
+    }
+
+    /**
      * Gets the username of a player with a given userid
      * @param userId the userid of the player whose username is needed
-     * @return cf the CompletableFuture with the specified user's username
+     * @return cf the CompletableFuture with the specified user's username paired with their id
      */
-    public CompletableFuture<String> getUsernameById(String userId){
-        CompletableFuture<String> cf = new CompletableFuture<>();
+    public CompletableFuture<Pair<String, String>> getUsernameById(String userId){
+        CompletableFuture<Pair<String, String>>  cf = new CompletableFuture<>();
 
         fireStoreHelper.documentWithIDExists(collectionReference, userId)
                 .thenAccept(exists -> {
@@ -462,7 +502,8 @@ public class PlayersDatabaseAdapter {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         if (task.isSuccessful()) {
-                                            cf.complete(task.getResult().get(FieldNames.USERNAME.fieldName).toString());
+                                            cf.complete(new Pair<String, String>(userId,
+                                                    task.getResult().get(FieldNames.USERNAME.fieldName).toString()));
                                         } else {
                                             cf.completeExceptionally(new Exception("Something went wrong" +
                                                     "in getUsernameById"));

@@ -1,5 +1,7 @@
 package com.example.hashcache.models.database;
 
+import android.util.Pair;
+
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
@@ -10,6 +12,7 @@ import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlaye
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface DatabasePort {
@@ -43,8 +46,9 @@ public interface DatabasePort {
     CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds);
     CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId);
     CompletableFuture<Boolean> updateContactInfo(ContactInfo contactInfo, String userId);
-    CompletableFuture<String> getUsernameById(String userId);
+    CompletableFuture<Pair<String, String>> getUsernameById(String userId);
     CompletableFuture<Integer> getNumPlayersWithScannableCode(String scannableCodeId);
+    CompletableFuture<List<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds);
     void onPlayerDataChanged(String userId, GetPlayerCallback callback);
     void onPlayerWalletChanged(String playerId, BooleanCallback callback);
 }
