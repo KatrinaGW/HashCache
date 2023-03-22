@@ -148,7 +148,7 @@ public class DisplayMonsterActivity extends AppCompatActivity {
 
     private void onViewCacherCommentsButtonClicked(){
         Intent intent = new Intent(getApplicationContext(), DisplayCommentsActivity.class);
-        intent.putExtra("belongsToCurrentUser", true);
+        intent.putExtra("belongsToCurrentUser", belongToCurrentUser);
 
         Context.get().setCurrentScannableCode(currentScannableCode);
         startActivity(intent);

@@ -33,6 +33,14 @@
         android:layout_above="@id/menu_button"
         android:layout_marginBottom="24dp"/>
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/add_comment_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_rect_green"
+        android:layout_below="@+id/comment_listview_content"
+        android:text="Add"/>
+
     <ImageButton
         android:id="@+id/menu_button"
         android:layout_width="80dp"

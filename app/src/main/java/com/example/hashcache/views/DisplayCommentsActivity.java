@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Pair;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hashcache.R;
 import com.example.hashcache.context.Context;
+import com.example.hashcache.controllers.AddCommentCommand;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
@@ -26,6 +28,7 @@ public class DisplayCommentsActivity extends AppCompatActivity {
     private ListView commentsList;
     private CommentsDataArrayAdapter commentsDataArrayAdapter;
     private ArrayList<Comment> comments;
+    private Button addCommentButton;
     private boolean belongToCurrentUser;
 
 
@@ -100,11 +103,30 @@ public class DisplayCommentsActivity extends AppCompatActivity {
                 });
     }
 
+    private void setButtons(){
+        if(belongToCurrentUser){
+            addCommentButton.setVisibility(View.VISIBLE);
+            addCommentButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), AddCommentActivity.class);
+                    intent.putExtra("belongsToCurrentUser", belongToCurrentUser);
+
+                    startActivity(intent);
+                }
+            });
+        }else{
+            addCommentButton.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         comments = Context.get().getCurrentScannableCode().getComments();
+        addCommentButton = findViewById(R.id.add_comment_button);
         commentsList = findViewById(R.id.comment_listview_content);
         setCommentsAdapter();
+        setButtons();
     }
 }
