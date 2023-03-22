@@ -306,7 +306,7 @@ public class ScannableCodesDatabaseAdapter {
                 .collection(CollectionNames.COMMENTS.collectionName);
         ListenerRegistration registration = collection.addSnapshotListener((snapshot, e) -> {
             Log.d("ScannableCodeComments Firestore Listener", "COMMENTS DATA HAS BEEN UPDATED.");
-            
+
             if (snapshot != null && (snapshot.getDocumentChanges().size()>0)) {
                 getScannableCode(scannableCodeId).thenAccept(scannableCode -> {
                     Log.d("ScannableCode Firestore Listener", "SCANNABLE CODE  DATA  AFTER COMMENT" +
