@@ -85,50 +85,6 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
     @Override
     protected void onResume() {
         super.onResume();
-//        currentScannableCode = Context.get().getCurrentScannableCode();
-//        HashInfo currentHashInfo = currentScannableCode.getHashInfo();
-//        setMonsterScore(currentHashInfo.getGeneratedScore());
-//        setMonsterName(currentHashInfo.getGeneratedName());
-//        ImageGenerator.getImageFromHash(currentScannableCode.getScannableCodeId()).thenAccept(drawable -> {
-//            Log.d("NewMonsterActivity", "Received drawable from API");
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Log.d("NewMonsterActivity", "Setting image...");
-//                    setMonsterImage(drawable);
-//                }
-//            });
-//
-//        }).exceptionally(new Function<Throwable, Void>() {
-//            @Override
-//            public Void apply(Throwable throwable) {
-//                Log.d("NewMonsterActivity ERROR", throwable.getMessage());
-//                return null;
-//            }
-//        });
-//        viewCacherButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                onViewCacherCommentsButtonClicked();
-//            }
-//        });
-//
-//        Database.getInstance().getNumPlayersWithScannableCode(currentScannableCode.getScannableCodeId())
-//                .thenAccept(numPlayers -> {
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            setNumPlayersCached(numPlayers);
-//                        }
-//                    });
-//                })
-//                .exceptionally(new Function<Throwable, Void>() {
-//                    @Override
-//                    public Void apply(Throwable throwable) {
-//                        Log.d("NewMonsterActivity ERROR", throwable.getMessage());
-//                        return null;
-//                    }
-//                });
         setViews();
     }
 
@@ -177,6 +133,7 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
                         return null;
                     }
                 });
+        Context.get().addObserver(this);
     }
 
     private void initializeViews() {

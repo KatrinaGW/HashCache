@@ -14,6 +14,7 @@ import com.example.hashcache.models.ScannableCode;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -305,7 +306,8 @@ public class ScannableCodesDatabaseAdapter {
                 .collection(CollectionNames.COMMENTS.collectionName);
         ListenerRegistration registration = collection.addSnapshotListener((snapshot, e) -> {
             Log.d("ScannableCodeComments Firestore Listener", "COMMENTS DATA HAS BEEN UPDATED.");
-            if (snapshot != null) {
+            
+            if (snapshot != null && (snapshot.getDocumentChanges().size()>0)) {
                 getScannableCode(scannableCodeId).thenAccept(scannableCode -> {
                     Log.d("ScannableCode Firestore Listener", "SCANNABLE CODE  DATA  AFTER COMMENT" +
                             "HAS BEEN FETCHED");
