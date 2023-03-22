@@ -63,12 +63,20 @@ public class DisplayCommentsActivity extends AppCompatActivity {
 
     private void setCommentsAdapter(){
         ArrayList<String> userIds = new ArrayList<>();
-        HashMap<String, String> commentatorIdTextBody = new HashMap<>();
+        HashMap<String, ArrayList<String>> commentatorIdTextBody = new HashMap<>();
         ArrayList<Pair<String, String> >userNameTextBody = new ArrayList<>();
+        String commentatorId;
 
         for(Comment comment : comments){
-            userIds.add(comment.getCommentatorId());
-            commentatorIdTextBody.put(comment.getCommentatorId(), comment.getBody());
+            commentatorId = comment.getCommentatorId();
+            userIds.add(commentatorId);
+            if(commentatorIdTextBody.containsKey(commentatorId)){
+                commentatorIdTextBody.get(commentatorId).add(comment.getBody());
+            }else{
+                ArrayList<String> newList = new ArrayList<>();
+                newList.add(comment.getBody());
+                commentatorIdTextBody.put(commentatorId, newList);
+            }
         }
 
         DisplayCommentsActivity activityContext = this;
@@ -80,7 +88,8 @@ public class DisplayCommentsActivity extends AppCompatActivity {
                         public void run() {
                             for(Pair<String, String> idName : userIdsNames){
                                 userNameTextBody.add(new Pair<>(idName.second,
-                                        commentatorIdTextBody.get(idName.first)));
+                                        commentatorIdTextBody.get(idName.first).get(0)));
+                                commentatorIdTextBody.get(idName.first).remove(0);
                             }
 
                             commentsDataArrayAdapter = new CommentsDataArrayAdapter(activityContext,
