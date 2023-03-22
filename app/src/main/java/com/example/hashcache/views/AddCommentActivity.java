@@ -13,10 +13,14 @@ import com.example.hashcache.context.Context;
 import com.example.hashcache.controllers.AddCommentCommand;
 import com.example.hashcache.models.Comment;
 
+/**
+ * Allows the user to add a comment to a QR code if they have scanned it
+ */
 public class AddCommentActivity extends AppCompatActivity {
     private Button confirmButtom;
     private TextView bodyEditText;
     boolean belongToCurrentUser;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

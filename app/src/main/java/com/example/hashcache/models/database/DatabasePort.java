@@ -9,6 +9,7 @@ import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,4 +52,5 @@ public interface DatabasePort {
     CompletableFuture<ArrayList<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds);
     void onPlayerDataChanged(String userId, GetPlayerCallback callback);
     void onPlayerWalletChanged(String playerId, BooleanCallback callback);
+    void onScannableCodeCommentsChanged(String scannableCodeId, GetScannableCodeCallback callback);
 }

@@ -5,6 +5,8 @@ import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.ScannableCodeDocumentConverter;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.Comment;
@@ -15,6 +17,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -288,6 +291,36 @@ public class ScannableCodesDatabaseAdapter {
                     });
         });
         return cf;
+    }
+
+    /**
+     * Adds a listener to a given scananble code in the DB
+     * @param scannableCodeId the id of the scannable code to be listening to
+     * @param callback the callback function to call with the changed scannable code
+     * @return registration a confirmation that the listener was registered
+     */
+    public ListenerRegistration setUpScannableCodeCommentsListener(String scannableCodeId,
+                                                           GetScannableCodeCallback callback) {
+        final CollectionReference collection = collectionReference.document(scannableCodeId)
+                .collection(CollectionNames.COMMENTS.collectionName);
+        ListenerRegistration registration = collection.addSnapshotListener((snapshot, e) -> {
+            Log.d("ScannableCodeComments Firestore Listener", "COMMENTS DATA HAS BEEN UPDATED.");
+            if (snapshot != null) {
+                getScannableCode(scannableCodeId).thenAccept(scannableCode -> {
+                    Log.d("ScannableCode Firestore Listener", "SCANNABLE CODE  DATA HAS BEEN FETCHED.");
+                    callback.onCallback(scannableCode);
+                }).exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        Log.d("ScannableCode Firestore Listener", "Could not get player");
+                        return null;
+                    }
+                });
+            } else {
+                callback.onCallback(null);
+            }
+        });
+        return registration;
     }
 
     /**

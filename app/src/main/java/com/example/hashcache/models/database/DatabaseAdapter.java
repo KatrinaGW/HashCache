@@ -17,6 +17,7 @@ import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesData
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
 
     private ListenerRegistration playerListener;
     private ListenerRegistration walletListener;
+    private ListenerRegistration scannableCodeListener;
 
     /**
      * Checks if a username already exists in the database.
@@ -426,6 +428,18 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     @Override
     public void onPlayerWalletChanged(String playerId, BooleanCallback callback) {
         walletListener = PlayerWalletDatabaseAdapter.getInstance().getPlayerWalletChangeListener(playerId, callback);
+    }
+
+    /**
+     * Called when a scannableCodeComment changes
+     * @param scannableCodeId the id of the scannable code that changed
+     * @param callback the callback to call once the changes have been processed
+     */
+    @Override
+    public void onScannableCodeCommentsChanged(String scannableCodeId, GetScannableCodeCallback callback){
+        scannableCodeListener = ScannableCodesDatabaseAdapter.getInstance().setUpScannableCodeCommentsListener(
+                scannableCodeId, callback
+        );
     }
 
     /**

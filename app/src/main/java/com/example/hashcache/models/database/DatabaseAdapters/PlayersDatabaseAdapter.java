@@ -345,6 +345,12 @@ public class PlayersDatabaseAdapter {
         return cf;
     }
 
+    /**
+     * Setup a listener that notifies observers when the player document is changed in the database
+     * @param userId the id of the player to be listening to
+     * @param callback called once the player's data has been updated
+     * @return registration the ListenerRegistration of the now registered listener
+     */
     public ListenerRegistration setupPlayerListener(String userId, GetPlayerCallback callback) {
         final DocumentReference documentReference = collectionReference.document(userId);
         ListenerRegistration registration = documentReference.addSnapshotListener((snapshot, e) -> {

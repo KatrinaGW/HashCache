@@ -5,6 +5,7 @@ import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 
 import java.util.Observable;
 
@@ -73,6 +74,7 @@ public class Context extends Observable {
      */
     public void setCurrentScannableCode(ScannableCode currentScannableCode) {
         this.currentScannableCode = currentScannableCode;
+        this.setUpScannableCodeListener();
     }
 
     private void setHighestScannableCode(ScannableCode scanCode) {
@@ -93,6 +95,25 @@ public class Context extends Observable {
 
     public ScannableCode getCurrentScannableCode() {
         return currentScannableCode;
+    }
+
+    /**
+     * Set up a scannableCodeListener for only the current scananble code
+     */
+    public void setUpScannableCodeListener(){
+        if(currentScannableCode!=null){
+            String scananbleCodeId = getCurrentScannableCode().getScannableCodeId();
+            Database.getInstance().onScannableCodeCommentsChanged(scananbleCodeId, new GetScannableCodeCallback() {
+                @Override
+                public void onCallback(ScannableCode scannableCode) {
+                    if(scannableCode.getScannableCodeId()==scananbleCodeId){
+                        setCurrentScannableCode(scannableCode);
+                        setChanged();
+                        notifyObservers();
+                    }
+                }
+            });
+        }
     }
 
     public void setupListeners() {

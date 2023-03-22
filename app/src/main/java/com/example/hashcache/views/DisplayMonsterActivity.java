@@ -24,6 +24,8 @@ import com.example.hashcache.models.database.Database;
 
 import org.w3c.dom.Text;
 
+import java.util.Observable;
+import java.util.Observer;
 import java.util.function.Function;
 
 /**
@@ -33,7 +35,7 @@ import java.util.function.Function;
  for the new monster or skipping the photo and navigating to the MyProfile activity. The menu button is also
  functional, allowing users to navigate to different activities in the app.
  */
-public class DisplayMonsterActivity extends AppCompatActivity {
+public class DisplayMonsterActivity extends AppCompatActivity implements Observer {
     /**
      * Called when the activity is created.
      *
@@ -60,7 +62,7 @@ public class DisplayMonsterActivity extends AppCompatActivity {
         Intent intent = getIntent();
         belongToCurrentUser = intent.getBooleanExtra("belongsToCurrentUser", false);
 
-        init();
+        initializeViews();
         // take location photo
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,6 +85,54 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+//        currentScannableCode = Context.get().getCurrentScannableCode();
+//        HashInfo currentHashInfo = currentScannableCode.getHashInfo();
+//        setMonsterScore(currentHashInfo.getGeneratedScore());
+//        setMonsterName(currentHashInfo.getGeneratedName());
+//        ImageGenerator.getImageFromHash(currentScannableCode.getScannableCodeId()).thenAccept(drawable -> {
+//            Log.d("NewMonsterActivity", "Received drawable from API");
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Log.d("NewMonsterActivity", "Setting image...");
+//                    setMonsterImage(drawable);
+//                }
+//            });
+//
+//        }).exceptionally(new Function<Throwable, Void>() {
+//            @Override
+//            public Void apply(Throwable throwable) {
+//                Log.d("NewMonsterActivity ERROR", throwable.getMessage());
+//                return null;
+//            }
+//        });
+//        viewCacherButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onViewCacherCommentsButtonClicked();
+//            }
+//        });
+//
+//        Database.getInstance().getNumPlayersWithScannableCode(currentScannableCode.getScannableCodeId())
+//                .thenAccept(numPlayers -> {
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            setNumPlayersCached(numPlayers);
+//                        }
+//                    });
+//                })
+//                .exceptionally(new Function<Throwable, Void>() {
+//                    @Override
+//                    public Void apply(Throwable throwable) {
+//                        Log.d("NewMonsterActivity ERROR", throwable.getMessage());
+//                        return null;
+//                    }
+//                });
+        setViews();
+    }
+
+    private void setViews(){
         currentScannableCode = Context.get().getCurrentScannableCode();
         HashInfo currentHashInfo = currentScannableCode.getHashInfo();
         setMonsterScore(currentHashInfo.getGeneratedScore());
@@ -129,7 +179,7 @@ public class DisplayMonsterActivity extends AppCompatActivity {
                 });
     }
 
-    private void init() {
+    private void initializeViews() {
         monsterName = findViewById(R.id.monster_name);
         monsterScore = findViewById(R.id.monster_score);
         monsterImage = findViewById(R.id.monster_image);
@@ -199,5 +249,10 @@ public class DisplayMonsterActivity extends AppCompatActivity {
 
     public void setPhotoButtonClickListener(View.OnClickListener listener) {
         deleteButton.setOnClickListener(listener);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        setViews();
     }
 }

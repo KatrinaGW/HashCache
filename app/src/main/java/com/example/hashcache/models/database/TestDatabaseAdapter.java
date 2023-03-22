@@ -9,6 +9,7 @@ import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 
 import org.checkerframework.checker.units.qual.C;
 
@@ -421,6 +422,16 @@ public class TestDatabaseAdapter implements DatabasePort {
         userIdsNamesCF.complete(userIdsNames);
 
         return userIdsNamesCF;
+    }
+
+    /**
+     * Called when a scannableCodeChanges
+     * @param scannableCodeId the id of the scannable code that changed
+     * @param callback the callback to call once the changes have been processed
+     */
+    @Override
+    public void onScannableCodeCommentsChanged(String scannableCodeId, GetScannableCodeCallback callback){
+        return;
     }
 
     /**
