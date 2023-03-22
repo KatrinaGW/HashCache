@@ -1,11 +1,5 @@
 package com.example.hashcache.unit;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.widget.EditText;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -100,6 +94,15 @@ public class SettingsTest {
         solo.clickOnText("Community");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
+    }
+
+    @Test
+    public void checkEditPlayerInfoButton(){
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
+        solo.assertCurrentActivity("Wrong Activity", Settings.class);
+        solo.clickOnImageButton(1);
+        solo.sleep(100);
+        solo.assertCurrentActivity("Wrong Activity", EditPlayerInfoActivity.class);
     }
 
 

@@ -14,7 +14,7 @@ import androidx.appcompat.widget.PopupMenu;
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
 /**
 
  OtherProfileInformationActivity displays the public profile information of another player.
@@ -64,45 +64,18 @@ public class OtherProfileInformationActivity extends AppCompatActivity {
         viewCacheButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppStore.get().setSelectedPlayer(otherPlayer);
+                Context.get().setSelectedPlayer(otherPlayer);
                 startActivity(new Intent(OtherProfileInformationActivity.this, OtherCacheActivity.class));
             }
         });
 
+        // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
-                // create main menu
-                PopupMenu menu = new PopupMenu(OtherProfileInformationActivity.this, menuButton);
-                menu.getMenuInflater()
-                        .inflate(R.menu.fragment_popup_menu, menu.getMenu());
-
-                // navigate to different activities based on menu item selected
-                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem item) {
-                        int id = item.getItemId();
-
-                        if (id == R.id.menu_home) {                 // go to AppHome page
-                            startActivity(new Intent(OtherProfileInformationActivity.this, AppHome.class));
-                            return true;
-
-                        } else if (id == R.id.menu_stats) {         // go to QRStats page
-                            startActivity(new Intent(OtherProfileInformationActivity.this, QRStats.class));
-                            return true;
-
-                        } else if (id == R.id.menu_profile) {       // go to MyProfile
-                            startActivity(new Intent(OtherProfileInformationActivity.this, MyProfile.class));
-                            return true;
-
-                        } else if (id == R.id.menu_community) {     // remain on Community page
-                            return true;
-                        }
-                        return OtherProfileInformationActivity.super.onOptionsItemSelected(item);
-                    }
-                });
-                menu.show();
+            public void onClick(View view) {
+                BottomMenuFragment bottomMenu = new BottomMenuFragment();
+                bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
         });
     }

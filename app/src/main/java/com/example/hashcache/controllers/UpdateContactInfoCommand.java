@@ -1,10 +1,15 @@
 package com.example.hashcache.controllers;
 
+import android.util.Log;
+
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
+import com.example.hashcache.models.database.DatabasePort;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+
 /**
 
  The UpdateContactInfoCommand class provides a static method to update the contact info of a player in the app.
@@ -16,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
  The update is executed asynchronously using CompletableFuture.runAsync() method to avoid blocking the main thread.
  @see ContactInfo
  @see Database
- @see AppStore
+ @see Context
  @see CompletableFuture
  */
 public class UpdateContactInfoCommand {
@@ -26,19 +31,30 @@ public class UpdateContactInfoCommand {
      * @param contactInfo the new contact information that needs to be used for the user
      * @return cf the CompletableFuture with the boolean value indicating if the operation was successful
      */
-    public static CompletableFuture<Boolean> updateContactInfoCommand(String userId, ContactInfo contactInfo){
+    public static CompletableFuture<Boolean> updateContactInfoCommand(String userId,
+                                                                      ContactInfo contactInfo,
+                                                                      DatabasePort db,
+                                                                      Context context){
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
-        if(userId.equals(AppStore.get().getCurrentPlayer().getUserId())){
-            AppStore.get().getCurrentPlayer().setContactInfo(contactInfo);
+        if(userId.equals(context.getCurrentPlayer().getUserId())){
+            context.getCurrentPlayer().setContactInfo(contactInfo);
         }
 
         CompletableFuture.runAsync(()->{
-            Database.getInstance().updateContactInfo(contactInfo, userId).thenAccept(
+            db.updateContactInfo(contactInfo, userId).thenAccept(
                     isComplete -> {
                         cf.complete(isComplete);
                     }
-            );
+            ).exceptionally(new Function<Throwable, Void>() {
+                @Override
+                public Void apply(Throwable throwable) {
+                    Log.d("ERROR", "Could not update player" + context.getCurrentPlayer().getUsername());
+                    Log.d("Reason", throwable.getMessage());
+                    cf.completeExceptionally(new Exception("Could not update player."));
+                    return null;
+                }
+            });
         });
 
         return cf;

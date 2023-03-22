@@ -43,6 +43,7 @@ import java.util.Observer;
 
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
+
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.store.AppStore;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -63,6 +64,8 @@ import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
+
+import com.example.hashcache.context.Context;
 
 /**
 
@@ -196,6 +199,8 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                 startActivity(new Intent(AppHome.this, Community.class));
             }
         });
+
+        // add functionality to scan QR button
         Button qrCodeTakeButton = findViewById(R.id.scan_qr_button);
         qrCodeTakeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -203,47 +208,21 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                 startActivity(new Intent(AppHome.this, QRScanActivity.class));
             }
         });
+
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
-                // create menu
-                PopupMenu menu = new PopupMenu(AppHome.this, menuButton);
-                menu.getMenuInflater()
-                        .inflate(R.menu.fragment_popup_menu, menu.getMenu());
-
-                // navigate to different activities based on menu item selected
-                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem item) {
-                        int id = item.getItemId();
-
-                        if (id == R.id.menu_home) {                 // remain on AppHome page
-                            return true;
-
-                        } else if (id == R.id.menu_stats) {         // go to QRStats page
-                            startActivity(new Intent(AppHome.this, QRStats.class));
-                            return true;
-
-                        } else if (id == R.id.menu_profile) {       // go to MyProfile
-                            startActivity(new Intent(AppHome.this, MyProfile.class));
-                            return true;
-
-                        } else if (id == R.id.menu_community) {     // go to Community
-                            startActivity(new Intent(AppHome.this, Community.class));
-                            return true;
-                        }
-                        return AppHome.super.onOptionsItemSelected(item);
-                    }
-                });
-                menu.show();
+            public void onClick(View view) {
+                BottomMenuFragment bottomMenu = new BottomMenuFragment();
+                bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
         });
 
-        playerInfo = AppStore.get().getCurrentPlayer();
+
+        playerInfo = Context.get().getCurrentPlayer();
         setUIParams();
-        AppStore.get().addObserver(this);
+        Context.get().addObserver(this);
 
     }
 
@@ -313,6 +292,8 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         }
         updateLocationUI();
     }
+    
+    
     //Updates the map's UI settings based on whether the user has granted location permission.
     private void updateLocationUI() {
         if (map == null) {
@@ -333,8 +314,6 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
             Log.e("Exception: %s", e.getMessage());
         }
     }
-
-
 
 
     private void getDeviceLocation() {
@@ -368,6 +347,8 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
+    
+    
     private void initView() {
         mLogoButton = findViewById(R.id.logo_button);
         mUsernameTextView = findViewById(R.id.username_textview);
@@ -464,9 +445,9 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
     }
 
     public void setUIParams(){
-        Player currentPlayer = AppStore.get().getCurrentPlayer();
+        Player currentPlayer = Context.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
-        setScore(currentPlayer.getTotalScore());
+        setScore(currentPlayer.getPlayerWallet().getTotalScore());
 
     }
 

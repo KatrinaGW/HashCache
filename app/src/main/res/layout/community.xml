@@ -3,48 +3,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <EditText
+        android:id="@+id/search_bar_edittext"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="54dp"
+        android:layout_marginBottom="24dp"
+        android:background="@color/white"
+        android:hint="search for players..."
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="16dp"
+        android:layout_alignStart="@+id/user_listview"/>
+
     <ImageButton
-        android:id="@+id/menu_button"
+        android:id="@+id/search_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/menu_button_light"
-        android:src="@android:drawable/ic_dialog_dialer"
-        android:padding="6dp"
-        android:layout_marginEnd="18dp"
-        android:layout_alignParentEnd="true"
-        android:elevation="6dp"/>
-
-    <LinearLayout
-        android:id="@+id/search_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/menu_button"
-        android:layout_marginVertical="24dp"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/search_bar_edittext"
-            android:layout_width="288dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="24dp"
-            android:background="@color/white"
-            android:hint="search for players..."
-            android:padding="8dp" />
-
-        <ImageButton
-            android:id="@+id/search_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:src="@android:drawable/ic_menu_search" />
-    </LinearLayout>
+        android:layout_alignBottom="@+id/search_bar_edittext"
+        android:layout_toEndOf="@+id/search_bar_edittext"
+        android:layout_alignEnd="@+id/user_listview"
+        android:src="@android:drawable/ic_menu_search" />
 
     <ListView
         android:id="@+id/user_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_rect_green"
-        android:layout_below="@+id/search_bar"
+        android:layout_below="@+id/search_bar_edittext"
         android:layout_above="@id/leaderboard_button"
         android:layout_marginHorizontal="24dp"/>
 
@@ -56,7 +42,18 @@
         android:text="LEADERBOARD"
         android:textSize="24sp"
         android:layout_margin="24dp"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/menu_button"
         android:elevation="6dp"/>
+
+    <ImageButton
+        android:id="@+id/menu_button"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/semicircle_button"
+        android:elevation="6dp"
+        android:src="@drawable/half_logo"
+        android:scaleType="fitCenter"/>
 
 </RelativeLayout>

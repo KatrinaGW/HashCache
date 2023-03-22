@@ -16,7 +16,7 @@ import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
+import com.example.hashcache.context.Context;
 
 import java.util.ArrayList;
 import java.util.function.Function;
@@ -50,47 +50,20 @@ public class OtherCacheActivity extends AppCompatActivity {
 
         otherUsernameHeader = findViewById(R.id.other_username_header);
         otherUserScoreHeader = findViewById(R.id.other_user_score);
-        player = AppStore.get().getSelectedPlayer();
+        player = Context.get().getSelectedPlayer();
         scannableCodesList = findViewById(R.id.scannable_codes_list);
 
         otherUsernameHeader.setText(player.getUsername());
 
         setAdapterValues();
 
+        // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
-                // create menu
-                PopupMenu menu = new PopupMenu(OtherCacheActivity.this, menuButton);
-                menu.getMenuInflater()
-                        .inflate(R.menu.fragment_popup_menu, menu.getMenu());
-
-                // navigate to different activities based on menu item selected
-                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem item) {
-                        int id = item.getItemId();
-
-                        if (id == R.id.menu_home) {                 // go to AppHome page
-                            startActivity(new Intent(OtherCacheActivity.this, AppHome.class));
-                            return true;
-
-                        } else if (id == R.id.menu_stats) {         // go to QRStats page
-                            startActivity(new Intent(OtherCacheActivity.this, QRStats.class));
-                            return true;
-
-                        } else if (id == R.id.menu_profile) {       // remain on MyProfile
-                            return true;
-
-                        } else if (id == R.id.menu_community) {     // go to Community
-                            startActivity(new Intent(OtherCacheActivity.this, Community.class));
-                            return true;
-                        }
-                        return OtherCacheActivity.super.onOptionsItemSelected(item);
-                    }
-                });
-                menu.show();
+            public void onClick(View view) {
+                BottomMenuFragment bottomMenu = new BottomMenuFragment();
+                bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
         });
     }
@@ -121,7 +94,7 @@ public class OtherCacheActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 ScannableCode scannableCode = scannableCodes.get(i);
-                AppStore.get().setCurrentScannableCode(scannableCode);
+                Context.get().setCurrentScannableCode(scannableCode);
 
                 Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
                 intent.putExtra("belongsToCurrentUser", false);

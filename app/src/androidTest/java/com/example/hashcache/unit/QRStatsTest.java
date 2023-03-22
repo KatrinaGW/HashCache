@@ -60,16 +60,6 @@ public class QRStatsTest {
 
 
     @Test
-    public void checkProfileButton(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
-        solo.clickOnButton("MY PROFILE");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
-    }
-
-
-    @Test
     public void checkMenuButton1(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", QRStats.class);

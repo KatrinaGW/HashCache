@@ -13,10 +13,7 @@
             android:layout_width="65dp"
             android:layout_height="65dp"
             android:layout_centerVertical="true"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="24dp"
+            android:layout_margin="24dp"
             android:background="@drawable/circle_button"
             android:elevation="6dp"
             android:src="@drawable/ic_launcher_foreground" />
@@ -40,16 +37,7 @@
             android:textStyle="bold"
             android:layout_below="@id/username_textview"
             android:layout_toEndOf="@id/logo_button"/>
-        <ImageButton
-            android:id="@+id/menu_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/menu_button_light"
-            android:src="@android:drawable/ic_dialog_dialer"
-            android:padding="6dp"
-            android:layout_marginEnd="18dp"
-            android:layout_alignParentEnd="true"
-            android:elevation="6dp"/>
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -104,4 +92,15 @@
         android:text="SCAN QR"
         android:textColor="@color/black"
         android:textSize="24sp" />
+
+    <ImageButton
+        android:id="@+id/menu_button"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/semicircle_button"
+        android:elevation="6dp"
+        android:src="@drawable/half_logo"
+        android:scaleType="fitCenter"/>
 </RelativeLayout>

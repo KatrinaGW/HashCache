@@ -7,12 +7,8 @@
     <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <View
-            android:id="@+id/purple_rect"
-            android:layout_width="match_parent"
-            android:layout_height="115dp"
-            android:background="@drawable/purple_gradient"/>
+        android:layout_height="wrap_content"
+        android:background="@drawable/purple_gradient">
         <ImageButton
             android:id="@+id/logo_button"
             android:layout_width="65dp"
@@ -42,17 +38,8 @@
             android:textColor="@color/white"
             android:textStyle="bold"
             android:layout_below="@id/username_textview"
-            android:layout_toEndOf="@id/logo_button"/>
-        <ImageButton
-            android:id="@+id/menu_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/menu_button_dark"
-            android:src="@android:drawable/ic_dialog_dialer"
-            android:padding="6dp"
-            android:layout_marginEnd="18dp"
-            android:layout_alignParentEnd="true"
-            android:elevation="6dp"/>
+            android:layout_toEndOf="@id/logo_button"
+            android:layout_marginBottom="24dp"/>
     </RelativeLayout>
 
     <ListView
@@ -72,7 +59,18 @@
         android:textSize="24sp"
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="24dp"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/menu_button"
         android:elevation="6dp"/>
+
+    <ImageButton
+        android:id="@+id/menu_button"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/semicircle_button"
+        android:elevation="6dp"
+        android:src="@drawable/half_logo"
+        android:scaleType="fitCenter"/>
 
 </RelativeLayout>

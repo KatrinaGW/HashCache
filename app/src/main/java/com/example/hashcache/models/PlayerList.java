@@ -1,15 +1,8 @@
 package com.example.hashcache.models;
 
-import android.app.VoiceInteractor;
-import android.util.Log;
-
 import com.example.hashcache.controllers.DependencyInjector;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database_connections.callbacks.GetPlayerCallback;
-import com.example.hashcache.models.database_connections.PlayersConnectionHandler;
-import com.example.hashcache.models.database_connections.callbacks.GetStringCallback;
-
-import org.checkerframework.checker.units.qual.C;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,26 +15,21 @@ import java.util.concurrent.CompletableFuture;
  */
 public class PlayerList {
     private static PlayerList INSTANCE;
-    private ArrayList<String> playerUserNames;
-    private HashMap<String, String> playerIdsNamesMapping;
-    private PlayersConnectionHandler playersConnectionHandler;
+    private PlayersDatabaseAdapter playersConnectionHandler;
     /**
      * Private constructor for creating a new instance of PlayerList
      */
     private PlayerList(){
-        playerUserNames = new ArrayList<>();
-        playerIdsNamesMapping = new HashMap<>();
         playersConnectionHandler = DependencyInjector
-                .makePlayersConnectionHandler(playerIdsNamesMapping);
+                .makePlayersConnectionHandler();
     }
     /**
      * Private constructor for creating a new instance of PlayerList with a given PlayersConnectionHandler
      *
      * @param playersConnectionHandler The PlayersConnectionHandler used to interact with the database
      */
-    private PlayerList(PlayersConnectionHandler playersConnectionHandler){
+    private PlayerList(PlayersDatabaseAdapter playersConnectionHandler){
         this.playersConnectionHandler = playersConnectionHandler;
-        playerUserNames = playersConnectionHandler.getInAppPlayerUserNames();
     }
     /**
      * Gets the singleton instance of the PlayerList
@@ -62,7 +50,7 @@ public class PlayerList {
      *
      * @return INSTANCE The singleton instance of the PlayerList
      */
-    public static PlayerList getInstance(PlayersConnectionHandler playersConnectionHandler) {
+    public static PlayerList getInstance(PlayersDatabaseAdapter playersConnectionHandler) {
         if(INSTANCE == null) {
             INSTANCE = new PlayerList(playersConnectionHandler);
         }
@@ -74,57 +62,6 @@ public class PlayerList {
      */
     public static void resetInstance(){
         INSTANCE = null;
-    }
-
-    /**
-     * Gets the usernames of all players
-     * @return playerUserNames the usernames of all players
-     */
-    public CompletableFuture<ArrayList<String>> getPlayerUserNames(){
-        CompletableFuture<ArrayList<String>> cf = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
-            ArrayList<String> usernames = new ArrayList<>();
-            Database.getInstance().getPlayers()
-                    .thenAccept(map -> {
-                                Object[] list = map.keySet().toArray();
-                                for (int i = 0; i < list.length; i++) {
-                                    usernames.add(list[i].toString());
-                                }
-                                cf.complete(usernames);
-                            }
-                    );
-        });
-        return cf;
-    }
-
-    /**
-     * Adds a player to the database
-     * @param username the username of the player to add
-     * @return success indicates if the user was successfully added or not
-     */
-    public boolean addPlayer(String username, GetStringCallback getStringCallback){
-        boolean success = true;
-
-        if(!this.playerUserNames.contains(username)){
-            try{
-                this.playersConnectionHandler.createPlayer(username, getStringCallback);
-            }catch (IllegalArgumentException e){
-                success = false;
-            }
-        }else{
-            throw new IllegalArgumentException("Given username already exists!");
-        }
-
-        return success;
-    }
-
-    /**
-     * Gets a player with a given username
-     * @param username the username of the player to find
-     * @param getPlayerCallback callback function to get username after asynchronous firestore call
-     */
-    public void getPlayer(String username, GetPlayerCallback getPlayerCallback){
-        this.playersConnectionHandler.getPlayer(username, getPlayerCallback);
     }
 
     /**

@@ -27,9 +27,7 @@ import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.store.AppStore;
-
-import org.w3c.dom.Text;
+import com.example.hashcache.context.Context;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -54,7 +52,7 @@ import java.util.Observer;
  * @see PopupMenu
  * @see MenuItem
  * @see Player
- * @see AppStore
+ * @see Context
  * @see Settings
  * @see QRStats
  * @see Community
@@ -79,7 +77,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
      *
      * @param savedInstanceState the saved state of the activity, if it was
      *                           previously closed
-     * @see AppStore
+     * @see Context
      * @see Player
      */
 
@@ -115,38 +113,9 @@ public class MyProfile extends AppCompatActivity implements Observer {
         ImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
-                // create menu
-                PopupMenu menu = new PopupMenu(MyProfile.this, menuButton);
-                menu.getMenuInflater()
-                        .inflate(R.menu.fragment_popup_menu, menu.getMenu());
-
-                // navigate to different activities based on menu item selected
-                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem item) {
-                        int id = item.getItemId();
-
-                        if (id == R.id.menu_home) { // go to AppHome page
-                            startActivity(new Intent(MyProfile.this, AppHome.class));
-                            return true;
-
-                        } else if (id == R.id.menu_stats) { // go to QRStats page
-                            startActivity(new Intent(MyProfile.this, QRStats.class));
-                            return true;
-
-                        } else if (id == R.id.menu_profile) { // remain on MyProfile
-                            return true;
-
-                        } else if (id == R.id.menu_community) { // go to Community
-                            startActivity(new Intent(MyProfile.this, Community.class));
-                            return true;
-                        }
-                        return MyProfile.super.onOptionsItemSelected(item);
-                    }
-                });
-                menu.show();
-
+            public void onClick(View view) {
+                BottomMenuFragment bottomMenu = new BottomMenuFragment();
+                bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
 
         });
@@ -160,7 +129,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
             }
         });
 
-        AppStore.get().addObserver(this);
+        Context.get().addObserver(this);
         setUIParams();
     }
 
@@ -170,7 +139,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
         Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
         intent.putExtra("belongsToCurrentUser", true);
 
-        AppStore.get().setCurrentScannableCode(clickedScannableCode);
+        Context.get().setCurrentScannableCode(clickedScannableCode);
         startActivity(intent);
     }
 
@@ -258,9 +227,9 @@ public class MyProfile extends AppCompatActivity implements Observer {
     }
 
     public void setUIParams() {
-        Player currentPlayer = AppStore.get().getCurrentPlayer();
+        Player currentPlayer = Context.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
-        setScore(currentPlayer.getTotalScore());
+        setScore(currentPlayer.getPlayerWallet().getTotalScore());
         Database.getInstance()
                 .getScannableCodesByIdInList(currentPlayer.getPlayerWallet().getScannedCodeIds())
                 .thenAccept(scannableCodes -> {

@@ -1,7 +1,6 @@
 package com.example.hashcache.views;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,19 +18,7 @@ import com.example.hashcache.R;
 import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.store.AppStore;
-
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatButton;
+import com.example.hashcache.context.Context;
 
 import java.util.function.Function;
 
@@ -73,7 +60,7 @@ public class NewMonsterActivity extends AppCompatActivity {
             }
         });
 
-        ScannableCode curCode =AppStore.get().getCurrentScannableCode();
+        ScannableCode curCode = Context.get().getCurrentScannableCode();
         HashInfo curInfo = curCode.getHashInfo();
         setMonsterName(curInfo.getGeneratedName());
         setMonsterScore(curInfo.getGeneratedScore());
