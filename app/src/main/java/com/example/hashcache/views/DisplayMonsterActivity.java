@@ -155,7 +155,6 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
 
     private void onViewCacherCommentsButtonClicked(){
         Intent intent = new Intent(getApplicationContext(), DisplayCommentsActivity.class);
-        intent.putExtra("belongsToCurrentUser", belongToCurrentUser);
 
         startActivity(intent);
     }
@@ -174,6 +173,12 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
                                     startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
                                 }
                             });
+                        })
+                        .exceptionally(new Function<Throwable, Void>() {
+                            @Override
+                            public Void apply(Throwable throwable) {
+                                return null;
+                            }
                         });
             }
         });
@@ -207,10 +212,16 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         deleteButton.setOnClickListener(listener);
     }
 
+    /**
+     * Called when the observable object is updated
+     * @param o     the observable object.
+     * @param arg   an argument passed to the {@code notifyObservers}
+     *                 method.
+     */
     @Override
     public void update(Observable o, Object arg) {
         currentScannableCode = Context.get().getCurrentScannableCode();
-        Log.d("DisplayMonsterActivity", "words");
+        Log.d("DisplayMonsterActivity", "called to update");
         setViews();
     }
 }

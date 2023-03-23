@@ -50,10 +50,7 @@ public class AddCommentActivity extends AppCompatActivity {
         String userId = Context.get().getCurrentPlayer().getUserId();
         AddCommentCommand.AddCommentCommand(new Comment(body, userId), scannableCodeId)
                 .thenAccept(voidObject -> {
-                    Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
-                    intent.putExtra("belongsToCurrentUser", belongToCurrentUser);
-
-                    startActivity(intent);
+                    finish();
         });
 
     }

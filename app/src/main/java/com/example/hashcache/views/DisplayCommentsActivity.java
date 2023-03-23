@@ -2,6 +2,7 @@ package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -26,12 +27,12 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.CompletableFuture;
 
-public class DisplayCommentsActivity extends AppCompatActivity{
+public class DisplayCommentsActivity extends AppCompatActivity implements Observer {
     private ListView commentsList;
     private CommentsDataArrayAdapter commentsDataArrayAdapter;
     private ArrayList<Comment> comments;
     private Button addCommentButton;
-    private boolean belongToCurrentUser;
+    private boolean userHasScanned;
 
 
     @Override
@@ -52,9 +53,6 @@ public class DisplayCommentsActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_comments);
 
-        Intent intent = getIntent();
-        belongToCurrentUser = intent.getBooleanExtra("belongsToCurrentUser", false);
-
         ImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +62,8 @@ public class DisplayCommentsActivity extends AppCompatActivity{
             }
 
         });
+
+        Context.get().addObserver(this);
     }
 
     private void setCommentsAdapter(){
@@ -106,13 +106,12 @@ public class DisplayCommentsActivity extends AppCompatActivity{
     }
 
     private void setButtons(){
-        if(belongToCurrentUser){
+        if(userHasScanned){
             addCommentButton.setVisibility(View.VISIBLE);
             addCommentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getApplicationContext(), AddCommentActivity.class);
-                    intent.putExtra("belongsToCurrentUser", belongToCurrentUser);
 
                     startActivity(intent);
                 }
@@ -122,13 +121,34 @@ public class DisplayCommentsActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * Called whenever this activity resumes
+     */
     @Override
     protected void onResume() {
         super.onResume();
+        init();
+    }
+
+    private void init(){
+        userHasScanned = Context.get().getCurrentPlayer().getPlayerWallet().getScannedCodeIds()
+                .contains(Context.get().getCurrentScannableCode().getScannableCodeId());
         comments = Context.get().getCurrentScannableCode().getComments();
         addCommentButton = findViewById(R.id.add_comment_button);
         commentsList = findViewById(R.id.comment_listview_content);
         setCommentsAdapter();
         setButtons();
+    }
+
+    /**
+     * Called when the observable for this observer is updated
+     * @param o     the observable object.
+     * @param arg   an argument passed to the {@code notifyObservers}
+     *                 method.
+     */
+    @Override
+    public void update(Observable o, Object arg) {
+        Log.d("DisplayCommentsActivity.update", "called to update");
+        init();
     }
 }

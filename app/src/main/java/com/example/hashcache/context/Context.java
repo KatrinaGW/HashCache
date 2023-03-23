@@ -72,15 +72,16 @@ public class Context extends Observable {
     /**
      * Sets the selected scannable code
      * 
-     * @param currentScannableCode the scananbleCode to set as selected
+     * @param newCurrentScannableCode the scananbleCode to set as selected
      */
-    public void setCurrentScannableCode(ScannableCode currentScannableCode) {
-        Log.d("Context.setCurrentScannableCode", currentScannableCode.getScannableCodeId());
-        if(this.currentScannableCode==null||!this.currentScannableCode.getScannableCodeId().equals(currentScannableCode.getScannableCodeId())){
-            this.currentScannableCode = currentScannableCode;
+    public void setCurrentScannableCode(ScannableCode newCurrentScannableCode) {
+        if(newCurrentScannableCode!=null&&(this.currentScannableCode==null||
+                !this.currentScannableCode.getScannableCodeId()
+                        .equals(newCurrentScannableCode.getScannableCodeId()))){
+            this.currentScannableCode = newCurrentScannableCode;
             this.setUpScannableCodeCommentListener();
         }else{
-            this.currentScannableCode = currentScannableCode;
+            this.currentScannableCode = newCurrentScannableCode;
         }
 
     }
