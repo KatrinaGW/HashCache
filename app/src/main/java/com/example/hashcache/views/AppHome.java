@@ -9,8 +9,17 @@
 
 package com.example.hashcache.views;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,33 +27,90 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
 import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
+
+import com.example.hashcache.models.database.Database;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
+import com.google.android.libraries.places.api.net.PlacesClient;
+
 import com.example.hashcache.context.Context;
+
 /**
 
  Represents the main landing page of the app.
 
  Displays a map centered on the user's location, with pins indicating QR codes scanned by the user and others.
  */
-public class AppHome extends AppCompatActivity implements Observer {
+public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCallback {
 
     private ImageButton mLogoButton;
     private TextView mUsernameTextView;
     private TextView mScoreTextView;
     private ImageButton mMenuButton;
-    private ImageButton mMapButton;
     private ImageButton mCommunityButton;
-    private View mTempMap;
+    private View mMap;
     private AppCompatButton mScanQrButton;
     private Player playerInfo;
+
+    private static final String TAG = AppHome.class.getSimpleName();
+    private GoogleMap map;
+    private CameraPosition cameraPosition;
+
+
+
+    // The entry point to the Fused Location Provider.
+    private FusedLocationProviderClient fusedLocationProviderClient;
+
+    // A default location (Sydney, Australia) and default zoom to use when location permission is
+    // not granted.
+    private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
+    private static final int DEFAULT_ZOOM = 15;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private boolean locationPermissionGranted;
+
+    // The geographical location where the device is currently located. That is, the last-known
+    // location retrieved by the Fused Location Provider.
+    private Location lastKnownLocation;
+
+    // Keys for storing activity state.
+    private static final String KEY_CAMERA_POSITION = "camera_position";
+    private static final String KEY_LOCATION = "location";
+
+    SharedPreferences settings;
+
+    SearchView searchView;
+
 
 
     @Override
@@ -52,6 +118,63 @@ public class AppHome extends AppCompatActivity implements Observer {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_home);
         initView();
+
+        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
+        SharedPreferences.Editor editor = settings.edit();
+
+
+        // Retrieve location and camera position from saved instance state.
+        if (savedInstanceState != null) {
+            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+        }
+
+
+
+        searchView = findViewById(R.id.idSearchView);
+
+        // Construct a FusedLocationProviderClient.
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Build the map.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                String location = searchView.getQuery().toString();
+
+                List<Address> addressList = null;
+
+                if (location != null || location.equals("")) {
+                    Geocoder geocoder = new Geocoder(AppHome.this);
+                    try {
+                        addressList = geocoder.getFromLocationName(location, 1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Address address = addressList.get(0);
+
+                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+
+                    //not sure if we want a marker there or not
+                    //map.addMarker(new MarkerOptions().position(latLng).title(location));
+
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        mapFragment.getMapAsync(this);
+
 
         // add functionality to logo button
         ImageButton logoButton = findViewById(R.id.logo_button);
@@ -64,16 +187,7 @@ public class AppHome extends AppCompatActivity implements Observer {
             }
         });
 
-        // add functionality to map button
-        ImageButton qrLocationButton = findViewById(R.id.map_button);
-        qrLocationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                // go to page showing QR codes near the user (as list)
-                startActivity(new Intent(AppHome.this, QRByLocation.class));
-            }
-        });
 
         // add functionality to community button
         ImageButton communityButton = findViewById(R.id.community_button);
@@ -103,19 +217,144 @@ public class AppHome extends AppCompatActivity implements Observer {
                 bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
         });
+
+
         playerInfo = Context.get().getCurrentPlayer();
         setUIParams();
         Context.get().addObserver(this);
+
     }
 
+
+
+    /**
+     * Saves the state of the map when the activity is paused.
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (map != null) {
+            outState.putParcelable(KEY_CAMERA_POSITION, map.getCameraPosition());
+            outState.putParcelable(KEY_LOCATION, lastKnownLocation);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+
+
+    //runs when the map is ready to receive user input
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        this.map = googleMap;
+
+        Log.d("TEST", "Granted entry, permission is ok");
+
+        getLocationPermission();
+
+        updateLocationUI();
+
+        getDeviceLocation();
+    }
+
+
+    //asks the user for permission to get their location
+    private void getLocationPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationPermissionGranted = true;
+
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+    //Handles the result of the request for location permissions
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        locationPermissionGranted = false;
+        if (requestCode
+                == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {// If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                locationPermissionGranted = true;
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+        updateLocationUI();
+    }
+    
+    
+    //Updates the map's UI settings based on whether the user has granted location permission.
+    private void updateLocationUI() {
+        if (map == null) {
+            return;
+        }
+        try {
+            if (locationPermissionGranted) {
+                map.setMyLocationEnabled(true);
+                map.getUiSettings().setMyLocationButtonEnabled(true);
+                getDeviceLocation();
+            } else {
+                map.setMyLocationEnabled(false);
+                map.getUiSettings().setMyLocationButtonEnabled(false);
+                lastKnownLocation = null;
+                //getLocationPermission();
+            }
+        } catch (SecurityException e)  {
+            Log.e("Exception: %s", e.getMessage());
+        }
+    }
+
+
+    private void getDeviceLocation() {
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
+        try {
+            if (locationPermissionGranted) {
+                Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
+                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
+                            // Set the map's camera position to the current location of the device.
+                            lastKnownLocation = task.getResult();
+                            if (lastKnownLocation != null) {
+                                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                        new LatLng(lastKnownLocation.getLatitude(),
+                                                lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                            }
+                        } else {
+                            map.moveCamera(CameraUpdateFactory
+                                    .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+                            map.getUiSettings().setMyLocationButtonEnabled(false);
+                        }
+                    }
+                });
+            }
+        } catch (SecurityException e)  {
+            Log.e("Exception: %s", e.getMessage(), e);
+        }
+    }
+    
+    
     private void initView() {
         mLogoButton = findViewById(R.id.logo_button);
         mUsernameTextView = findViewById(R.id.username_textview);
         mScoreTextView = findViewById(R.id.score_textview);
         mMenuButton = findViewById(R.id.menu_button);
-        mMapButton = findViewById(R.id.map_button);
         mCommunityButton = findViewById(R.id.community_button);
-        mTempMap = findViewById(R.id.temp_map);
+        mMap = findViewById(R.id.map);
         mScanQrButton = findViewById(R.id.scan_qr_button);
     }
 
@@ -140,14 +379,7 @@ public class AppHome extends AppCompatActivity implements Observer {
     public void setMenuButtonListener(View.OnClickListener listener) {
         mMenuButton.setOnClickListener(listener);
     }
-    /**
 
-     Sets the listener for the map button.
-     @param listener the listener to set
-     */
-    public void setMapButtonListener(View.OnClickListener listener) {
-        mMapButton.setOnClickListener(listener);
-    }
     /**
 
      Sets the listener for the community button.
@@ -203,7 +435,7 @@ public class AppHome extends AppCompatActivity implements Observer {
      @param listener the listener to set
      */
     public void setMapTempViewClickListener(OnClickListener listener) {
-        mTempMap.setOnClickListener(listener);
+        mMap.setOnClickListener(listener);
     }
 
     @Override
