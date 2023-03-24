@@ -24,6 +24,8 @@ import com.example.hashcache.models.database.Database;
 
 import org.w3c.dom.Text;
 
+import java.util.Observable;
+import java.util.Observer;
 import java.util.function.Function;
 
 /**
@@ -33,7 +35,7 @@ import java.util.function.Function;
  for the new monster or skipping the photo and navigating to the MyProfile activity. The menu button is also
  functional, allowing users to navigate to different activities in the app.
  */
-public class DisplayMonsterActivity extends AppCompatActivity {
+public class DisplayMonsterActivity extends AppCompatActivity implements Observer {
     /**
      * Called when the activity is created.
      *
@@ -46,6 +48,7 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     private ImageView monsterImage;
     private ImageView miniMap;
     private ImageButton menuButton;
+    private Button viewCacherButton;
     private Button deleteButton;
     private ScannableCode currentScannableCode;
     private boolean belongToCurrentUser;
@@ -59,7 +62,7 @@ public class DisplayMonsterActivity extends AppCompatActivity {
         Intent intent = getIntent();
         belongToCurrentUser = intent.getBooleanExtra("belongsToCurrentUser", false);
 
-        init();
+        initializeViews();
         // take location photo
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,6 +85,10 @@ public class DisplayMonsterActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        setViews();
+    }
+
+    private void setViews(){
         currentScannableCode = Context.get().getCurrentScannableCode();
         HashInfo currentHashInfo = currentScannableCode.getHashInfo();
         setMonsterScore(currentHashInfo.getGeneratedScore());
@@ -103,6 +110,12 @@ public class DisplayMonsterActivity extends AppCompatActivity {
                 return null;
             }
         });
+        viewCacherButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onViewCacherCommentsButtonClicked();
+            }
+        });
 
         Database.getInstance().getNumPlayersWithScannableCode(currentScannableCode.getScannableCodeId())
                 .thenAccept(numPlayers -> {
@@ -120,15 +133,17 @@ public class DisplayMonsterActivity extends AppCompatActivity {
                         return null;
                     }
                 });
+        Context.get().addObserver(this);
     }
 
-    private void init() {
+    private void initializeViews() {
         monsterName = findViewById(R.id.monster_name);
         monsterScore = findViewById(R.id.monster_score);
         monsterImage = findViewById(R.id.monster_image);
         miniMap = findViewById(R.id.mini_map);
         menuButton = findViewById(R.id.menu_button);
         deleteButton = findViewById(R.id.delete_button);
+        viewCacherButton = findViewById(R.id.view_comments_button);
         numPlayersValueView = findViewById(R.id.num_players_value);
 
         if(!belongToCurrentUser){
@@ -136,6 +151,12 @@ public class DisplayMonsterActivity extends AppCompatActivity {
         }else{
             deleteButton.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void onViewCacherCommentsButtonClicked(){
+        Intent intent = new Intent(getApplicationContext(), DisplayCommentsActivity.class);
+
+        startActivity(intent);
     }
 
     private void onDeleteButtonClicked(){
@@ -152,6 +173,12 @@ public class DisplayMonsterActivity extends AppCompatActivity {
                                     startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
                                 }
                             });
+                        })
+                        .exceptionally(new Function<Throwable, Void>() {
+                            @Override
+                            public Void apply(Throwable throwable) {
+                                return null;
+                            }
                         });
             }
         });
@@ -183,5 +210,18 @@ public class DisplayMonsterActivity extends AppCompatActivity {
 
     public void setPhotoButtonClickListener(View.OnClickListener listener) {
         deleteButton.setOnClickListener(listener);
+    }
+
+    /**
+     * Called when the observable object is updated
+     * @param o     the observable object.
+     * @param arg   an argument passed to the {@code notifyObservers}
+     *                 method.
+     */
+    @Override
+    public void update(Observable o, Object arg) {
+        currentScannableCode = Context.get().getCurrentScannableCode();
+        Log.d("DisplayMonsterActivity", "called to update");
+        setViews();
     }
 }

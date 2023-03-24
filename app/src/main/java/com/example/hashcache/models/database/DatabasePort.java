@@ -1,5 +1,7 @@
 package com.example.hashcache.models.database;
 
+import android.util.Pair;
+
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
@@ -7,9 +9,11 @@ import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface DatabasePort {
@@ -43,11 +47,14 @@ public interface DatabasePort {
     CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds);
     CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId);
     CompletableFuture<Boolean> updateContactInfo(ContactInfo contactInfo, String userId);
+    CompletableFuture<Pair<String, String>> getUsernameById(String userId);
     CompletableFuture<Integer> getNumPlayersWithScannableCode(String scannableCodeId);
     CompletableFuture<Void> addLoginRecord(String username);
     CompletableFuture<String> getUsernameForDevice();
     CompletableFuture<Void> deleteLogin();
     void resetInstances();
+    CompletableFuture<ArrayList<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds);
     void onPlayerDataChanged(String userId, GetPlayerCallback callback);
     void onPlayerWalletChanged(String playerId, BooleanCallback callback);
+    void onScannableCodeCommentsChanged(String scannableCodeId, GetScannableCodeCallback callback);
 }
