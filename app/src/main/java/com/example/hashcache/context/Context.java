@@ -1,10 +1,13 @@
 package com.example.hashcache.context;
 
+import android.util.Log;
+
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 
 import java.util.Observable;
 
@@ -69,10 +72,18 @@ public class Context extends Observable {
     /**
      * Sets the selected scannable code
      * 
-     * @param currentScannableCode the scananbleCode to set as selected
+     * @param newCurrentScannableCode the scananbleCode to set as selected
      */
-    public void setCurrentScannableCode(ScannableCode currentScannableCode) {
-        this.currentScannableCode = currentScannableCode;
+    public void setCurrentScannableCode(ScannableCode newCurrentScannableCode) {
+        if(newCurrentScannableCode!=null&&(this.currentScannableCode==null||
+                !this.currentScannableCode.getScannableCodeId()
+                        .equals(newCurrentScannableCode.getScannableCodeId()))){
+            this.currentScannableCode = newCurrentScannableCode;
+            this.setUpScannableCodeCommentListener();
+        }else{
+            this.currentScannableCode = newCurrentScannableCode;
+        }
+
     }
 
     private void setHighestScannableCode(ScannableCode scanCode) {
@@ -93,6 +104,24 @@ public class Context extends Observable {
 
     public ScannableCode getCurrentScannableCode() {
         return currentScannableCode;
+    }
+
+    private void setUpScannableCodeCommentListener(){
+        if(currentScannableCode!=null){
+            String scananbleCodeId = getCurrentScannableCode().getScannableCodeId();
+            Database.getInstance().onScannableCodeCommentsChanged(scananbleCodeId, new GetScannableCodeCallback() {
+                @Override
+                public void onCallback(ScannableCode scannableCode) {
+                    if(scannableCode != null &&
+                            scannableCode.getScannableCodeId().equals(currentScannableCode.getScannableCodeId())){
+                        Log.d("Context.onScannableCodeCommentsChanged", "notifying observers");
+                        setCurrentScannableCode(scannableCode);
+                        setChanged();
+                        notifyObservers();
+                    }
+                }
+            });
+        }
     }
 
     public void setupListeners() {
