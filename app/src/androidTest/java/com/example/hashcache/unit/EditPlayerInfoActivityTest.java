@@ -11,16 +11,10 @@ import android.widget.EditText;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.example.hashcache.views.AppHome;
-import com.example.hashcache.views.Community;
 import com.example.hashcache.views.EditPlayerInfoActivity;
 import com.example.hashcache.views.MainActivity;
-import com.example.hashcache.views.MyProfile;
-import com.example.hashcache.views.QRByLocation;
-import com.example.hashcache.views.QRScanActivity;
-import com.example.hashcache.views.QRStats;
 import com.example.hashcache.R;
-import com.example.hashcache.views.Settings;
+import com.example.hashcache.views.SettingsActivity;
 import com.robotium.solo.Solo;
 
 
@@ -81,7 +75,7 @@ public class EditPlayerInfoActivityTest {
         solo.assertCurrentActivity("Wrong Activity", EditPlayerInfoActivity.class);
         solo.clickOnButton("CONFIRM");
         solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", Settings.class);
+        solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
 
     }
 
@@ -107,7 +101,7 @@ public class EditPlayerInfoActivityTest {
         solo.enterText((EditText) solo.getView(R.id.edit_phone_number), "111-111-1111");
         solo.clickOnButton("CONFIRM");
         solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", Settings.class);
+        solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
 
     }
 

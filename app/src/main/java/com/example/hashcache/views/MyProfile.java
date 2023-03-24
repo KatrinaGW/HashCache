@@ -53,7 +53,7 @@ import java.util.Observer;
  * @see MenuItem
  * @see Player
  * @see Context
- * @see Settings
+ * @see SettingsActivity
  * @see QRStats
  * @see Community
  */
@@ -93,7 +93,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
             public void onClick(View v) {
 
                 // go to user settings page
-                startActivity(new Intent(MyProfile.this, Settings.class));
+                startActivity(new Intent(MyProfile.this, SettingsActivity.class));
             }
         });
 
@@ -158,7 +158,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
      *
      * @param listener the listener to be set for the logo button
      * @see ImageButton
-     * @see Settings
+     * @see SettingsActivity
      */
     public void setLogoButtonListener(View.OnClickListener listener) {
         mLogoButton.setOnClickListener(listener);
