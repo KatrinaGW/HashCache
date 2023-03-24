@@ -8,12 +8,13 @@ import java.util.function.Function;
 
 public class checkLoginCommand {
     public static CompletableFuture<Boolean> checkLogin(LoginUserCommand loginUserCommand){
+        SetupUserCommand setupUserCommand = new SetupUserCommand();
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             Database.getInstance().getUsernameForDevice()
                     .thenAccept(username -> {
                         if(username!=null){
-                            SetupUserCommand.setupUser(username, Database.getInstance(), Context.get())
+                            setupUserCommand.setupUser(username, Database.getInstance(), Context.get())
                                     .thenAccept(nullValue -> {
                                         cf.complete(true);
                                     })

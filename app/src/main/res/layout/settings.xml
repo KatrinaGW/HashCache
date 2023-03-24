@@ -80,7 +80,7 @@
         android:background="@drawable/rounded_rect_green"
         android:layout_below="@+id/geolocation_checkbox"
         android:layout_centerHorizontal="true"
-        android:text="LOGOUT AND EXIT"/>
+        android:text="LOGOUT"/>
 
     <ImageButton
         android:id="@+id/menu_button"

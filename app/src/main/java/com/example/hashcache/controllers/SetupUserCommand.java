@@ -17,7 +17,7 @@ public class SetupUserCommand {
      * @param context the current context of the app
      * @return cf the CompletableFuture that will complete exceptionally if there was a problem
      */
-    public static CompletableFuture<Void> setupUser(String userName, DatabasePort db,
+    public CompletableFuture<Void> setupUser(String userName, DatabasePort db,
                            Context context) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         db.getIdByUsername(userName).thenAccept(userId -> {

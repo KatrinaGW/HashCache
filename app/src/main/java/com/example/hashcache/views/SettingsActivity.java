@@ -50,7 +50,7 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
     private CheckBox geoLocationPreferenceCheckbox;
     private ImageView editInfoButton;
     private ImageButton menuButton;
-    private Button logoutExitButton;
+    private Button logoutButton;
     /**
      * Called when the activity is starting. Initializes the activity and its associated layout.
      *
@@ -67,7 +67,7 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
         emailView = findViewById(R.id.email_textview);
         geoLocationPreferenceCheckbox = findViewById(R.id.geolocation_checkbox);
         editInfoButton = findViewById(R.id.edit_info_image);
-        logoutExitButton = findViewById(R.id.logout_button);
+        logoutButton = findViewById(R.id.logout_button);
 
         geoLocationPreferenceCheckbox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,10 +83,10 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
             }
         });
 
-        logoutExitButton.setOnClickListener(new View.OnClickListener() {
+        logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onLogoutExitClicked();
+                onLogoutClicked();
             }
         });
 
@@ -109,7 +109,7 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
         setValues();
     }
 
-    private void onLogoutExitClicked(){
+    private void onLogoutClicked(){
         LogoutCommand.logout(Database.getInstance())
                 .thenAccept(nullValue -> {
                     ResetCommand.reset();

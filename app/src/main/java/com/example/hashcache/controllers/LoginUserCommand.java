@@ -15,13 +15,15 @@ public class LoginUserCommand {
      * @param userName the username of the user to log in or create
      * @param db the database instance of the DatabasePort to interface with the Firestore collection
      * @param context the current app context
+     * @param setupUserCommand the instance of the SetupUser command to use
      * @return a CompletableFuture that completes when the user has been logged in or created
      */
-    public CompletableFuture<Void> loginUser(String userName, DatabasePort db, Context context){
+    public CompletableFuture<Void> loginUser(String userName, DatabasePort db, Context context,
+                                             SetupUserCommand setupUserCommand){
         CompletableFuture<Void> cf = new CompletableFuture<>();
         db.usernameExists(userName).thenAccept(exists -> {
             if(exists){
-                SetupUserCommand.setupUser(userName, db, context)
+                setupUserCommand.setupUser(userName, db, context)
                         .thenAccept(nullValue->{
                             cf.complete(null);
                         })
@@ -35,7 +37,7 @@ public class LoginUserCommand {
             }
             else{
                 db.createPlayer(userName).thenAccept(result -> {
-                    SetupUserCommand.setupUser(userName, db, context)
+                    setupUserCommand.setupUser(userName, db, context)
                             .thenAccept(nullValue -> {
                                 cf.complete(null);
                             })

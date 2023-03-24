@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.LoginUserCommand;
+import com.example.hashcache.controllers.SetupUserCommand;
 import com.example.hashcache.controllers.checkLoginCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
@@ -153,7 +154,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                loginUserCommand.loginUser(getUsername(), Database.getInstance(), Context.get())
+                loginUserCommand.loginUser(getUsername(), Database.getInstance(), Context.get(),
+                                 new SetupUserCommand())
                         .thenAccept(res -> {
                             Intent goHome = new Intent(MainActivity.this, AppHome.class);
 
