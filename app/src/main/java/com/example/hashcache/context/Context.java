@@ -2,6 +2,8 @@ package com.example.hashcache.context;
 
 import android.provider.Settings;
 
+import androidx.lifecycle.Observer;
+
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
@@ -41,6 +43,16 @@ public class Context extends Observable {
             }
         }
         return instance;
+    }
+
+    /**
+     * Resets the context after a logout
+     */
+    public void resetContext(){
+        deleteObservers();
+        this.currentScannableCode = null;
+        this.currentPlayer = null;
+        this.deviceId = null;
     }
 
 

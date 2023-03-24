@@ -465,4 +465,22 @@ public class TestDatabaseAdapter implements DatabasePort {
         cf.complete("Jean Val Jean");
         return cf;
     }
+
+    /**
+     * Remove the login record for the current device
+     * @return cf the CompletableFuture that completes exceptionally if the operation caused
+     * an error
+     */
+    public CompletableFuture<Void> deleteLogin(){
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        cf.complete(null);
+        return cf;
+    }
+
+    /**
+     * Resets the static instances of the adapters
+     */
+    public void resetInstances(){
+        return;
+    }
 }

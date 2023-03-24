@@ -591,4 +591,22 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return LoginsAdapter.getInstance().getUsernameForDevice();
     }
 
+    /**
+     * Remove the login record for the current device
+     * @return cf the CompletableFuture that completes exceptionally if the operation caused
+     * an error
+     */
+    public CompletableFuture<Void> deleteLogin(){
+        return LoginsAdapter.getInstance().deleteLogin();
+    }
+
+    /**
+     * Resets the static instances of the adapters
+     */
+    public void resetInstances(){
+        LoginsAdapter.resetInstance();
+        PlayersDatabaseAdapter.resetInstance();
+        ScannableCodesDatabaseAdapter.resetInstance();
+    }
+
 }

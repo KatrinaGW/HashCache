@@ -8,6 +8,8 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -43,6 +45,13 @@ public class LoginsAdapter {
         }else{
             throw new IllegalArgumentException("The LoginsAdapter INSTANCE does not exist!");
         }
+    }
+
+    /**
+     * Resets the static instance
+     */
+    public static void resetInstance(){
+        INSTANCE = null;
     }
 
     /**
@@ -142,6 +151,50 @@ public class LoginsAdapter {
                     );
                 }
         );
+        return cf;
+    }
+
+    /**
+     * Remove the login record for the current device
+     * @return cf the CompletableFuture that completes exceptionally if the operation caused
+     * an error
+     */
+    public CompletableFuture<Void> deleteLogin(){
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            fireStoreHelper.documentWithIDExists(collectionReference, Context.get().getDeviceId())
+                    .thenAccept(
+                            exists -> {
+                                if(!exists){
+                                    cf.completeExceptionally(new Exception(
+                                            "There is no login record for the given ID!"
+                                    ));
+                                }else{
+                                    collectionReference.document(Context.get().getDeviceId())
+                                            .delete()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                    cf.complete(null);
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    cf.completeExceptionally(e);
+                                                }
+                                            });
+                                }
+                            }
+                    ).exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
         return cf;
     }
 }

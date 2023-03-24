@@ -68,9 +68,19 @@
         android:layout_marginTop="60dp"
         android:layout_marginEnd="60dp"
         android:layout_marginBottom="60dp"
+        android:layout_centerHorizontal="true"
         android:text="Record Geolocation"
         android:textColor="@color/white"
         android:textSize="18sp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/logout_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_rect_green"
+        android:layout_below="@+id/geolocation_checkbox"
+        android:layout_centerHorizontal="true"
+        android:text="LOGOUT AND EXIT"/>
 
     <ImageButton
         android:id="@+id/menu_button"

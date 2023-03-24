@@ -18,6 +18,7 @@ package com.example.hashcache.views;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -26,6 +27,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hashcache.R;
+import com.example.hashcache.controllers.LogoutCommand;
+import com.example.hashcache.controllers.ResetCommand;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.context.Context;
@@ -47,6 +50,7 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
     private CheckBox geoLocationPreferenceCheckbox;
     private ImageView editInfoButton;
     private ImageButton menuButton;
+    private Button logoutExitButton;
     /**
      * Called when the activity is starting. Initializes the activity and its associated layout.
      *
@@ -63,6 +67,7 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
         emailView = findViewById(R.id.email_textview);
         geoLocationPreferenceCheckbox = findViewById(R.id.geolocation_checkbox);
         editInfoButton = findViewById(R.id.edit_info_image);
+        logoutExitButton = findViewById(R.id.logout_button);
 
         geoLocationPreferenceCheckbox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +80,13 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(SettingsActivity.this, EditPlayerInfoActivity.class));
+            }
+        });
+
+        logoutExitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onLogoutExitClicked();
             }
         });
 
@@ -95,6 +107,14 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
         super.onResume();
 
         setValues();
+    }
+
+    private void onLogoutExitClicked(){
+        LogoutCommand.logout(Database.getInstance())
+                .thenAccept(nullValue -> {
+                    ResetCommand.reset();
+                    startActivity(new Intent(SettingsActivity.this, MainActivity.class));
+                });
     }
 
     private void setValues(){

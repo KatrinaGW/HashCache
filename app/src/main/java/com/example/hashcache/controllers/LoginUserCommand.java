@@ -57,41 +57,4 @@ public class LoginUserCommand {
         });
         return cf;
     }
-//    /**
-//     * Sets up the user with the given username after the user has been logged in or created.
-//     *
-//     * @param userName the username of the user to set up
-//     * @param db the interface to use to conenct to the firestore collection
-//     * @param context the current context of the app
-//     * @param cf the CompletableFuture to complete when the user has been set up
-//     */
-//    private void setupUser(String userName, CompletableFuture<Void> cf, DatabasePort db,
-//                           Context context) {
-//        db.getIdByUsername(userName).thenAccept(userId -> {
-//            db.getPlayer(userId).thenAccept(player -> {
-//
-//                AddLoginCommand.addLogin(userName, context, db)
-//                                .thenAccept(nullValue -> {
-//                                    context.setCurrentPlayer(player);
-//                                    context.setupListeners();
-//                                    cf.complete(null);
-//                                })
-//                        .exceptionally(new Function<Throwable, Void>() {
-//                            @Override
-//                            public Void apply(Throwable throwable) {
-//                                cf.completeExceptionally(throwable);
-//                                return null;
-//                            }
-//                        });
-//            }).exceptionally(new Function<Throwable, Void>() {
-//                @Override
-//                public Void apply(Throwable throwable) {
-//                    Log.d("ERROR", "Could not get player" + userName);
-//                    Log.d("Reason", throwable.getMessage());
-//                    cf.completeExceptionally(new Exception("Could not get player."));
-//                    return null;
-//                }
-//            });
-//        });
-//    }
 }

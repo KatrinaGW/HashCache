@@ -41,7 +41,7 @@ public class LoginUserCommandTest {
 
         LoginUserCommand loginUserCommand = new LoginUserCommand();
 
-        assertNull(loginUserCommand.addUser(testUsername, mockDB, mockContext).join());
+        assertNull(loginUserCommand.loginUser(testUsername, mockDB, mockContext).join());
 
         verify(mockContext, times(1)).setCurrentPlayer(testPlayer);
     }

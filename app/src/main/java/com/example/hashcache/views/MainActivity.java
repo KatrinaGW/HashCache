@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -114,38 +115,6 @@ public class MainActivity extends AppCompatActivity {
         loginUserCommand = new LoginUserCommand();
         playerList = PlayerList.getInstance();
         checkDeviceId();
-//        // Initializes the AddUserCommand and PlayerList instances
-//        addUserCommand = new AddUserCommand();
-//
-//        playerList = PlayerList.getInstance();
-//
-//        // add functionality to start button
-//        AppCompatButton startButton = findViewById(R.id.start_button);
-//        usernameEditText = findViewById(R.id.username_edittext);
-//
-//        // Gets input stream to names.csv which is used for name generation
-//        InputStream is;
-//        is = getResources().openRawResource(R.raw.names);
-//        NameGenerator.getNames(is);        // Sets the listener for the start button
-//        setStartBtnListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View view) {
-//                Context.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
-//                        Settings.Secure.ANDROID_ID));
-//
-//                addUserCommand.addUser(getUsername(), Database.getInstance(), Context.get())
-//                        .thenAccept(res -> {
-//                            Intent goHome = new Intent(MainActivity.this, AppHome.class);
-//
-//                            Database.getInstance().getPlayers().thenAccept(players -> {
-//
-//                                startActivity(goHome);
-//                            });
-//
-//                });
-//            }
-//        });
     }
 
     private void checkDeviceId(){
@@ -171,14 +140,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void newUserLoginProcess(){
-        // Initializes the AddUserCommand and PlayerList instances
-        //addUserCommand = new AddUserCommand();
-
-//        playerList = PlayerList.getInstance();
-
         // add functionality to start button
         AppCompatButton startButton = findViewById(R.id.start_button);
         usernameEditText = findViewById(R.id.username_edittext);
+        usernameEditText.setVisibility(View.VISIBLE);
 
         // Gets input stream to names.csv which is used for name generation
         InputStream is;
@@ -209,7 +174,9 @@ public class MainActivity extends AppCompatActivity {
      * @see View.OnClickListener
      */
     public void setStartBtnListener(View.OnClickListener listeners) {
-        findViewById(R.id.start_button).setOnClickListener(listeners);
+        Button startCachingButton = findViewById(R.id.start_button);
+        startCachingButton.setVisibility(View.VISIBLE);
+        startCachingButton.setOnClickListener(listeners);
     }
     /**
      * Gets the username entered by the user.

@@ -70,6 +70,13 @@ public class PlayerWalletDatabaseAdapter {
         this.db = db;
     }
 
+    /**
+     * Resets the static instance to null
+     */
+    public void resetInstance(){
+        INSTANCE = null;
+    }
+
     public static PlayerWalletDatabaseAdapter getInstance(FireStoreHelper fireStoreHelper) {
         if (INSTANCE == null) {
             INSTANCE = new PlayerWalletDatabaseAdapter(fireStoreHelper);
