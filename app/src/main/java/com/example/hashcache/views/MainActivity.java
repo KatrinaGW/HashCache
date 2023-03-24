@@ -7,6 +7,7 @@
 package com.example.hashcache.views;
 
 import static com.example.hashcache.controllers.DependencyInjector.getOrMakeScannableCodesConnectionHandler;
+import static com.example.hashcache.controllers.DependencyInjector.makeLoginsAdapter;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -85,8 +86,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         boolean hasBeenInitialized=false;
         List<FirebaseApp> firebaseApps = FirebaseApp.getApps(getApplicationContext());
         for(FirebaseApp app : firebaseApps){
@@ -107,6 +106,44 @@ public class MainActivity extends AppCompatActivity {
         Context.get();
 
         getOrMakeScannableCodesConnectionHandler();
+        makeLoginsAdapter();
+
+        newUserLoginProcess();
+//        // Initializes the AddUserCommand and PlayerList instances
+//        addUserCommand = new AddUserCommand();
+//
+//        playerList = PlayerList.getInstance();
+//
+//        // add functionality to start button
+//        AppCompatButton startButton = findViewById(R.id.start_button);
+//        usernameEditText = findViewById(R.id.username_edittext);
+//
+//        // Gets input stream to names.csv which is used for name generation
+//        InputStream is;
+//        is = getResources().openRawResource(R.raw.names);
+//        NameGenerator.getNames(is);        // Sets the listener for the start button
+//        setStartBtnListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View view) {
+//                Context.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
+//                        Settings.Secure.ANDROID_ID));
+//
+//                addUserCommand.addUser(getUsername(), Database.getInstance(), Context.get())
+//                        .thenAccept(res -> {
+//                            Intent goHome = new Intent(MainActivity.this, AppHome.class);
+//
+//                            Database.getInstance().getPlayers().thenAccept(players -> {
+//
+//                                startActivity(goHome);
+//                            });
+//
+//                });
+//            }
+//        });
+    }
+
+    private void newUserLoginProcess(){
         // Initializes the AddUserCommand and PlayerList instances
         addUserCommand = new AddUserCommand();
 
@@ -124,30 +161,23 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-
-
+                Context.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
+                        Settings.Secure.ANDROID_ID));
 
                 addUserCommand.addUser(getUsername(), Database.getInstance(), Context.get())
                         .thenAccept(res -> {
                             Intent goHome = new Intent(MainActivity.this, AppHome.class);
 
                             Database.getInstance().getPlayers().thenAccept(players -> {
-                                String deviceId = Settings.Secure.getString(getContentResolver(),
-                                        Settings.Secure.ANDROID_ID);
 
                                 startActivity(goHome);
                             });
 
-                }).exceptionally(new Function<Throwable, Void>() {
-                    @Override
-                    public Void apply(Throwable throwable) {
-                        // display some error on the screen
-                        return null;
-                    }
-                });
+                        });
             }
         });
     }
+
     /**
      * Sets the listener for the start button.
      *

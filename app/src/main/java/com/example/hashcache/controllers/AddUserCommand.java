@@ -25,7 +25,9 @@ public class AddUserCommand {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         db.usernameExists(userName).thenAccept(exists -> {
             if(exists){
-                setupUser(userName, cf, db, context);
+                cf.completeExceptionally(new IllegalArgumentException(
+                        "User already exists with given username!"
+                ));
             }
             else{
                 db.createPlayer(userName).thenAccept(result -> {
@@ -53,9 +55,20 @@ public class AddUserCommand {
                            Context context) {
         db.getIdByUsername(userName).thenAccept(userId -> {
             db.getPlayer(userId).thenAccept(player -> {
-                context.setCurrentPlayer(player);
-                context.setupListeners();
-                cf.complete(null);
+
+                AddLoginCommand.addLogin(userName, context, db)
+                                .thenAccept(nullValue -> {
+                                    context.setCurrentPlayer(player);
+                                    context.setupListeners();
+                                    cf.complete(null);
+                                })
+                        .exceptionally(new Function<Throwable, Void>() {
+                            @Override
+                            public Void apply(Throwable throwable) {
+                                cf.completeExceptionally(throwable);
+                                return null;
+                            }
+                        });
             }).exceptionally(new Function<Throwable, Void>() {
                 @Override
                 public Void apply(Throwable throwable) {

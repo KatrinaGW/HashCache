@@ -1,5 +1,6 @@
 package com.example.hashcache.controllers;
 
+import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database.DatabasePort;
 
@@ -9,12 +10,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class AddLoginCommand {
-    public static CompletableFuture<Void> addLogin(String username, String deviceId, DatabasePort
+    public static CompletableFuture<Void> addLogin(String username, Context context, DatabasePort
                                                    db){
         CompletableFuture<Void> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            db.addLoginRecord(username, deviceId)
+            db.addLoginRecord(username, context.getDeviceId())
                     .thenAccept(nullValue -> {
                         cf.complete(null);
                     })
