@@ -6,14 +6,14 @@ import com.example.hashcache.models.database.Database;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-public class PerformLoginCommand {
-    public static CompletableFuture<Boolean> performLogin(AddUserCommand addUserCommand){
+public class checkLoginCommand {
+    public static CompletableFuture<Boolean> checkLogin(AddUserCommand addUserCommand){
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             Database.getInstance().getUsernameForDevice()
                     .thenAccept(username -> {
                         if(username!=null){
-                            addUserCommand.addUser(username, Database.getInstance(), Context.get())
+                            SetupUserCommand.setupUser(username, Database.getInstance(), Context.get())
                                     .thenAccept(nullValue -> {
                                         cf.complete(true);
                                     })
@@ -26,6 +26,13 @@ public class PerformLoginCommand {
                                     });
                         }else{
                             cf.complete(false);
+                        }
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
                         }
                     });
         });

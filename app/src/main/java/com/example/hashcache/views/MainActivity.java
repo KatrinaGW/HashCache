@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
-import com.example.hashcache.controllers.PerformLoginCommand;
+import com.example.hashcache.controllers.checkLoginCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.Database;
@@ -111,8 +111,9 @@ public class MainActivity extends AppCompatActivity {
 
         Context.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID));
-
-        newUserLoginProcess();
+        addUserCommand = new AddUserCommand();
+        playerList = PlayerList.getInstance();
+        checkDeviceId();
 //        // Initializes the AddUserCommand and PlayerList instances
 //        addUserCommand = new AddUserCommand();
 //
@@ -148,14 +149,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkDeviceId(){
-        //PerformLoginCommand.performLogin()
+        checkLoginCommand.checkLogin(addUserCommand)
+                .thenAccept(existed -> {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(!existed){
+                                newUserLoginProcess();
+                            }else{
+                                startActivity(new Intent(MainActivity.this, AppHome.class));
+                            }
+                        }
+                    });
+                })
+                .exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        return null;
+                    }
+                });
     }
 
     private void newUserLoginProcess(){
         // Initializes the AddUserCommand and PlayerList instances
-        addUserCommand = new AddUserCommand();
+        //addUserCommand = new AddUserCommand();
 
-        playerList = PlayerList.getInstance();
+//        playerList = PlayerList.getInstance();
 
         // add functionality to start button
         AppCompatButton startButton = findViewById(R.id.start_button);
