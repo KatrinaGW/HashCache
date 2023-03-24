@@ -1,18 +1,14 @@
 package com.example.hashcache.controllers;
 
-import android.util.Log;
-
 import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.DatabasePort;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 /**
  * The AddUserCommand class is responsible for handling the logic for adding a new user or logging in an existing user.
  */
-public class AddUserCommand {
-    FirebaseFirestore db;
+public class LoginUserCommand {
     /**
      * Logs in the user with the given username or creates a new user with the given username if the user does not exist.
      *
@@ -21,13 +17,21 @@ public class AddUserCommand {
      * @param context the current app context
      * @return a CompletableFuture that completes when the user has been logged in or created
      */
-    public CompletableFuture<Void> addUser(String userName, DatabasePort db, Context context){
+    public CompletableFuture<Void> loginUser(String userName, DatabasePort db, Context context){
         CompletableFuture<Void> cf = new CompletableFuture<>();
         db.usernameExists(userName).thenAccept(exists -> {
             if(exists){
-                cf.completeExceptionally(new IllegalArgumentException(
-                        "User already exists with given username!"
-                ));
+                SetupUserCommand.setupUser(userName, db, context)
+                        .thenAccept(nullValue->{
+                            cf.complete(null);
+                        })
+                        .exceptionally(new Function<Throwable, Void>() {
+                            @Override
+                            public Void apply(Throwable throwable) {
+                                cf.completeExceptionally(throwable);
+                                return null;
+                            }
+                        });
             }
             else{
                 db.createPlayer(userName).thenAccept(result -> {

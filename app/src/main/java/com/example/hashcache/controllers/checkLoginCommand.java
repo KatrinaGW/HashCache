@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class checkLoginCommand {
-    public static CompletableFuture<Boolean> checkLogin(AddUserCommand addUserCommand){
+    public static CompletableFuture<Boolean> checkLogin(LoginUserCommand loginUserCommand){
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             Database.getInstance().getUsernameForDevice()

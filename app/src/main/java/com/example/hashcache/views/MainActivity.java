@@ -19,7 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.hashcache.R;
-import com.example.hashcache.controllers.AddUserCommand;
+import com.example.hashcache.controllers.LoginUserCommand;
 import com.example.hashcache.controllers.checkLoginCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
@@ -43,7 +43,7 @@ import java.io.InputStream;
 
  @see FirebaseOptions.Builder
 
- @see AddUserCommand
+ @see LoginUserCommand
 
  @see PlayerList
  */
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
     PlayerList playerList;
     EditText usernameEditText;
-    AddUserCommand addUserCommand;
+    LoginUserCommand loginUserCommand;
     /**
 
      onCreate method is called when the activity is created.
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
      @see FirebaseOptions.Builder
 
-     @see AddUserCommand
+     @see LoginUserCommand
 
      @see PlayerList
 
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
         Context.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID));
-        addUserCommand = new AddUserCommand();
+        loginUserCommand = new LoginUserCommand();
         playerList = PlayerList.getInstance();
         checkDeviceId();
 //        // Initializes the AddUserCommand and PlayerList instances
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkDeviceId(){
-        checkLoginCommand.checkLogin(addUserCommand)
+        checkLoginCommand.checkLogin(loginUserCommand)
                 .thenAccept(existed -> {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                addUserCommand.addUser(getUsername(), Database.getInstance(), Context.get())
+                loginUserCommand.loginUser(getUsername(), Database.getInstance(), Context.get())
                         .thenAccept(res -> {
                             Intent goHome = new Intent(MainActivity.this, AppHome.class);
 

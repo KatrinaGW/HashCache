@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.context.Context;
-import com.example.hashcache.controllers.AddUserCommand;
+import com.example.hashcache.controllers.LoginUserCommand;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.DatabasePort;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +15,7 @@ import org.mockito.Mockito;
 
 import java.util.concurrent.CompletableFuture;
 
-public class AddUserCommandTest {
+public class LoginUserCommandTest {
     DatabasePort mockDB;
     Context mockContext;
 
@@ -39,9 +39,9 @@ public class AddUserCommandTest {
         when(mockDB.getIdByUsername(testUsername)).thenReturn(idCF);
         when(mockDB.getPlayer(testPlayer.getUserId())).thenReturn(playerCF);
 
-        AddUserCommand addUserCommand = new AddUserCommand();
+        LoginUserCommand loginUserCommand = new LoginUserCommand();
 
-        assertNull(addUserCommand.addUser(testUsername, mockDB, mockContext).join());
+        assertNull(loginUserCommand.addUser(testUsername, mockDB, mockContext).join());
 
         verify(mockContext, times(1)).setCurrentPlayer(testPlayer);
     }
