@@ -44,8 +44,8 @@ public interface DatabasePort {
     CompletableFuture<ScannableCode> getScannableCodeById(String scannableCodeId);
     CompletableFuture<Boolean> updateContactInfo(ContactInfo contactInfo, String userId);
     CompletableFuture<Integer> getNumPlayersWithScannableCode(String scannableCodeId);
-    CompletableFuture<Void> addLoginRecord(String username, String deviceId);
-    CompletableFuture<String> getUsernameForDevice(String deviceId);
+    CompletableFuture<Void> addLoginRecord(String username);
+    CompletableFuture<String> getUsernameForDevice();
     void onPlayerDataChanged(String userId, GetPlayerCallback callback);
     void onPlayerWalletChanged(String playerId, BooleanCallback callback);
 }

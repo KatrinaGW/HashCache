@@ -15,7 +15,7 @@ public class AddLoginCommand {
         CompletableFuture<Void> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            db.addLoginRecord(username, context.getDeviceId())
+            db.addLoginRecord(username)
                     .thenAccept(nullValue -> {
                         cf.complete(null);
                     })

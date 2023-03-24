@@ -7,10 +7,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class PerformLoginCommand {
-    public static CompletableFuture<Boolean> performLogin(String deviceId, AddUserCommand addUserCommand){
+    public static CompletableFuture<Boolean> performLogin(AddUserCommand addUserCommand){
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            Database.getInstance().getUsernameForDevice(deviceId)
+            Database.getInstance().getUsernameForDevice()
                     .thenAccept(username -> {
                         if(username!=null){
                             addUserCommand.addUser(username, Database.getInstance(), Context.get())

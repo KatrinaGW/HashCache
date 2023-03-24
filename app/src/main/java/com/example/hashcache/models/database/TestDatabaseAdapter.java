@@ -445,12 +445,11 @@ public class TestDatabaseAdapter implements DatabasePort {
      * Sets the userId for the user who has logged in with a specified device. Will overwrite any
      * existing login record for the device
      * @param username the name to use for the login record
-     * @param deviceId the id of the device to remember the user on
      * @return cf the CompletableFuture which completes exceptionally if there was an error in setting
      * up the record
      */
     @Override
-    public CompletableFuture<Void> addLoginRecord(String username, String deviceId){
+    public CompletableFuture<Void> addLoginRecord(String username){
         CompletableFuture<Void> cf = new CompletableFuture<>();
         cf.complete(null);
         return cf;
@@ -458,11 +457,10 @@ public class TestDatabaseAdapter implements DatabasePort {
 
     /**
      * Gets the username to use if the device has had a login before
-     * @param deviceId the device to check for a previous login
      * @return cf the CompletableFuture with the username of the associated user. Returns
      * null if there is not a login entry for the specified device
      */
-    public CompletableFuture<String> getUsernameForDevice(String deviceId){
+    public CompletableFuture<String> getUsernameForDevice(){
         CompletableFuture<String> cf = new CompletableFuture<>();
         cf.complete("Jean Val Jean");
         return cf;

@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.AddUserCommand;
+import com.example.hashcache.controllers.PerformLoginCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.Database;
@@ -108,6 +109,9 @@ public class MainActivity extends AppCompatActivity {
         getOrMakeScannableCodesConnectionHandler();
         makeLoginsAdapter();
 
+        Context.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ANDROID_ID));
+
         newUserLoginProcess();
 //        // Initializes the AddUserCommand and PlayerList instances
 //        addUserCommand = new AddUserCommand();
@@ -143,6 +147,10 @@ public class MainActivity extends AppCompatActivity {
 //        });
     }
 
+    private void checkDeviceId(){
+        //PerformLoginCommand.performLogin()
+    }
+
     private void newUserLoginProcess(){
         // Initializes the AddUserCommand and PlayerList instances
         addUserCommand = new AddUserCommand();
@@ -161,9 +169,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Context.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
-                        Settings.Secure.ANDROID_ID));
-
                 addUserCommand.addUser(getUsername(), Database.getInstance(), Context.get())
                         .thenAccept(res -> {
                             Intent goHome = new Intent(MainActivity.this, AppHome.class);
