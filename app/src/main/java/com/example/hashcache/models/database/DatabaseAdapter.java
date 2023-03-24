@@ -583,4 +583,14 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return LoginsAdapter.getInstance().addLoginRecord(username, deviceId);
     }
 
+    /**
+     * Gets the username to use if the device has had a login before
+     * @param deviceId the device to check for a previous login
+     * @return cf the CompletableFuture with the username of the associated user. Returns
+     * null if there is not a login entry for the specified device
+     */
+    public CompletableFuture<String> getUsernameForDevice(String deviceId){
+        return LoginsAdapter.getInstance().getUsernameForDevice(deviceId);
+    }
+
 }

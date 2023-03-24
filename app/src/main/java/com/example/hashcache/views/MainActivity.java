@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,9 +22,7 @@ import com.example.hashcache.controllers.AddUserCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.context.Context;
-import com.example.hashcache.models.database.DatabaseAdapter;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
@@ -126,16 +124,18 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                addUserCommand.loginUser(getUsername(), Database.getInstance(), Context.get())
+
+
+
+                addUserCommand.addUser(getUsername(), Database.getInstance(), Context.get())
                         .thenAccept(res -> {
                             Intent goHome = new Intent(MainActivity.this, AppHome.class);
 
                             Database.getInstance().getPlayers().thenAccept(players -> {
-                                //String mId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                                String deviceId = Settings.Secure.getString(getContentResolver(),
+                                        Settings.Secure.ANDROID_ID);
 
                                 startActivity(goHome);
-
-
                             });
 
                 }).exceptionally(new Function<Throwable, Void>() {

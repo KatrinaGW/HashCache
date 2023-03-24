@@ -2,7 +2,6 @@ package com.example.hashcache.controllers;
 
 import android.util.Log;
 
-import com.example.hashcache.models.database.Database;
 import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.DatabasePort;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -22,7 +21,7 @@ public class AddUserCommand {
      * @param context the current app context
      * @return a CompletableFuture that completes when the user has been logged in or created
      */
-    public CompletableFuture<Void> loginUser(String userName, DatabasePort db, Context context){
+    public CompletableFuture<Void> addUser(String userName, DatabasePort db, Context context){
         CompletableFuture<Void> cf = new CompletableFuture<>();
         db.usernameExists(userName).thenAccept(exists -> {
             if(exists){

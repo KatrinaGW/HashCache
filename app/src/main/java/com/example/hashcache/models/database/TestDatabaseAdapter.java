@@ -8,6 +8,8 @@ import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
@@ -451,6 +453,18 @@ public class TestDatabaseAdapter implements DatabasePort {
     public CompletableFuture<Void> addLoginRecord(String username, String deviceId){
         CompletableFuture<Void> cf = new CompletableFuture<>();
         cf.complete(null);
+        return cf;
+    }
+
+    /**
+     * Gets the username to use if the device has had a login before
+     * @param deviceId the device to check for a previous login
+     * @return cf the CompletableFuture with the username of the associated user. Returns
+     * null if there is not a login entry for the specified device
+     */
+    public CompletableFuture<String> getUsernameForDevice(String deviceId){
+        CompletableFuture<String> cf = new CompletableFuture<>();
+        cf.complete("Jean Val Jean");
         return cf;
     }
 }
