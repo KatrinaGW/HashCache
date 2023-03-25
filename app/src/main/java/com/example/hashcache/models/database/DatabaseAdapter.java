@@ -458,7 +458,6 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return cf;
     }
 
-    ;
 
     /**
      * Get the player's highest scoring QR code

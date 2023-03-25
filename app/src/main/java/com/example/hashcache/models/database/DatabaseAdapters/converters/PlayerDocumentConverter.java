@@ -18,7 +18,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.protobuf.FieldMask;
 
+import java.lang.reflect.Field;
+import java.net.FileNameMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -42,11 +45,13 @@ public class PlayerDocumentConverter {
         CompletableFuture.runAsync(()->{
             CompletableFuture<Player> thing = getPersonalDetails(documentReference);
                     thing.thenAccept(playerDetails -> {
-                        getPlayerWallet(documentReference.collection(CollectionNames.PLAYER_WALLET.collectionName))
+                        getPlayerWallet(documentReference.collection(CollectionNames.PLAYER_WALLET.collectionName), documentReference)
                                 .thenAccept(playerWallet -> {
-                                    cf.complete(new Player(playerDetails.getUserId(),
-                                            playerDetails.getUsername(), playerDetails.getContactInfo(),
-                                            playerDetails.getPlayerPreferences(), playerWallet));
+                                    getPlayerScores(documentReference, playerWallet).thenAccept(pWallet -> {
+                                        cf.complete(new Player(playerDetails.getUserId(),
+                                                playerDetails.getUsername(), playerDetails.getContactInfo(),
+                                                playerDetails.getPlayerPreferences(), pWallet));
+                                    });
                                 })
                                 .exceptionally(new Function<Throwable, Void>() {
                                     @Override
@@ -76,9 +81,10 @@ public class PlayerDocumentConverter {
      *                            images in it
      * @return cf the CompletableFuture with the PlayerWallet
      */
-    private CompletableFuture<PlayerWallet> getPlayerWallet(CollectionReference collectionReference){
+    private CompletableFuture<PlayerWallet> getPlayerWallet(CollectionReference collectionReference, DocumentReference documentReference){
         CompletableFuture<PlayerWallet> cf = new CompletableFuture<>();
         PlayerWallet playerWallet = new PlayerWallet();
+
         collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -159,6 +165,52 @@ public class PlayerDocumentConverter {
                         cf.completeExceptionally(new Exception("No player document exists"));
                         Log.d(TAG, "No such document");
                     }
+                } else {
+                    cf.completeExceptionally(new Exception(task.getException()));
+                }
+            }
+        });
+        return cf;
+    }
+
+    private CompletableFuture<PlayerWallet> getPlayerScores(DocumentReference playerDocument, PlayerWallet playerWallet) {
+        CompletableFuture<PlayerWallet> cf = new CompletableFuture<>();
+        playerDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    try {
+                        String total_score = (String) document.getData().get(FieldNames.TOTAL_SCORE.fieldName);
+                        if(total_score == "") {
+                            total_score = "0";
+                        }
+                        playerWallet.setTotalScore(Integer.parseInt(total_score));
+                    } catch (NullPointerException e) {
+                        Log.e(TAG, "User does not have a total score!");
+                    }
+
+                    try{
+                        String max_score = (String) document.getData().get(FieldNames.MAX_SCORE.fieldName);
+                        if(max_score == "") {
+                            max_score = "0";
+                        }
+                        playerWallet.setMaxScore(Integer.parseInt(max_score));
+                    } catch (NullPointerException e) {
+                        Log.e(TAG, "User does not have a max score!");
+                    }
+
+                    try{
+                        String qr_count = (String) document.getData().get(FieldNames.QR_COUNT.fieldName);
+                        if(qr_count == "") {
+                            qr_count = "0";
+                        }
+                        playerWallet.setQrCount(Integer.parseInt(qr_count));
+                    } catch (NullPointerException e) {
+                        Log.e(TAG, "User does not have a QR count");
+                    }
+
+                    cf.complete(playerWallet);
                 } else {
                     cf.completeExceptionally(new Exception(task.getException()));
                 }

@@ -505,7 +505,7 @@ public class TestDatabaseAdapter implements DatabasePort {
 
         return cf;
     }
-    
+
     /**
      * Sets the userId for the user who has logged in with a specified device. Will overwrite any
      * existing login record for the device

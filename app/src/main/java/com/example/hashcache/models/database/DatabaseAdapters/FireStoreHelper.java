@@ -85,6 +85,34 @@ public class FireStoreHelper {
     }
 
     /**
+     * Adds a number field to the document
+     * @param documentReference document to add the field to
+     * @param key key of the field
+     * @param value integer value for the field
+     * @return returns true on success
+     */
+    public CompletableFuture<Boolean> addNumberFieldToDocument(DocumentReference documentReference,
+                                                               String key, int value) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
+        documentReference
+                .update(key, value)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        cf.complete(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        cf.completeExceptionally(e);
+                    }
+                });
+
+        return cf;
+    }
+    /**
      * Sets the id reference and initial data for a specific document
      * @param documentReference the document to set the id and initial data on
      * @param data the initial fields, with String values, to add to the document

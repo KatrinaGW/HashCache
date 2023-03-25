@@ -441,20 +441,24 @@ private CompletableFuture<Boolean> setPlayerPreferences(DocumentReference player
     public CompletableFuture<String> createPlayer(String username) {
         CompletableFuture<String> cf = new CompletableFuture<>();
         HashMap<String, String> data = new HashMap<>();
+        HashMap<String, Integer> numData = new HashMap<>();
         data.put(FieldNames.USERNAME.fieldName, username);
         data.put(FieldNames.EMAIL.fieldName, "");
         data.put(FieldNames.PHONE_NUMBER.fieldName, "");
         data.put(FieldNames.RECORD_GEOLOCATION.fieldName, "");
-        data.put(FieldNames.TOTAL_SCORE.fieldName, "");
-        data.put(FieldNames.MAX_SCORE.fieldName, "");
-        data.put(FieldNames.QR_COUNT.fieldName, "");
+
+        numData.put(FieldNames.QR_COUNT.fieldName, 0);
 
         String userId = UUID.randomUUID().toString();
 
         fireStoreHelper.setDocumentReference(collectionReference.document(userId), data)
                         .thenAccept(successful -> {
                             if (successful) {
-                                cf.complete(userId);
+                                fireStoreHelper.addNumberFieldToDocument(collectionReference.document(userId),
+                                        FieldNames.TOTAL_SCORE.fieldName, 0).thenAccept(accept -> {
+                                            cf.complete(userId);
+
+                                });
                             } else {
                                 Log.e(TAG, "Something went wrong while setting the userId" +
                                         "on a new Playerdocument");
