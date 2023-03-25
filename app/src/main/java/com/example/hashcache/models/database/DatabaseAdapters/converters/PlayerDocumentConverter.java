@@ -103,6 +103,7 @@ public class PlayerDocumentConverter {
                         }
                     }
                 });
+
         return cf;
     }
 
@@ -165,4 +166,5 @@ public class PlayerDocumentConverter {
         });
         return cf;
     }
+
 }
