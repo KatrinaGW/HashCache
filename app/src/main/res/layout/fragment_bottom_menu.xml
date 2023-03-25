@@ -23,46 +23,54 @@
 
     <ImageButton
         android:id="@+id/map_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignBottom="@+id/scan_qr_button"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="32dp"
         android:layout_toStartOf="@+id/leaderboard_button"
         android:layout_marginHorizontal="12dp"
-        android:background="@drawable/circle_button"
+        android:background="@drawable/circle_button_black"
         android:elevation="6dp"
-        android:src="@android:drawable/ic_menu_myplaces" />
+        android:src="@drawable/icon_map"
+        android:scaleType="fitCenter"/>
 
     <ImageButton
         android:id="@+id/leaderboard_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignBottom="@+id/scan_qr_button"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="32dp"
         android:layout_toStartOf="@+id/scan_qr_button"
         android:layout_marginHorizontal="12dp"
-        android:background="@drawable/circle_button"
+        android:background="@drawable/circle_button_black"
         android:elevation="6dp"
-        android:src="@android:drawable/ic_menu_sort_by_size" />
+        android:src="@drawable/icon_leaderboard"
+        android:scaleType="fitCenter"/>
 
     <ImageButton
         android:id="@+id/my_codes_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignBottom="@+id/scan_qr_button"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="32dp"
         android:layout_toEndOf="@+id/scan_qr_button"
         android:layout_marginHorizontal="12dp"
-        android:background="@drawable/circle_button"
+        android:background="@drawable/circle_button_black"
         android:elevation="6dp"
-        android:src="@android:drawable/ic_menu_compass" />
+        android:src="@drawable/icon_my_profile"
+        android:scaleType="fitCenter"/>
 
     <ImageButton
         android:id="@+id/community_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignBottom="@+id/scan_qr_button"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="32dp"
         android:layout_toEndOf="@+id/my_codes_button"
         android:layout_marginHorizontal="12dp"
-        android:background="@drawable/circle_button"
+        android:background="@drawable/circle_button_black"
         android:elevation="6dp"
-        android:src="@android:drawable/ic_menu_share" />
+        android:src="@drawable/icon_search"
+        android:scaleType="fitCenter"/>
 
 </RelativeLayout>
