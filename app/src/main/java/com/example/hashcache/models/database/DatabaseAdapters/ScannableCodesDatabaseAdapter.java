@@ -34,7 +34,6 @@ import java.util.function.Function;
 public class ScannableCodesDatabaseAdapter {
     private FirebaseFirestore db;
     private CollectionReference collectionReference;
-    private HashMap<String, ScannableCode> cachedScannableCodes;
     final String TAG = "Sample";
     private ScannableCodeDocumentConverter scannableCodeDocumentConverter;
     private FireStoreHelper fireStoreHelper;
@@ -60,7 +59,6 @@ public class ScannableCodesDatabaseAdapter {
      */
     private ScannableCodesDatabaseAdapter(ScannableCodeDocumentConverter scannableCodeDocumentConverter,
                                           FireStoreHelper fireStoreHelper, FirebaseFirestore db) {
-        this.cachedScannableCodes = new HashMap<>();
         this.scannableCodeDocumentConverter = scannableCodeDocumentConverter;
         this.fireStoreHelper = fireStoreHelper;
         this.db = db;

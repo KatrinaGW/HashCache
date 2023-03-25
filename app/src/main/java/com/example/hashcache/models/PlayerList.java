@@ -43,6 +43,7 @@ public class PlayerList {
 
         return INSTANCE;
     }
+
     /**
      * Gets the singleton instance of the PlayerList with a given PlayersConnectionHandler
      *

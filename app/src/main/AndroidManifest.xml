@@ -36,7 +36,7 @@
         <activity android:name=".views.MyProfile"/>
         <activity android:name=".views.Community"/>
         <activity android:name=".views.QRByLocation"/>
-        <activity android:name=".views.Settings"/>
+        <activity android:name=".views.SettingsActivity"/>
         <activity android:name=".views.QRScanActivity"/>
         <activity android:name=".views.LeaderboardScoreActivity"/>
         <activity android:name=".views.LeaderboardRegionActivity"/>

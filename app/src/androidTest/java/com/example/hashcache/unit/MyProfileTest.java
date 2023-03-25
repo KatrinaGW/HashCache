@@ -4,8 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.widget.EditText;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -17,7 +15,7 @@ import com.example.hashcache.views.Community;
 import com.example.hashcache.views.MainActivity;
 import com.example.hashcache.views.MyProfile;
 import com.example.hashcache.views.QRStats;
-import com.example.hashcache.views.Settings;
+import com.example.hashcache.views.SettingsActivity;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;
@@ -65,7 +63,7 @@ public class MyProfileTest {
         solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
         solo.clickOnImageButton(0);
         solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", Settings.class);
+        solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
     }
 
     @Test

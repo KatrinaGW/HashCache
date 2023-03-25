@@ -14,6 +14,7 @@ public enum FieldNames {
     PHONE_NUMBER("phoneNumber"),
     RECORD_GEOLOCATION("recordGeoLocation"),
     USER_ID("userId"),
+    DEVICE_ID("deviceId"),
     COMMENTATOR_ID("commentatorId");
 
     public final String fieldName;

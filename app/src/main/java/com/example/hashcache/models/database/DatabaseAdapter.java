@@ -12,6 +12,7 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.DatabaseAdapters.LoginsAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
@@ -606,6 +607,45 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
                     });
         });
         return cf;
+    }
+
+    /**
+     * Sets the userId for the user who has logged in with a specified device. Will overwrite any
+     * existing login record for the device
+     * @param username the name to use for the login record
+     * @return cf the CompletableFuture which completes exceptionally if there was an error in setting
+     * up the record
+     */
+    @Override
+    public CompletableFuture<Void> addLoginRecord(String username){
+        return LoginsAdapter.getInstance().addLoginRecord(username);
+    }
+
+    /**
+     * Gets the username to use if the device has had a login before
+     * @return cf the CompletableFuture with the username of the associated user. Returns
+     * null if there is not a login entry for the specified device
+     */
+    public CompletableFuture<String> getUsernameForDevice(){
+        return LoginsAdapter.getInstance().getUsernameForDevice();
+    }
+
+    /**
+     * Remove the login record for the current device
+     * @return cf the CompletableFuture that completes exceptionally if the operation caused
+     * an error
+     */
+    public CompletableFuture<Void> deleteLogin(){
+        return LoginsAdapter.getInstance().deleteLogin();
+    }
+
+    /**
+     * Resets the static instances of the adapters
+     */
+    public void resetInstances(){
+        LoginsAdapter.resetInstance();
+        PlayersDatabaseAdapter.resetInstance();
+        ScannableCodesDatabaseAdapter.resetInstance();
     }
 
 }

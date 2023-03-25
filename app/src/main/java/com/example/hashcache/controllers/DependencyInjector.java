@@ -1,6 +1,7 @@
 package com.example.hashcache.controllers;
 
 import com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.LoginsAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.PlayerDocumentConverter;
@@ -39,6 +40,13 @@ public class DependencyInjector {
         }
 
         return scannableCodesDatabaseAdapter;
+    }
+
+    /**
+     * Creates the static instance of the Logins Adapter
+     */
+    public static void makeLoginsAdapter(){
+        LoginsAdapter.makeInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
     }
 
     /**

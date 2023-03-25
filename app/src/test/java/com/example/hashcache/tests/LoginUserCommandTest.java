@@ -6,16 +6,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.context.Context;
-import com.example.hashcache.controllers.AddUserCommand;
+import com.example.hashcache.controllers.LoginUserCommand;
+import com.example.hashcache.controllers.SetupUserCommand;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.DatabasePort;
+
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.concurrent.CompletableFuture;
 
-public class AddUserCommandTest {
+public class LoginUserCommandTest {
     DatabasePort mockDB;
     Context mockContext;
 
@@ -28,7 +31,10 @@ public class AddUserCommandTest {
     void loginUserTest(){
         String testUsername = "this is not a username";
         Player testPlayer = new Player(testUsername);
+        SetupUserCommand mockSetUpUserCommand = Mockito.mock(SetupUserCommand.class);
         CompletableFuture<Boolean> existsCF = new CompletableFuture<>();
+        CompletableFuture<Void> nullCF = new CompletableFuture<>();
+        nullCF.complete(null);
         existsCF.complete(true);
         CompletableFuture<Player> playerCF = new CompletableFuture<>();
         playerCF.complete(testPlayer);
@@ -38,11 +44,15 @@ public class AddUserCommandTest {
         when(mockDB.usernameExists(testUsername)).thenReturn(existsCF);
         when(mockDB.getIdByUsername(testUsername)).thenReturn(idCF);
         when(mockDB.getPlayer(testPlayer.getUserId())).thenReturn(playerCF);
+        when(mockSetUpUserCommand.setupUser(testUsername, mockDB, mockContext))
+                .thenReturn(nullCF);
 
-        AddUserCommand addUserCommand = new AddUserCommand();
+        LoginUserCommand loginUserCommand = new LoginUserCommand();
 
-        assertNull(addUserCommand.loginUser(testUsername, mockDB, mockContext).join());
+        assertNull(loginUserCommand.loginUser(testUsername, mockDB, mockContext, mockSetUpUserCommand)
+                .join());
 
-        verify(mockContext, times(1)).setCurrentPlayer(testPlayer);
+        verify(mockSetUpUserCommand, times(1)).setupUser(testUsername,
+                mockDB, mockContext);
     }
 }

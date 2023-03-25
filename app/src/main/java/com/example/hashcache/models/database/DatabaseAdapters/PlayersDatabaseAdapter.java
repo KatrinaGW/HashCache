@@ -124,7 +124,6 @@ public class PlayersDatabaseAdapter {
 
     /**
      * Resets the static INSTANCE to null.
-     * Should only be used for test purposes
      */
     public static void resetInstance() {
         INSTANCE = null;

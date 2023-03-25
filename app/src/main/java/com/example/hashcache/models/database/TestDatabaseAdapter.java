@@ -13,6 +13,8 @@ import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScann
 
 import org.checkerframework.checker.units.qual.C;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -492,5 +494,48 @@ public class TestDatabaseAdapter implements DatabasePort {
         cf.complete(count);
 
         return cf;
+    }
+
+    /**
+     * Sets the userId for the user who has logged in with a specified device. Will overwrite any
+     * existing login record for the device
+     * @param username the name to use for the login record
+     * @return cf the CompletableFuture which completes exceptionally if there was an error in setting
+     * up the record
+     */
+    @Override
+    public CompletableFuture<Void> addLoginRecord(String username){
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        cf.complete(null);
+        return cf;
+    }
+
+    /**
+     * Gets the username to use if the device has had a login before
+     * @return cf the CompletableFuture with the username of the associated user. Returns
+     * null if there is not a login entry for the specified device
+     */
+    public CompletableFuture<String> getUsernameForDevice(){
+        CompletableFuture<String> cf = new CompletableFuture<>();
+        cf.complete("Jean Val Jean");
+        return cf;
+    }
+
+    /**
+     * Remove the login record for the current device
+     * @return cf the CompletableFuture that completes exceptionally if the operation caused
+     * an error
+     */
+    public CompletableFuture<Void> deleteLogin(){
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        cf.complete(null);
+        return cf;
+    }
+
+    /**
+     * Resets the static instances of the adapters
+     */
+    public void resetInstances(){
+        return;
     }
 }

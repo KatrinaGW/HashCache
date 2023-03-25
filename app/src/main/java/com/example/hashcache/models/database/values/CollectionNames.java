@@ -10,6 +10,7 @@ public enum CollectionNames {
     CONTACT_INFO("contactInfo"),
     PLAYER_PREFERENCES("playerPreferences"),
     PLAYER_WALLET("playerWallet"),
+    LOGINS("logins"),
     COMMENTS("comments");
     public final String collectionName;
 
