@@ -16,6 +16,7 @@ import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
 import com.example.hashcache.R;
+import com.example.hashcache.context.Context;
 import com.example.hashcache.controllers.hashInfo.HashController;
 import com.example.hashcache.controllers.hashInfo.HashExceptions;
 import com.google.zxing.Result;
@@ -71,6 +72,9 @@ public class QRScanActivity extends AppCompatActivity {
                                     Toast.makeText(QRScanActivity.this, "Added QR code!", Toast.LENGTH_SHORT).show();
                                 }
                             });
+                            if ( Context.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference() ){
+
+                            }
                             Intent intent = new Intent(QRScanActivity.this, NewMonsterActivity.class);
                             startActivity(intent);
                         }).exceptionally(new Function<Throwable, Void>() {

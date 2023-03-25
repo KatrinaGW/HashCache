@@ -639,6 +639,8 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return LoginsAdapter.getInstance().deleteLogin();
     }
 
+    
+
     /**
      * Resets the static instances of the adapters
      */
