@@ -90,7 +90,9 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@color/HC_purple"
-            android:src="@android:drawable/ic_menu_compass"
+            android:src="@drawable/icon_star_one"
+            android:scaleType="fitCenter"
+            android:padding="6dp"
             android:layout_centerVertical="true" />
         <TextView
             android:id="@+id/user_one"
@@ -142,7 +144,9 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@color/HC_purple"
-            android:src="@android:drawable/ic_menu_compass"
+            android:src="@drawable/icon_star_two"
+            android:scaleType="fitCenter"
+            android:padding="6dp"
             android:layout_centerVertical="true" />
         <TextView
             android:id="@+id/user_two"
@@ -252,7 +256,9 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@color/HC_purple"
-            android:src="@android:drawable/ic_menu_compass"
+            android:src="@drawable/icon_star_three"
+            android:scaleType="fitCenter"
+            android:padding="6dp"
             android:layout_centerVertical="true" />
         <TextView
             android:id="@+id/user_three"
