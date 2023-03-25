@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import android.media.Image;
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
@@ -125,7 +126,6 @@ public class PlayersDatabaseAdapter {
 
     /**
      * Resets the static INSTANCE to null.
-     * Should only be used for test purposes
      */
     public static void resetInstance() {
         INSTANCE = null;
@@ -404,6 +404,12 @@ private CompletableFuture<Boolean> setPlayerPreferences(DocumentReference player
         return cf;
     }
 
+    /**
+     * Setup a listener that notifies observers when the player document is changed in the database
+     * @param userId the id of the player to be listening to
+     * @param callback called once the player's data has been updated
+     * @return registration the ListenerRegistration of the now registered listener
+     */
     public ListenerRegistration setupPlayerListener(String userId, GetPlayerCallback callback) {
         final DocumentReference documentReference = collectionReference.document(userId);
         ListenerRegistration registration = documentReference.addSnapshotListener((snapshot, e) -> {
@@ -510,6 +516,81 @@ private CompletableFuture<Boolean> setPlayerPreferences(DocumentReference player
         return cf;
     }
 
+    /**
+     * Get all the usernames for the users in a given list of ids
+     * @param userIds the ids of the users whose usernames are wanted
+     * @return userIdsNamesCF the completableFuture with the usernames and userIds of the
+     * specified users
+     */
+    public CompletableFuture<ArrayList<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds){
+        CompletableFuture<ArrayList<Pair<String, String>>> userIdsNamesCF = new CompletableFuture<>();
+        ArrayList<Pair<String, String>> userIdsNames = new ArrayList<>();
+
+        ArrayList<CompletableFuture<Pair<String, String>>> futureCfs = new ArrayList<>();
+
+        for(String userId : userIds){
+            futureCfs.add(getUsernameById(userId));
+        }
+
+        if(futureCfs.size()>0){
+            CompletableFuture.allOf(futureCfs.toArray(new CompletableFuture[futureCfs.size()]))
+                    .thenAccept(voidValue -> {
+                        futureCfs.stream()
+                                .forEach(cf -> {
+                                    userIdsNames.add(cf.join());
+                                });
+                        userIdsNamesCF.complete(userIdsNames);
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            userIdsNamesCF.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        }else{
+            userIdsNamesCF.complete(userIdsNames);
+        }
+
+        return userIdsNamesCF;
+    }
+
+    /**
+     * Gets the username of a player with a given userid
+     * @param userId the userid of the player whose username is needed
+     * @return cf the CompletableFuture with the specified user's username paired with their id
+     */
+    public CompletableFuture<Pair<String, String>> getUsernameById(String userId){
+        CompletableFuture<Pair<String, String>>  cf = new CompletableFuture<>();
+
+        fireStoreHelper.documentWithIDExists(collectionReference, userId)
+                .thenAccept(exists -> {
+                    if(exists){
+                        collectionReference.document(userId).get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            cf.complete(new Pair<String, String>(userId,
+                                                    task.getResult().get(FieldNames.USERNAME.fieldName).toString()));
+                                        } else {
+                                            cf.completeExceptionally(new Exception("Something went wrong" +
+                                                    "in getUsernameById"));
+                                        }
+                                    }
+                                });
+                    }else{
+                        cf.completeExceptionally(new Exception("No player exists with given userId!"));
+                    }
+                }).exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        cf.completeExceptionally(throwable);
+                        return null;
+                    }
+                });
+        return cf;
+    }
 
     /**
      * Gets the number of players who have scanned a specific QR code

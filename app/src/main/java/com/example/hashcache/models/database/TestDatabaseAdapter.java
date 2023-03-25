@@ -1,5 +1,7 @@
 package com.example.hashcache.models.database;
 
+import android.util.Pair;
+
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
@@ -7,9 +9,15 @@ import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+
+import org.checkerframework.checker.units.qual.C;
+
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -380,6 +388,55 @@ public class TestDatabaseAdapter implements DatabasePort {
     }
 
     /**
+     * Gets the username of a player with a given userid
+     * @param userId the userid of the player whose username is needed
+     * @return cf the CompletableFuture with the specified user's username paired with their id
+     */
+    @Override
+    public CompletableFuture<Pair<String, String>> getUsernameById(String userId){
+        CompletableFuture<Pair<String, String>> cf = new CompletableFuture();
+        if (players.containsKey(userId)){
+            cf.complete(new Pair<String, String>(userId, players.get(userId).getUsername()));
+        }else{
+            cf.completeExceptionally(new Exception("No player exists with that userid!"));
+        }
+
+        return cf;
+    }
+
+    /**
+     * Get all the usernames for the users in a given list of ids
+     * @param userIds the ids of the users whose usernames are wanted
+     * @return userIdsNamesCF the completableFuture with the usernames and userIds of the
+     * specified users
+     */
+    @Override
+    public CompletableFuture<ArrayList<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds){
+        ArrayList<Pair<String, String>> userIdsNames = new ArrayList<>();
+        CompletableFuture<ArrayList<Pair<String, String>>> userIdsNamesCF = new CompletableFuture<>();
+
+        for(String userId : userIds){
+            if(players.containsKey(userId)){
+                userIdsNames.add(new Pair<String, String>(userId, players.get(userId).getUsername()));
+            }
+        }
+
+        userIdsNamesCF.complete(userIdsNames);
+
+        return userIdsNamesCF;
+    }
+
+    /**
+     * Called when a scannableCodeChanges
+     * @param scannableCodeId the id of the scannable code that changed
+     * @param callback the callback to call once the changes have been processed
+     */
+    @Override
+    public void onScannableCodeCommentsChanged(String scannableCodeId, GetScannableCodeCallback callback){
+        return;
+    }
+
+    /**
      * Gets the total score of all scannableCodeIds in a list
      * @param scannableCodeIds the ids of codes to sum
      * @return cf the CompletableFuture that contains the total score
@@ -447,5 +504,48 @@ public class TestDatabaseAdapter implements DatabasePort {
         });
 
         return cf;
+    }
+    
+    /**
+     * Sets the userId for the user who has logged in with a specified device. Will overwrite any
+     * existing login record for the device
+     * @param username the name to use for the login record
+     * @return cf the CompletableFuture which completes exceptionally if there was an error in setting
+     * up the record
+     */
+    @Override
+    public CompletableFuture<Void> addLoginRecord(String username){
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        cf.complete(null);
+        return cf;
+    }
+
+    /**
+     * Gets the username to use if the device has had a login before
+     * @return cf the CompletableFuture with the username of the associated user. Returns
+     * null if there is not a login entry for the specified device
+     */
+    public CompletableFuture<String> getUsernameForDevice(){
+        CompletableFuture<String> cf = new CompletableFuture<>();
+        cf.complete("Jean Val Jean");
+        return cf;
+    }
+
+    /**
+     * Remove the login record for the current device
+     * @return cf the CompletableFuture that completes exceptionally if the operation caused
+     * an error
+     */
+    public CompletableFuture<Void> deleteLogin(){
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        cf.complete(null);
+        return cf;
+    }
+
+    /**
+     * Resets the static instances of the adapters
+     */
+    public void resetInstances(){
+        return;
     }
 }

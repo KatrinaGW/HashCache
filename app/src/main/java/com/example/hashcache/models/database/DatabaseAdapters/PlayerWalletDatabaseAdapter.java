@@ -54,7 +54,6 @@ public class PlayerWalletDatabaseAdapter {
      * @return the listener now attached to the user's wallet
      */
     public ListenerRegistration getPlayerWalletChangeListener(String userId, BooleanCallback callback) {
-        CompletableFuture<ArrayList<String>> cf = new CompletableFuture<>();
         CollectionReference scannedCodeCollection = db.collection(CollectionNames.PLAYERS.collectionName)
                 .document(userId)
                 .collection(CollectionNames.PLAYER_WALLET.collectionName);
@@ -68,6 +67,13 @@ public class PlayerWalletDatabaseAdapter {
 
     public PlayerWalletDatabaseAdapter(FirebaseFirestore db) {
         this.db = db;
+    }
+
+    /**
+     * Resets the static instance to null
+     */
+    public void resetInstance(){
+        INSTANCE = null;
     }
 
     public static PlayerWalletDatabaseAdapter getInstance(FireStoreHelper fireStoreHelper) {

@@ -4,8 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.widget.EditText;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -19,11 +17,8 @@ import com.example.hashcache.views.LeaderboardScoreActivity;
 import com.example.hashcache.views.LeaderboardTopQRActivity;
 import com.example.hashcache.views.MainActivity;
 import com.example.hashcache.views.MyProfile;
-import com.example.hashcache.views.QRByLocation;
-import com.example.hashcache.views.QRScanActivity;
 import com.example.hashcache.views.QRStats;
 import com.example.hashcache.R;
-import com.example.hashcache.views.Settings;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;

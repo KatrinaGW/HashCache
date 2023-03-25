@@ -17,17 +17,18 @@ package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.controllers.LogoutCommand;
+import com.example.hashcache.controllers.ResetCommand;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.context.Context;
@@ -42,13 +43,14 @@ import java.util.Observer;
  and allows them to toggle their location settings on and off, as well as edit their username and contact information.
  Additional buttons permit navigation to other pages within the application.
  */
-public class Settings extends AppCompatActivity implements Observer {
+public class SettingsActivity extends AppCompatActivity implements Observer {
     private TextView usernameView;
     private TextView phoneNumberView;
     private TextView emailView;
     private CheckBox geoLocationPreferenceCheckbox;
     private ImageView editInfoButton;
     private ImageButton menuButton;
+    private Button logoutButton;
     /**
      * Called when the activity is starting. Initializes the activity and its associated layout.
      *
@@ -65,6 +67,7 @@ public class Settings extends AppCompatActivity implements Observer {
         emailView = findViewById(R.id.email_textview);
         geoLocationPreferenceCheckbox = findViewById(R.id.geolocation_checkbox);
         editInfoButton = findViewById(R.id.edit_info_image);
+        logoutButton = findViewById(R.id.logout_button);
 
         geoLocationPreferenceCheckbox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +79,14 @@ public class Settings extends AppCompatActivity implements Observer {
         editInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(Settings.this, EditPlayerInfoActivity.class));
+                startActivity(new Intent(SettingsActivity.this, EditPlayerInfoActivity.class));
+            }
+        });
+
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onLogoutClicked();
             }
         });
 
@@ -97,6 +107,14 @@ public class Settings extends AppCompatActivity implements Observer {
         super.onResume();
 
         setValues();
+    }
+
+    private void onLogoutClicked(){
+        LogoutCommand.logout(Database.getInstance())
+                .thenAccept(nullValue -> {
+                    ResetCommand.reset();
+                    startActivity(new Intent(SettingsActivity.this, MainActivity.class));
+                });
     }
 
     private void setValues(){

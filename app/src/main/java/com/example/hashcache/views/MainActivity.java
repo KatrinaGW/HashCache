@@ -7,24 +7,26 @@
 package com.example.hashcache.views;
 
 import static com.example.hashcache.controllers.DependencyInjector.getOrMakeScannableCodesConnectionHandler;
+import static com.example.hashcache.controllers.DependencyInjector.makeLoginsAdapter;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.hashcache.R;
-import com.example.hashcache.controllers.AddUserCommand;
+import com.example.hashcache.controllers.LoginUserCommand;
+import com.example.hashcache.controllers.SetupUserCommand;
+import com.example.hashcache.controllers.checkLoginCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.context.Context;
-import com.example.hashcache.models.database.DatabaseAdapter;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
@@ -43,7 +45,7 @@ import java.io.InputStream;
 
  @see FirebaseOptions.Builder
 
- @see AddUserCommand
+ @see LoginUserCommand
 
  @see PlayerList
  */
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     PlayerList playerList;
     EditText usernameEditText;
-    AddUserCommand addUserCommand;
+    LoginUserCommand loginUserCommand;
     /**
 
      onCreate method is called when the activity is created.
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
      @see FirebaseOptions.Builder
 
-     @see AddUserCommand
+     @see LoginUserCommand
 
      @see PlayerList
 
@@ -86,8 +88,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
 
         boolean hasBeenInitialized=false;
         List<FirebaseApp> firebaseApps = FirebaseApp.getApps(getApplicationContext());
@@ -109,14 +109,42 @@ public class MainActivity extends AppCompatActivity {
         Context.get();
 
         getOrMakeScannableCodesConnectionHandler();
-        // Initializes the AddUserCommand and PlayerList instances
-        addUserCommand = new AddUserCommand();
+        makeLoginsAdapter();
 
+        Context.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ANDROID_ID));
+        loginUserCommand = new LoginUserCommand();
         playerList = PlayerList.getInstance();
+        checkDeviceId();
+    }
 
+    private void checkDeviceId(){
+        checkLoginCommand.checkLogin(loginUserCommand)
+                .thenAccept(existed -> {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(!existed){
+                                newUserLoginProcess();
+                            }else{
+                                startActivity(new Intent(MainActivity.this, AppHome.class));
+                            }
+                        }
+                    });
+                })
+                .exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        return null;
+                    }
+                });
+    }
+
+    private void newUserLoginProcess(){
         // add functionality to start button
         AppCompatButton startButton = findViewById(R.id.start_button);
         usernameEditText = findViewById(R.id.username_edittext);
+        usernameEditText.setVisibility(View.VISIBLE);
 
         // Gets input stream to names.csv which is used for name generation
         InputStream is;
@@ -126,30 +154,21 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                addUserCommand.loginUser(getUsername(), Database.getInstance(), Context.get())
+                loginUserCommand.loginUser(getUsername(), Database.getInstance(), Context.get(),
+                                 new SetupUserCommand())
                         .thenAccept(res -> {
                             Intent goHome = new Intent(MainActivity.this, AppHome.class);
 
                             Database.getInstance().getPlayers().thenAccept(players -> {
 
-                                Database.getInstance().getNumPlayersWithScannableCode("31136a180fe960a8d753595ff3208fd0aeab6eb837c27c678d57dd22949cc95e")
-                                                .thenAccept(count -> {
-                                                    startActivity(goHome);
-                                                });
-
-
+                                startActivity(goHome);
                             });
 
-                }).exceptionally(new Function<Throwable, Void>() {
-                    @Override
-                    public Void apply(Throwable throwable) {
-                        // display some error on the screen
-                        return null;
-                    }
-                });
+                        });
             }
         });
     }
+
     /**
      * Sets the listener for the start button.
      *
@@ -157,7 +176,9 @@ public class MainActivity extends AppCompatActivity {
      * @see View.OnClickListener
      */
     public void setStartBtnListener(View.OnClickListener listeners) {
-        findViewById(R.id.start_button).setOnClickListener(listeners);
+        Button startCachingButton = findViewById(R.id.start_button);
+        startCachingButton.setVisibility(View.VISIBLE);
+        startCachingButton.setOnClickListener(listeners);
     }
     /**
      * Gets the username entered by the user.

@@ -1,10 +1,16 @@
 package com.example.hashcache.context;
 
+import android.provider.Settings;
+
+import androidx.lifecycle.Observer;
+import android.util.Log;
+
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 
 import java.util.Observable;
 
@@ -18,6 +24,7 @@ public class Context extends Observable {
 
     boolean isLoggedIn;
     private Player currentPlayer;
+    private String deviceId;
     private Player selectedPlayer;
     private ScannableCode currentScannableCode = new ScannableCode();
     private ScannableCode lowestScannableCode = new ScannableCode();
@@ -38,6 +45,16 @@ public class Context extends Observable {
             }
         }
         return instance;
+    }
+
+    /**
+     * Resets the context after a logout
+     */
+    public void resetContext(){
+        deleteObservers();
+        this.currentScannableCode = null;
+        this.currentPlayer = null;
+        this.deviceId = null;
     }
 
 
@@ -69,10 +86,18 @@ public class Context extends Observable {
     /**
      * Sets the selected scannable code
      * 
-     * @param currentScannableCode the scananbleCode to set as selected
+     * @param newCurrentScannableCode the scananbleCode to set as selected
      */
-    public void setCurrentScannableCode(ScannableCode currentScannableCode) {
-        this.currentScannableCode = currentScannableCode;
+    public void setCurrentScannableCode(ScannableCode newCurrentScannableCode) {
+        if(newCurrentScannableCode!=null&&(this.currentScannableCode==null||
+                !this.currentScannableCode.getScannableCodeId()
+                        .equals(newCurrentScannableCode.getScannableCodeId()))){
+            this.currentScannableCode = newCurrentScannableCode;
+            this.setUpScannableCodeCommentListener();
+        }else{
+            this.currentScannableCode = newCurrentScannableCode;
+        }
+
     }
 
     private void setHighestScannableCode(ScannableCode scanCode) {
@@ -93,6 +118,40 @@ public class Context extends Observable {
 
     public ScannableCode getCurrentScannableCode() {
         return currentScannableCode;
+    }
+
+    /**
+     * Sets the device Id for this app session
+     * @param deviceId the id of the device being used
+     */
+    public void setDeviceId(String deviceId){
+        this.deviceId = deviceId;
+    }
+
+    /**
+     * Gets the device Id for this app session
+     * @return the id of the deivce being used
+     */
+    public String getDeviceId(){
+        return this.deviceId;
+    }
+
+    private void setUpScannableCodeCommentListener(){
+        if(currentScannableCode!=null){
+            String scananbleCodeId = getCurrentScannableCode().getScannableCodeId();
+            Database.getInstance().onScannableCodeCommentsChanged(scananbleCodeId, new GetScannableCodeCallback() {
+                @Override
+                public void onCallback(ScannableCode scannableCode) {
+                    if(scannableCode != null &&
+                            scannableCode.getScannableCodeId().equals(currentScannableCode.getScannableCodeId())){
+                        Log.d("Context.onScannableCodeCommentsChanged", "notifying observers");
+                        setCurrentScannableCode(scannableCode);
+                        setChanged();
+                        notifyObservers();
+                    }
+                }
+            });
+        }
     }
 
     public void setupListeners() {

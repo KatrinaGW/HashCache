@@ -1,5 +1,9 @@
 package com.example.hashcache.models.database;
 
+import android.util.Pair;
+
+import java.lang.reflect.Array;
+import java.util.List;
 import java.util.Observable;
 
 import com.example.hashcache.controllers.hashInfo.ImageGenerator;
@@ -8,11 +12,13 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.DatabaseAdapters.LoginsAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
+import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
@@ -43,6 +49,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
 
     private ListenerRegistration playerListener;
     private ListenerRegistration walletListener;
+    private ListenerRegistration scannableCodeListener;
 
     /**
      * Checks if a username already exists in the database.
@@ -425,6 +432,18 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     }
 
     /**
+     * Called when a scannableCodeComment changes
+     * @param scannableCodeId the id of the scannable code that changed
+     * @param callback the callback to call once the changes have been processed
+     */
+    @Override
+    public void onScannableCodeCommentsChanged(String scannableCodeId, GetScannableCodeCallback callback){
+        scannableCodeListener = ScannableCodesDatabaseAdapter.getInstance().setUpScannableCodeCommentsListener(
+                scannableCodeId, callback
+        );
+    }
+
+    /**
      * Deletes a comment from a scananble code
      * @param scannableCodeId the id of the scannable code to delete the comment from
      * @param commentId the id of the comment to delete
@@ -546,6 +565,27 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     }
 
     /**
+     * Gets the username of a player with a given userid
+     * @param userId the userid of the player whose username is needed
+     * @return cf the CompletableFuture with the specified user's username paired with their id
+     */
+    @Override
+    public CompletableFuture<Pair<String, String>> getUsernameById(String userId){
+        return PlayersDatabaseAdapter.getInstance().getUsernameById(userId);
+    }
+
+    /**
+     * Get all the usernames for the users in a given list of ids
+     * @param userIds the ids of the users whose usernames are wanted
+     * @return the completableFuture with the usernames and userIds of the
+     * specified users
+     */
+    @Override
+    public CompletableFuture<ArrayList<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds){
+        return PlayersDatabaseAdapter.getInstance().getUsernamesByIds(userIds);
+    }
+    
+    /**
      * Gets the number of players with the specified scananble code id in their wallets
      * @param scannableCodeId the id of the scannable code to look for
      * @return a completableFuture with the number of players who have the scannablecode
@@ -579,5 +619,42 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return cf;
     }
 
+    /**
+     * Sets the userId for the user who has logged in with a specified device. Will overwrite any
+     * existing login record for the device
+     * @param username the name to use for the login record
+     * @return cf the CompletableFuture which completes exceptionally if there was an error in setting
+     * up the record
+     */
+    @Override
+    public CompletableFuture<Void> addLoginRecord(String username){
+        return LoginsAdapter.getInstance().addLoginRecord(username);
+    }
 
+    /**
+     * Gets the username to use if the device has had a login before
+     * @return cf the CompletableFuture with the username of the associated user. Returns
+     * null if there is not a login entry for the specified device
+     */
+    public CompletableFuture<String> getUsernameForDevice(){
+        return LoginsAdapter.getInstance().getUsernameForDevice();
+    }
+
+    /**
+     * Remove the login record for the current device
+     * @return cf the CompletableFuture that completes exceptionally if the operation caused
+     * an error
+     */
+    public CompletableFuture<Void> deleteLogin(){
+        return LoginsAdapter.getInstance().deleteLogin();
+    }
+
+    /**
+     * Resets the static instances of the adapters
+     */
+    public void resetInstances(){
+        LoginsAdapter.resetInstance();
+        PlayersDatabaseAdapter.resetInstance();
+        ScannableCodesDatabaseAdapter.resetInstance();
+    }
 }
