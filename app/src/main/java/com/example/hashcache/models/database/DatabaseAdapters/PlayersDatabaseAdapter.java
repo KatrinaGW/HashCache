@@ -441,13 +441,11 @@ private CompletableFuture<Boolean> setPlayerPreferences(DocumentReference player
     public CompletableFuture<String> createPlayer(String username) {
         CompletableFuture<String> cf = new CompletableFuture<>();
         HashMap<String, String> data = new HashMap<>();
-        HashMap<String, Integer> numData = new HashMap<>();
         data.put(FieldNames.USERNAME.fieldName, username);
         data.put(FieldNames.EMAIL.fieldName, "");
         data.put(FieldNames.PHONE_NUMBER.fieldName, "");
         data.put(FieldNames.RECORD_GEOLOCATION.fieldName, "");
 
-        numData.put(FieldNames.QR_COUNT.fieldName, 0);
 
         String userId = UUID.randomUUID().toString();
 
