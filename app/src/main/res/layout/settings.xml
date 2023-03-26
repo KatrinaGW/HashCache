@@ -8,7 +8,9 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:background="@drawable/circle_button"
-        android:src="@android:drawable/ic_menu_edit"
+        android:src="@drawable/icon_edit"
+        android:scaleType="fitCenter"
+        android:padding="6dp"
         android:layout_centerHorizontal="true"
         android:clickable="true"
         android:onClick="onClick"
@@ -77,10 +79,12 @@
         android:id="@+id/logout_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_rect_green"
+        android:background="@drawable/rounded_rect_purple"
         android:layout_below="@+id/geolocation_checkbox"
         android:layout_centerHorizontal="true"
-        android:text="LOGOUT"/>
+        android:text="LOGOUT"
+        android:padding="14dp"
+        android:textSize="18sp"/>
 
     <ImageButton
         android:id="@+id/menu_button"
