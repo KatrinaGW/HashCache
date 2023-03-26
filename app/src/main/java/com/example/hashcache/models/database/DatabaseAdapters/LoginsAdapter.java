@@ -87,8 +87,13 @@ public class LoginsAdapter {
 
         CompletableFuture.runAsync(() -> {
             fireStoreHelper.setDocumentReference(collectionReference.document(deviceId), data)
-                    .thenAccept(nullValue -> {
-                        cf.complete(null);
+                    .thenAccept(complete -> {
+                        if(complete){
+                            cf.complete(null);
+                        }else{
+                            cf.completeExceptionally(new Exception("Something went wrong while adding" +
+                                    "a login record"));
+                        }
                     })
                     .exceptionally(new Function<Throwable, Void>() {
                         @Override
@@ -125,7 +130,7 @@ public class LoginsAdapter {
                                                             .get((FieldNames.USERNAME.fieldName)));
                                                 } else {
                                                     cf.completeExceptionally(new Exception(
-                                                            "Something went wrong while getting the" +
+                                                            "Something went wrong while getting the " +
                                                                     "username from the deviceId record"
                                                     ));
                                                 }
