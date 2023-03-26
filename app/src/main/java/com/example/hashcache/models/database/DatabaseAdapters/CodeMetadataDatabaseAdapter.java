@@ -82,6 +82,21 @@ public class CodeMetadataDatabaseAdapter {
         return INSTANCE;
     }
 
+
+    /**
+     * Get the singleton instance of the CodeMetadataDatabaseAdapter
+     * @return INSTANCE the singleton instance of the CodeMetadataDatabaseAdapter
+     * @throws IllegalArgumentException if the CodeMetadataDatabaseAdapter instance hasn't
+     * been initialized yet
+     */
+    public static CodeMetadataDatabaseAdapter getInstance(){
+        if(INSTANCE == null){
+            throw new IllegalArgumentException("CodeMetadataDatabaseAdapter INSTANCE does" +
+                    "not exist!");
+        }
+        return INSTANCE;
+    }
+
     // Based on:
     // https://firebase.google.com/docs/firestore/solutions/geoqueries#java
     public CompletableFuture<Void> createScannableCodeMetadata(CodeMetadata codeMetadata) {
