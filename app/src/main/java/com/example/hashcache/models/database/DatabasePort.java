@@ -12,6 +12,7 @@ import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+import com.firebase.geofire.GeoLocation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,12 +55,7 @@ public interface DatabasePort {
     CompletableFuture<Void> addLoginRecord(String username);
 
     CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata);
-
-    CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata);
-
-    CompletableFuture<CodeMetadata[]> getScannableCodesWithinRadius(Location location, double radius);
-
-    CompletableFuture<CodeMetadata[]> getScannableCodesWithinRadius(Location location, double radius);
+    CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation location, double radiusMeters);
 
     CompletableFuture<String> getUsernameForDevice();
     CompletableFuture<Void> deleteLogin();

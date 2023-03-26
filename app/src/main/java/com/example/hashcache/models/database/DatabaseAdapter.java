@@ -11,6 +11,7 @@ import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.LoginsAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
@@ -18,6 +19,7 @@ import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanC
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+import com.firebase.geofire.GeoLocation;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
@@ -624,9 +626,10 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     public CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata){
         return null;
     }
+
     @Override
-    public CompletableFuture<CodeMetadata[]> getScannableCodesWithinRadius(Location location, double radius){
-        return null;
+    public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation location, double radiusMeters) {
+        return CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataWithinRadius(location, radiusMeters);
     }
 
     /**

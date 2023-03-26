@@ -1,7 +1,9 @@
 package com.example.hashcache.models.database;
 
+import android.location.Location;
 import android.util.Pair;
 
+import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
@@ -10,6 +12,7 @@ import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+import com.firebase.geofire.GeoLocation;
 
 import org.checkerframework.checker.units.qual.C;
 
@@ -509,6 +512,17 @@ public class TestDatabaseAdapter implements DatabasePort {
         cf.complete(null);
         return cf;
     }
+
+    @Override
+    public CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation location, double radiusMeters) {
+        return null;
+    }
+
 
     /**
      * Gets the username to use if the device has had a login before
