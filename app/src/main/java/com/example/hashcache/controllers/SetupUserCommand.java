@@ -23,7 +23,7 @@ public class SetupUserCommand {
         db.getIdByUsername(userName).thenAccept(userId -> {
             db.getPlayer(userId).thenAccept(player -> {
 
-                AddLoginCommand.addLogin(userName, context, db)
+                AddLoginCommand.addLogin(userName, db)
                         .thenAccept(nullValue -> {
                             context.setCurrentPlayer(player);
                             context.setupListeners();

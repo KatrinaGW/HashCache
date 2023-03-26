@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class AddLoginCommand {
-    public static CompletableFuture<Void> addLogin(String username, Context context, DatabasePort
+    public static CompletableFuture<Void> addLogin(String username, DatabasePort
                                                    db){
         CompletableFuture<Void> cf = new CompletableFuture<>();
 
