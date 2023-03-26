@@ -27,8 +27,11 @@ import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.context.Context;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 import java.util.function.Function;
@@ -110,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
         getOrMakeScannableCodesConnectionHandler();
         makeLoginsAdapter();
+        CodeMetadataDatabaseAdapter.makeInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
 
         Context.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID));
