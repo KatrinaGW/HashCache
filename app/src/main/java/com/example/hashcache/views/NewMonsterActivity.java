@@ -57,6 +57,7 @@ public class NewMonsterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // go to activity to take location photo
+                startActivity(new Intent(NewMonsterActivity.this, MyCameraActivity.class));
             }
         });
 
