@@ -523,6 +523,11 @@ public class TestDatabaseAdapter implements DatabasePort {
         return null;
     }
 
+    @Override
+    public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesWithinRadius(GeoLocation location, double radiusMeters) {
+        return null;
+    }
+
 
     /**
      * Gets the username to use if the device has had a login before

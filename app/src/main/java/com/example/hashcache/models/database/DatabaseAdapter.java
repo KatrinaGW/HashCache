@@ -3,6 +3,8 @@ package com.example.hashcache.models.database;
 import android.location.Location;
 import android.util.Pair;
 
+import java.lang.reflect.Array;
+import java.util.HashSet;
 import java.util.Observable;
 
 import com.example.hashcache.models.CodeMetadata;
@@ -24,6 +26,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -630,6 +633,37 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     @Override
     public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation location, double radiusMeters) {
         return CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataWithinRadius(location, radiusMeters);
+    }
+
+    @Override
+    public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesWithinRadius(GeoLocation location, double radiusMeters) {
+        CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(new Runnable() {
+            @Override
+            public void run() {
+                CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataWithinRadius(location, radiusMeters).thenAccept(cms -> {
+                    HashSet<String> scannableCodeIds = new HashSet<>();
+                    cms.forEach(cm -> {
+                        scannableCodeIds.add(cm.getScannableCodeId());
+                    });
+                    ArrayList<String> scannableCodeArray = new ArrayList<>();
+                    for(String id: scannableCodeIds){
+                        scannableCodeArray.add(id);
+                    }
+                    getScannableCodesByIdInList(scannableCodeArray).thenAccept(scodes -> {
+                        cf.complete(scodes);
+                    }).exceptionally(throwable -> {
+                        cf.completeExceptionally(throwable);
+                        return null;
+                    });
+
+                }).exceptionally(throwable -> {
+                    cf.completeExceptionally(throwable);
+                    return null;
+                });
+            }
+        });
+        return cf;
     }
 
     /**
