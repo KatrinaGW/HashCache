@@ -2,16 +2,23 @@ package com.example.hashcache.controllers;
 
 import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.database.DatabasePort;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-public class checkLoginCommand {
-    public static CompletableFuture<Boolean> checkLogin(LoginUserCommand loginUserCommand){
-        SetupUserCommand setupUserCommand = new SetupUserCommand();
+public class CheckLoginCommand {
+
+    /**
+     * Checks if the device has a login record for a specific user
+     * @param db the instance of the DatabasePort to use
+     * @param setupUserCommand the instance of the SetUpUserCommand to use
+     * @return cf the CompletableFuture which returns true if the device has a login and false otherwise
+     */
+    public static CompletableFuture<Boolean> checkLogin(DatabasePort db, SetupUserCommand setupUserCommand){
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            Database.getInstance().getUsernameForDevice()
+            db.getUsernameForDevice()
                     .thenAccept(username -> {
                         if(username!=null){
                             setupUserCommand.setupUser(username, Database.getInstance(), Context.get())
