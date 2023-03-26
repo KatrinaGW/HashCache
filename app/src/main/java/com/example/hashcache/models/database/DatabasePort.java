@@ -1,7 +1,9 @@
 package com.example.hashcache.models.database;
 
+import android.location.Location;
 import android.util.Pair;
 
+import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
@@ -50,6 +52,15 @@ public interface DatabasePort {
     CompletableFuture<Pair<String, String>> getUsernameById(String userId);
     CompletableFuture<Integer> getNumPlayersWithScannableCode(String scannableCodeId);
     CompletableFuture<Void> addLoginRecord(String username);
+
+    CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata);
+
+    CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata);
+
+    CompletableFuture<CodeMetadata[]> getScannableCodesWithinRadius(Location location, double radius);
+
+    CompletableFuture<CodeMetadata[]> getScannableCodesWithinRadius(Location location, double radius);
+
     CompletableFuture<String> getUsernameForDevice();
     CompletableFuture<Void> deleteLogin();
     void resetInstances();

@@ -1,12 +1,11 @@
 package com.example.hashcache.models.database;
 
+import android.location.Location;
 import android.util.Pair;
 
-import java.lang.reflect.Array;
-import java.util.List;
 import java.util.Observable;
 
-import com.example.hashcache.controllers.hashInfo.ImageGenerator;
+import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
@@ -619,6 +618,15 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     @Override
     public CompletableFuture<Void> addLoginRecord(String username){
         return LoginsAdapter.getInstance().addLoginRecord(username);
+    }
+
+    @Override
+    public CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata){
+        return null;
+    }
+    @Override
+    public CompletableFuture<CodeMetadata[]> getScannableCodesWithinRadius(Location location, double radius){
+        return null;
     }
 
     /**
