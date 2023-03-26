@@ -126,10 +126,10 @@ public class CodeMetadataDatabaseAdapter {
 
     // Based on:
     // https://firebase.google.com/docs/firestore/solutions/geoqueries#java
-    public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(Location loc, double radiusMeters) {
+    public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation loc, double radiusMeters) {
         CompletableFuture<ArrayList<CodeMetadata>> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            final GeoLocation center = new GeoLocation(loc.getLatitude(), loc.getLongitude());
+            final GeoLocation center = new GeoLocation(loc.latitude, loc.longitude);
             List<GeoQueryBounds> bounds = GeoFireUtils.getGeoHashQueryBounds(center, radiusMeters);
             final List<Task<QuerySnapshot>> tasks = new ArrayList<>();
             for (GeoQueryBounds b : bounds) {
