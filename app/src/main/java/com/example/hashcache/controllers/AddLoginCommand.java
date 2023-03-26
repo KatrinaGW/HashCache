@@ -10,6 +10,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class AddLoginCommand {
+    /**
+     * Adds a login record to the DB for the current device and user
+     * @param username the username to attach to the device id
+     * @param db the instance of the DatabasePort to use
+     * @return cf a CompletableFuture that completes exceptionally if there is a problem
+     */
     public static CompletableFuture<Void> addLogin(String username, DatabasePort
                                                    db){
         CompletableFuture<Void> cf = new CompletableFuture<>();
