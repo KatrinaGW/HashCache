@@ -5,16 +5,20 @@
 package com.example.hashcache.views;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
+import android.Manifest;
 import com.example.hashcache.R;
 import com.example.hashcache.context.Context;
 import com.example.hashcache.controllers.hashInfo.HashController;
@@ -116,6 +120,10 @@ public class QRScanActivity extends AppCompatActivity {
                 mCodeScanner.startPreview();
             }
         });
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED){
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, 10);
+        }
     }
     /**
      * Called when the activity is resumed.
