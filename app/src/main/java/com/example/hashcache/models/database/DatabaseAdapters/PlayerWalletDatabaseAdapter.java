@@ -208,7 +208,6 @@ public class PlayerWalletDatabaseAdapter {
                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
                                        @Override
                                        public void onSuccess(Void aVoid) {
-                                           Log.d(TAG, "DocumentSnapshot successfully deleted!");
                                            cf.complete(true);
                                        }
                                    })
