@@ -40,8 +40,10 @@
             android:id="@+id/score_icon"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@color/HC_light_grey"
-            android:src="@android:drawable/ic_btn_speak_now"
+            android:background="@color/HC_light_green"
+            android:src="@drawable/icon_sum"
+            android:scaleType="fitCenter"
+            android:padding="10dp"
             android:layout_centerVertical="true"/>
         <TextView
             android:id="@+id/total_score_textview"
@@ -82,8 +84,10 @@
             android:id="@+id/codes_icon"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@color/HC_light_grey"
-            android:src="@android:drawable/ic_menu_share"
+            android:background="@color/HC_light_purple"
+            android:src="@drawable/hc_character_noarms"
+            android:scaleType="fitCenter"
+            android:padding="6dp"
             android:layout_centerVertical="true"/>
         <TextView
             android:id="@+id/my_codes_textview"
@@ -124,8 +128,8 @@
             android:id="@+id/top_score_icon"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@color/HC_light_grey"
-            android:src="@android:drawable/ic_input_add"
+            android:background="@drawable/rounded_rect_green"
+            android:src="@drawable/icon_happy"
             android:layout_centerVertical="true"/>
 
         <TextView
@@ -169,8 +173,8 @@
             android:id="@+id/low_score_icon"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@color/HC_light_grey"
-            android:src="@android:drawable/ic_delete"
+            android:background="@drawable/rounded_rect_purple"
+            android:src="@drawable/icon_frown"
             android:layout_centerVertical="true"/>
 
         <TextView
