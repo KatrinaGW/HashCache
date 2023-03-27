@@ -171,6 +171,7 @@ public class ScannableCodesDatabaseAdapter {
     public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
         ArrayList<ScannableCode> scannableCodes = new ArrayList<>();
+        ArrayList<CompletableFuture<ScannableCode>> futureCfs = new ArrayList<>();
 
         if (scannableCodeIds.size() == 0) {
             cf.complete(scannableCodes);
@@ -184,26 +185,33 @@ public class ScannableCodesDatabaseAdapter {
                             if (scannableCodeIds.contains(document.getId())) {
                                 matches++;
 
-                                scannableCodeDocumentConverter.getScannableCodeFromDocument(
+                                futureCfs.add(scannableCodeDocumentConverter.getScannableCodeFromDocument(
                                         document.getReference()
-                                ).thenAccept(scannableCode -> {
-                                    scannableCodes.add(scannableCode);
-                                    if (scannableCodes.size() == scannableCodeIds.size()) {
-                                        cf.complete(scannableCodes);
-                                    }
-                                }).exceptionally(new Function<Throwable, Void>() {
-                                    @Override
-                                    public Void apply(Throwable throwable) {
-                                        cf.completeExceptionally(throwable);
-                                        return null;
-                                    }
-                                });
+                                ));
                             }
                         }
 
                         if (matches != scannableCodeIds.size()) {
                             cf.completeExceptionally(new Exception("One or more player wallet code ids" +
                                     "could not be mapped to actual codes!"));
+                        }else if(futureCfs.size()>0){
+                            CompletableFuture.allOf(futureCfs.toArray(new CompletableFuture[futureCfs.size()]))
+                                    .thenAccept(nullValue -> {
+                                        futureCfs.stream()
+                                                .forEach(futureCf -> {
+                                                    scannableCodes.add(futureCf.join());
+                                                });
+                                        cf.complete(scannableCodes);
+                                    })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
+                        }else{
+                            cf.complete(scannableCodes);
                         }
 
                     } else {

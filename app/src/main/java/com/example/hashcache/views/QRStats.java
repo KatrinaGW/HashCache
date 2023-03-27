@@ -144,7 +144,7 @@ public class QRStats extends AppCompatActivity implements Observer {
 
     public void setLowScoreValue(ScannableCode lowestScoring) {
         if(lowestScoring!=null){
-            lowScoreValueTextView.setText(String.valueOf(lowestScoring.getHashInfo().getGeneratedScore()));
+            lowScoreValueTextView.setText(Long.toString(lowestScoring.getHashInfo().getGeneratedScore()));
             lowScoreValueTextView.setClickable(true);
         }else{
             lowScoreValueTextView.setText(R.string.no_codes_scanned);
