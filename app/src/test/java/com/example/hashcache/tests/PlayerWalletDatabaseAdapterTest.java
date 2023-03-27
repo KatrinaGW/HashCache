@@ -1,6 +1,7 @@
 package com.example.hashcache.tests;
 
 import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Matchers.any;
@@ -11,10 +12,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.PlayerWallet;
+import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
+import com.example.hashcache.models.database.DatabasePort;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,6 +31,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -169,11 +174,56 @@ public class PlayerWalletDatabaseAdapterTest {
     }
 
     @Test
-    void getPlayerWalletTopScoreTest(){
-        String scannableCodeId1 = "Number one reason to not be QA";
-        String scannableCodeId2 = "Second reason to not leave tests to the last minute";
+    void getPlayerWalletLowScoreTest(){
+        ScannableCode testScananbleCode1 = new ScannableCode("fakeId", new HashInfo(
+                null, "fake", 123
+        ));
+        ScannableCode testScannableCode2 = new ScannableCode("notFake", new HashInfo(
+                null, "notFake", 1234
+        ));
         ArrayList<String> fakeData = new ArrayList<>();
-        fakeData.add(scannableCodeId1);
-        fakeData.add(scannableCodeId2);
+        fakeData.add(testScananbleCode1.getScannableCodeId());
+        fakeData.add(testScannableCode2.getScannableCodeId());
+        ArrayList<ScannableCode> fakeResults = new ArrayList<>();
+        fakeResults.add(testScananbleCode1);
+        fakeResults.add(testScannableCode2);
+        CompletableFuture<ArrayList<ScannableCode> >fakeCF = new CompletableFuture<>();
+        fakeCF.complete(fakeResults);
+        DatabasePort mockDB = Mockito.mock(DatabasePort.class);
+
+        when(mockDB.getScannableCodesByIdInList(fakeData)).thenReturn(fakeCF);
+
+        PlayerWalletDatabaseAdapter playerWalletDatabaseAdapter = getMockPlayerDatabaseAdapterWithDB();
+        ScannableCode result = playerWalletDatabaseAdapter.getPlayerWalletLowScore(fakeData,
+                mockDB).join();
+
+        assertEquals(testScananbleCode1, result);
+    }
+
+    @Test
+    void getPlayerWalletTopScoreTest(){
+        ScannableCode testScananbleCode1 = new ScannableCode("fakeId", new HashInfo(
+                null, "fake", 123
+        ));
+        ScannableCode testScannableCode2 = new ScannableCode("notFake", new HashInfo(
+                null, "notFake", 1234
+        ));
+        ArrayList<String> fakeData = new ArrayList<>();
+        fakeData.add(testScananbleCode1.getScannableCodeId());
+        fakeData.add(testScannableCode2.getScannableCodeId());
+        ArrayList<ScannableCode> fakeResults = new ArrayList<>();
+        fakeResults.add(testScananbleCode1);
+        fakeResults.add(testScannableCode2);
+        CompletableFuture<ArrayList<ScannableCode> >fakeCF = new CompletableFuture<>();
+        fakeCF.complete(fakeResults);
+        DatabasePort mockDB = Mockito.mock(DatabasePort.class);
+
+        when(mockDB.getScannableCodesByIdInList(fakeData)).thenReturn(fakeCF);
+
+        PlayerWalletDatabaseAdapter playerWalletDatabaseAdapter = getMockPlayerDatabaseAdapterWithDB();
+        ScannableCode result = playerWalletDatabaseAdapter.getPlayerWalletTopScore(fakeData,
+                mockDB).join();
+
+        assertEquals(testScannableCode2, result);
     }
 }

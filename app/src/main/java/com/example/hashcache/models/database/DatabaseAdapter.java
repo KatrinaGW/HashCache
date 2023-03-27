@@ -472,7 +472,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             PlayerWalletDatabaseAdapter.getInstance()
-                    .getPlayerWalletTopScore(scannableCodeIds)
+                    .getPlayerWalletTopScore(scannableCodeIds, this)
                     .thenAccept(topScore -> {
                         cf.complete(topScore);
                     })
@@ -499,7 +499,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             PlayerWalletDatabaseAdapter.getInstance()
-                    .getPlayerWalletLowScore(scannableCodeIds)
+                    .getPlayerWalletLowScore(scannableCodeIds, this)
                     .thenAccept(lowScore -> {
                         cf.complete(lowScore);
                     })
