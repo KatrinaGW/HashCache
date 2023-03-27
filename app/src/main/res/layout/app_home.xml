@@ -69,13 +69,14 @@
             android:layout_height="55dp"
             android:background="@drawable/circle_button"
             app:tint="@color/black"
-            android:src="@android:drawable/ic_menu_myplaces"
+            android:src="@drawable/icon_search"
             android:layout_alignParentEnd="true"
             android:layout_alignBottom="@id/map"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             android:layout_marginEnd="24dp"
-            android:elevation="6dp"/>
+            android:elevation="6dp"
+            android:scaleType="fitCenter"/>
     </RelativeLayout>
 
     <androidx.appcompat.widget.AppCompatButton
