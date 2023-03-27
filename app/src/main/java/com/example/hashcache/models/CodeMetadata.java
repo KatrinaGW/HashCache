@@ -9,6 +9,7 @@ import com.firebase.geofire.GeoLocation;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 public class CodeMetadata {
 
@@ -17,23 +18,28 @@ public class CodeMetadata {
     final private GeoLocation location;
     final private String geohash;
     private String image;
+    private String userId;
 
-    public CodeMetadata(String scannableCodeId, GeoLocation location, String base64Image) throws NoSuchAlgorithmException {
+    public CodeMetadata(String scannableCodeId, GeoLocation location, String base64Image, String userId) {
         this.image = base64Image;
         this.location = location;
         this.geohash = GeoFireUtils.getGeoHashForLocation(location);
         this.scannableCodeId = scannableCodeId;
-        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-        String idString = this.scannableCodeId + this.geohash;
-        messageDigest.update(idString.getBytes());
-        byte[] byteArray = messageDigest.digest();
-        this.documentId = new BigInteger(1, byteArray).toString(16);
+        this.documentId = UUID.randomUUID().toString();
+        this.userId = userId;
     }
 
-    public CodeMetadata(String scannableCodeId, GeoLocation location) throws NoSuchAlgorithmException {
+    public CodeMetadata(String scannableCodeId, GeoLocation location, String base64Image) {
+        this(scannableCodeId, location, base64Image, null);
+    }
+
+    public CodeMetadata(String scannableCodeId, String base64Image) {
+        this(scannableCodeId, null, null, base64Image);
+    }
+
+    public CodeMetadata(String scannableCodeId, GeoLocation location){
         this(scannableCodeId, location, null);
     }
-
 
     public String getDocumentId() {
         return documentId;
@@ -47,12 +53,12 @@ public class CodeMetadata {
         return geohash;
     }
 
-    public String getImage() {
-        return image;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public String getImage() {
+        return image;
     }
 
     public GeoLocation getLocation() {
