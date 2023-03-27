@@ -52,7 +52,8 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            tools:context=".MapsActivity" />
+            tools:context=".MapsActivity"
+            map:mapId="@string/map_id" />
         <androidx.appcompat.widget.SearchView
             android:id="@+id/idSearchView"
             android:layout_width="match_parent"
@@ -69,7 +70,7 @@
             android:layout_height="55dp"
             android:background="@drawable/circle_button"
             app:tint="@color/black"
-            android:src="@android:drawable/ic_menu_myplaces"
+            android:src="@android:drawable/ic_menu_view"
             android:layout_alignParentEnd="true"
             android:layout_alignBottom="@id/map"
             android:layout_marginTop="12dp"

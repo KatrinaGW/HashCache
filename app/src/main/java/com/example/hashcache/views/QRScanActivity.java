@@ -72,9 +72,6 @@ public class QRScanActivity extends AppCompatActivity {
                                     Toast.makeText(QRScanActivity.this, "Added QR code!", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                            if ( Context.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference() ){
-
-                            }
                             Intent intent = new Intent(QRScanActivity.this, NewMonsterActivity.class);
                             startActivity(intent);
                         }).exceptionally(new Function<Throwable, Void>() {

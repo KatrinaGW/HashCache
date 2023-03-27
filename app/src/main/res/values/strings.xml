@@ -3,4 +3,5 @@
     <string name="no_codes_scanned">No codes scanned yet!</string>
     <string name="scannable_code_name">Cached Name</string>
     <string name="scannable_code_score">Score for Cache</string>
+    <string name="map_id">973e9ed7114852b3</string>
 </resources>

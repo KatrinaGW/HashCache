@@ -42,6 +42,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import com.example.hashcache.R;
+import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
 import com.example.hashcache.models.Player;
 
 import com.example.hashcache.models.database.Database;
@@ -53,6 +54,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -94,7 +96,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
 
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
-    private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
+    private final LatLng defaultLocation = new LatLng(45.564694, -81.462021);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean locationPermissionGranted;
@@ -108,8 +110,11 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
     private static final String KEY_LOCATION = "location";
 
     SharedPreferences settings;
+    SharedPreferences.Editor editor;
 
     SearchView searchView;
+
+    int test = 0;
 
 
 
@@ -119,8 +124,6 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         setContentView(R.layout.app_home);
         initView();
 
-        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
-        SharedPreferences.Editor editor = settings.edit();
 
 
         // Retrieve location and camera position from saved instance state.
@@ -194,7 +197,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         communityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // go to community page
+                // RENDER ALL MARKERS IN VISION
                 startActivity(new Intent(AppHome.this, Community.class));
             }
         });
@@ -247,7 +250,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         this.map = googleMap;
 
         Log.d("TEST", "Granted entry, permission is ok");
-
+        googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json));
         getLocationPermission();
 
         updateLocationUI();
@@ -268,6 +271,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                 == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true;
 
+
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -285,6 +289,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 locationPermissionGranted = true;
+
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -302,12 +307,21 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
             if (locationPermissionGranted) {
                 map.setMyLocationEnabled(true);
                 map.getUiSettings().setMyLocationButtonEnabled(true);
+                UpdateUserPreferencesCommand.toggleGeoLocationPreference(true, Context.get(),
+                        Database.getInstance());
                 getDeviceLocation();
             } else {
                 map.setMyLocationEnabled(false);
+                map.moveCamera(CameraUpdateFactory
+                        .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                 map.getUiSettings().setMyLocationButtonEnabled(false);
                 lastKnownLocation = null;
+                UpdateUserPreferencesCommand.toggleGeoLocationPreference(false, Context.get(),
+                        Database.getInstance());
+
                 //getLocationPermission();
+
+
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());

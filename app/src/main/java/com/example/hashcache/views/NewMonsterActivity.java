@@ -1,7 +1,9 @@
 package com.example.hashcache.views;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -10,16 +12,27 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.ContextCompat;
 
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.hashInfo.ImageGenerator;
+import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.context.Context;
+import com.example.hashcache.models.database.Database;
+import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.function.Function;
 
 /**
@@ -45,6 +58,12 @@ public class NewMonsterActivity extends AppCompatActivity {
     private TextView takePhotoText;
     private ImageButton photoButton;
     private AppCompatButton skipPhotoButton;
+
+    private FusedLocationProviderClient fusedLocationProviderClient;
+
+    private Location itemLocation;
+
+    private GeoLocation itemGeoLocation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +113,23 @@ public class NewMonsterActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(View v) {
+
+                //no picture
+                //check if they allow for metadata
+
+
+                if (Context.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference()  ){
+                    String codeID = curCode.getScannableCodeId();
+                    getLocation();
+                    if (itemGeoLocation != null) {
+                        try {
+                            Database.getInstance().addScannableCodeMetadata(new CodeMetadata(codeID, itemGeoLocation));
+                        } catch (NoSuchAlgorithmException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
                 // go to profile page
                 startActivity(new Intent(NewMonsterActivity.this, MyProfile.class));
             }
@@ -154,6 +190,34 @@ public class NewMonsterActivity extends AppCompatActivity {
             }
 
         });
+    }
+
+    private void getLocation() {
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
+        try {
+            if ( Context.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference()  ) {
+                Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
+                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
+                            // Set the map's camera position to the current location of the device.
+                            itemLocation = task.getResult();
+                            if (itemLocation != null) {
+                                itemGeoLocation = new GeoLocation(itemLocation.getLatitude(), itemLocation.getLongitude());
+                            }
+                        } else {
+                            itemGeoLocation = null;
+                        }
+                    }
+                });
+            }
+        } catch (SecurityException e)  {
+            Log.e("Exception: %s", e.getMessage(), e);
+        }
     }
     private void init() {
 
