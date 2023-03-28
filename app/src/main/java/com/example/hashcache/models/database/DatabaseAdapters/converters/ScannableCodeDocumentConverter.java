@@ -24,7 +24,7 @@ import java.util.function.Function;
 
 public class ScannableCodeDocumentConverter {
 
-    public static CompletableFuture<String> addScannableCodeToCollection(ScannableCode scannableCode,
+    public CompletableFuture<String> addScannableCodeToCollection(ScannableCode scannableCode,
                                                                        CollectionReference collectionReference,
                                                                        FireStoreHelper fireStoreHelper){
         CompletableFuture<String> cf = new CompletableFuture<>();
@@ -70,7 +70,7 @@ public class ScannableCodeDocumentConverter {
      * @param comment the comment to add to the document
      * @param documentReference the reference to the scannableCodeDocument
      */
-    public static void addCommentToScannableCodeDocument(Comment comment,
+    public void addCommentToScannableCodeDocument(Comment comment,
                                                          DocumentReference documentReference){
         documentReference
                 .collection(CollectionNames.COMMENTS.collectionName)
@@ -99,7 +99,7 @@ public class ScannableCodeDocumentConverter {
      * @param documentReference the document reference to get the scannableCode object from
      * @return cf the CompleteableFuture with the ScannableCode object
      */
-    public static CompletableFuture<ScannableCode> getScannableCodeFromDocument(DocumentReference documentReference){
+    public CompletableFuture<ScannableCode> getScannableCodeFromDocument(DocumentReference documentReference){
         String[] scannableCodeId = new String[1];
         String[] codeLocationId  = new String[1];
         String[] generatedName = new String[1];

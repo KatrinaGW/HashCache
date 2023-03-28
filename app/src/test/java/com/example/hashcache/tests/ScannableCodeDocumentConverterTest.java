@@ -45,7 +45,7 @@ public class ScannableCodeDocumentConverterTest {
         when(mockFireStoreHelper.setDocumentReference(any(DocumentReference.class), any(HashMap.class)))
                 .thenReturn(testCF);
 
-        String result = ScannableCodeDocumentConverter.addScannableCodeToCollection(
+        String result = new ScannableCodeDocumentConverter().addScannableCodeToCollection(
                 testScannableCode, mockCollectionReference, mockFireStoreHelper
         ).join();
 
@@ -64,7 +64,7 @@ public class ScannableCodeDocumentConverterTest {
         when(mockCollectionReference.document(testComment.getCommentId()))
                 .thenReturn(mockDocumentReference);
 
-        ScannableCodeDocumentConverter.addCommentToScannableCodeDocument(testComment, mockDocumentReference);
+        new ScannableCodeDocumentConverter().addCommentToScannableCodeDocument(testComment, mockDocumentReference);
 
         verify(mockDocumentReference, times(1)).set(any(HashMap.class));
     }
@@ -110,7 +110,7 @@ public class ScannableCodeDocumentConverterTest {
             return null;
         }).when(mockQueryTask).addOnCompleteListener(any(OnCompleteListener.class));
 
-        ScannableCode result = ScannableCodeDocumentConverter
+        ScannableCode result = new ScannableCodeDocumentConverter()
                 .getScannableCodeFromDocument(mockDocumentReference)
                 .join();
 

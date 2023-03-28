@@ -31,8 +31,6 @@ public interface DatabasePort {
 
     CompletableFuture<Void> addComment(String scannableCodeId, Comment comment);
 
-    CompletableFuture<Boolean> deleteComment(String scannableCodeId, String commentId);
-
     CompletableFuture<Void> updatePlayerPreferences(String userId, PlayerPreferences playerPreferences);
 
     CompletableFuture<String> addScannableCode(ScannableCode scannableCode);
