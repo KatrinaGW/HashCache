@@ -99,11 +99,11 @@ public class ScannableCodeDocumentConverter {
      * @param documentReference the document reference to get the scannableCode object from
      * @return cf the CompleteableFuture with the ScannableCode object
      */
-    public CompletableFuture<ScannableCode> getScannableCodeFromDocument(DocumentReference documentReference){
+    public static CompletableFuture<ScannableCode> getScannableCodeFromDocument(DocumentReference documentReference){
         String[] scannableCodeId = new String[1];
         String[] codeLocationId  = new String[1];
         String[] generatedName = new String[1];
-        int[] generatedScore = new int[1];
+        long[] generatedScore = new long[1];
 
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
 
@@ -117,8 +117,8 @@ public class ScannableCodeDocumentConverter {
                             scannableCodeId[0] = document.getId();
                             codeLocationId[0] = (String) document.getData().get(FieldNames.CODE_LOCATION_ID.fieldName);
                             generatedName[0] = (String) document.getData().get(FieldNames.GENERATED_NAME.fieldName);
-                            generatedScore[0] = Integer.parseInt((String) document.getData()
-                                    .get(FieldNames.GENERATED_SCORE.fieldName));
+                            generatedScore[0] = Long.parseLong(String.valueOf(document.getData()
+                                    .get(FieldNames.GENERATED_SCORE.fieldName)));
 
                             getAllComments(documentReference.collection(CollectionNames.COMMENTS.collectionName))
                                     .thenAccept(comments -> {

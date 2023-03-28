@@ -21,6 +21,7 @@ public class ResetCommandTest {
         PlayersDatabaseAdapter mockPlayersDatabaseAdapter = Mockito.mock(PlayersDatabaseAdapter.class);
 
         PlayerList originalPlayerList = PlayerList.getInstance(mockPlayersDatabaseAdapter);
+        Context.get().setCurrentPlayer(Mockito.mock(Player.class));
 
         ResetCommand.reset();
 
