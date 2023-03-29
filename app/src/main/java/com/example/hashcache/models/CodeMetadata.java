@@ -30,7 +30,6 @@ public class CodeMetadata {
         final private String geohash;
         // The base64-encoded image of the scannable code (if available)
         private String image;
-
     /**
      * Constructs a new CodeMetadata object.
      *
@@ -44,6 +43,7 @@ public class CodeMetadata {
             this.location = location;
             this.geohash = GeoFireUtils.getGeoHashForLocation(location);
             this.scannableCodeId = scannableCodeId;
+
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             String idString = this.scannableCodeId + this.geohash;
             messageDigest.update(idString.getBytes());
