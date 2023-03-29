@@ -22,6 +22,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -148,15 +149,21 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Address address = addressList.get(0);
 
-                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    try{
+                        Address address = addressList.get(0);
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                    }
+                    catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(AppHome.this, "Couldn't find location!", Toast.LENGTH_SHORT).show();
+                    }
 
 
                     //not sure if we want a marker there or not
                     //map.addMarker(new MarkerOptions().position(latLng).title(location));
 
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+
                 }
                 return false;
             }
