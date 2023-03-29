@@ -122,13 +122,10 @@ public class NewMonsterActivity extends AppCompatActivity {
                     String codeID = curCode.getScannableCodeId();
                     getLocation();
                     if (itemGeoLocation != null) {
-                        try {
                             Database.getInstance().addScannableCodeMetadata(new CodeMetadata(codeID, itemGeoLocation));
-                        } catch (NoSuchAlgorithmException e) {
-                            throw new RuntimeException(e);
-                        }
                     }
                 }
+                Log.e("Markers", "MARKER PLACED PEPEGA");
 
                 // go to profile page
                 startActivity(new Intent(NewMonsterActivity.this, MyProfile.class));
@@ -207,6 +204,7 @@ public class NewMonsterActivity extends AppCompatActivity {
                             // Set the map's camera position to the current location of the device.
                             itemLocation = task.getResult();
                             if (itemLocation != null) {
+                                Log.e("Markers", "MARKER PLACED PEPEGA");
                                 itemGeoLocation = new GeoLocation(itemLocation.getLatitude(), itemLocation.getLongitude());
                             }
                         } else {

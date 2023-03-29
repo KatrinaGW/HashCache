@@ -627,7 +627,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
 
     @Override
     public CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata){
-        return null;
+        return CodeMetadataDatabaseAdapter.getInstance().createScannableCodeMetadata(codeMetadata);
     }
 
     @Override

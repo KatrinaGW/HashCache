@@ -9,8 +9,6 @@
 
 package com.example.hashcache.views;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -19,8 +17,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -30,22 +26,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.CompletableFuture;
 
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
+import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.Player;
 
 import com.example.hashcache.models.database.Database;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -58,13 +56,6 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
-import com.google.android.libraries.places.api.net.PlacesClient;
 
 import com.example.hashcache.context.Context;
 
@@ -97,7 +88,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     private final LatLng defaultLocation = new LatLng(45.564694, -81.462021);
-    private static final int DEFAULT_ZOOM = 15;
+    private static final int DEFAULT_ZOOM = 13;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean locationPermissionGranted;
 
@@ -193,12 +184,29 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
 
 
         // add functionality to community button
-        ImageButton communityButton = findViewById(R.id.community_button);
-        communityButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton markerButton = findViewById(R.id.community_button);
+        markerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // RENDER ALL MARKERS IN VISION
-                startActivity(new Intent(AppHome.this, Community.class));
+                double zoom = map.getCameraPosition().zoom;
+                Log.e("Zoom Level:", zoom + "");
+                double radius = ((40000/Math.pow(2,zoom)) * 2) * 1000;
+                Log.e("Radius:", radius + "");
+
+
+                GeoLocation currentLocation = new GeoLocation(map.getCameraPosition().target.latitude, map.getCameraPosition().target.longitude);
+                Database.getInstance().getCodeMetadataWithinRadius(currentLocation, radius).thenAccept(allMarkers -> {
+                    for (CodeMetadata mark: allMarkers){
+                        Log.e("Markers", "MARKER PLACED PEPEGA");
+                        map.addMarker(new MarkerOptions()
+                                .position(new LatLng(mark.getLocation().latitude, mark.getLocation().longitude))
+                                .title("Marker in Sydney"));
+                    }
+                });
+
+                //LatLng right = new LatLng(map.getCameraPosition().target.latitude + radius, map.getCameraPosition().target.longitude + radius);
+
             }
         });
 
