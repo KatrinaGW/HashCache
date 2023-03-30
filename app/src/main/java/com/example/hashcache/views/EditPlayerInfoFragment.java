@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -25,6 +26,7 @@ public class EditPlayerInfoFragment extends Fragment {
     ImageButton xButton;
     Button confirmButton;
     EditPlayerInfoFragmentDismisser dismisser;
+    TextView invalidInputText;
 
     interface EditPlayerInfoFragmentDismisser{
         void dismissFragment(ContactInfo newContactInfo);
@@ -60,6 +62,8 @@ public class EditPlayerInfoFragment extends Fragment {
         xButton = getView().findViewById(R.id.x_button);
         emailEditText = getView().findViewById(R.id.email_edit_text);
         phoneNumberEditText = getView().findViewById(R.id.edit_phone_number);
+        invalidInputText = getView().findViewById(R.id.invalid_input_text);
+        invalidInputText.setVisibility(View.GONE);
         if(!contactInfo.getEmail().equals("")){
             emailEditText.setText(contactInfo.getEmail());
         }
@@ -89,19 +93,14 @@ public class EditPlayerInfoFragment extends Fragment {
         String phoneNumberText = phoneNumberEditText.getText().toString();
         ContactInfo newContactInfo = new ContactInfo();
 
-        //TODO: FE input validation
-        newContactInfo.setPhoneNumber(phoneNumberText);
-        newContactInfo.setEmail(emailText);
+        if(newContactInfo.testValidEmail(emailText) && newContactInfo.testValidPhoneNumber(phoneNumberText)){
+            newContactInfo.setPhoneNumber(phoneNumberText);
+            newContactInfo.setEmail(emailText);
 
-        dismisser.dismissFragment(newContactInfo);
-
-//        UpdateContactInfoCommand.updateContactInfoCommand(AppContext.get().getCurrentPlayer().getUserId(),
-//                        newContactInfo, Database.getInstance(), AppContext.get())
-//                .thenAccept(isComplete->{
-//                    if(isComplete){
-//                        dismisser.dismissFragment();
-//                    }
-//                });
+            dismisser.dismissFragment(newContactInfo);
+        }else{
+            invalidInputText.setVisibility(View.VISIBLE);
+        }
     }
 
 
