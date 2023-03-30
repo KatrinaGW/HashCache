@@ -12,8 +12,8 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.context.Context;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
@@ -46,7 +46,7 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         TextView playersTotalScore = findViewById(R.id.score_value_textview);
         AtomicLong playerScores = new AtomicLong();
         Database.getInstance()
-                .getTotalScore(Context.get().getCurrentPlayer().getUserId())
+                .getTotalScore(AppContext.get().getCurrentPlayer().getUserId())
                 .thenAccept( score -> {
                     playerScores.set(score);
                 });

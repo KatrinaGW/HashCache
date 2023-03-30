@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -12,17 +11,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.controllers.hashInfo.HashController;
 import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.Database;
-
-import org.w3c.dom.Text;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -89,7 +85,7 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
     }
 
     private void setViews(){
-        currentScannableCode = Context.get().getCurrentScannableCode();
+        currentScannableCode = AppContext.get().getCurrentScannableCode();
         HashInfo currentHashInfo = currentScannableCode.getHashInfo();
         setMonsterScore(currentHashInfo.getGeneratedScore());
         setMonsterName(currentHashInfo.getGeneratedName());
@@ -133,7 +129,7 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
                         return null;
                     }
                 });
-        Context.get().addObserver(this);
+        AppContext.get().addObserver(this);
     }
 
     private void initializeViews() {
@@ -164,12 +160,12 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
             @Override
             public void run() {
                 HashController.deleteScannableCodeFromWallet(currentScannableCode.getScannableCodeId(),
-                                Context.get().getCurrentPlayer().getUserId())
+                                AppContext.get().getCurrentPlayer().getUserId())
                         .thenAccept(completed -> {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Context.get().setCurrentScannableCode(null);
+                                    AppContext.get().setCurrentScannableCode(null);
                                     startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
                                 }
                             });
@@ -220,7 +216,7 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
      */
     @Override
     public void update(Observable o, Object arg) {
-        currentScannableCode = Context.get().getCurrentScannableCode();
+        currentScannableCode = AppContext.get().getCurrentScannableCode();
         Log.d("DisplayMonsterActivity", "called to update");
         setViews();
     }

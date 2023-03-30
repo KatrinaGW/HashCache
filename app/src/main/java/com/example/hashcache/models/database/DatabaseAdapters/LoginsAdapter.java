@@ -2,9 +2,7 @@ package com.example.hashcache.models.database.DatabaseAdapters;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.context.Context;
-import com.example.hashcache.models.Comment;
-import com.example.hashcache.models.ContactInfo;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -14,8 +12,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
@@ -80,7 +76,7 @@ public class LoginsAdapter {
      */
     public CompletableFuture<Void> addLoginRecord(String username){
         CompletableFuture<Void> cf = new CompletableFuture<>();
-        String deviceId = Context.get().getDeviceId();
+        String deviceId = AppContext.get().getDeviceId();
         HashMap<String, String> data = new HashMap<>();
         data.put(FieldNames.DEVICE_ID.fieldName, deviceId);
         data.put(FieldNames.USERNAME.fieldName, username);
@@ -108,7 +104,7 @@ public class LoginsAdapter {
      */
     public CompletableFuture<String> getUsernameForDevice(){
         CompletableFuture<String> cf = new CompletableFuture<>();
-        String deviceId = Context.get().getDeviceId();
+        String deviceId = AppContext.get().getDeviceId();
 
         CompletableFuture.runAsync(()->{
             fireStoreHelper.documentWithIDExists(collectionReference, deviceId)
@@ -163,7 +159,7 @@ public class LoginsAdapter {
         CompletableFuture<Void> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            fireStoreHelper.documentWithIDExists(collectionReference, Context.get().getDeviceId())
+            fireStoreHelper.documentWithIDExists(collectionReference, AppContext.get().getDeviceId())
                     .thenAccept(
                             exists -> {
                                 if(!exists){
@@ -171,7 +167,7 @@ public class LoginsAdapter {
                                             "There is no login record for the given ID!"
                                     ));
                                 }else{
-                                    collectionReference.document(Context.get().getDeviceId())
+                                    collectionReference.document(AppContext.get().getDeviceId())
                                             .delete()
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override

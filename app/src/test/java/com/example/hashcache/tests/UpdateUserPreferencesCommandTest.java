@@ -4,7 +4,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.hashcache.context.Context;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
@@ -17,14 +17,14 @@ public class UpdateUserPreferencesCommandTest {
     @Test
     void toggleGeoLocationPreferenceTest(){
         DatabasePort mockDB = Mockito.mock(DatabasePort.class);
-        Context mockContext = Mockito.mock(Context.class);
+        AppContext mockAppContext = Mockito.mock(AppContext.class);
         Player testPlayer = new Player("hi;dfgs");
         PlayerPreferences testPlayerPreferences = new PlayerPreferences();
         testPlayer.setPlayerPreferences(testPlayerPreferences);
 
-        when(mockContext.getCurrentPlayer()).thenReturn(testPlayer);
+        when(mockAppContext.getCurrentPlayer()).thenReturn(testPlayer);
 
-        UpdateUserPreferencesCommand.toggleGeoLocationPreference(true, mockContext,
+        UpdateUserPreferencesCommand.toggleGeoLocationPreference(true, mockAppContext,
                 mockDB);
 
         verify(mockDB, times(1)).updatePlayerPreferences(

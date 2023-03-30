@@ -31,7 +31,7 @@ import com.example.hashcache.controllers.LogoutCommand;
 import com.example.hashcache.controllers.ResetCommand;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
 import com.example.hashcache.models.Player;
-import com.example.hashcache.context.Context;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.database.Database;
 
 import java.util.Observable;
@@ -43,14 +43,28 @@ import java.util.Observer;
  and allows them to toggle their location settings on and off, as well as edit their username and contact information.
  Additional buttons permit navigation to other pages within the application.
  */
-public class SettingsActivity extends AppCompatActivity implements Observer {
+public class SettingsActivity extends AppCompatActivity implements Observer,
+EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
     private TextView usernameView;
     private TextView phoneNumberView;
     private TextView emailView;
-    private CheckBox geoLocationPreferenceCheckbox;
     private ImageView editInfoButton;
     private ImageButton menuButton;
     private Button logoutButton;
+
+    @Override
+    public void dismissFragment(){
+        getSupportFragmentManager().beginTransaction().
+                remove(getSupportFragmentManager().findFragmentById(R.id.edit_info_fragment_container)).commit();
+        logoutButton.setVisibility(View.VISIBLE);
+        usernameView.setVisibility(View.VISIBLE);
+        emailView.setVisibility(View.VISIBLE);
+        phoneNumberView.setVisibility(View.VISIBLE);
+        logoutButton.setVisibility(View.VISIBLE);
+        editInfoButton.setVisibility(View.VISIBLE);
+
+    }
+
     /**
      * Called when the activity is starting. Initializes the activity and its associated layout.
      *
@@ -65,21 +79,13 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
         usernameView = findViewById(R.id.username_textview);
         phoneNumberView = findViewById(R.id.phone_textview);
         emailView = findViewById(R.id.email_textview);
-        geoLocationPreferenceCheckbox = findViewById(R.id.geolocation_checkbox);
         editInfoButton = findViewById(R.id.edit_info_image);
         logoutButton = findViewById(R.id.logout_button);
-
-        geoLocationPreferenceCheckbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onCheckboxClicked(v);
-            }
-        });
 
         editInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(SettingsActivity.this, EditPlayerInfoActivity.class));
+                onEditInfoClicked();
             }
         });
 
@@ -98,7 +104,7 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
                 bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
         });
-        Context.get().addObserver(this);
+        AppContext.get().addObserver(this);
 
     }
 
@@ -107,6 +113,19 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
         super.onResume();
 
         setValues();
+    }
+
+    private void onEditInfoClicked(){
+        logoutButton.setVisibility(View.GONE);
+        usernameView.setVisibility(View.GONE);
+        emailView.setVisibility(View.GONE);
+        phoneNumberView.setVisibility(View.GONE);
+        logoutButton.setVisibility(View.GONE);
+        editInfoButton.setVisibility(View.GONE);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.edit_info_fragment_container, EditPlayerInfoFragment.class, null)
+                .commit();
     }
 
     private void onLogoutClicked(){
@@ -118,11 +137,10 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
     }
 
     private void setValues(){
-        Player playerInfo = Context.get().getCurrentPlayer();
+        Player playerInfo = AppContext.get().getCurrentPlayer();
         setUsername(playerInfo.getUsername());
         setEmail(playerInfo.getContactInfo().getEmail());
         setPhoneNumber(playerInfo.getContactInfo().getPhoneNumber());
-        setRecordGeoLocationChecked(playerInfo.getPlayerPreferences().getRecordGeolocationPreference());
     }
 
     /**
@@ -134,7 +152,7 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
 
         boolean checked = ((CheckBox) view).isChecked();
 
-        UpdateUserPreferencesCommand.toggleGeoLocationPreference(checked, Context.get(),
+        UpdateUserPreferencesCommand.toggleGeoLocationPreference(checked, AppContext.get(),
                 Database.getInstance());
     }
     /**
@@ -170,10 +188,6 @@ public class SettingsActivity extends AppCompatActivity implements Observer {
         }else{
             this.emailView.setVisibility(View.GONE);
         }
-    }
-
-    private void setRecordGeoLocationChecked(boolean checked){
-        this.geoLocationPreferenceCheckbox.setChecked(checked);
     }
 
     @Override
