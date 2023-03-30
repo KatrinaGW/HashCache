@@ -181,31 +181,22 @@ public class PlayerDocumentConverter {
                 if(task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     try {
-                        String total_score = (String) document.getData().get(FieldNames.TOTAL_SCORE.fieldName);
-                        if(total_score == "") {
-                            total_score = "0";
-                        }
-                        playerWallet.setTotalScore(Integer.parseInt(total_score));
+                        Long total_score = (Long) document.getData().get(FieldNames.TOTAL_SCORE.fieldName);
+                        playerWallet.setTotalScore(total_score);
                     } catch (NullPointerException e) {
                         Log.e(TAG, "User does not have a total score!");
                     }
 
                     try{
-                        String max_score = (String) document.getData().get(FieldNames.MAX_SCORE.fieldName);
-                        if(max_score == "") {
-                            max_score = "0";
-                        }
-                        playerWallet.setMaxScore(Integer.parseInt(max_score));
+                        Long qr_count = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
+                        playerWallet.setQrCount(qr_count);
                     } catch (NullPointerException e) {
-                        Log.e(TAG, "User does not have a max score!");
+                        Log.e(TAG, "User does not have a QR count");
                     }
 
                     try{
-                        String qr_count = (String) document.getData().get(FieldNames.QR_COUNT.fieldName);
-                        if(qr_count == "") {
-                            qr_count = "0";
-                        }
-                        playerWallet.setQrCount(Integer.parseInt(qr_count));
+                        Long max_score = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
+                        playerWallet.setQrCount(max_score);
                     } catch (NullPointerException e) {
                         Log.e(TAG, "User does not have a QR count");
                     }

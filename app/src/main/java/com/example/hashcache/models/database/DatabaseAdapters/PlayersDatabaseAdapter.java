@@ -260,78 +260,52 @@ public class PlayersDatabaseAdapter {
 
     public CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet) {
         DocumentReference playerDocument = collectionReference.document(userId);
-        CompletableFuture<Boolean> cf = new CompletableFuture<>();
-        fireStoreHelper.addStringFieldToDocument(playerDocument, FieldNames.EMAIL.fieldName,
-                        String.valueOf(playerWallet.getTotalScore())).thenAccept(success -> {
-                    if (success) {
-                        fireStoreHelper.addStringFieldToDocument(playerDocument,
-                                        FieldNames.MAX_SCORE.fieldName, String.valueOf(playerWallet.getMaxScore()))
-                                .thenAccept(successful->{
-                                    if(successful){
-
-                                        fireStoreHelper.addStringFieldToDocument(playerDocument, FieldNames.QR_COUNT.fieldName, String.valueOf(playerWallet.getQrCount()))
-                                                        .thenAccept(successfully -> {
-                                                            if(successfully) {
-                                                                cf.complete(true);
-                                                            } else {
-                                                                cf.completeExceptionally(new Exception(
-                                                                        "Something went wrong while setting the " +
-                                                                                "qr count!"
-                                                                ));
-                                                            }
-                                                        });
-                                    }else{
-                                        cf.completeExceptionally(new Exception(
-                                                "Something went wrong while setting the " +
-                                                        "max score!"
-                                        ));
-                                    }
-                                })
-                                .exceptionally(new Function<Throwable, Void>() {
-                                    @Override
-                                    public Void apply(Throwable throwable) {
-                                        Log.d("Update contact info",
-                                                "Could not set the total score");
-                                        return null;
-                                    }
-                                });
-
-                    } else {
-                        Log.e(TAG, "Something went wrong while setting the score information" +
-                                "of the player document");
-                        cf.completeExceptionally(new Exception("Something went wrong while setting" +
-                                "the contact information"));
-                    }
-                })
-                .exceptionally(new Function<Throwable, Void>() {
-                    @Override
-                    public Void apply(Throwable throwable) {
-                        Log.d("Update contact info",
-                                "Could not set the email");
-                        return null;
-                    }
-                });
+        CompletableFuture<Boolean> cf = setPlayerScores(playerDocument, playerWallet);
 
         return cf;
     }
 
-/**
- * Sets the player preferences of a user
- *
- * @param playerDocument    the document of the player to change the preferences
- *                          on
- * @param playerPreferences the preferences to set for the user
- * @return cf the CompleteableFuture which indicate that the operation was successful
- *
- *
- */
-private CompletableFuture<Boolean> setPlayerPreferences(DocumentReference playerDocument,
+    /**
+     * Sets the player preferences of a user
+     *
+     * @param playerDocument    the document of the player to change the preferences
+     *                          on
+     * @param playerPreferences the preferences to set for the user
+     * @return cf the CompleteableFuture which indicate that the operation was successful
+     *
+     *
+     */
+    private CompletableFuture<Boolean> setPlayerPreferences(DocumentReference playerDocument,
                                                             PlayerPreferences playerPreferences) {
         CompletableFuture<Boolean> cf;
         cf = fireStoreHelper.addBooleanFieldToDocument(playerDocument,
                 FieldNames.RECORD_GEOLOCATION.fieldName, playerPreferences.getRecordGeolocationPreference());
 
         return cf;
+    }
+
+    private CompletableFuture  setPlayerScores(DocumentReference playerDocument,
+                                               PlayerWallet playerWallet) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
+        fireStoreHelper.addNumberFieldToDocument(playerDocument,
+                FieldNames.TOTAL_SCORE.fieldName, playerWallet.getTotalScore()).thenAccept(accept -> {
+            fireStoreHelper.addNumberFieldToDocument(playerDocument,
+                    FieldNames.MAX_SCORE.fieldName, playerWallet.getMaxScore()).thenAccept(accepted -> {
+                fireStoreHelper.addNumberFieldToDocument(playerDocument,
+                        FieldNames.QR_COUNT.fieldName, playerWallet.getQrCount()).thenAccept(acceptedd -> {
+                    if(accept && accepted && acceptedd) {
+                        cf.complete(true);
+                    }
+                    else {
+                        Log.e(TAG, "Error adding the number to the documents");
+                        cf.completeExceptionally(new Exception("Error"));
+                    }
+                });
+            });
+        });
+
+        return  cf;
     }
 
     /**
@@ -453,8 +427,14 @@ private CompletableFuture<Boolean> setPlayerPreferences(DocumentReference player
                         .thenAccept(successful -> {
                             if (successful) {
                                 fireStoreHelper.addNumberFieldToDocument(collectionReference.document(userId),
-                                        FieldNames.TOTAL_SCORE.fieldName, 0).thenAccept(accept -> {
-                                            cf.complete(userId);
+                                        FieldNames.TOTAL_SCORE.fieldName, 0L).thenAccept(accept -> {
+                                            fireStoreHelper.addNumberFieldToDocument(collectionReference.document(userId),
+                                                    FieldNames.MAX_SCORE.fieldName, 0L).thenAccept(accepted -> {
+                                                        fireStoreHelper.addNumberFieldToDocument(collectionReference.document(userId),
+                                                                FieldNames.QR_COUNT.fieldName, 0L).thenAccept(acceptedd -> {
+                                                                    cf.complete(userId);
+                                                        });
+                                            });
 
                                 });
                             } else {

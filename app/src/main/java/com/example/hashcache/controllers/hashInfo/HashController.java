@@ -1,7 +1,9 @@
 package com.example.hashcache.controllers.hashInfo;
 
 
+import com.example.hashcache.controllers.UpdateUserScore;
 import com.example.hashcache.models.Player;
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.context.Context;
@@ -89,8 +91,29 @@ public class HashController {
      */
     private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf, ScannableCode sc) {
         Database.getInstance().addScannableCodeToPlayerWallet(userId, hash).thenAccept(created->{
+            Context context = Context.get();
             // Set the current scannable code to the newly added scannable code
-            Context.get().setCurrentScannableCode(sc);
+            context.setCurrentScannableCode(sc);
+
+            // Update the player scores
+            PlayerWallet playerWallet = context.getCurrentPlayer().getPlayerWallet();
+            long score = sc.getHashInfo().getGeneratedScore();
+
+            // Max score
+            long maxScore = playerWallet.getMaxScore();
+            if(score > maxScore) {
+                playerWallet.setMaxScore(score);
+            }
+
+            // Total Score
+            playerWallet.setTotalScore(playerWallet.getTotalScore() + score);
+
+            // Qr count
+            playerWallet.setQrCount(playerWallet.getQrCount() + 1);
+
+            // Update the players score in the database
+            UpdateUserScore.updateUserScore(context, Database.getInstance());
+
             cf.complete(null);
         }).exceptionally(new Function<Throwable, Void>() {
             @Override

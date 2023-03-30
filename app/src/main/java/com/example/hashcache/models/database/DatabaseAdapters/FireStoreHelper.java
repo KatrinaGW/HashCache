@@ -92,7 +92,7 @@ public class FireStoreHelper {
      * @return returns true on success
      */
     public CompletableFuture<Boolean> addNumberFieldToDocument(DocumentReference documentReference,
-                                                               String key, int value) {
+                                                               String key, Long value) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
         documentReference
