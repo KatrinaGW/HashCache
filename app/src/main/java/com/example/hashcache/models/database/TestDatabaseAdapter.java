@@ -6,6 +6,7 @@ import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
@@ -547,5 +548,10 @@ public class TestDatabaseAdapter implements DatabasePort {
      */
     public void resetInstances(){
         return;
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet) {
+        return null;
     }
 }

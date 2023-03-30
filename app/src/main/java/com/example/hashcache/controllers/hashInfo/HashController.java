@@ -1,6 +1,8 @@
 package com.example.hashcache.controllers.hashInfo;
 
 
+import android.util.Log;
+
 import com.example.hashcache.controllers.UpdateUserScore;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerWallet;
@@ -12,6 +14,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 /**
@@ -90,6 +93,7 @@ public class HashController {
      * @param sc the scannable code to add to the player's wallet
      */
     private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf, ScannableCode sc) {
+        Log.i("GETS", "HERE");
         Database.getInstance().addScannableCodeToPlayerWallet(userId, hash).thenAccept(created->{
             Context context = Context.get();
             // Set the current scannable code to the newly added scannable code
@@ -112,7 +116,13 @@ public class HashController {
             playerWallet.setQrCount(playerWallet.getQrCount() + 1);
 
             // Update the players score in the database
-            UpdateUserScore.updateUserScore(context, Database.getInstance());
+            try {
+                UpdateUserScore.updateUserScore(context, Database.getInstance());
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             cf.complete(null);
         }).exceptionally(new Function<Throwable, Void>() {

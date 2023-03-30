@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.Comment;
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.Database;
@@ -340,6 +341,41 @@ public class PlayerWalletDatabaseAdapter {
                 }
             });
         });
+        return cf;
+    }
+
+
+    private CompletableFuture  setPlayerScores(DocumentReference playerDocument,
+                                               PlayerWallet playerWallet) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
+
+        fireStoreHelper.addNumberFieldToDocument(playerDocument,
+                FieldNames.TOTAL_SCORE.fieldName, playerWallet.getTotalScore()).thenAccept(accept -> {
+            fireStoreHelper.addNumberFieldToDocument(playerDocument,
+                    FieldNames.MAX_SCORE.fieldName, 10L).thenAccept(accepted -> {
+                fireStoreHelper.addNumberFieldToDocument(playerDocument,
+                        FieldNames.QR_COUNT.fieldName, playerWallet.getQrCount()).thenAccept(acceptedd -> {
+                    if(accept && accepted && acceptedd) {
+                        cf.complete(true);
+                    }
+                    else {
+                        Log.e(TAG, "Error adding the number to the documents");
+                        cf.completeExceptionally(new Exception("Error"));
+                    }
+                });
+            });
+        });
+
+        return  cf;
+    }
+
+    public CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet) {
+        Log.i("Gets", "TO update player scores");
+        CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
+        DocumentReference playerDocument = collectionReference.document(userId);
+        CompletableFuture<Boolean> cf = setPlayerScores(playerDocument, playerWallet);
+
         return cf;
     }
 }

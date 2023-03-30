@@ -11,6 +11,7 @@ import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.LoginsAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
@@ -655,5 +656,30 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         LoginsAdapter.resetInstance();
         PlayersDatabaseAdapter.resetInstance();
         ScannableCodesDatabaseAdapter.resetInstance();
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet) {
+
+
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            PlayerWalletDatabaseAdapter.getInstance().updatePlayerScores(userId, playerWallet)
+                    .thenAccept(success -> {
+                        if(success) {
+                            cf.complete(true);
+                        } else {
+                            cf.completeExceptionally(new Exception("Something went wrong updating player score"));
+                        }
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
+        return cf;
     }
 }
