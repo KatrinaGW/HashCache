@@ -29,13 +29,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.LogoutCommand;
 import com.example.hashcache.controllers.ResetCommand;
+import com.example.hashcache.controllers.UpdateContactInfoCommand;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
+import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.database.Database;
 
 import java.util.Observable;
 import java.util.Observer;
+import java.util.function.Function;
 
 /**
 
@@ -52,17 +55,38 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
     private ImageButton menuButton;
     private Button logoutButton;
 
+    /**
+     * Dismiss the edit info fragment and make the buttons visible again
+     */
     @Override
-    public void dismissFragment(){
+    public void dismissFragment(ContactInfo contactInfo){
+        if(contactInfo!=null){
+            UpdateContactInfoCommand.updateContactInfoCommand(AppContext.get().getCurrentPlayer().getUserId(),
+                            contactInfo, Database.getInstance(), AppContext.get())
+                    .thenAccept(isComplete->{
+                        if(isComplete){
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setValues();
+                                }
+                            });
+                        }
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            return null;
+                        }
+                    });
+        }else{
+            setValues();
+        }
         getSupportFragmentManager().beginTransaction().
                 remove(getSupportFragmentManager().findFragmentById(R.id.edit_info_fragment_container)).commit();
         logoutButton.setVisibility(View.VISIBLE);
-        usernameView.setVisibility(View.VISIBLE);
-        emailView.setVisibility(View.VISIBLE);
-        phoneNumberView.setVisibility(View.VISIBLE);
         logoutButton.setVisibility(View.VISIBLE);
         editInfoButton.setVisibility(View.VISIBLE);
-
     }
 
     /**
@@ -138,7 +162,9 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
 
     private void setValues(){
         Player playerInfo = AppContext.get().getCurrentPlayer();
+        usernameView.setVisibility(View.VISIBLE);
         setUsername(playerInfo.getUsername());
+
         setEmail(playerInfo.getContactInfo().getEmail());
         setPhoneNumber(playerInfo.getContactInfo().getPhoneNumber());
     }
@@ -172,6 +198,7 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
     private void setPhoneNumber(String phoneNumber){
         if(!phoneNumber.equals("")){
             this.phoneNumberView.setText(phoneNumber);
+            this.phoneNumberView.setVisibility(View.VISIBLE);
         }else{
             this.phoneNumberView.setVisibility(View.GONE);
         }
@@ -185,6 +212,7 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
     private void setEmail(String email){
         if(!email.equals("")){
             this.emailView.setText(email);
+            this.emailView.setVisibility(View.VISIBLE);
         }else{
             this.emailView.setVisibility(View.GONE);
         }
