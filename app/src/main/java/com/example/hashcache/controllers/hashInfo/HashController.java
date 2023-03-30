@@ -1,6 +1,8 @@
 package com.example.hashcache.controllers.hashInfo;
 
 
+import static com.example.hashcache.controllers.UpdateUserScore.*;
+
 import android.util.Log;
 
 import com.example.hashcache.controllers.UpdateUserScore;
@@ -116,14 +118,8 @@ public class HashController {
             playerWallet.setQrCount(playerWallet.getQrCount() + 1);
 
             // Update the players score in the database
-            try {
-                UpdateUserScore.updateUserScore(context, Database.getInstance());
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
+            updateUserScore(context, Database.getInstance());
             cf.complete(null);
         }).exceptionally(new Function<Throwable, Void>() {
             @Override

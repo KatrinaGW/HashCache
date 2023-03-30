@@ -6,7 +6,10 @@ import com.example.hashcache.context.Context;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.database.DatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.database.DatabasePort;
+import com.google.firebase.firestore.CollectionReference;
 
 import java.util.concurrent.ExecutionException;
 
@@ -16,6 +19,7 @@ public class UpdateUserScore {
         Log.i("USER", "CALLED");
         Player currentPlayer = context.getCurrentPlayer();
         PlayerWallet currentPlayerWallet = currentPlayer.getPlayerWallet();
-        db.updatePlayerScores(currentPlayer.getUserId(), currentPlayerWallet).get();
+        db.updatePlayerScores(currentPlayer.getUserId(), currentPlayerWallet);
+
     }
 }
