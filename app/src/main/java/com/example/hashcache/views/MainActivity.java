@@ -127,6 +127,9 @@ public class MainActivity extends AppCompatActivity {
                             if(!existed){
                                 newUserLoginProcess();
                             }else{
+                                InputStream is;
+                                is = getResources().openRawResource(R.raw.names);
+                                NameGenerator.getNames(is);
                                 startActivity(new Intent(MainActivity.this, AppHome.class));
                             }
                         }
