@@ -115,6 +115,9 @@ public class MainActivity extends AppCompatActivity {
                 Settings.Secure.ANDROID_ID));
         loginUserCommand = new LoginUserCommand();
         playerList = PlayerList.getInstance();
+        InputStream is;
+        is = getResources().openRawResource(R.raw.names);
+        NameGenerator.getNames(is);
         checkDeviceId();
     }
 
@@ -145,11 +148,6 @@ public class MainActivity extends AppCompatActivity {
         AppCompatButton startButton = findViewById(R.id.start_button);
         usernameEditText = findViewById(R.id.username_edittext);
         usernameEditText.setVisibility(View.VISIBLE);
-
-        // Gets input stream to names.csv which is used for name generation
-        InputStream is;
-        is = getResources().openRawResource(R.raw.names);
-        NameGenerator.getNames(is);        // Sets the listener for the start button
         setStartBtnListener(new View.OnClickListener() {
 
             @Override
