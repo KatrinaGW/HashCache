@@ -27,6 +27,7 @@ import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.Database;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -68,6 +69,9 @@ public class NewMonsterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_monster);
+
+        // Construct a FusedLocationProviderClient.
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         init();
         // take location photo
@@ -120,12 +124,8 @@ public class NewMonsterActivity extends AppCompatActivity {
 
                 if (Context.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference()  ){
                     String codeID = curCode.getScannableCodeId();
-                    getLocation();
-                    if (itemGeoLocation != null) {
-                            Database.getInstance().addScannableCodeMetadata(new CodeMetadata(codeID, itemGeoLocation));
-                    }
+                    getLocationAndAdd(codeID);
                 }
-                Log.e("Markers", "MARKER PLACED PEPEGA");
 
                 // go to profile page
                 startActivity(new Intent(NewMonsterActivity.this, MyProfile.class));
@@ -189,7 +189,7 @@ public class NewMonsterActivity extends AppCompatActivity {
         });
     }
 
-    private void getLocation() {
+    private void getLocationAndAdd(String codeID) {
         /*
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
@@ -204,8 +204,9 @@ public class NewMonsterActivity extends AppCompatActivity {
                             // Set the map's camera position to the current location of the device.
                             itemLocation = task.getResult();
                             if (itemLocation != null) {
-                                Log.e("Markers", "MARKER PLACED PEPEGA");
                                 itemGeoLocation = new GeoLocation(itemLocation.getLatitude(), itemLocation.getLongitude());
+                                Log.e("Markers", "itemLocation= " + itemGeoLocation);
+                                Database.getInstance().addScannableCodeMetadata(new CodeMetadata(codeID, itemGeoLocation)).complete(null);
                             }
                         } else {
                             itemGeoLocation = null;
