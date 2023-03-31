@@ -98,43 +98,42 @@ public class HashController {
      */
     private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf,
                                                  ScannableCode sc) {
-        Log.i("GETS", "HERE");
-        Database.getInstance().addScannableCodeToPlayerWallet(userId, hash).thenAccept(created->{
+        Database.getInstance().addScannableCodeToPlayerWallet(userId, hash)
+                .thenAccept(created->{
             Context context = Context.get();
             // Set the current scannable code to the newly added scannable code
             context.setCurrentScannableCode(sc);
 
-            // Update the player scores
             PlayerWallet playerWallet = context.getCurrentPlayer().getPlayerWallet();
-            long score = sc.getHashInfo().getGeneratedScore();
 
-            playerWallet.updateMaxScore(score);
-            playerWallet.setQRCount(playerWallet.getQrCount() + 1);
-
-            // Total Score
-            playerWallet.setTotalScore(playerWallet.getTotalScore() + score);
-
-            // Update the players score in the database
-
-            Database.getInstance().updatePlayerScores(userId, playerWallet)
-                            .thenAccept(success -> {
-                                cf.complete(null);
-                            })
-                    .exceptionally(new Function<Throwable, Void>() {
-                        @Override
-                        public Void apply(Throwable throwable) {
-                            cf.completeExceptionally(throwable);
-                            return null;
-                        }
-                    });
-
-        }).exceptionally(new Function<Throwable, Void>() {
-            @Override
-            public Void apply(Throwable throwable) {
-                cf.completeExceptionally(throwable);
-                return null;
+            if(userId.equals(Context.get().getCurrentPlayer().getUserId())){
+                playerWallet.setQRCount(playerWallet.getQrCount() + 1);
             }
-        });
+
+            CompletableFuture.runAsync(() -> {
+                updateTotalMaxScore()
+                        .thenAccept(nullValue -> {
+                            Database.getInstance().updatePlayerScores(userId, playerWallet)
+                                    .thenAccept(success -> {
+                                        cf.complete(null);
+                                    })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
+
+                }).exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        cf.completeExceptionally(throwable);
+                        return null;
+                    }
+                });
+            });
+                });
     }
     /**
      * Deletes a scannable code from a player's wallet.
@@ -160,7 +159,6 @@ public class HashController {
                                 Player currentPlayer = Context.get().getCurrentPlayer();
                                 // If the deleted scannable code belonged to the current player, remove it from their wallet
                                 if(currentPlayer.getUserId().equals(userId)){
-                                    //currentPlayer.getPlayerWallet().deleteScannableCode(scannableCodeId);
                                     currentPlayer.getPlayerWallet().setQRCount(currentPlayer.getPlayerWallet().getQrCount() - 1);
                                 }
 
