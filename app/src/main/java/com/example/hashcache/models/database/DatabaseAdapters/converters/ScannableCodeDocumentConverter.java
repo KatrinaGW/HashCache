@@ -24,7 +24,7 @@ import java.util.function.Function;
 
 public class ScannableCodeDocumentConverter {
 
-    public CompletableFuture<String> addScannableCodeToCollection(ScannableCode scannableCode,
+    public static CompletableFuture<String> addScannableCodeToCollection(ScannableCode scannableCode,
                                                                        CollectionReference collectionReference,
                                                                        FireStoreHelper fireStoreHelper){
         CompletableFuture<String> cf = new CompletableFuture<>();
@@ -70,7 +70,7 @@ public class ScannableCodeDocumentConverter {
      * @param comment the comment to add to the document
      * @param documentReference the reference to the scannableCodeDocument
      */
-    public void addCommentToScannableCodeDocument(Comment comment,
+    public static void addCommentToScannableCodeDocument(Comment comment,
                                                          DocumentReference documentReference){
         documentReference
                 .collection(CollectionNames.COMMENTS.collectionName)
@@ -103,7 +103,7 @@ public class ScannableCodeDocumentConverter {
         String[] scannableCodeId = new String[1];
         String[] codeLocationId  = new String[1];
         String[] generatedName = new String[1];
-        long[] generatedScore = new long[1];
+        int[] generatedScore = new int[1];
 
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
 
@@ -117,8 +117,8 @@ public class ScannableCodeDocumentConverter {
                             scannableCodeId[0] = document.getId();
                             codeLocationId[0] = (String) document.getData().get(FieldNames.CODE_LOCATION_ID.fieldName);
                             generatedName[0] = (String) document.getData().get(FieldNames.GENERATED_NAME.fieldName);
-                            generatedScore[0] = Long.parseLong(String.valueOf(document.getData()
-                                    .get(FieldNames.GENERATED_SCORE.fieldName)));
+                            generatedScore[0] = Integer.parseInt((String) document.getData()
+                                    .get(FieldNames.GENERATED_SCORE.fieldName));
 
                             getAllComments(documentReference.collection(CollectionNames.COMMENTS.collectionName))
                                     .thenAccept(comments -> {

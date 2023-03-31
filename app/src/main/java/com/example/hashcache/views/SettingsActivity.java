@@ -29,16 +29,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.LogoutCommand;
 import com.example.hashcache.controllers.ResetCommand;
-import com.example.hashcache.controllers.UpdateContactInfoCommand;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
-import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
-import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.Database;
 
 import java.util.Observable;
 import java.util.Observer;
-import java.util.function.Function;
 
 /**
 
@@ -46,49 +43,14 @@ import java.util.function.Function;
  and allows them to toggle their location settings on and off, as well as edit their username and contact information.
  Additional buttons permit navigation to other pages within the application.
  */
-public class SettingsActivity extends AppCompatActivity implements Observer,
-EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
+public class SettingsActivity extends AppCompatActivity implements Observer {
     private TextView usernameView;
     private TextView phoneNumberView;
     private TextView emailView;
+    private CheckBox geoLocationPreferenceCheckbox;
     private ImageView editInfoButton;
     private ImageButton menuButton;
     private Button logoutButton;
-
-    /**
-     * Dismiss the edit info fragment and make the buttons visible again
-     */
-    @Override
-    public void dismissFragment(ContactInfo contactInfo){
-        if(contactInfo!=null){
-            UpdateContactInfoCommand.updateContactInfoCommand(AppContext.get().getCurrentPlayer().getUserId(),
-                            contactInfo, Database.getInstance(), AppContext.get())
-                    .thenAccept(isComplete->{
-                        if(isComplete){
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    setValues();
-                                }
-                            });
-                        }
-                    })
-                    .exceptionally(new Function<Throwable, Void>() {
-                        @Override
-                        public Void apply(Throwable throwable) {
-                            return null;
-                        }
-                    });
-        }else{
-            setValues();
-        }
-        getSupportFragmentManager().beginTransaction().
-                remove(getSupportFragmentManager().findFragmentById(R.id.edit_info_fragment_container)).commit();
-        logoutButton.setVisibility(View.VISIBLE);
-        logoutButton.setVisibility(View.VISIBLE);
-        editInfoButton.setVisibility(View.VISIBLE);
-    }
-
     /**
      * Called when the activity is starting. Initializes the activity and its associated layout.
      *
@@ -103,13 +65,21 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
         usernameView = findViewById(R.id.username_textview);
         phoneNumberView = findViewById(R.id.phone_textview);
         emailView = findViewById(R.id.email_textview);
+        geoLocationPreferenceCheckbox = findViewById(R.id.geolocation_checkbox);
         editInfoButton = findViewById(R.id.edit_info_image);
         logoutButton = findViewById(R.id.logout_button);
+
+        geoLocationPreferenceCheckbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onCheckboxClicked(v);
+            }
+        });
 
         editInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onEditInfoClicked();
+                startActivity(new Intent(SettingsActivity.this, EditPlayerInfoActivity.class));
             }
         });
 
@@ -128,7 +98,7 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
                 bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
         });
-        AppContext.get().addObserver(this);
+        Context.get().addObserver(this);
 
     }
 
@@ -137,19 +107,6 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
         super.onResume();
 
         setValues();
-    }
-
-    private void onEditInfoClicked(){
-        logoutButton.setVisibility(View.GONE);
-        usernameView.setVisibility(View.GONE);
-        emailView.setVisibility(View.GONE);
-        phoneNumberView.setVisibility(View.GONE);
-        logoutButton.setVisibility(View.GONE);
-        editInfoButton.setVisibility(View.GONE);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.edit_info_fragment_container, EditPlayerInfoFragment.class, null)
-                .commit();
     }
 
     private void onLogoutClicked(){
@@ -161,12 +118,11 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
     }
 
     private void setValues(){
-        Player playerInfo = AppContext.get().getCurrentPlayer();
-        usernameView.setVisibility(View.VISIBLE);
+        Player playerInfo = Context.get().getCurrentPlayer();
         setUsername(playerInfo.getUsername());
-
         setEmail(playerInfo.getContactInfo().getEmail());
         setPhoneNumber(playerInfo.getContactInfo().getPhoneNumber());
+        setRecordGeoLocationChecked(playerInfo.getPlayerPreferences().getRecordGeolocationPreference());
     }
 
     /**
@@ -178,7 +134,7 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
 
         boolean checked = ((CheckBox) view).isChecked();
 
-        UpdateUserPreferencesCommand.toggleGeoLocationPreference(checked, AppContext.get(),
+        UpdateUserPreferencesCommand.toggleGeoLocationPreference(checked, Context.get(),
                 Database.getInstance());
     }
     /**
@@ -198,7 +154,6 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
     private void setPhoneNumber(String phoneNumber){
         if(!phoneNumber.equals("")){
             this.phoneNumberView.setText(phoneNumber);
-            this.phoneNumberView.setVisibility(View.VISIBLE);
         }else{
             this.phoneNumberView.setVisibility(View.GONE);
         }
@@ -212,10 +167,13 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
     private void setEmail(String email){
         if(!email.equals("")){
             this.emailView.setText(email);
-            this.emailView.setVisibility(View.VISIBLE);
         }else{
             this.emailView.setVisibility(View.GONE);
         }
+    }
+
+    private void setRecordGeoLocationChecked(boolean checked){
+        this.geoLocationPreferenceCheckbox.setChecked(checked);
     }
 
     @Override

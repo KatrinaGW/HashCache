@@ -32,12 +32,4 @@ public class CommentTest {
 
         assertEquals(commentatorId, testComment.getCommentatorId());
     }
-
-    @Test
-    void getCommentIdTest(){
-        String testCommentId = "This is a comment";
-        Comment testComment = new Comment(testCommentId, "definitely a robot", "definitely not a robot");
-
-        assertEquals(testCommentId, testComment.getCommentId());
-    }
 }

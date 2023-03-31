@@ -11,6 +11,7 @@ import android.widget.EditText;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
+import com.example.hashcache.views.EditPlayerInfoActivity;
 import com.example.hashcache.views.MainActivity;
 import com.example.hashcache.R;
 import com.example.hashcache.views.SettingsActivity;
@@ -71,7 +72,7 @@ public class EditPlayerInfoActivityTest {
     @Test
     public void checkEmptyInput(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
-        //solo.assertCurrentActivity("Wrong Activity", EditPlayerInfoActivity.class);
+        solo.assertCurrentActivity("Wrong Activity", EditPlayerInfoActivity.class);
         solo.clickOnButton("CONFIRM");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);

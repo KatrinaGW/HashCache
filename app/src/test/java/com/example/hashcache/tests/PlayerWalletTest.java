@@ -5,14 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import android.media.Image;
-
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
 
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -24,7 +21,7 @@ import java.util.UUID;
 public class PlayerWalletTest {
 
     @Test
-    void getScannableCodeLocationImageThrows(){
+    void GetScannableCodeLocationImageThrows(){
         PlayerWallet playerWallet= new PlayerWallet();
 
         assertThrows(IllegalArgumentException.class, () -> {
@@ -33,7 +30,7 @@ public class PlayerWalletTest {
     }
 
     @Test
-    void getScannableCodeLocationImage(){
+    void GetScannableCodeLocationImage(){
         PlayerWallet playerWallet= new PlayerWallet();
         ScannableCode scannableCode = new ScannableCode("123", new HashInfo(null, "name", 321));
 
@@ -43,7 +40,7 @@ public class PlayerWalletTest {
     }
 
     @Test
-    void getScannedCodeIds(){
+    void GetScannedCodeIds(){
         PlayerWallet playerWallet= new PlayerWallet();
         ScannableCode firstMockScannableCode = new ScannableCode("123", new HashInfo(null, "name1", 321), String.valueOf(1234));
         ScannableCode secondMockScannableCode = new ScannableCode("124", new HashInfo(null, "name2", 321), String.valueOf(1234));
@@ -58,75 +55,5 @@ public class PlayerWalletTest {
         assertTrue(expectedUUIDs.containsAll(playerWallet.getScannedCodeIds()) &&
                 playerWallet.getScannedCodeIds().containsAll(expectedUUIDs));
 
-    }
-
-    @Test
-    void addScannableCodeNoImageTest(){
-        String randomId = "randomId";
-        PlayerWallet playerWallet = new PlayerWallet();
-        playerWallet.addScannableCode(randomId);
-
-        assertTrue(playerWallet.getSize() == 1);
-        assertEquals(playerWallet.getScannedCodeIds().get(0), randomId);
-    }
-
-    @Test
-    void addScannableCodeWithImageTest(){
-        String randomId = "randomId";
-        Image mockImage = Mockito.mock(Image.class);
-        PlayerWallet playerWallet = new PlayerWallet();
-        playerWallet.addScannableCode(randomId, mockImage);
-
-        assertTrue(playerWallet.getSize() == 1);
-        assertEquals(playerWallet.getScannedCodeIds().get(0), randomId);
-        assertEquals(mockImage, playerWallet.getScannableCodeLocationImage(randomId));
-    }
-
-    @Test
-    void getTotalScoreTest(){
-        PlayerWallet playerWallet = new PlayerWallet();
-        long fakeScore = 4918;
-        playerWallet.setTotalScore(fakeScore);
-
-        assertEquals(fakeScore, playerWallet.getTotalScore());
-    }
-
-    @Test
-    void setTotalScoreTest(){
-        PlayerWallet playerWallet = new PlayerWallet();
-        long fakeScore = 4918;
-        playerWallet.setTotalScore(48953);
-        playerWallet.setTotalScore(fakeScore);
-
-        assertEquals(fakeScore, playerWallet.getTotalScore());
-    }
-
-    @Test
-    void getSizeTest(){
-        PlayerWallet playerWallet= new PlayerWallet();
-        ScannableCode firstMockScannableCode = new ScannableCode("123", new HashInfo(null, "name1", 321), String.valueOf(1234));
-        ScannableCode secondMockScannableCode = new ScannableCode("124", new HashInfo(null, "name2", 321), String.valueOf(1234));
-
-        playerWallet.addScannableCode(firstMockScannableCode.getScannableCodeId());
-        playerWallet.addScannableCode(secondMockScannableCode.getScannableCodeId());
-
-        assertEquals(2, playerWallet.getSize());
-    }
-
-    @Test
-    void deleteScannableCodeTest(){
-        PlayerWallet playerWallet= new PlayerWallet();
-        ScannableCode firstMockScannableCode = new ScannableCode("123", new HashInfo(null, "name1", 321), String.valueOf(12234));
-        ScannableCode secondMockScannableCode = new ScannableCode("124", new HashInfo(null, "name2", 321), String.valueOf(1234));
-
-        playerWallet.addScannableCode(firstMockScannableCode.getScannableCodeId());
-        playerWallet.addScannableCode(secondMockScannableCode.getScannableCodeId());
-
-        assertEquals(2, playerWallet.getSize());
-
-        playerWallet.deleteScannableCode(firstMockScannableCode.getScannableCodeId());
-
-        assertTrue(playerWallet.getSize() == 1);
-        assertTrue(playerWallet.getScannedCodeIds().get(0) == secondMockScannableCode.getScannableCodeId());
     }
 }

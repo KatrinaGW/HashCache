@@ -3,7 +3,6 @@ package com.example.hashcache.models;
 import com.example.hashcache.controllers.DependencyInjector;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
-import com.example.hashcache.models.database.DatabasePort;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,11 +71,9 @@ public class PlayerList {
      * Will
      * @param searchTerm string enter in to the search box by the user
      * @param k number of names to return
-     * @param db the instance of the DatabasePort to use
      * @return list of user who closely match the search term
      */
-    public CompletableFuture<ArrayList<String>> searchPlayers(String searchTerm, int k,
-                                                              DatabasePort db) {
+    public CompletableFuture<ArrayList<String>> searchPlayers(String searchTerm, int k) {
         if(INSTANCE == null) {
             throw new IllegalArgumentException("The playerList singleton object has yet to be created");
         }
@@ -85,7 +82,7 @@ public class PlayerList {
         ArrayList<Username> foundPlayers = new ArrayList<>();
 
         CompletableFuture.runAsync(()->{
-            db.getPlayers().thenAccept(usernames -> {
+            Database.getInstance().getPlayers().thenAccept(usernames -> {
                 int distance;
                 for(String name: usernames.keySet()) {
                     distance = getInstance().computeLevenshteinDistance(name, searchTerm);

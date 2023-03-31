@@ -4,7 +4,7 @@ package com.example.hashcache.controllers.hashInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.context.Context;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -37,7 +37,7 @@ public class HashController {
                     // Generate hash information for the scannable code and check if it already exists in the database
                     HashInfoGenerator.generateHashInfo(byteArray).thenAccept(hashInfo -> {
                         Database.getInstance().scannableCodeExists(hash).thenAccept(exists -> {
-                            String userId = AppContext.get().getCurrentPlayer().getUserId();
+                            String userId = Context.get().getCurrentPlayer().getUserId();
                             ScannableCode sc = new ScannableCode(hash, hashInfo);
                             // If the scannable code already exists in the database, add it to the player's wallet
                             if(exists){
@@ -90,7 +90,7 @@ public class HashController {
     private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf, ScannableCode sc) {
         Database.getInstance().addScannableCodeToPlayerWallet(userId, hash).thenAccept(created->{
             // Set the current scannable code to the newly added scannable code
-            AppContext.get().setCurrentScannableCode(sc);
+            Context.get().setCurrentScannableCode(sc);
             cf.complete(null);
         }).exceptionally(new Function<Throwable, Void>() {
             @Override
@@ -120,7 +120,7 @@ public class HashController {
                             // If the scannable code was deleted successfully, update the current player's wallet
                             if(completed){
                         cf.complete(completed);
-                        Player currentPlayer = AppContext.get().getCurrentPlayer();
+                        Player currentPlayer = Context.get().getCurrentPlayer();
                         // If the deleted scannable code belonged to the current player, remove it from their wallet
                         if(currentPlayer.getUserId() == userId){
                             currentPlayer.getPlayerWallet().deleteScannableCode(scannableCodeId);

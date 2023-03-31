@@ -448,6 +448,23 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     }
 
     /**
+     * Deletes a comment from a scananble code
+     * @param scannableCodeId the id of the scannable code to delete the comment from
+     * @param commentId the id of the comment to delete
+     * @return cf the CompletableFuture with a boolean value indicating if the operation was successful
+     * or not
+     */
+    @Override
+    public CompletableFuture<Boolean> deleteComment(String scannableCodeId, String commentId){
+        CompletableFuture<Boolean> cf = ScannableCodesDatabaseAdapter.getInstance().deleteComment(
+                scannableCodeId, commentId
+        );
+        return cf;
+    }
+
+    ;
+
+    /**
      * Get the player's highest scoring QR code
      * 
      * @param scannableCodeIds the scannableIds to find the highest scoring
@@ -459,7 +476,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             PlayerWalletDatabaseAdapter.getInstance()
-                    .getPlayerWalletTopScore(scannableCodeIds, this)
+                    .getPlayerWalletTopScore(scannableCodeIds)
                     .thenAccept(topScore -> {
                         cf.complete(topScore);
                     })
@@ -486,7 +503,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             PlayerWalletDatabaseAdapter.getInstance()
-                    .getPlayerWalletLowScore(scannableCodeIds, this)
+                    .getPlayerWalletLowScore(scannableCodeIds)
                     .thenAccept(lowScore -> {
                         cf.complete(lowScore);
                     })

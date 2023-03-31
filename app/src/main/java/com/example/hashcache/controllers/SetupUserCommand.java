@@ -2,7 +2,7 @@ package com.example.hashcache.controllers;
 
 import android.util.Log;
 
-import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.DatabasePort;
 
 import java.util.concurrent.CompletableFuture;
@@ -14,19 +14,19 @@ public class SetupUserCommand {
      *
      * @param userName the username of the user to set up
      * @param db the interface to use to conenct to the firestore collection
-     * @param appContext the current context of the app
+     * @param context the current context of the app
      * @return cf the CompletableFuture that will complete exceptionally if there was a problem
      */
     public CompletableFuture<Void> setupUser(String userName, DatabasePort db,
-                           AppContext appContext) {
+                           Context context) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         db.getIdByUsername(userName).thenAccept(userId -> {
             db.getPlayer(userId).thenAccept(player -> {
 
-                AddLoginCommand.addLogin(userName, appContext, db)
+                AddLoginCommand.addLogin(userName, context, db)
                         .thenAccept(nullValue -> {
-                            appContext.setCurrentPlayer(player);
-                            appContext.setupListeners();
+                            context.setCurrentPlayer(player);
+                            context.setupListeners();
                             cf.complete(null);
                         })
                         .exceptionally(new Function<Throwable, Void>() {

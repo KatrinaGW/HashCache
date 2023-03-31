@@ -7,7 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.context.Context;
 import com.example.hashcache.controllers.UpdateContactInfoCommand;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
@@ -20,12 +20,12 @@ import org.mockito.Mockito;
 import java.util.concurrent.CompletableFuture;
 
 public class UpdateContactInfoCommandTest {
-    private AppContext mockAppContext;
+    private Context mockContext;
     private DatabasePort mockDB;
 
     @BeforeEach
     void resetMocks(){
-        mockAppContext = Mockito.mock(AppContext.class);
+        mockContext = Mockito.mock(Context.class);
         mockDB = Mockito.mock(DatabasePort.class);
     }
 
@@ -37,12 +37,12 @@ public class UpdateContactInfoCommandTest {
         CompletableFuture<Boolean> testCF = new CompletableFuture<>();
         testCF.complete(true);
 
-        when(mockAppContext.getCurrentPlayer()).thenReturn(testPlayer);
+        when(mockContext.getCurrentPlayer()).thenReturn(testPlayer);
         when(testPlayer.getUserId()).thenReturn(testId);
         when(mockDB.updateContactInfo(testContactInfo, testId)).thenReturn(testCF);
 
         assertTrue(UpdateContactInfoCommand.updateContactInfoCommand(testId, testContactInfo,
-                mockDB, mockAppContext).join());
+                mockDB, mockContext).join());
 
         verify(testPlayer, times(1)).setContactInfo(testContactInfo);
     }

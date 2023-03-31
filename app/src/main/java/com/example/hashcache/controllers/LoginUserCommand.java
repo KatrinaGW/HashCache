@@ -1,6 +1,6 @@
 package com.example.hashcache.controllers;
 
-import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.DatabasePort;
 
 import java.util.concurrent.CompletableFuture;
@@ -14,16 +14,16 @@ public class LoginUserCommand {
      *
      * @param userName the username of the user to log in or create
      * @param db the database instance of the DatabasePort to interface with the Firestore collection
-     * @param appContext the current app context
+     * @param context the current app context
      * @param setupUserCommand the instance of the SetupUser command to use
      * @return a CompletableFuture that completes when the user has been logged in or created
      */
-    public CompletableFuture<Void> loginUser(String userName, DatabasePort db, AppContext appContext,
+    public CompletableFuture<Void> loginUser(String userName, DatabasePort db, Context context,
                                              SetupUserCommand setupUserCommand){
         CompletableFuture<Void> cf = new CompletableFuture<>();
         db.usernameExists(userName).thenAccept(exists -> {
             if(exists){
-                setupUserCommand.setupUser(userName, db, appContext)
+                setupUserCommand.setupUser(userName, db, context)
                         .thenAccept(nullValue->{
                             cf.complete(null);
                         })
@@ -37,7 +37,7 @@ public class LoginUserCommand {
             }
             else{
                 db.createPlayer(userName).thenAccept(result -> {
-                    setupUserCommand.setupUser(userName, db, appContext)
+                    setupUserCommand.setupUser(userName, db, context)
                             .thenAccept(nullValue -> {
                                 cf.complete(null);
                             })

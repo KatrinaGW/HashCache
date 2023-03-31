@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:appContext="com.example.hashcache.views.DisplayCommentsActivity">
+    tools:context="com.example.hashcache.views.DisplayCommentsActivity">
 
     <RelativeLayout
         android:id="@+id/header"

@@ -9,7 +9,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hashcache.R;
-import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.context.Context;
 import com.example.hashcache.controllers.AddCommentCommand;
 import com.example.hashcache.models.Comment;
 
@@ -46,8 +46,8 @@ public class AddCommentActivity extends AppCompatActivity {
 
     private void onConfirmButtonClicked(){
         String body = bodyEditText.getText().toString();
-        String scannableCodeId = AppContext.get().getCurrentScannableCode().getScannableCodeId();
-        String userId = AppContext.get().getCurrentPlayer().getUserId();
+        String scannableCodeId = Context.get().getCurrentScannableCode().getScannableCodeId();
+        String userId = Context.get().getCurrentPlayer().getUserId();
         AddCommentCommand.AddCommentCommand(new Comment(body, userId), scannableCodeId)
                 .thenAccept(voidObject -> {
                     finish();

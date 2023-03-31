@@ -13,7 +13,7 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.context.Context;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
@@ -47,7 +47,7 @@ public class LeaderboardScoreActivity extends AppCompatActivity {
 
         AtomicLong playerScores = new AtomicLong();
         Database.getInstance()
-                .getTotalScore(AppContext.get().getCurrentPlayer().getUserId())
+                .getTotalScore(Context.get().getCurrentPlayer().getUserId())
                 .thenAccept( score -> {
                     runOnUiThread(new Runnable() {
                         @Override

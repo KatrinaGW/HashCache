@@ -37,7 +37,6 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
 import com.example.hashcache.models.PlayerList;
-import com.example.hashcache.models.database.Database;
 
 import java.util.ArrayList;
 /**
@@ -93,8 +92,7 @@ public class Community extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(),
-                                        10, Database.getInstance())
+                        PlayerList.getInstance().searchPlayers(searchBarText.getText().toString(), 10)
                                 .thenAccept(searchResults->{
 
                                     runOnUiThread(new Runnable() {

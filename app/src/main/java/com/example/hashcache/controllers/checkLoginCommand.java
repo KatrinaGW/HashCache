@@ -1,27 +1,20 @@
 package com.example.hashcache.controllers;
 
-import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database.DatabasePort;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-public class CheckLoginCommand {
-
-    /**
-     * Checks if the device has a login record for a specific user
-     * @param db the instance of the DatabasePort to use
-     * @param setupUserCommand the instance of the SetUpUserCommand to use
-     * @return cf the CompletableFuture which returns true if the device has a login and false otherwise
-     */
-    public static CompletableFuture<Boolean> checkLogin(DatabasePort db, SetupUserCommand setupUserCommand){
+public class checkLoginCommand {
+    public static CompletableFuture<Boolean> checkLogin(LoginUserCommand loginUserCommand){
+        SetupUserCommand setupUserCommand = new SetupUserCommand();
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
-            db.getUsernameForDevice()
+            Database.getInstance().getUsernameForDevice()
                     .thenAccept(username -> {
                         if(username!=null){
-                            setupUserCommand.setupUser(username, Database.getInstance(), AppContext.get())
+                            setupUserCommand.setupUser(username, Database.getInstance(), Context.get())
                                     .thenAccept(nullValue -> {
                                         cf.complete(true);
                                     })

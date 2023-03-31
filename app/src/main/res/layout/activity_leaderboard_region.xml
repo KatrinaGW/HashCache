@@ -10,18 +10,28 @@
         <View
             android:id="@+id/purple_rect"
             android:layout_width="match_parent"
-            android:layout_height="76dp"
+            android:layout_height="115dp"
             android:background="@drawable/purple_gradient"/>
         <TextView
             android:id="@+id/leaderboard_score_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="LEADERBOARD"
-            android:textSize="28sp"
+            android:textSize="32sp"
             android:textColor="@color/black"
             android:textStyle="bold"
             android:textAlignment="center"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="40dp"/>
+        <ImageButton
+            android:id="@+id/menu_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/menu_button_dark"
+            android:src="@android:drawable/ic_dialog_dialer"
+            android:padding="6dp"
+            android:layout_marginEnd="18dp"
+            android:layout_alignParentEnd="true"
+            android:elevation="6dp"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -80,9 +90,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@color/HC_purple"
-            android:src="@drawable/icon_star_one"
-            android:scaleType="fitCenter"
-            android:padding="6dp"
+            android:src="@android:drawable/ic_menu_compass"
             android:layout_centerVertical="true" />
         <TextView
             android:id="@+id/user_one"
@@ -134,9 +142,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@color/HC_purple"
-            android:src="@drawable/icon_star_two"
-            android:scaleType="fitCenter"
-            android:padding="6dp"
+            android:src="@android:drawable/ic_menu_compass"
             android:layout_centerVertical="true" />
         <TextView
             android:id="@+id/user_two"
@@ -188,9 +194,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@color/HC_purple"
-            android:src="@drawable/icon_star_three"
-            android:scaleType="fitCenter"
-            android:padding="6dp"
+            android:src="@android:drawable/ic_menu_compass"
             android:layout_centerVertical="true" />
         <TextView
             android:id="@+id/user_three"
@@ -232,18 +236,18 @@
         <View
             android:id="@+id/grey_rect"
             android:layout_width="match_parent"
-            android:layout_height="164dp"
+            android:layout_height="125dp"
             android:background="@color/HC_ash_grey"
             android:layout_alignParentBottom="true"/>
         <TextView
             android:id="@+id/my_score_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="My Score for this Region"
+            android:text="My Score"
             android:textSize="20sp"
             android:textColor="@color/HC_light_green"
             android:textAlignment="center"
-            android:layout_above="@id/score_value_textview"
+            android:layout_alignTop="@id/grey_rect"
             android:layout_marginTop="10dp" />
         <TextView
             android:id="@+id/score_value_textview"
@@ -253,38 +257,28 @@
             android:textSize="20sp"
             android:textColor="@color/white"
             android:textAlignment="center"
-            android:layout_above="@id/region_textview"/>
+            android:layout_alignTop="@id/my_score_textview"
+            android:layout_marginTop="24dp"/>
         <TextView
             android:id="@+id/region_textview"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/menu_button"
-            android:layout_alignEnd="@+id/menu_button"
-            android:text="Ranking: "
-            android:textAlignment="center"
+            android:text="My Ranking in this radius"
+            android:textSize="20sp"
             android:textColor="@color/HC_light_green"
-            android:textSize="20sp" />
+            android:textAlignment="center"
+            android:layout_alignTop="@id/score_value_textview"
+            android:layout_marginTop="24dp"/>
         <TextView
             android:id="@+id/region_value_textview"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/region_textview"
-            android:layout_above="@id/menu_button"
             android:text="700"
-            android:textAlignment="center"
+            android:textSize="20sp"
             android:textColor="@color/white"
-            android:textSize="20sp" />
-        <ImageButton
-            android:id="@+id/menu_button"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/semicircle_button"
-            android:elevation="6dp"
-            android:src="@drawable/half_logo"
-            android:scaleType="fitCenter"/>
+            android:textAlignment="center"
+            android:layout_alignTop="@id/region_textview"
+            android:layout_marginTop="24dp"/>
     </RelativeLayout>
 
 </RelativeLayout>

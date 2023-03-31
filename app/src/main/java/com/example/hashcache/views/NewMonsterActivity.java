@@ -19,7 +19,6 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 
 import com.example.hashcache.R;
-import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.HashInfo;
@@ -84,7 +83,7 @@ public class NewMonsterActivity extends AppCompatActivity {
             }
         });
 
-        ScannableCode curCode = AppContext.get().getCurrentScannableCode();
+        ScannableCode curCode = Context.get().getCurrentScannableCode();
         HashInfo curInfo = curCode.getHashInfo();
         setMonsterName(curInfo.getGeneratedName());
         setMonsterScore(curInfo.getGeneratedScore());

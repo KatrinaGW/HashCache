@@ -151,11 +151,6 @@ public class PlayersDatabaseAdapter {
         return cf;
     }
 
-    /**
-     * Gets the id of a user based on their username
-     * @param username the username of the player whose id needs to be fetched
-     * @return cf the CompletableFuture with the player id
-     */
     public CompletableFuture<String> getPlayerIdByUsername(String username) {
         CompletableFuture<String> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
@@ -512,8 +507,6 @@ public class PlayersDatabaseAdapter {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         if (task.isSuccessful()) {
-                                            String otherThing = task.getResult().get(FieldNames.USERNAME.fieldName).toString();
-                                            Pair<String, String> thing = new Pair<String, String>(userId, otherThing);
                                             cf.complete(new Pair<String, String>(userId,
                                                     task.getResult().get(FieldNames.USERNAME.fieldName).toString()));
                                         } else {

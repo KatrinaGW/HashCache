@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.hashcache.views.AddCommentActivity"
+    tools:context="com.example.hashcache.views.EditPlayerInfoActivity"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+             android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="409dp"
@@ -16,15 +16,23 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <EditText
-            android:id="@+id/comment_body_edit_text"
+            android:id="@+id/email_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter comment body here"
+            android:hint="email (example@domain.com)"
+            android:textColor="@color/white"
+            android:textColorHint="#FFFFFF" />
+
+        <EditText
+            android:id="@+id/edit_phone_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="phone number (111-111-1111)"
             android:textColor="@color/white"
             android:textColorHint="#FFFFFF" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/confirm_add_comment_button"
+            android:id="@+id/confirm_player_info_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Confirm"

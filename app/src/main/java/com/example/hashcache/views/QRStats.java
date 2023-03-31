@@ -9,16 +9,19 @@ package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
-import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.context.Context;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -81,7 +84,7 @@ public class QRStats extends AppCompatActivity implements Observer {
         });
 
         init();
-        AppContext.get().addObserver(this);
+        Context.get().addObserver(this);
     }
 
     @Override
@@ -94,10 +97,10 @@ public class QRStats extends AppCompatActivity implements Observer {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PlayerWallet curWallet = AppContext.get().getCurrentPlayer().getPlayerWallet();
-                ScannableCode lowestScan = AppContext.get().getLowestScannableCode();
-                ScannableCode highestScan = AppContext.get().getHighestScannableCode();
-                long totalScore = AppContext.get().getCurrentPlayer().getPlayerWallet().getTotalScore();
+                PlayerWallet curWallet = Context.get().getCurrentPlayer().getPlayerWallet();
+                ScannableCode lowestScan = Context.get().getLowestScannableCode();
+                ScannableCode highestScan = Context.get().getHighestScannableCode();
+                long totalScore = Context.get().getCurrentPlayer().getPlayerWallet().getTotalScore();
                 setMyCodesValue(curWallet.getSize());
                 setLowScoreValue(lowestScan);
                 setHighScoreValue(highestScan);
@@ -107,16 +110,16 @@ public class QRStats extends AppCompatActivity implements Observer {
     }
 
     private void highestScoringCodeClicked() {
-        ScannableCode highestScan = AppContext.get().getHighestScannableCode();
-        AppContext.get().setCurrentScannableCode(highestScan);
+        ScannableCode highestScan = Context.get().getHighestScannableCode();
+        Context.get().setCurrentScannableCode(highestScan);
         Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
         intent.putExtra("belongsToCurrentUser", true);
         startActivity(intent);
     }
 
     private void lowestScoringCodeClicked() {
-        ScannableCode lowestScan = AppContext.get().getLowestScannableCode();
-        AppContext.get().setCurrentScannableCode(lowestScan);
+        ScannableCode lowestScan = Context.get().getLowestScannableCode();
+        Context.get().setCurrentScannableCode(lowestScan);
         Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
         intent.putExtra("belongsToCurrentUser", true);
         startActivity(intent);
@@ -141,7 +144,7 @@ public class QRStats extends AppCompatActivity implements Observer {
 
     public void setLowScoreValue(ScannableCode lowestScoring) {
         if(lowestScoring!=null){
-            lowScoreValueTextView.setText(Long.toString(lowestScoring.getHashInfo().getGeneratedScore()));
+            lowScoreValueTextView.setText(String.valueOf(lowestScoring.getHashInfo().getGeneratedScore()));
             lowScoreValueTextView.setClickable(true);
         }else{
             lowScoreValueTextView.setText(R.string.no_codes_scanned);

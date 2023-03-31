@@ -2,7 +2,9 @@ package com.example.hashcache.models.database.DatabaseAdapters;
 
 import androidx.annotation.NonNull;
 
-import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.context.Context;
+import com.example.hashcache.models.Comment;
+import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -12,6 +14,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
@@ -76,20 +80,15 @@ public class LoginsAdapter {
      */
     public CompletableFuture<Void> addLoginRecord(String username){
         CompletableFuture<Void> cf = new CompletableFuture<>();
-        String deviceId = AppContext.get().getDeviceId();
+        String deviceId = Context.get().getDeviceId();
         HashMap<String, String> data = new HashMap<>();
         data.put(FieldNames.DEVICE_ID.fieldName, deviceId);
         data.put(FieldNames.USERNAME.fieldName, username);
 
         CompletableFuture.runAsync(() -> {
             fireStoreHelper.setDocumentReference(collectionReference.document(deviceId), data)
-                    .thenAccept(complete -> {
-                        if(complete){
-                            cf.complete(null);
-                        }else{
-                            cf.completeExceptionally(new Exception("Something went wrong while adding" +
-                                    "a login record"));
-                        }
+                    .thenAccept(nullValue -> {
+                        cf.complete(null);
                     })
                     .exceptionally(new Function<Throwable, Void>() {
                         @Override
@@ -109,7 +108,7 @@ public class LoginsAdapter {
      */
     public CompletableFuture<String> getUsernameForDevice(){
         CompletableFuture<String> cf = new CompletableFuture<>();
-        String deviceId = AppContext.get().getDeviceId();
+        String deviceId = Context.get().getDeviceId();
 
         CompletableFuture.runAsync(()->{
             fireStoreHelper.documentWithIDExists(collectionReference, deviceId)
@@ -126,7 +125,7 @@ public class LoginsAdapter {
                                                             .get((FieldNames.USERNAME.fieldName)));
                                                 } else {
                                                     cf.completeExceptionally(new Exception(
-                                                            "Something went wrong while getting the " +
+                                                            "Something went wrong while getting the" +
                                                                     "username from the deviceId record"
                                                     ));
                                                 }
@@ -164,7 +163,7 @@ public class LoginsAdapter {
         CompletableFuture<Void> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            fireStoreHelper.documentWithIDExists(collectionReference, AppContext.get().getDeviceId())
+            fireStoreHelper.documentWithIDExists(collectionReference, Context.get().getDeviceId())
                     .thenAccept(
                             exists -> {
                                 if(!exists){
@@ -172,7 +171,7 @@ public class LoginsAdapter {
                                             "There is no login record for the given ID!"
                                     ));
                                 }else{
-                                    collectionReference.document(AppContext.get().getDeviceId())
+                                    collectionReference.document(Context.get().getDeviceId())
                                             .delete()
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
