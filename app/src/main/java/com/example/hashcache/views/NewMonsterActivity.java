@@ -24,7 +24,6 @@ import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.context.Context;
 import com.example.hashcache.models.database.Database;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -123,7 +122,7 @@ public class NewMonsterActivity extends AppCompatActivity {
                 //check if they allow for metadata
 
 
-                if (Context.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference()  ){
+                if ( AppContext.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference()  ){
                     String codeID = curCode.getScannableCodeId();
                     getLocationAndAdd(codeID);
                 }
@@ -196,7 +195,7 @@ public class NewMonsterActivity extends AppCompatActivity {
          * cases when a location is not available.
          */
         try {
-            if ( Context.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference()  ) {
+            if ( AppContext.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference()  ) {
                 Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
                 locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
                     @Override

@@ -60,7 +60,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import com.example.hashcache.context.Context;
 
 /**
 
@@ -324,7 +323,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
             if (locationPermissionGranted) {
                 map.setMyLocationEnabled(true);
                 map.getUiSettings().setMyLocationButtonEnabled(true);
-                UpdateUserPreferencesCommand.toggleGeoLocationPreference(true, Context.get(),
+                UpdateUserPreferencesCommand.toggleGeoLocationPreference(true, AppContext.get(),
                         Database.getInstance());
                 getDeviceLocation();
             } else {
@@ -333,7 +332,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                         .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                 map.getUiSettings().setMyLocationButtonEnabled(false);
                 lastKnownLocation = null;
-                UpdateUserPreferencesCommand.toggleGeoLocationPreference(false, Context.get(),
+                UpdateUserPreferencesCommand.toggleGeoLocationPreference(false, AppContext.get(),
                         Database.getInstance());
 
                 //getLocationPermission();
