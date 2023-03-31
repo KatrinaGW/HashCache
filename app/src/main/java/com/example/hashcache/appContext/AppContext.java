@@ -1,8 +1,5 @@
-package com.example.hashcache.context;
+package com.example.hashcache.appContext;
 
-import android.provider.Settings;
-
-import androidx.lifecycle.Observer;
 import android.util.Log;
 
 import com.example.hashcache.models.Player;
@@ -17,10 +14,10 @@ import java.util.Observable;
 /**
  * Holds the global state information for the app
  */
-public class Context extends Observable {
-    private static Context instance;
+public class AppContext extends Observable {
+    private static AppContext instance;
 
-    private Context() {}
+    private AppContext() {}
 
     boolean isLoggedIn;
     private Player currentPlayer;
@@ -35,11 +32,11 @@ public class Context extends Observable {
      *
      * @return instance The singleton instance of the AppStore
      */
-    public static Context get() {
+    public static AppContext get() {
         if (instance == null) {
-            synchronized (Context.class) {
+            synchronized (AppContext.class) {
                 if (instance == null) {
-                    instance = new Context();
+                    instance = new AppContext();
                 }
 
             }

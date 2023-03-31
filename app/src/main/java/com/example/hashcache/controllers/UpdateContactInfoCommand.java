@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.context.Context;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.database.DatabasePort;
 
 import java.util.concurrent.CompletableFuture;
@@ -21,7 +21,7 @@ import java.util.function.Function;
  The update is executed asynchronously using CompletableFuture.runAsync() method to avoid blocking the main thread.
  @see ContactInfo
  @see Database
- @see Context
+ @see AppContext
  @see CompletableFuture
  */
 public class UpdateContactInfoCommand {
@@ -34,11 +34,11 @@ public class UpdateContactInfoCommand {
     public static CompletableFuture<Boolean> updateContactInfoCommand(String userId,
                                                                       ContactInfo contactInfo,
                                                                       DatabasePort db,
-                                                                      Context context){
+                                                                      AppContext appContext){
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
-        if(userId.equals(context.getCurrentPlayer().getUserId())){
-            context.getCurrentPlayer().setContactInfo(contactInfo);
+        if(userId.equals(appContext.getCurrentPlayer().getUserId())){
+            appContext.getCurrentPlayer().setContactInfo(contactInfo);
         }
 
         CompletableFuture.runAsync(()->{
@@ -49,7 +49,7 @@ public class UpdateContactInfoCommand {
             ).exceptionally(new Function<Throwable, Void>() {
                 @Override
                 public Void apply(Throwable throwable) {
-                    Log.d("ERROR", "Could not update player" + context.getCurrentPlayer().getUsername());
+                    Log.d("ERROR", "Could not update player" + appContext.getCurrentPlayer().getUsername());
                     Log.d("Reason", throwable.getMessage());
                     cf.completeExceptionally(new Exception("Could not update player."));
                     return null;
