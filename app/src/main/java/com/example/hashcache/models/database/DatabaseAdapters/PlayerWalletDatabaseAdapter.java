@@ -348,13 +348,13 @@ public class PlayerWalletDatabaseAdapter {
                                                PlayerWallet playerWallet) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
 
-        HashMap<String, String> data = new HashMap<>();
+        HashMap<String, Object> data = new HashMap<>();
         data.put(FieldNames.TOTAL_SCORE.fieldName, Long.toString(playerWallet.getTotalScore()));
         data.put(FieldNames.MAX_SCORE.fieldName, Long.toString(playerWallet.getMaxScore()));
         data.put(FieldNames.QR_COUNT.fieldName, Long.toString(playerWallet.getQrCount()));
 
         CompletableFuture.runAsync(() -> {
-            fireStoreHelper.setDocumentReference(playerDocument, data)
+            fireStoreHelper.addUpdateManyFieldsIntoDocument(playerDocument, data)
                     .thenAccept(success -> {
                         if(success){
                             cf.complete(null);
@@ -419,8 +419,6 @@ public class PlayerWalletDatabaseAdapter {
                     });
         });
 
-        Log.i("DATABASE", "Updating player score");
-        return fireStoreHelper.addNumberFieldToDocument(playerDocument,
-                FieldNames.MAX_SCORE.fieldName, 10L);
+        return cf;
     }
 }

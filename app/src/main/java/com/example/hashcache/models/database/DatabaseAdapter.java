@@ -665,6 +665,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
 
 
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
             PlayerWalletDatabaseAdapter.getInstance().updatePlayerScores(userId, playerWallet,
                             new FireStoreHelper())
                     .thenAccept(success -> {

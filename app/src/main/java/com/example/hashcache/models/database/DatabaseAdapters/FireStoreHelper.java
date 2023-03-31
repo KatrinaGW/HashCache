@@ -115,6 +115,33 @@ public class FireStoreHelper {
 
         return cf;
     }
+
+    /**
+     * Adds or updates fields in the document
+     * @param documentReference the document to change
+     * @param data the data to add or update in the document
+     * @return cf the CompletableFuture that completes with true if the operation was successful
+     */
+    public CompletableFuture<Boolean> addUpdateManyFieldsIntoDocument(DocumentReference documentReference,
+                                                                   HashMap<String, Object> data){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
+        documentReference.update(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        cf.complete(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        cf.completeExceptionally(e);
+                    }
+                });
+        return cf;
+    }
+
     /**
      * Sets the id reference and initial data for a specific document
      * @param documentReference the document to set the id and initial data on
