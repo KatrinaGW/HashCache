@@ -20,9 +20,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.hashcache.R;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.controllers.LoginUserCommand;
 import com.example.hashcache.controllers.SetupUserCommand;
-import com.example.hashcache.controllers.checkLoginCommand;
+import com.example.hashcache.controllers.CheckLoginCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.Database;
@@ -109,21 +110,24 @@ public class MainActivity extends AppCompatActivity {
                 .setProjectId("hashcache2")
                 .build());
 
-        Context.get();
+        AppContext.get();
 
         getOrMakeScannableCodesConnectionHandler();
         makeLoginsAdapter();
         CodeMetadataDatabaseAdapter.makeInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
 
-        Context.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
+        AppContext.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID));
         loginUserCommand = new LoginUserCommand();
         playerList = PlayerList.getInstance();
+        InputStream is;
+        is = getResources().openRawResource(R.raw.names);
+        NameGenerator.getNames(is);
         checkDeviceId();
     }
 
     private void checkDeviceId(){
-        checkLoginCommand.checkLogin(loginUserCommand)
+        CheckLoginCommand.checkLogin(Database.getInstance(), new SetupUserCommand())
                 .thenAccept(existed -> {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -149,16 +153,11 @@ public class MainActivity extends AppCompatActivity {
         AppCompatButton startButton = findViewById(R.id.start_button);
         usernameEditText = findViewById(R.id.username_edittext);
         usernameEditText.setVisibility(View.VISIBLE);
-
-        // Gets input stream to names.csv which is used for name generation
-        InputStream is;
-        is = getResources().openRawResource(R.raw.names);
-        NameGenerator.getNames(is);        // Sets the listener for the start button
         setStartBtnListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                loginUserCommand.loginUser(getUsername(), Database.getInstance(), Context.get(),
+                loginUserCommand.loginUser(getUsername(), Database.getInstance(), AppContext.get(),
                                  new SetupUserCommand())
                         .thenAccept(res -> {
                             Intent goHome = new Intent(MainActivity.this, AppHome.class);

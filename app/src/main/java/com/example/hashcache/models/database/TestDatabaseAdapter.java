@@ -197,11 +197,6 @@ public class TestDatabaseAdapter implements DatabasePort {
         return null;
     }
 
-    @Override
-    public CompletableFuture<Boolean> deleteComment(String scannableCodeId, String commentId){
-        return null;
-    }
-
     /**
      * Updates the player preferences of a player.
      *

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.hashcache.models.ContactInfo;
 
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 
 public class ContactInfoTest {
@@ -24,6 +25,7 @@ public class ContactInfoTest {
     void AddPhoneNumber(){
         String validPhoneNumber = "403-999-9999";
         ContactInfo contactInfo = new ContactInfo();
+        contactInfo.setPhoneNumber("425-472-2482");
         contactInfo.setPhoneNumber(validPhoneNumber);
         assertEquals(validPhoneNumber, contactInfo.getPhoneNumber());
     }
@@ -47,10 +49,43 @@ public class ContactInfoTest {
     }
 
     @Test
-    void AddEmail(){
+    void SetEmail(){
+        String validEmail = "tony.stank@ualberta.ca";
+        ContactInfo contactInfo = new ContactInfo();
+        contactInfo.setEmail("firstEmail@gmail.com");
+        contactInfo.setEmail(validEmail);
+        assertEquals(validEmail, contactInfo.getEmail());
+    }
+
+    @Test
+    void getEmail(){
         String validEmail = "tony.stank@ualberta.ca";
         ContactInfo contactInfo = new ContactInfo();
         contactInfo.setEmail(validEmail);
         assertEquals(validEmail, contactInfo.getEmail());
+    }
+
+    @Test
+    void getPhoneNumberTest(){
+        String validPhoneNumber = "403-999-9999";
+        ContactInfo contactInfo = new ContactInfo();
+        contactInfo.setPhoneNumber(validPhoneNumber);
+        assertEquals(validPhoneNumber, contactInfo.getPhoneNumber());
+    }
+
+    @Test
+    void testValidEmailFalseTest(){
+        String validEmail = "tony.stank@ualberta";
+        ContactInfo contactInfo = new ContactInfo();
+        boolean result = contactInfo.testValidEmail(validEmail);
+        assertFalse(result);
+    }
+
+    @Test
+    void testValidPhoneNumberFalseTest(){
+        String validPhoneNumber = "4031112222";
+        ContactInfo contactInfo = new ContactInfo();
+        boolean result = contactInfo.testValidPhoneNumber(validPhoneNumber);
+        assertFalse(result);
     }
 }

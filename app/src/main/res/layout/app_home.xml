@@ -54,6 +54,7 @@
             android:layout_height="400dp"
             tools:context=".MapsActivity"
             map:mapId="@string/map_id" />
+            tools:appContext=".MapsActivity" />
         <androidx.appcompat.widget.SearchView
             android:id="@+id/idSearchView"
             android:layout_width="match_parent"
@@ -76,7 +77,8 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             android:layout_marginEnd="24dp"
-            android:elevation="6dp"/>
+            android:elevation="6dp"
+            android:scaleType="fitCenter"/>
     </RelativeLayout>
 
     <androidx.appcompat.widget.AppCompatButton

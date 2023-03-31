@@ -5,13 +5,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.hashcache.context.Context;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.controllers.LoginUserCommand;
 import com.example.hashcache.controllers.SetupUserCommand;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.DatabasePort;
 
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -20,12 +19,12 @@ import java.util.concurrent.CompletableFuture;
 
 public class LoginUserCommandTest {
     DatabasePort mockDB;
-    Context mockContext;
+    AppContext mockAppContext;
 
     @BeforeEach
     void resetMocks(){
         mockDB = Mockito.mock(DatabasePort.class);
-        mockContext = Mockito.mock(Context.class);
+        mockAppContext = Mockito.mock(AppContext.class);
     }
     @Test
     void loginUserTest(){
@@ -44,15 +43,15 @@ public class LoginUserCommandTest {
         when(mockDB.usernameExists(testUsername)).thenReturn(existsCF);
         when(mockDB.getIdByUsername(testUsername)).thenReturn(idCF);
         when(mockDB.getPlayer(testPlayer.getUserId())).thenReturn(playerCF);
-        when(mockSetUpUserCommand.setupUser(testUsername, mockDB, mockContext))
+        when(mockSetUpUserCommand.setupUser(testUsername, mockDB, mockAppContext))
                 .thenReturn(nullCF);
 
         LoginUserCommand loginUserCommand = new LoginUserCommand();
 
-        assertNull(loginUserCommand.loginUser(testUsername, mockDB, mockContext, mockSetUpUserCommand)
+        assertNull(loginUserCommand.loginUser(testUsername, mockDB, mockAppContext, mockSetUpUserCommand)
                 .join());
 
         verify(mockSetUpUserCommand, times(1)).setupUser(testUsername,
-                mockDB, mockContext);
+                mockDB, mockAppContext);
     }
 }

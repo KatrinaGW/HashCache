@@ -4,4 +4,7 @@
     <string name="scannable_code_name">Cached Name</string>
     <string name="scannable_code_score">Score for Cache</string>
     <string name="map_id">973e9ed7114852b3</string>
+    <string name="invalid_input_text">One or more of the inputs has an invalid format.
+        The phone number can be blank or in the 111-111-1111 format. The email
+    can be blank or in the example@domain.com format</string>
 </resources>

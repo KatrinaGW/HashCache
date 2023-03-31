@@ -45,6 +45,8 @@ import com.example.hashcache.models.Player;
 
 import com.example.hashcache.models.database.Database;
 import com.firebase.geofire.GeoLocation;
+import com.example.hashcache.appContext.AppContext;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -237,9 +239,9 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         });
 
 
-        playerInfo = Context.get().getCurrentPlayer();
+        playerInfo = AppContext.get().getCurrentPlayer();
         setUIParams();
-        Context.get().addObserver(this);
+        AppContext.get().addObserver(this);
 
     }
 
@@ -473,7 +475,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
     }
 
     public void setUIParams(){
-        Player currentPlayer = Context.get().getCurrentPlayer();
+        Player currentPlayer = AppContext.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
         setScore(currentPlayer.getPlayerWallet().getTotalScore());
 
