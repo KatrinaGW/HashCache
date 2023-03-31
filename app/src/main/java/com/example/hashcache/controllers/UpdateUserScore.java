@@ -11,15 +11,35 @@ import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.database.DatabasePort;
 import com.google.firebase.firestore.CollectionReference;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 public class UpdateUserScore {
 
-    public static void updateUserScore(Context context, DatabasePort db) throws ExecutionException, InterruptedException {
+    public static CompletableFuture<Boolean> updateUserScore(Context context, DatabasePort db) throws ExecutionException, InterruptedException {
         Log.i("USER", "CALLED");
         Player currentPlayer = context.getCurrentPlayer();
         PlayerWallet currentPlayerWallet = currentPlayer.getPlayerWallet();
-        db.updatePlayerScores(currentPlayer.getUserId(), currentPlayerWallet);
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            db.updatePlayerScores(currentPlayer.getUserId(), currentPlayerWallet).thenAccept(
+                    isComplete -> {
+                        cf.complete(true);
+                    }
+            ).exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            Log.d("ERROR", "Could not update player" + context.getCurrentPlayer().getUsername());
+                            Log.d("Reason", throwable.getMessage());
+                            cf.completeExceptionally(new Exception("Could not update player."));
+                            return null;
+                        }
+                    });
+
+        });
+        return cf;
 
     }
 }

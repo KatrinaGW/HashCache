@@ -119,8 +119,16 @@ public class HashController {
 
             // Update the players score in the database
 
-            updateUserScore(context, Database.getInstance());
-            cf.complete(null);
+            Log.e("DATABASE", "Error adding the score to the database");
+            try {
+                UpdateUserScore.updateUserScore(Context.get(), Database.getInstance()).thenAccept(accept -> {
+                    cf.complete(null);
+                });
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }).exceptionally(new Function<Throwable, Void>() {
             @Override
             public Void apply(Throwable throwable) {
