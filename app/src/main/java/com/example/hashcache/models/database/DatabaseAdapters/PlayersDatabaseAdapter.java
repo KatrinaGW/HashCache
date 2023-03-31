@@ -407,7 +407,7 @@ public class PlayersDatabaseAdapter {
                                 )
                                         .thenAccept(successfulAdd -> {
                                             if(successfulAdd){
-                                                cf.complete(null);
+                                                cf.complete(userId);
                                             }else{
                                                 cf.completeExceptionally(
                                                         new Exception("Something went wrong when" +
