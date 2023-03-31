@@ -202,12 +202,12 @@ public class PlayerDocumentConverter {
 
                     if (strMaxScore != null) {
                         playerWallet.setMaxScore(strMaxScore);
-
-                        cf.complete(playerWallet);
-                    } else {
+                    }
+                    cf.complete(playerWallet);
+                }else {
                         cf.completeExceptionally(new Exception(task.getException()));
                     }
-                }
+
             }
         });
         return cf;
