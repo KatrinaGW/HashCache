@@ -15,10 +15,10 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.context.Context;
 
 import java.util.function.Function;
 
@@ -60,7 +60,7 @@ public class NewMonsterActivity extends AppCompatActivity {
             }
         });
 
-        ScannableCode curCode = Context.get().getCurrentScannableCode();
+        ScannableCode curCode = AppContext.get().getCurrentScannableCode();
         HashInfo curInfo = curCode.getHashInfo();
         setMonsterName(curInfo.getGeneratedName());
         setMonsterScore(curInfo.getGeneratedScore());

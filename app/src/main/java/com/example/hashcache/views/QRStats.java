@@ -16,9 +16,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hashcache.R;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.context.Context;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -81,7 +81,7 @@ public class QRStats extends AppCompatActivity implements Observer {
         });
 
         init();
-        Context.get().addObserver(this);
+        AppContext.get().addObserver(this);
     }
 
     @Override
@@ -94,10 +94,10 @@ public class QRStats extends AppCompatActivity implements Observer {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PlayerWallet curWallet = Context.get().getCurrentPlayer().getPlayerWallet();
-                ScannableCode lowestScan = Context.get().getLowestScannableCode();
-                ScannableCode highestScan = Context.get().getHighestScannableCode();
-                long totalScore = Context.get().getCurrentPlayer().getPlayerWallet().getTotalScore();
+                PlayerWallet curWallet = AppContext.get().getCurrentPlayer().getPlayerWallet();
+                ScannableCode lowestScan = AppContext.get().getLowestScannableCode();
+                ScannableCode highestScan = AppContext.get().getHighestScannableCode();
+                long totalScore = AppContext.get().getCurrentPlayer().getPlayerWallet().getTotalScore();
                 setMyCodesValue((int)curWallet.getQrCount());
                 setLowScoreValue(lowestScan);
                 setHighScoreValue(highestScan);
@@ -107,16 +107,16 @@ public class QRStats extends AppCompatActivity implements Observer {
     }
 
     private void highestScoringCodeClicked() {
-        ScannableCode highestScan = Context.get().getHighestScannableCode();
-        Context.get().setCurrentScannableCode(highestScan);
+        ScannableCode highestScan = AppContext.get().getHighestScannableCode();
+        AppContext.get().setCurrentScannableCode(highestScan);
         Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
         intent.putExtra("belongsToCurrentUser", true);
         startActivity(intent);
     }
 
     private void lowestScoringCodeClicked() {
-        ScannableCode lowestScan = Context.get().getLowestScannableCode();
-        Context.get().setCurrentScannableCode(lowestScan);
+        ScannableCode lowestScan = AppContext.get().getLowestScannableCode();
+        AppContext.get().setCurrentScannableCode(lowestScan);
         Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
         intent.putExtra("belongsToCurrentUser", true);
         startActivity(intent);

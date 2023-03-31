@@ -53,4 +53,20 @@ public class ContactInfoTest {
         contactInfo.setEmail(validEmail);
         assertEquals(validEmail, contactInfo.getEmail());
     }
+
+    @Test
+    void testValidEmailFalseTest(){
+        String validEmail = "tony.stank@ualberta";
+        ContactInfo contactInfo = new ContactInfo();
+        boolean result = contactInfo.testValidEmail(validEmail);
+        assertFalse(result);
+    }
+
+    @Test
+    void testValidPhoneNumberFalseTest(){
+        String validPhoneNumber = "4031112222";
+        ContactInfo contactInfo = new ContactInfo();
+        boolean result = contactInfo.testValidPhoneNumber(validPhoneNumber);
+        assertFalse(result);
+    }
 }

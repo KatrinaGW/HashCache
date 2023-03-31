@@ -2,7 +2,7 @@ package com.example.hashcache.controllers;
 
 import android.util.Log;
 
-import com.example.hashcache.context.Context;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.Database;
@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 public class UpdateUserScore {
 
-    public static CompletableFuture<Boolean> updateUserScore(Context context, DatabasePort db) throws ExecutionException, InterruptedException {
+    public static CompletableFuture<Boolean> updateUserScore(AppContext context, DatabasePort db) throws ExecutionException, InterruptedException {
         Log.i("USER", "CALLED");
         Player currentPlayer = context.getCurrentPlayer();
         PlayerWallet currentPlayerWallet = currentPlayer.getPlayerWallet();

@@ -24,10 +24,10 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.context.Context;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -52,7 +52,7 @@ import java.util.Observer;
  * @see PopupMenu
  * @see MenuItem
  * @see Player
- * @see Context
+ * @see AppContext
  * @see SettingsActivity
  * @see QRStats
  * @see Community
@@ -77,7 +77,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
      *
      * @param savedInstanceState the saved state of the activity, if it was
      *                           previously closed
-     * @see Context
+     * @see AppContext
      * @see Player
      */
 
@@ -129,7 +129,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
             }
         });
 
-        Context.get().addObserver(this);
+        AppContext.get().addObserver(this);
         setUIParams();
     }
 
@@ -139,7 +139,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
         Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
         intent.putExtra("belongsToCurrentUser", true);
 
-        Context.get().setCurrentScannableCode(clickedScannableCode);
+        AppContext.get().setCurrentScannableCode(clickedScannableCode);
         startActivity(intent);
     }
 
@@ -227,7 +227,7 @@ public class MyProfile extends AppCompatActivity implements Observer {
     }
 
     public void setUIParams() {
-        Player currentPlayer = Context.get().getCurrentPlayer();
+        Player currentPlayer = AppContext.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
         setScore(currentPlayer.getPlayerWallet().getTotalScore());
         Database.getInstance()
