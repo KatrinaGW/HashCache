@@ -2,7 +2,6 @@ package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -10,13 +9,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.context.Context;
 
 import java.util.ArrayList;
 import java.util.function.Function;
@@ -50,7 +48,7 @@ public class OtherCacheActivity extends AppCompatActivity {
 
         otherUsernameHeader = findViewById(R.id.other_username_header);
         otherUserScoreHeader = findViewById(R.id.other_user_score);
-        player = Context.get().getSelectedPlayer();
+        player = AppContext.get().getSelectedPlayer();
         scannableCodesList = findViewById(R.id.scannable_codes_list);
 
         otherUsernameHeader.setText(player.getUsername());
@@ -94,7 +92,7 @@ public class OtherCacheActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 ScannableCode scannableCode = scannableCodes.get(i);
-                Context.get().setCurrentScannableCode(scannableCode);
+                AppContext.get().setCurrentScannableCode(scannableCode);
 
                 Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
                 intent.putExtra("belongsToCurrentUser", false);
