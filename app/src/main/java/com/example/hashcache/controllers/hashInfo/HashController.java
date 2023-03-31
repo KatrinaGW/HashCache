@@ -107,6 +107,7 @@ public class HashController {
             long score = sc.getHashInfo().getGeneratedScore();
 
             playerWallet.updateMaxScore(score);
+            playerWallet.setQRCount(playerWallet.getQrCount() + 1);
 
             // Total Score
             playerWallet.setTotalScore(playerWallet.getTotalScore() + score);

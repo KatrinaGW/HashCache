@@ -198,7 +198,7 @@ public class PlayerDocumentConverter {
                         playerWallet.setQRCount(strQRCount);
                     }
 
-                    Long strMaxScore = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
+                    Long strMaxScore = (Long) document.getData().get(FieldNames.MAX_SCORE.fieldName);
 
                     if (strMaxScore != null) {
                         playerWallet.setMaxScore(strMaxScore);
