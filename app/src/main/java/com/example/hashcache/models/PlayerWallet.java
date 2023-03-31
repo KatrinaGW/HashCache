@@ -27,7 +27,6 @@ public class PlayerWallet {
      */
     public void addScannableCode(String scannableCodeId) {
         this.scannableCodes.put(scannableCodeId, null);
-        this.qrCount++;
     }
 
     /**
