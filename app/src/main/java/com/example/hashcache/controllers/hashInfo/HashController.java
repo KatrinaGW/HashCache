@@ -94,7 +94,8 @@ public class HashController {
      * @param cf a CompletableFuture that completes once the scannable code has been added to the player's wallet
      * @param sc the scannable code to add to the player's wallet
      */
-    private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf, ScannableCode sc) {
+    private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf,
+                                                 ScannableCode sc) {
         Log.i("GETS", "HERE");
         Database.getInstance().addScannableCodeToPlayerWallet(userId, hash).thenAccept(created->{
             Context context = Context.get();
@@ -105,22 +106,28 @@ public class HashController {
             PlayerWallet playerWallet = context.getCurrentPlayer().getPlayerWallet();
             long score = sc.getHashInfo().getGeneratedScore();
 
-            // Max score
-            long maxScore = playerWallet.getMaxScore();
-            if(score > maxScore) {
-                playerWallet.setMaxScore(score);
-            }
+            playerWallet.setMaxScore(score);
 
             // Total Score
             playerWallet.setTotalScore(playerWallet.getTotalScore() + score);
 
             // Qr count
-            playerWallet.setQrCount(playerWallet.getQrCount() + 1);
+            playerWallet.incrementQRCount();
 
             // Update the players score in the database
 
-            updateUserScore(context, Database.getInstance());
-            cf.complete(null);
+            Database.getInstance().updatePlayerScores(userId, playerWallet)
+                            .thenAccept(success -> {
+                                cf.complete(null);
+                            })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+
         }).exceptionally(new Function<Throwable, Void>() {
             @Override
             public Void apply(Throwable throwable) {

@@ -344,37 +344,80 @@ public class PlayerWalletDatabaseAdapter {
         return cf;
     }
 
-
-    private CompletableFuture  setPlayerScores(DocumentReference playerDocument,
+    private CompletableFuture<Void> setPlayerScores(DocumentReference playerDocument,
                                                PlayerWallet playerWallet) {
-        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture<Void> cf = new CompletableFuture<>();
 
+        HashMap<String, String> data = new HashMap<>();
+        data.put(FieldNames.TOTAL_SCORE.fieldName, Long.toString(playerWallet.getTotalScore()));
+        data.put(FieldNames.MAX_SCORE.fieldName, Long.toString(playerWallet.getMaxScore()));
+        data.put(FieldNames.QR_COUNT.fieldName, Long.toString(playerWallet.getQrCount()));
 
-        fireStoreHelper.addNumberFieldToDocument(playerDocument,
-                FieldNames.TOTAL_SCORE.fieldName, playerWallet.getTotalScore()).thenAccept(accept -> {
-            fireStoreHelper.addNumberFieldToDocument(playerDocument,
-                    FieldNames.MAX_SCORE.fieldName, 10L).thenAccept(accepted -> {
-                fireStoreHelper.addNumberFieldToDocument(playerDocument,
-                        FieldNames.QR_COUNT.fieldName, playerWallet.getQrCount()).thenAccept(acceptedd -> {
-                    if(accept && accepted && acceptedd) {
-                        cf.complete(true);
-                    }
-                    else {
-                        Log.e(TAG, "Error adding the number to the documents");
-                        cf.completeExceptionally(new Exception("Error"));
-                    }
-                });
-            });
+        CompletableFuture.runAsync(() -> {
+            fireStoreHelper.setDocumentReference(playerDocument, data)
+                    .thenAccept(success -> {
+                        if(success){
+                            cf.complete(null);
+                        }else{
+                            cf.completeExceptionally(
+                                    new Exception("Something went wrong while setting the" +
+                                            "user scores!")
+                            );
+                        }
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
         });
 
         return  cf;
     }
 
-    public CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet) {
-        Log.i("Gets", "TO update player scores");
+    /**
+     * Updates the player score values on the player document
+     * @param userId the id of the user whose score values need to be updated
+     * @param playerWallet the wallet of the player
+     * @return cf the CompletableFuture that completes with true if the operation was successful
+     */
+    public CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet,
+                                                         FireStoreHelper fireStoreHelper) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
-        DocumentReference playerDocument = collectionReference.document(userId);
-        CompletableFuture<Boolean> cf = setPlayerScores(playerDocument, playerWallet);
+        this.fireStoreHelper = fireStoreHelper;
+
+        CompletableFuture.runAsync(() -> {
+            fireStoreHelper.documentWithIDExists(collectionReference, userId)
+                    .thenAccept(exists -> {
+                        if(exists){
+                            DocumentReference playerDocument = collectionReference.document(userId);
+                            setPlayerScores(playerDocument, playerWallet)
+                                    .thenAccept(nullValue -> {
+                                        cf.complete(true);
+                                    })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
+                        }else{
+                            cf.completeExceptionally(new IllegalArgumentException("The player" +
+                                    "id doesn't exist!"));
+                        }
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
 
         return cf;
     }

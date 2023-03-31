@@ -180,25 +180,22 @@ public class PlayerDocumentConverter {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    try {
-                        Long total_score = (Long) document.getData().get(FieldNames.TOTAL_SCORE.fieldName);
-                        playerWallet.setTotalScore(total_score);
-                    } catch (NullPointerException e) {
-                        Log.e(TAG, "User does not have a total score!");
+
+                    String strTotalScore = (String)
+                            document.getData().get(FieldNames.TOTAL_SCORE.fieldName);
+                    if(strTotalScore!=null){
+                        playerWallet.setTotalScore(Long.parseLong(strTotalScore));
                     }
 
-                    try{
-                        Long qr_count = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
-                        playerWallet.setQrCount(qr_count);
-                    } catch (NullPointerException e) {
-                        Log.e(TAG, "User does not have a QR count");
+                    String strQRCount = (String) document.getData().get(FieldNames.QR_COUNT.fieldName);
+                    if(strQRCount!=null){
+                        playerWallet.setQRCount(Long.parseLong(strQRCount));
                     }
 
-                    try{
-                        Long max_score = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
-                        playerWallet.setQrCount(max_score);
-                    } catch (NullPointerException e) {
-                        Log.e(TAG, "User does not have a QR count");
+                    String strMaxScore = (String) document.getData().get(FieldNames.QR_COUNT.fieldName);
+
+                    if(strMaxScore!=null){
+                        playerWallet.setMaxScore(Long.parseLong(strMaxScore));
                     }
 
                     cf.complete(playerWallet);

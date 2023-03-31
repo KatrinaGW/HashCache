@@ -115,11 +115,17 @@ public class PlayerWallet{
         return qrCount;
     }
 
-    public void setMaxScore(long maxScore) {
-        this.maxScore = maxScore;
+    public void setMaxScore(long candidateScore) {
+        if(candidateScore>maxScore){
+            this.maxScore = candidateScore;
+        }
     }
 
-    public void setQrCount(long qrCount) {
+    public void setQRCount(long qrCount){
         this.qrCount = qrCount;
+    }
+
+    public void incrementQRCount(){
+        this.qrCount++;
     }
 }

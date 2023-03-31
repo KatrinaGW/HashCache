@@ -13,6 +13,7 @@ import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.database.DatabaseAdapters.LoginsAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
@@ -663,7 +664,8 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
 
 
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
-            PlayerWalletDatabaseAdapter.getInstance().updatePlayerScores(userId, playerWallet)
+            PlayerWalletDatabaseAdapter.getInstance().updatePlayerScores(userId, playerWallet,
+                            new FireStoreHelper())
                     .thenAccept(success -> {
                         if(success) {
                             cf.complete(true);
