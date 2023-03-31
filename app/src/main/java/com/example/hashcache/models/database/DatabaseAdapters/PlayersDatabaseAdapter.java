@@ -397,17 +397,31 @@ public class PlayersDatabaseAdapter {
         fireStoreHelper.setDocumentReference(collectionReference.document(userId), data)
                         .thenAccept(successful -> {
                             if (successful) {
-                                fireStoreHelper.addNumberFieldToDocument(collectionReference.document(userId),
-                                        FieldNames.TOTAL_SCORE.fieldName, 0L).thenAccept(accept -> {
-                                            fireStoreHelper.addNumberFieldToDocument(collectionReference.document(userId),
-                                                    FieldNames.MAX_SCORE.fieldName, 0L).thenAccept(accepted -> {
-                                                        fireStoreHelper.addNumberFieldToDocument(collectionReference.document(userId),
-                                                                FieldNames.QR_COUNT.fieldName, 0L).thenAccept(acceptedd -> {
-                                                                    cf.complete(userId);
-                                                        });
-                                            });
+                                HashMap<String, Object> scoreData = new HashMap<>();
+                                scoreData.put(FieldNames.TOTAL_SCORE.fieldName, 0);
+                                scoreData.put(FieldNames.MAX_SCORE.fieldName, 0);
+                                scoreData.put(FieldNames.QR_COUNT.fieldName, 0);
 
-                                });
+                                fireStoreHelper.addUpdateManyFieldsIntoDocument(
+                                        collectionReference.document(userId), scoreData
+                                )
+                                        .thenAccept(successfulAdd -> {
+                                            if(successfulAdd){
+                                                cf.complete(null);
+                                            }else{
+                                                cf.completeExceptionally(
+                                                        new Exception("Something went wrong when" +
+                                                                "setting the score values")
+                                                );
+                                            }
+                                        })
+                                        .exceptionally(new Function<Throwable, Void>() {
+                                            @Override
+                                            public Void apply(Throwable throwable) {
+                                                cf.completeExceptionally(throwable);
+                                                return null;
+                                            }
+                                        });
                             } else {
                                 Log.e(TAG, "Something went wrong while setting the userId" +
                                         "on a new Playerdocument");
