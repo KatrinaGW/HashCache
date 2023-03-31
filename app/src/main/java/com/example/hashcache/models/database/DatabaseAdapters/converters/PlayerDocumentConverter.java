@@ -202,7 +202,7 @@ public class PlayerDocumentConverter {
                     String strMaxScore = (String) document.getData().get(FieldNames.QR_COUNT.fieldName);
 
                     if(strMaxScore!=null){
-                        playerWallet.setMaxScore(Long.parseLong(strMaxScore));
+                        playerWallet.updateMaxScore(Long.parseLong(strMaxScore));
                     }
 
                     cf.complete(playerWallet);
