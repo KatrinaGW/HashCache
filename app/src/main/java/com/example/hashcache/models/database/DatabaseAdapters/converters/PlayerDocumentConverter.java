@@ -190,22 +190,23 @@ public class PlayerDocumentConverter {
 
                     Long strTotalScore = (Long)
                             document.getData().get(FieldNames.TOTAL_SCORE.fieldName);
-                    if(strTotalScore!=null){
+                    if (strTotalScore != null) {
                         playerWallet.setTotalScore(strTotalScore);
                     }
                     Long strQRCount = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
-                    if(strQRCount!=null){
+                    if (strQRCount != null) {
                         playerWallet.setQRCount(strQRCount);
                     }
 
                     Long strMaxScore = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
 
-                    if(strMaxScore!=null){
+                    if (strMaxScore != null) {
                         playerWallet.setMaxScore(strMaxScore);
 
-                    cf.complete(playerWallet);
-                } else {
-                    cf.completeExceptionally(new Exception(task.getException()));
+                        cf.complete(playerWallet);
+                    } else {
+                        cf.completeExceptionally(new Exception(task.getException()));
+                    }
                 }
             }
         });
