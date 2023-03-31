@@ -95,6 +95,8 @@ public class PlayersDatabaseAdapterTest {
         when(mockCollectionReference.document(anyString())).thenReturn(mockDocument);
         when(mockFireStoreHelper.setDocumentReference(any(DocumentReference.class), any(HashMap.class)))
                 .thenReturn(fireStoreCF);
+        when(mockFireStoreHelper.addUpdateManyFieldsIntoDocument(any(DocumentReference.class), any(HashMap.class)))
+                .thenReturn(fireStoreCF);
 
         PlayersDatabaseAdapter playersDatabaseAdapter = getPlayersDatabaseAdapter();
 

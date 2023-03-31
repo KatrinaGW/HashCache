@@ -6,6 +6,7 @@ import static com.example.hashcache.controllers.UpdateUserScore.*;
 import android.util.Log;
 
 import com.example.hashcache.controllers.UpdateUserScore;
+import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
@@ -15,6 +16,7 @@ import com.example.hashcache.context.Context;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -96,45 +98,42 @@ public class HashController {
      */
     private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf,
                                                  ScannableCode sc) {
-        Log.i("GETS", "HERE");
-        Database.getInstance().addScannableCodeToPlayerWallet(userId, hash).thenAccept(created->{
-            Context context = Context.get();
-            // Set the current scannable code to the newly added scannable code
-            context.setCurrentScannableCode(sc);
+        Database.getInstance().addScannableCodeToPlayerWallet(userId, hash)
+                .thenAccept(created->{
+                    Context context = Context.get();
+                    // Set the current scannable code to the newly added scannable code
+                    context.setCurrentScannableCode(sc);
 
-            // Update the player scores
-            PlayerWallet playerWallet = context.getCurrentPlayer().getPlayerWallet();
-            long score = sc.getHashInfo().getGeneratedScore();
+                    PlayerWallet playerWallet = context.getCurrentPlayer().getPlayerWallet();
 
-            playerWallet.updateMaxScore(score);
+                    if(userId.equals(Context.get().getCurrentPlayer().getUserId())){
+                        playerWallet.setQRCount(playerWallet.getQrCount() + 1);
+                    }
 
-            // Total Score
-            playerWallet.setTotalScore(playerWallet.getTotalScore() + score);
+                    CompletableFuture.runAsync(() -> {
+                        updateTotalMaxScore()
+                                .thenAccept(nullValue -> {
+                                    Database.getInstance().updatePlayerScores(userId, playerWallet)
+                                            .thenAccept(success -> {
+                                                cf.complete(null);
+                                            })
+                                            .exceptionally(new Function<Throwable, Void>() {
+                                                @Override
+                                                public Void apply(Throwable throwable) {
+                                                    cf.completeExceptionally(throwable);
+                                                    return null;
+                                                }
+                                            });
 
-            // Qr count
-            playerWallet.setQRCount(playerWallet.getQrCount() + 1);
-
-            // Update the players score in the database
-
-            Database.getInstance().updatePlayerScores(userId, playerWallet)
-                            .thenAccept(success -> {
-                                cf.complete(null);
-                            })
-                    .exceptionally(new Function<Throwable, Void>() {
-                        @Override
-                        public Void apply(Throwable throwable) {
-                            cf.completeExceptionally(throwable);
-                            return null;
-                        }
+                                }).exceptionally(new Function<Throwable, Void>() {
+                                    @Override
+                                    public Void apply(Throwable throwable) {
+                                        cf.completeExceptionally(throwable);
+                                        return null;
+                                    }
+                                });
                     });
-
-        }).exceptionally(new Function<Throwable, Void>() {
-            @Override
-            public Void apply(Throwable throwable) {
-                cf.completeExceptionally(throwable);
-                return null;
-            }
-        });
+                });
     }
     /**
      * Deletes a scannable code from a player's wallet.
@@ -159,24 +158,33 @@ public class HashController {
                             if(completed){
                                 Player currentPlayer = Context.get().getCurrentPlayer();
                                 // If the deleted scannable code belonged to the current player, remove it from their wallet
-                                if(currentPlayer.getUserId() == userId){
-                                    playerWallet.deleteScannableCode(scannableCodeId);
-                                    playerWallet.updateMaxScore(Context.get().getCurrentScannableCode()
-                                            .getHashInfo().getGeneratedScore());
-                                    playerWallet.setTotalScore(playerWallet.getTotalScore() -
-                                            Context.get().getCurrentScannableCode().getHashInfo()
-                                                    .getGeneratedScore());
+                                if(currentPlayer.getUserId().equals(userId)){
+                                    currentPlayer.getPlayerWallet().setQRCount(currentPlayer.getPlayerWallet().getQrCount() - 1);
                                 }
 
                                 CompletableFuture.runAsync(() -> {
-                                    Database.getInstance().updatePlayerScores(userId, playerWallet)
-                                            .thenAccept(success-> {
-                                                if(success){
-                                                    cf.complete(completed);
-                                                }else{
-                                                    cf.completeExceptionally(new Exception("Something " +
-                                                            "went wrong while updating the scores"));
-                                                }
+                                    updateTotalMaxScore()
+                                            .thenAccept(nullValue -> {
+
+                                                CompletableFuture.runAsync(() -> {
+                                                    Database.getInstance().updatePlayerScores(userId,
+                                                                    Context.get().getCurrentPlayer().getPlayerWallet())
+                                                            .thenAccept(success -> {
+                                                                if (success) {
+                                                                    cf.complete(completed);
+                                                                } else {
+                                                                    cf.completeExceptionally(new Exception("Something " +
+                                                                            "went wrong while updating the scores"));
+                                                                }
+                                                            })
+                                                            .exceptionally(new Function<Throwable, Void>() {
+                                                                @Override
+                                                                public Void apply(Throwable throwable) {
+                                                                    cf.completeExceptionally(throwable);
+                                                                    return null;
+                                                                }
+                                                            });
+                                                });
                                             })
                                             .exceptionally(new Function<Throwable, Void>() {
                                                 @Override
@@ -191,9 +199,59 @@ public class HashController {
                                 cf.completeExceptionally(new Exception("Something went wrong while " +
                                         "deleting the scannable code from the wallet"));
                             }
+                })
+                .exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        cf.completeExceptionally(throwable);
+                        return null;
+                    }
                 });
             }
         });
+
+        return cf;
+    }
+
+    private static CompletableFuture<Void> updateTotalMaxScore(){
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        ArrayList<CompletableFuture> futureCfs = new ArrayList<>();
+        Database.getInstance()
+                .getPlayerWalletTotalScore(Context.get().getCurrentPlayer().getPlayerWallet()
+                        .getScannedCodeIds())
+                .thenAccept(totalScore -> {
+                    Context.get().getCurrentPlayer().getPlayerWallet().setTotalScore(totalScore);
+
+                    CompletableFuture.runAsync(() -> {
+                        Database.getInstance().getPlayerWalletTopScore(
+                                        Context.get().getCurrentPlayer().getPlayerWallet().getScannedCodeIds()
+                                )
+                                .thenAccept(topScore -> {
+                                    long maxScore = 0;
+                                    if(topScore != null){
+                                        maxScore = topScore.getHashInfo().getGeneratedScore();
+                                    }
+                                    Context.get().getCurrentPlayer().getPlayerWallet().setMaxScore(
+                                            maxScore);
+                                    cf.complete(null);
+
+                                })
+                                .exceptionally(new Function<Throwable, Void>() {
+                                    @Override
+                                    public Void apply(Throwable throwable) {
+                                        cf.completeExceptionally(throwable);
+                                        return null;
+                                    }
+                                });
+                    });
+                })
+                .exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        cf.completeExceptionally(throwable);
+                        return null;
+                    }
+                });
 
         return cf;
     }
