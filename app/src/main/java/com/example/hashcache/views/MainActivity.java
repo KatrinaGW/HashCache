@@ -23,7 +23,7 @@ import com.example.hashcache.R;
 import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.controllers.LoginUserCommand;
 import com.example.hashcache.controllers.SetupUserCommand;
-import com.example.hashcache.controllers.checkLoginCommand;
+import com.example.hashcache.controllers.CheckLoginCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.Database;
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkDeviceId(){
-        checkLoginCommand.checkLogin(loginUserCommand)
+        CheckLoginCommand.checkLogin(Database.getInstance(), new SetupUserCommand())
                 .thenAccept(existed -> {
                     runOnUiThread(new Runnable() {
                         @Override

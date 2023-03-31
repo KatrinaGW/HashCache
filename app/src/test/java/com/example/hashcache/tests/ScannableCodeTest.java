@@ -59,4 +59,13 @@ public class ScannableCodeTest {
         assertEquals(newComment1, scannableCode.getComments().get(0));
         assertEquals(newComment2, scannableCode.getComments().get(1));
     }
+
+    @Test
+    void getScannableCodeIdTest(){
+        String fakeId = "Definitely over 18";
+        HashInfo mockHashInfo = Mockito.mock(HashInfo.class);
+        ScannableCode testScannableCode = new ScannableCode(fakeId, mockHashInfo);
+
+        assertEquals(testScannableCode.getScannableCodeId(), fakeId);
+    }
 }
