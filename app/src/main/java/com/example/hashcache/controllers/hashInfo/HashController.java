@@ -143,6 +143,8 @@ public class HashController {
     public static CompletableFuture<Boolean> deleteScannableCodeFromWallet(String scannableCodeId,
                                                                            String userId) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        PlayerWallet playerWallet = Context.get().getCurrentPlayer().getPlayerWallet();
+
         CompletableFuture.runAsync(new Runnable() {
 
             @Override
@@ -152,17 +154,40 @@ public class HashController {
                         .thenAccept(completed -> {
                             // If the scannable code was deleted successfully, update the current player's wallet
                             if(completed){
-                        cf.complete(completed);
-                        Player currentPlayer = Context.get().getCurrentPlayer();
-                        // If the deleted scannable code belonged to the current player, remove it from their wallet
-                        if(currentPlayer.getUserId() == userId){
-                            currentPlayer.getPlayerWallet().deleteScannableCode(scannableCodeId);
-                        }
+                                Player currentPlayer = Context.get().getCurrentPlayer();
+                                // If the deleted scannable code belonged to the current player, remove it from their wallet
+                                if(currentPlayer.getUserId() == userId){
+                                    playerWallet.deleteScannableCode(scannableCodeId);
+                                    playerWallet.updateMaxScore(Context.get().getCurrentScannableCode()
+                                            .getHashInfo().getGeneratedScore());
+                                    playerWallet.setTotalScore(playerWallet.getTotalScore() -
+                                            Context.get().getCurrentScannableCode().getHashInfo()
+                                                    .getGeneratedScore());
+                                }
+
+                                CompletableFuture.runAsync(() -> {
+                                    Database.getInstance().updatePlayerScores(userId, playerWallet)
+                                            .thenAccept(success-> {
+                                                if(success){
+                                                    cf.complete(completed);
+                                                }else{
+                                                    cf.completeExceptionally(new Exception("Something " +
+                                                            "went wrong while updating the scores"));
+                                                }
+                                            })
+                                            .exceptionally(new Function<Throwable, Void>() {
+                                                @Override
+                                                public Void apply(Throwable throwable) {
+                                                    cf.completeExceptionally(throwable);
+                                                    return null;
+                                                }
+                                            });
+                                });
                         // Otherwise, complete exceptionally with an error message
-                    }else{
-                        cf.completeExceptionally(new Exception("Something went wrong while " +
-                                "deleting the scannable code from the wallet"));
-                    }
+                            }else{
+                                cf.completeExceptionally(new Exception("Something went wrong while " +
+                                        "deleting the scannable code from the wallet"));
+                            }
                 });
             }
         });
