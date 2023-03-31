@@ -1,6 +1,6 @@
 package com.example.hashcache.controllers;
 
-import com.example.hashcache.context.Context;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database.DatabasePort;
 
@@ -21,7 +21,7 @@ public class CheckLoginCommand {
             db.getUsernameForDevice()
                     .thenAccept(username -> {
                         if(username!=null){
-                            setupUserCommand.setupUser(username, Database.getInstance(), Context.get())
+                            setupUserCommand.setupUser(username, Database.getInstance(), AppContext.get())
                                     .thenAccept(nullValue -> {
                                         cf.complete(true);
                                     })

@@ -52,7 +52,7 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            tools:context=".MapsActivity" />
+            tools:appContext=".MapsActivity" />
         <androidx.appcompat.widget.SearchView
             android:id="@+id/idSearchView"
             android:layout_width="match_parent"

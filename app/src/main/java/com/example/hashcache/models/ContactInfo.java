@@ -21,21 +21,48 @@ public class ContactInfo {
      * @throws IllegalArgumentException if the candidate email does not have a valid form
      */
     public void setEmail(String email){
-        if(email.equals("")){
-            return;
-        }
-
-        int dotPosition = email.lastIndexOf(".");
-        if(dotPosition==-1){
-            throw new IllegalArgumentException("Given email does not contain a domain");
-        }
-
-        if(email.substring(0, dotPosition + 1).matches(emailRegex)){
+        if(testValidEmail(email)){
             this.email = email;
-        } else{
-            System.out.println(email.substring(0, dotPosition + 1));
-            throw new IllegalArgumentException("Given email has an invalid format!");
+        }else{
+            throw new IllegalArgumentException("The email format is invalid!");
         }
+    }
+
+    /**
+     * Checks if the phoneNumber matches the ddd-ddd-dddd format
+     * @param newPhoneNumber the phone number whose format needs to be checked
+     * @return isValid true if the phone number matches the format, false otherwise
+     */
+    public boolean testValidPhoneNumber(String newPhoneNumber){
+        boolean isValid = true;
+
+        if(!newPhoneNumber.equals("")){
+            isValid = newPhoneNumber.matches(phoneNumberRegex);
+        }
+
+        return isValid;
+    }
+
+    /**
+     * Checks if the email matches the valid email format
+     * @param newEmail the email whose format needs to be checked
+     * @return isValid true if the email matches the format, false otherwise
+     */
+    public boolean testValidEmail(String newEmail){
+        boolean isValid = true;
+
+        if(!newEmail.equals("")){
+            int dotPosition = newEmail.lastIndexOf(".");
+            if (dotPosition == -1) {
+                isValid = false;
+            }
+
+            if (isValid && !newEmail.substring(0, dotPosition + 1).matches(emailRegex)) {
+                isValid = false;
+            }
+        }
+
+        return isValid;
     }
 
     /**
@@ -44,11 +71,7 @@ public class ContactInfo {
      * @throws IllegalArgumentException if the phone number does not have a valid form
      */
     public void setPhoneNumber(String phoneNumber){
-        if(phoneNumber.equals("")){
-            return;
-        }
-
-        if(phoneNumber.matches(phoneNumberRegex)){
+        if(testValidPhoneNumber(phoneNumber)){
             this.phoneNumber = phoneNumber;
         }else{
             throw new IllegalArgumentException("Given phone number has an invalid format!");
