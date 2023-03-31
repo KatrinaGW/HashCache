@@ -173,6 +173,13 @@ public class PlayerDocumentConverter {
         return cf;
     }
 
+    /**
+     * Take in a playerWallet and fills the score area with those in the player document in the database.
+     * Used when first fetching the player information from the database.
+     * @param playerDocument a access point to get player document information
+     * @param playerWallet the wallet you want to update with the new player scores
+     * @return A Completable futre of the Player wallet
+     */
     private CompletableFuture<PlayerWallet> getPlayerScores(DocumentReference playerDocument, PlayerWallet playerWallet) {
         CompletableFuture<PlayerWallet> cf = new CompletableFuture<>();
         playerDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {

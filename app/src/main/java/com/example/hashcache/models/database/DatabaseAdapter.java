@@ -1,5 +1,6 @@
 package com.example.hashcache.models.database;
 
+import android.util.Log;
 import android.util.Pair;
 
 import java.lang.reflect.Array;
@@ -670,16 +671,18 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
                         if(success) {
                             cf.complete(true);
                         } else {
-                            cf.completeExceptionally(new Exception("Something went wrong updating player score"));
+                            Log.e("DATABASE", "Error adding score");
                         }
                     })
                     .exceptionally(new Function<Throwable, Void>() {
                         @Override
                         public Void apply(Throwable throwable) {
+                            Log.e("DATABASE", "Error adding score");
                             cf.completeExceptionally(throwable);
                             return null;
                         }
                     });
+        });
         return cf;
     }
 }

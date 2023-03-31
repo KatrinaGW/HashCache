@@ -1,5 +1,6 @@
 package com.example.hashcache.models.database.DatabaseAdapters;
 
+import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
@@ -95,6 +96,7 @@ public class FireStoreHelper {
                                                                String key, Long value) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
+        Log.i("DATABASE", "Adding / Changing number field to document");
         documentReference
                 .update(key, value)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -106,6 +108,7 @@ public class FireStoreHelper {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        Log.e("Database", "Failed to add number field to document");
                         cf.completeExceptionally(e);
                     }
                 });

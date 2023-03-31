@@ -419,6 +419,8 @@ public class PlayerWalletDatabaseAdapter {
                     });
         });
 
-        return cf;
+        Log.i("DATABASE", "Updating player score");
+        return fireStoreHelper.addNumberFieldToDocument(playerDocument,
+                FieldNames.MAX_SCORE.fieldName, 10L);
     }
 }
