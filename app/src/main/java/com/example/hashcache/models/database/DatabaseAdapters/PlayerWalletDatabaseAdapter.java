@@ -10,6 +10,7 @@ import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.database.DatabasePort;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -209,7 +210,6 @@ public class PlayerWalletDatabaseAdapter {
                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
                                        @Override
                                        public void onSuccess(Void aVoid) {
-                                           Log.d(TAG, "DocumentSnapshot successfully deleted!");
                                            cf.complete(true);
                                        }
                                    })
@@ -269,14 +269,16 @@ public class PlayerWalletDatabaseAdapter {
      *
      * @param scannableCodeIds the list of scannableIds to get the highest score
      *                         from
+     * @param databasePort the instance of the databasePort to use
      * @return a CompletableFuture that will return the highest scoring
      *         ScannableCode
      */
-    public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds) {
+    public CompletableFuture<ScannableCode> getPlayerWalletTopScore(ArrayList<String> scannableCodeIds,
+                                                                    DatabasePort databasePort) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            Database.getInstance().getScannableCodesByIdInList(scannableCodeIds).thenAccept(
+            databasePort.getScannableCodesByIdInList(scannableCodeIds).thenAccept(
                     scannableCodes -> {
                         if (scannableCodes.size() > 0) {
                             ScannableCode highestScoring = scannableCodes.get(0);
@@ -309,13 +311,15 @@ public class PlayerWalletDatabaseAdapter {
      * Gets the the lowest score from a list of scannableCodes
      *
      * @param scannableCodeIds the list of scannableIds to get the lowest score from
+     * @param databasePort the instance of the databaseport to use
      * @return a CompletableFuture that will return the lowest scoring ScannableCode
      */
-    public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds) {
+    public CompletableFuture<ScannableCode> getPlayerWalletLowScore(ArrayList<String> scannableCodeIds,
+                                                                    DatabasePort databasePort) {
         CompletableFuture<ScannableCode> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            Database.getInstance().getScannableCodesByIdInList(scannableCodeIds).thenAccept(
+            databasePort.getScannableCodesByIdInList(scannableCodeIds).thenAccept(
                     scannableCodes -> {
                         if (scannableCodes.size() > 0) {
                             ScannableCode lowestScoring = scannableCodes.get(0);
