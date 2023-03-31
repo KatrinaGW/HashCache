@@ -115,7 +115,7 @@ public class PlayerWallet{
         return qrCount;
     }
 
-    public void setMaxScore(long candidateScore) {
+    public void updateMaxScore(long candidateScore) {
         if(candidateScore>maxScore){
             this.maxScore = candidateScore;
         }
