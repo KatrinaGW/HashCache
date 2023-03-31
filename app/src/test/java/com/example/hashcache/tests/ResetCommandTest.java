@@ -4,7 +4,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 
-import com.example.hashcache.context.Context;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.controllers.ResetCommand;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
@@ -21,13 +21,13 @@ public class ResetCommandTest {
         PlayersDatabaseAdapter mockPlayersDatabaseAdapter = Mockito.mock(PlayersDatabaseAdapter.class);
 
         PlayerList originalPlayerList = PlayerList.getInstance(mockPlayersDatabaseAdapter);
-        Context.get().setCurrentPlayer(Mockito.mock(Player.class));
+        AppContext.get().setCurrentPlayer(Mockito.mock(Player.class));
 
         ResetCommand.reset();
 
         assertNotEquals(originalPlayerList, PlayerList.getInstance(mockPlayersDatabaseAdapter));
-        assertNull(Context.get().getCurrentPlayer());
-        assertNull(Context.get().getDeviceId());
-        assertNull(Context.get().getCurrentScannableCode());
+        assertNull(AppContext.get().getCurrentPlayer());
+        assertNull(AppContext.get().getDeviceId());
+        assertNull(AppContext.get().getCurrentScannableCode());
     }
 }

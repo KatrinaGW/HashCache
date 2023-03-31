@@ -8,7 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.hashcache.context.Context;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.database.DatabaseAdapters.LoginsAdapter;
 import com.example.hashcache.models.database.values.CollectionNames;
@@ -54,7 +54,7 @@ public class LoginsAdapterTest {
     @Test
     void addLoginRecordTest(){
         String testDeviceId = "12345";
-        Context.get().setDeviceId(testDeviceId);
+        AppContext.get().setDeviceId(testDeviceId);
         CompletableFuture<Boolean> booleanCF = new CompletableFuture<>();
         booleanCF.complete(true);
         DocumentReference mockDocument = Mockito.mock(DocumentReference.class);
@@ -78,7 +78,7 @@ public class LoginsAdapterTest {
     void getUsernameForDeviceTest(){
         String testDeviceId = "12345";
         String testUsername = "Hal";
-        Context.get().setDeviceId(testDeviceId);
+        AppContext.get().setDeviceId(testDeviceId);
         DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
         CompletableFuture<Boolean> boolCF = new CompletableFuture<>();
         boolCF.complete(true);
@@ -112,7 +112,7 @@ public class LoginsAdapterTest {
     @Test
     void deleteLoginTest(){
         String testDeviceId = "12345";
-        Context.get().setDeviceId(testDeviceId);
+        AppContext.get().setDeviceId(testDeviceId);
         DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
         CompletableFuture<Boolean> boolCF = new CompletableFuture<>();
         boolCF.complete(true);

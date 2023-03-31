@@ -8,7 +8,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.example.hashcache.context.Context;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.controllers.ResetCommand;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerList;
@@ -41,23 +41,23 @@ public class ContextTest {
     @Test
     void setDeviceIdTest(){
         String deviceId = "02489";
-        Context.get().setDeviceId("notReal");
-        Context.get().setDeviceId(deviceId);
-        assertEquals(deviceId, Context.get().getDeviceId());
+        AppContext.get().setDeviceId("notReal");
+        AppContext.get().setDeviceId(deviceId);
+        assertEquals(deviceId, AppContext.get().getDeviceId());
     }
 
     @Test
     void getDeviceId(){
         String deviceId = "02489";
-        Context.get().setDeviceId(deviceId);
-        assertEquals(deviceId, Context.get().getDeviceId());
+        AppContext.get().setDeviceId(deviceId);
+        assertEquals(deviceId, AppContext.get().getDeviceId());
     }
 
     @Test
     void setNullCurrentScannableCode(){
         ScannableCode mockScananbleCode = null;
-        Context.get().setCurrentScannableCode(mockScananbleCode);
-        assertEquals(mockScananbleCode, Context.get().getCurrentScannableCode());
+        AppContext.get().setCurrentScannableCode(mockScananbleCode);
+        assertEquals(mockScananbleCode, AppContext.get().getCurrentScannableCode());
         verify(mockFirebaseFirestore, times(1)).collection(CollectionNames
                 .SCANNABLE_CODES.collectionName);
     }
@@ -65,54 +65,54 @@ public class ContextTest {
     @Test
     void setCurrentPlayerTest(){
         Player mockPlayer = Mockito.mock(Player.class);
-        Context.get().setCurrentPlayer(Mockito.mock(Player.class));
-        Context.get().setCurrentPlayer(mockPlayer);
+        AppContext.get().setCurrentPlayer(Mockito.mock(Player.class));
+        AppContext.get().setCurrentPlayer(mockPlayer);
 
-        assertEquals(Context.get().getCurrentPlayer(), mockPlayer);
+        assertEquals(AppContext.get().getCurrentPlayer(), mockPlayer);
     }
 
     @Test
     void getCurrentPlayerTest(){
         Player mockPlayer = Mockito.mock(Player.class);
-        Context.get().setCurrentPlayer(mockPlayer);
+        AppContext.get().setCurrentPlayer(mockPlayer);
 
-        assertEquals(Context.get().getCurrentPlayer(), mockPlayer);
+        assertEquals(AppContext.get().getCurrentPlayer(), mockPlayer);
     }
 
     @Test
     void setSelectedPlayer(){
         Player mockPlayer = Mockito.mock(Player.class);
-        Context.get().setSelectedPlayer(Mockito.mock(Player.class));
-        Context.get().setSelectedPlayer(mockPlayer);
+        AppContext.get().setSelectedPlayer(Mockito.mock(Player.class));
+        AppContext.get().setSelectedPlayer(mockPlayer);
 
-        assertEquals(Context.get().getSelectedPlayer(), mockPlayer);
+        assertEquals(AppContext.get().getSelectedPlayer(), mockPlayer);
     }
 
     @Test
     void getSelectedPlayerTest(){
         Player mockPlayer = Mockito.mock(Player.class);
-        Context.get().setSelectedPlayer(mockPlayer);
+        AppContext.get().setSelectedPlayer(mockPlayer);
 
-        assertEquals(Context.get().getSelectedPlayer(), mockPlayer);
+        assertEquals(AppContext.get().getSelectedPlayer(), mockPlayer);
     }
 
     @Test
     void resetTest(){
-        Context.get().setDeviceId("random number");
+        AppContext.get().setDeviceId("random number");
         Player mockPLayer = Mockito.mock(Player.class);
-        Context.get().setCurrentPlayer(mockPLayer);
+        AppContext.get().setCurrentPlayer(mockPLayer);
 
-        Context.get().resetContext();
+        AppContext.get().resetContext();
 
-        assertNull(Context.get().getCurrentPlayer());
-        assertNull(Context.get().getDeviceId());
-        assertNull(Context.get().getCurrentScannableCode());
+        assertNull(AppContext.get().getCurrentPlayer());
+        assertNull(AppContext.get().getDeviceId());
+        assertNull(AppContext.get().getCurrentScannableCode());
     }
 
     @Test
     void getTest(){
-        Context result = Context.get();
+        AppContext result = AppContext.get();
         assertNotNull(result);
-        assertEquals(Context.class, result.getClass());
+        assertEquals(AppContext.class, result.getClass());
     }
 }

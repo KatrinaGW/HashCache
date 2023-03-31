@@ -5,7 +5,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.hashcache.context.Context;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.controllers.AddLoginCommand;
 import com.example.hashcache.models.database.DatabasePort;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -29,11 +29,12 @@ public class AddLoginCommandTest {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         cf.complete(null);
         String testUsername = "I am groot";
+        AppContext fakeContext = Mockito.mock(AppContext.class);
 
         when(mockDb.addLoginRecord(testUsername)).thenReturn(cf);
 
         CompletableFuture<Void> result = AddLoginCommand.addLogin(testUsername,
-                mockDb);
+                fakeContext, mockDb);
 
         assertNull(result.join());
         verify(mockDb, times(1)).addLoginRecord(testUsername);

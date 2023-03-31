@@ -7,7 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.hashcache.context.Context;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.controllers.CheckLoginCommand;
 import com.example.hashcache.controllers.SetupUserCommand;
 import com.example.hashcache.models.database.DatabasePort;
@@ -38,13 +38,13 @@ public class CheckLoginCommandTest {
 
         when(mockDb.getUsernameForDevice()).thenReturn(usernameCf);
         when(mockSetUpUserCommand.setupUser(anyString(), any(DatabasePort.class),
-                any(Context.class))).thenReturn(nullCf);
+                any(AppContext.class))).thenReturn(nullCf);
 
         CompletableFuture<Boolean> result = CheckLoginCommand.checkLogin(mockDb,
                 mockSetUpUserCommand);
 
         assertTrue(result.join());
         verify(mockSetUpUserCommand, times((1))).setupUser(anyString(), any(DatabasePort.class),
-                any(Context.class));
+                any(AppContext.class));
     }
 }
