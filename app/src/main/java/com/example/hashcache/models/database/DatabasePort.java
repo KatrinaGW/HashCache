@@ -58,6 +58,6 @@ public interface DatabasePort {
     void onPlayerDataChanged(String userId, GetPlayerCallback callback);
     void onPlayerWalletChanged(String playerId, BooleanCallback callback);
     void onScannableCodeCommentsChanged(String scannableCodeId, GetScannableCodeCallback callback);
-    CompletableFuture<String> getTopKUsers(String filter, int k);
+    CompletableFuture<ArrayList<Pair<String, Long>>> getTopKUsers(String filter, int k);
     CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet);
 }

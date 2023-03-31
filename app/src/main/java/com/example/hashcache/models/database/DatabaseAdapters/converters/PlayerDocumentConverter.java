@@ -188,21 +188,21 @@ public class PlayerDocumentConverter {
                 if(task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
 
-                    String strTotalScore = (String)
+                    Long strTotalScore = (Long)
                             document.getData().get(FieldNames.TOTAL_SCORE.fieldName);
                     if(strTotalScore!=null){
-                        playerWallet.setTotalScore(Long.parseLong(strTotalScore));
+                        playerWallet.setTotalScore(strTotalScore);
                     }
 
-                    String strQRCount = (String) document.getData().get(FieldNames.QR_COUNT.fieldName);
+                    Long strQRCount = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
                     if(strQRCount!=null){
-                        playerWallet.setQRCount(Long.parseLong(strQRCount));
+                        playerWallet.setQRCount(strQRCount);
                     }
 
-                    String strMaxScore = (String) document.getData().get(FieldNames.QR_COUNT.fieldName);
+                    Long strMaxScore = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
 
                     if(strMaxScore!=null){
-                        playerWallet.setMaxScore(Long.parseLong(strMaxScore));
+                        playerWallet.setMaxScore(strMaxScore);
                     }
 
                     cf.complete(playerWallet);
