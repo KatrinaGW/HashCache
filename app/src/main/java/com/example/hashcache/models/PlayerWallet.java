@@ -9,16 +9,14 @@ import java.util.HashMap;
  */
 public class PlayerWallet{
     private HashMap<String, Image> scannableCodes;
-    private int size;
+    private int qrCount;
     private long totalScore;
     private long maxScore;
-    private long qrCount;
 
     public PlayerWallet(){
-        this.size = 0;
+        this.qrCount = 0;
         this.totalScore = 0;
         this.maxScore = 0;
-        this.qrCount = 0;
         this.scannableCodes = new HashMap<String, Image>();
     }
 
@@ -28,7 +26,7 @@ public class PlayerWallet{
      */
     public void addScannableCode(String scannableCodeId){
         this.scannableCodes.put(scannableCodeId, null);
-        this.size++;
+        this.qrCount++;
     }
 
     /**
@@ -38,7 +36,7 @@ public class PlayerWallet{
      */
     public void addScannableCode(String scannableCodeId, Image locationImage){
         this.scannableCodes.put(scannableCodeId, locationImage);
-        this.size++;
+        this.qrCount++;
     }
 
     /**
@@ -87,8 +85,8 @@ public class PlayerWallet{
      * Gets the number of scanned codes
      * @return the number of scanned codes
      */
-    public int getSize(){
-        return this.size;
+    public int getQrCount(){
+        return this.qrCount;
     }
 
     /**
@@ -99,7 +97,7 @@ public class PlayerWallet{
     public void deleteScannableCode(String scannableCodeId){
         if(this.scannableCodes.containsKey(scannableCodeId)){
             this.scannableCodes.remove(scannableCodeId);
-            this.size--;
+            this.qrCount--;
 
         }else{
             throw new IllegalArgumentException("Player wallet does not contain scannable" +
@@ -111,21 +109,9 @@ public class PlayerWallet{
         return maxScore;
     }
 
-    public long getQrCount() {
-        return qrCount;
-    }
-
     public void updateMaxScore(long candidateScore) {
         if(candidateScore>maxScore){
             this.maxScore = candidateScore;
         }
-    }
-
-    public void setQRCount(long qrCount){
-        this.qrCount = qrCount;
-    }
-
-    public void incrementQRCount(){
-        this.qrCount++;
     }
 }

@@ -111,9 +111,6 @@ public class HashController {
             // Total Score
             playerWallet.setTotalScore(playerWallet.getTotalScore() + score);
 
-            // Qr count
-            playerWallet.incrementQRCount();
-
             // Update the players score in the database
 
             Database.getInstance().updatePlayerScores(userId, playerWallet)
