@@ -166,9 +166,12 @@ public class Context extends Observable {
             @Override
             public void onCallback(Player player) {
                 System.out.println(String.format("Player data for %s has changed", currentPlayer.getUsername()));
-                setCurrentPlayer(player);
-                setChanged();
-                notifyObservers();
+                if(currentPlayer!=null && player!=null &&
+                        player.getUserId() == currentPlayer.getUserId()){
+                    setCurrentPlayer(player);
+                    setChanged();
+                    notifyObservers();
+                }
             }
         });
 
@@ -185,7 +188,7 @@ public class Context extends Observable {
                         Database.getInstance()
                                 .getPlayerWalletTotalScore(playa.getPlayerWallet().getScannedCodeIds())
                                 .thenAccept(totalScore -> {
-                                    //getCurrentPlayer().getPlayerWallet().setTotalScore(totalScore.longValue());
+                                    playa.getPlayerWallet().setTotalScore(totalScore);
                                     setChanged();
                                     notifyObservers();
                                 });
@@ -198,7 +201,6 @@ public class Context extends Observable {
                         Database.getInstance().getPlayerWalletTopScore(playa.getPlayerWallet().getScannedCodeIds())
                                 .thenAccept(scanCode -> {
                                     setHighestScannableCode(scanCode);
-                                    //getCurrentPlayer().getPlayerWallet().updateMaxScore(scanCode.getHashInfo().getGeneratedScore());
                                     setChanged();
                                     notifyObservers();
                                 });
