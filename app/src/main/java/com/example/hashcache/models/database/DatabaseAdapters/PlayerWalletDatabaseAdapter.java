@@ -279,8 +279,8 @@ public class PlayerWalletDatabaseAdapter {
             Database.getInstance().getScannableCodesByIdInList(scannableCodeIds).thenAccept(
                     scannableCodes -> {
                         if (scannableCodes.size() > 0) {
-                            long highestScore = 0;
                             ScannableCode highestScoring = scannableCodes.get(0);
+                            long highestScore = highestScoring.getHashInfo().getGeneratedScore();
 
                             for (int i = 0; i < scannableCodes.size(); i++) {
                                 ScannableCode scannableCode = scannableCodes.get(i);
@@ -318,8 +318,8 @@ public class PlayerWalletDatabaseAdapter {
             Database.getInstance().getScannableCodesByIdInList(scannableCodeIds).thenAccept(
                     scannableCodes -> {
                         if (scannableCodes.size() > 0) {
-                            long lowestScore = Long.MAX_VALUE;
                             ScannableCode lowestScoring = scannableCodes.get(0);
+                            long lowestScore = lowestScoring.getHashInfo().getGeneratedScore();
 
                             for (int i = 1; i < scannableCodes.size(); i++) {
                                 ScannableCode scannableCode = scannableCodes.get(i);
