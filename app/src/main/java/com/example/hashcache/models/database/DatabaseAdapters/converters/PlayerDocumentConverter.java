@@ -188,20 +188,25 @@ public class PlayerDocumentConverter {
                 if(task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
 
-                    String strTotalScore = (String)
+                    Long strTotalScore = (Long)
                             document.getData().get(FieldNames.TOTAL_SCORE.fieldName);
-                    if(strTotalScore!=null){
-                        playerWallet.setTotalScore(Long.parseLong(strTotalScore));
+                    if (strTotalScore != null) {
+                        playerWallet.setTotalScore(strTotalScore);
                     }
-                    String strMaxScore = (String) document.getData().get(FieldNames.QR_COUNT.fieldName);
-
-                    if(strMaxScore!=null){
-                        playerWallet.updateMaxScore(Long.parseLong(strMaxScore));
+                    Long strQRCount = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
+                    if (strQRCount != null) {
+                        playerWallet.setQRCount(strQRCount);
                     }
 
-                    cf.complete(playerWallet);
-                } else {
-                    cf.completeExceptionally(new Exception(task.getException()));
+                    Long strMaxScore = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
+
+                    if (strMaxScore != null) {
+                        playerWallet.setMaxScore(strMaxScore);
+
+                        cf.complete(playerWallet);
+                    } else {
+                        cf.completeExceptionally(new Exception(task.getException()));
+                    }
                 }
             }
         });

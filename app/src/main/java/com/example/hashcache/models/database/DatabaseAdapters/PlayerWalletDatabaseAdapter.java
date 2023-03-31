@@ -349,9 +349,9 @@ public class PlayerWalletDatabaseAdapter {
         CompletableFuture<Void> cf = new CompletableFuture<>();
 
         HashMap<String, Object> data = new HashMap<>();
-        data.put(FieldNames.TOTAL_SCORE.fieldName, Long.toString(playerWallet.getTotalScore()));
-        data.put(FieldNames.MAX_SCORE.fieldName, Long.toString(playerWallet.getMaxScore()));
-        data.put(FieldNames.QR_COUNT.fieldName, Long.toString(playerWallet.getQrCount()));
+        data.put(FieldNames.TOTAL_SCORE.fieldName, playerWallet.getTotalScore());
+        data.put(FieldNames.MAX_SCORE.fieldName, playerWallet.getMaxScore());
+        data.put(FieldNames.QR_COUNT.fieldName, playerWallet.getQrCount());
 
         CompletableFuture.runAsync(() -> {
             fireStoreHelper.addUpdateManyFieldsIntoDocument(playerDocument, data)
@@ -421,4 +421,5 @@ public class PlayerWalletDatabaseAdapter {
 
         return cf;
     }
+
 }

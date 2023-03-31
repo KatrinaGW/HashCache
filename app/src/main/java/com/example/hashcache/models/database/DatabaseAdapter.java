@@ -3,11 +3,11 @@ package com.example.hashcache.models.database;
 import android.util.Log;
 import android.util.Pair;
 
-import java.lang.reflect.Array;
-import java.util.List;
+import androidx.annotation.NonNull;
+
+import java.lang.reflect.Field;
 import java.util.Observable;
 
-import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
@@ -22,7 +22,15 @@ import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanC
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+import com.example.hashcache.models.database.values.CollectionNames;
+import com.example.hashcache.models.database.values.FieldNames;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -611,11 +619,37 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return cf;
     }
 
+    /**
+     * Returns the user id of the top k players with the given filter. Given a list containing user
+     * names and the score of the user (determined by filter)
+     * @param filter
+     * @param k
+     * @return
+     */
     @Override
-    public CompletableFuture<String> getTopKUsers(String filter, int k) {
-        CompletableFuture<String> cf = new CompletableFuture<>();
+    public CompletableFuture<ArrayList<Pair<String, Long>>> getTopKUsers(String filter, int k) {
+        CompletableFuture<ArrayList<Pair<String, Long>>> cf = new CompletableFuture<>();
+        ArrayList<Pair<String, Long>> arrayList = new ArrayList<>();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
 
         CompletableFuture.runAsync(() -> {
+            collectionReference.orderBy(filter).limit(k).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if(task.isSuccessful()) {
+                        for(QueryDocumentSnapshot document: task.getResult()) {
+                            Pair<String, Long> pair = new Pair(document.get(FieldNames.USERNAME.fieldName),
+                                            document.get(filter));
+                            arrayList.add(pair);
+                        }
+                        cf.complete(arrayList);
+                    } else {
+                        Log.e("DATABASE", "Error getting the top k users");
+                    }
+                }
+            });
+
         });
 
         return cf;
@@ -686,4 +720,5 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         });
         return cf;
     }
+
 }
