@@ -159,8 +159,9 @@ public class HashController {
                             if(completed){
                                 Player currentPlayer = Context.get().getCurrentPlayer();
                                 // If the deleted scannable code belonged to the current player, remove it from their wallet
-                                if(currentPlayer.getUserId() == userId){
-                                    currentPlayer.getPlayerWallet().deleteScannableCode(scannableCodeId);
+                                if(currentPlayer.getUserId().equals(userId)){
+                                    //currentPlayer.getPlayerWallet().deleteScannableCode(scannableCodeId);
+                                    currentPlayer.getPlayerWallet().setQRCount(currentPlayer.getPlayerWallet().getQrCount() - 1);
                                 }
 
                                 CompletableFuture.runAsync(() -> {
