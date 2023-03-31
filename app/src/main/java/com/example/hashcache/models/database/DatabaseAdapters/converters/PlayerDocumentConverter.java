@@ -193,7 +193,6 @@ public class PlayerDocumentConverter {
                     if(strTotalScore!=null){
                         playerWallet.setTotalScore(strTotalScore);
                     }
-
                     Long strQRCount = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
                     if(strQRCount!=null){
                         playerWallet.setQRCount(strQRCount);
@@ -203,7 +202,6 @@ public class PlayerDocumentConverter {
 
                     if(strMaxScore!=null){
                         playerWallet.setMaxScore(strMaxScore);
-                    }
 
                     cf.complete(playerWallet);
                 } else {

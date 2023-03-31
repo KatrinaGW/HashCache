@@ -5,6 +5,7 @@ import android.provider.Settings;
 import androidx.lifecycle.Observer;
 import android.util.Log;
 
+import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
@@ -12,7 +13,12 @@ import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanC
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 
+import org.checkerframework.checker.units.qual.A;
+import org.checkerframework.checker.units.qual.C;
+
+import java.util.ArrayList;
 import java.util.Observable;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Holds the global state information for the app
@@ -175,10 +181,11 @@ public class Context extends Observable {
                         setCurrentPlayer(playa);
                         setChanged();
                         notifyObservers();
+
                         Database.getInstance()
                                 .getPlayerWalletTotalScore(playa.getPlayerWallet().getScannedCodeIds())
                                 .thenAccept(totalScore -> {
-                                    getCurrentPlayer().getPlayerWallet().setTotalScore(totalScore.longValue());
+                                    //getCurrentPlayer().getPlayerWallet().setTotalScore(totalScore.longValue());
                                     setChanged();
                                     notifyObservers();
                                 });
@@ -191,6 +198,7 @@ public class Context extends Observable {
                         Database.getInstance().getPlayerWalletTopScore(playa.getPlayerWallet().getScannedCodeIds())
                                 .thenAccept(scanCode -> {
                                     setHighestScannableCode(scanCode);
+                                    //getCurrentPlayer().getPlayerWallet().updateMaxScore(scanCode.getHashInfo().getGeneratedScore());
                                     setChanged();
                                     notifyObservers();
                                 });
