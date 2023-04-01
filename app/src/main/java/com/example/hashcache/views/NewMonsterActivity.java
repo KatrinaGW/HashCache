@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,7 +65,7 @@ public class NewMonsterActivity extends AppCompatActivity {
     private TextView takePhotoText;
     private ImageButton photoButton;
     private AppCompatButton skipPhotoButton;
-    
+    private FusedLocationProviderClient fusedLocationProviderClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,7 +76,7 @@ public class NewMonsterActivity extends AppCompatActivity {
 
         init();
 
-        ScannableCode curCode = Context.get().getCurrentScannableCode();
+        ScannableCode curCode = AppContext.get().getCurrentScannableCode();
         HashInfo curInfo = curCode.getHashInfo();
         ActivityResultLauncher<Intent> startCapture = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
@@ -144,7 +145,7 @@ public class NewMonsterActivity extends AppCompatActivity {
 
                 if ( AppContext.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference()  ){
                     String codeID = curCode.getScannableCodeId();
-                    getLocationAndAdd(codeID);
+//                    getLocationAndAdd(codeID);
                 }
 
                 // go to profile page
@@ -220,9 +221,10 @@ public class NewMonsterActivity extends AppCompatActivity {
                 locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
+                        GeoLocation itemGeoLocation;
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
-                            itemLocation = task.getResult();
+                            Location itemLocation = task.getResult();
                             if (itemLocation != null) {
                                 itemGeoLocation = new GeoLocation(itemLocation.getLatitude(), itemLocation.getLongitude());
                                 Log.e("Markers", "itemLocation= " + itemGeoLocation);

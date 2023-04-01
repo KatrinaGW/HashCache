@@ -25,6 +25,8 @@ import java.util.function.Function;
  * The HashController class provides methods for managing scannable codes and their associated hash information.
  */
 public class HashController {
+
+    private static final String TAG = "HashController";
     /**
      * Adds a new scannable code to the database and associates it with the current player's wallet.
      *
@@ -98,6 +100,8 @@ public class HashController {
      */
     private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf,
                                                  ScannableCode sc) {
+
+        Log.d(TAG, String.format("Adding scannableCode: %s to userId: %s", hash, userId));
         Database.getInstance().addScannableCodeToPlayerWallet(userId, hash)
                 .thenAccept(created->{
             AppContext.get().setCurrentScannableCode(sc);
@@ -108,11 +112,13 @@ public class HashController {
                 playerWallet.setQRCount(playerWallet.getQrCount() + 1);
             }
 
+            Log.d(TAG, String.format("Updating scores for userId %s", userId));
             CompletableFuture.runAsync(() -> {
                 updateTotalMaxScore()
                         .thenAccept(nullValue -> {
                             Database.getInstance().updatePlayerScores(userId, playerWallet)
                                     .thenAccept(success -> {
+                                        Log.d(TAG, String.format("Successfully updated scores for userId %s", userId));
                                         cf.complete(null);
                                     })
                                     .exceptionally(new Function<Throwable, Void>() {

@@ -71,6 +71,10 @@ public class CodeMetadata {
         return documentId;
     }
 
+    public String getScannableCodeId(){
+        return scannableCodeId;
+    }
+
     public String getGeohash() {
         return geohash;
     }
