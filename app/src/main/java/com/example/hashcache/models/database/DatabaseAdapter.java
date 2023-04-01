@@ -19,6 +19,7 @@ import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.database.DatabaseAdapters.LoginsAdapter;
@@ -738,6 +739,8 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         LoginsAdapter.resetInstance();
         PlayersDatabaseAdapter.resetInstance();
         ScannableCodesDatabaseAdapter.resetInstance();
+        CodeMetadataDatabaseAdapter.resetInstance();
+        CodeLocationDatabaseAdapter.resetInstance();
     }
 
     @Override

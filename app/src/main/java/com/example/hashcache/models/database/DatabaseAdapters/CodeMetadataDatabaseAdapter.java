@@ -78,7 +78,7 @@ public class CodeMetadataDatabaseAdapter {
     public static CodeMetadataDatabaseAdapter makeInstance(FireStoreHelper fireStoreHelper,
                                                            FirebaseFirestore db) {
         if (INSTANCE != null) {
-            throw new IllegalArgumentException("CodeLocationConnectionHandler INSTANCE already " +
+            throw new IllegalArgumentException("CodeMetadataDatabaseAdapter INSTANCE already " +
                     "exists!");
         }
 
@@ -100,6 +100,13 @@ public class CodeMetadataDatabaseAdapter {
                     "not exist!");
         }
         return INSTANCE;
+    }
+
+    /**
+     * Resets the static instance to null
+     */
+    public static void resetInstance(){
+        INSTANCE = null;
     }
 
     public CompletableFuture<Void> updateLocationImage(String codeMetadataId, String base64Image) {
