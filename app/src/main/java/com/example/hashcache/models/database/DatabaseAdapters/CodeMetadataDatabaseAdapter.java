@@ -134,7 +134,7 @@ public class CodeMetadataDatabaseAdapter {
             objMap.put("scannableCodeId", codeMetadata.getScannableCodeId());
             objMap.put("userId", codeMetadata.getUserId());
             DocumentReference docRef = collectionReference.document(documentId);
-            docRef.update(objMap).addOnCompleteListener(task -> {
+            docRef.set(objMap).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     cf.complete(null);
                 } else {
@@ -142,6 +142,33 @@ public class CodeMetadataDatabaseAdapter {
                     cf.completeExceptionally(task.getException());
                 }
             });
+        });
+        return cf;
+    }
+
+    public CompletableFuture<Boolean> updatePlayerCodeMetadataImage(String scannableCodeId, String userId, String image) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            CollectionReference colRef = collectionReference;
+            Query query = colRef.
+                    whereEqualTo("scannableCodeId", scannableCodeId).
+                    whereEqualTo("userId", userId).limit(1);
+            query.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    if (task.getResult().isEmpty()) {
+                        cf.complete(false);
+                    } else {
+                        List<DocumentSnapshot> sn = task.getResult().getDocuments();
+                        DocumentSnapshot ds = sn.get(0);
+                        DocumentReference dr = ds.getReference();
+                        dr.update("base64Image", image);
+                        cf.complete(true);
+                    }
+                } else {
+                    cf.completeExceptionally(new Exception("Could not fet code metadata"));
+                }
+            });
+
         });
         return cf;
     }
@@ -244,11 +271,12 @@ public class CodeMetadataDatabaseAdapter {
 
     @NonNull
     private CodeMetadata parseCodeMetadataDocument(DocumentSnapshot doc) {
-        String image = doc.getString("image");
+        String image = doc.getString("base64Image");
         String scannableCodeId = doc.getString("scannableCodeId");
         double lat = doc.getDouble("lat");
         double lng = doc.getDouble("lng");
-        CodeMetadata cm = new CodeMetadata(scannableCodeId, new GeoLocation(lat, lng));
+        String userId = doc.getString("userId");
+        CodeMetadata cm = new CodeMetadata(scannableCodeId, userId, new GeoLocation(lat, lng), image);
         return cm;
     }
 }
