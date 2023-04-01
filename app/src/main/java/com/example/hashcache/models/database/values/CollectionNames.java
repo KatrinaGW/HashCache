@@ -12,7 +12,7 @@ public enum CollectionNames {
     PLAYER_WALLET("playerWallet"),
     LOGINS("logins"),
     COMMENTS("comments"),
-    CODE_METADATA("codeLocations");
+    CODE_METADATA("CodeMetadata");
     public final String collectionName;
 
     private CollectionNames(String collectionName) {
