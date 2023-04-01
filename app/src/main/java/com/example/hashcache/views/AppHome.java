@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -107,6 +108,8 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
 
     SearchView searchView;
 
+    View mMapView;
+
     int test = 0;
 
 
@@ -135,6 +138,8 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         // Build the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+
+        mMapView = mapFragment.getView();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -206,10 +211,12 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                 GeoLocation currentLocation = new GeoLocation(map.getCameraPosition().target.latitude, map.getCameraPosition().target.longitude);
                 Database.getInstance().getCodeMetadataWithinRadius(currentLocation, radius).thenAccept(allMarkers -> {
                     for (CodeMetadata mark: allMarkers){
-                        Log.e("Markers", "MARKER PLACED PEPEGA");
-                        map.addMarker(new MarkerOptions()
-                                .position(new LatLng(mark.getLocation().latitude, mark.getLocation().longitude))
-                                .title("Marker in Sydney"));
+                        Database.getInstance().getScannableCodeById(mark.getScannableCodeId()).thenAccept(code ->{
+                            map.addMarker(new MarkerOptions()
+                                    .position(new LatLng(mark.getLocation().latitude, mark.getLocation().longitude))
+                                    .title(code.getHashInfo().getGeneratedName()));
+                        });
+
                     }
                 });
 
@@ -241,6 +248,13 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         playerInfo = AppContext.get().getCurrentPlayer();
         setUIParams();
         AppContext.get().addObserver(this);
+
+        View locationButton = ((View) mMapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        // position on right bottom
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        rlp.setMargins(0, 0, 0, 750);
 
     }
 
