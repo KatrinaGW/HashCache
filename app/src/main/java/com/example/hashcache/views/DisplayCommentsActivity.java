@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.function.Function;
 
 public class DisplayCommentsActivity extends AppCompatActivity implements Observer {
     private ListView commentsList;
