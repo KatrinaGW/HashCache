@@ -130,8 +130,4 @@ public class CommunityTest {
         solo.clickOnView(solo.getView(R.id.logo_button));
         solo.clickOnView(solo.getView(R.id.logout_button));
     }
-
-
-
-
 }
