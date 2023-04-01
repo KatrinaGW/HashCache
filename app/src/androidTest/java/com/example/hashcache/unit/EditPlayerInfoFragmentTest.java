@@ -45,7 +45,6 @@ public class EditPlayerInfoFragmentTest {
     @Before
     public void setUp() throws Exception{
         solo = new Solo(InstrumentationRegistry.getInstrumentation(),rule.getActivity());
-        Activity activity = rule.getActivity();
         final String ALLOWED_CHARACTERS = "0123456789qwertyuiopasdfghjklzxcvbnm";
         final Random random = new Random();
         final StringBuilder sb = new StringBuilder(15);
@@ -100,9 +99,6 @@ public class EditPlayerInfoFragmentTest {
         solo.clickOnView(solo.getView(R.id.logout_button));
 
     }
-
-
-
 }
 
 
