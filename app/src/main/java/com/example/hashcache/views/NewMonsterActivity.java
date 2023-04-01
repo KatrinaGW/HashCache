@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.hashcache.R;
 import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.controllers.LocationController;
 import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.HashInfo;
@@ -40,24 +41,32 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.ByteArrayOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.function.Function;
 
 /**
-
- The NewMonsterActivity class represents an activity in the app that allows users to create a new monster.
- This activity sets up the UI elements and adds functionality to the buttons, including taking a location photo
- for the new monster or skipping the photo and navigating to the MyProfile activity. The menu button is also
- functional, allowing users to navigate to different activities in the app.
+ * 
+ * The NewMonsterActivity class represents an activity in the app that allows
+ * users to create a new monster.
+ * This activity sets up the UI elements and adds functionality to the buttons,
+ * including taking a location photo
+ * for the new monster or skipping the photo and navigating to the MyProfile
+ * activity. The menu button is also
+ * functional, allowing users to navigate to different activities in the app.
  */
 public class NewMonsterActivity extends AppCompatActivity {
     /**
      * Called when the activity is created.
      *
-     * Initializes the activity by setting up the UI elements and adding functionality to the buttons.
+     * Initializes the activity by setting up the UI elements and adding
+     * functionality to the buttons.
      *
-     * @param savedInstanceState saved state of the activity, if it was previously closed.
+     * @param savedInstanceState saved state of the activity, if it was previously
+     *                           closed.
      */
+
+    private final String TAG = "NewMonsterActivity";
     private TextView monsterName;
     private TextView monsterScore;
     private ImageView monsterImage;
@@ -67,6 +76,7 @@ public class NewMonsterActivity extends AppCompatActivity {
     private ImageButton photoButton;
     private AppCompatButton skipPhotoButton;
     private FusedLocationProviderClient fusedLocationProviderClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,15 +89,22 @@ public class NewMonsterActivity extends AppCompatActivity {
 
         ScannableCode curCode = AppContext.get().getCurrentScannableCode();
         HashInfo curInfo = curCode.getHashInfo();
-        ActivityResultLauncher<Intent> startCapture = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+        ActivityResultLauncher<Intent> startCapture = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
-                        if(result.getResultCode() == Activity.RESULT_OK) {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
                             Bundle imageData = result.getData().getExtras();
-
+                            // https://stackoverflow.com/questions/9224056/android-bitmap-to-base64-string
                             Bitmap image = (Bitmap) imageData.get("data");
-
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            image.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                            byte[] byteArray = byteArrayOutputStream.toByteArray();
+                            String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                            Log.d(TAG, String.format("Image taken. Size: %d bytes", encoded.getBytes().length));
+                            Log.d("NewMonsterActivity - Camera", "Location photo successfully taken.");
+                            // Log.d("New Monster Activity - Camera", encoded);
                             // Sets the scannable code to the image
                             curCode.setImage(image);
 
@@ -132,7 +149,7 @@ public class NewMonsterActivity extends AppCompatActivity {
         skipPhotoButton.setOnClickListener(new View.OnClickListener() {
             /**
              * Called when the skip photo button is clicked.
-             *
+             * <p>
              * Navigates to the MyProfile activity when the skip photo button is clicked.
              *
              * @param v the view that was clicked (the skip photo button)
@@ -140,13 +157,12 @@ public class NewMonsterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                //no picture
-                //check if they allow for metadata
+                // no picture
+                // check if they allow for metadata
 
-
-                if ( AppContext.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference()  ){
+                if (AppContext.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference()) {
                     String codeID = curCode.getScannableCodeId();
-//                    getLocationAndAdd(codeID);
+                    // getLocationAndAdd(codeID);
                 }
 
                 // go to profile page
@@ -159,8 +175,9 @@ public class NewMonsterActivity extends AppCompatActivity {
         menuButton.setOnClickListener(new View.OnClickListener() {
             /**
              * Called when the menu button is clicked.
-             *
-             * Creates a popup menu and sets up the menu items. Navigates to different activities based on the menu item
+             * <p>
+             * Creates a popup menu and sets up the menu items. Navigates to different
+             * activities based on the menu item
              * that was clicked.
              *
              * @param v the view that was clicked (the menu button)
@@ -178,7 +195,8 @@ public class NewMonsterActivity extends AppCompatActivity {
                     /**
                      * Called when a menu item is clicked.
                      *
-                     * Navigates to the appropriate activity based on the menu item that was clicked.
+                     * Navigates to the appropriate activity based on the menu item that was
+                     * clicked.
                      *
                      * @param item the menu item that was clicked
                      * @return true if the menu item was handled, false otherwise
@@ -186,19 +204,19 @@ public class NewMonsterActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
 
-                        if (id == R.id.menu_home) {                 // go to AppHome page
+                        if (id == R.id.menu_home) { // go to AppHome page
                             startActivity(new Intent(NewMonsterActivity.this, AppHome.class));
                             return true;
 
-                        } else if (id == R.id.menu_stats) {         // go to QRStats page
+                        } else if (id == R.id.menu_stats) { // go to QRStats page
                             startActivity(new Intent(NewMonsterActivity.this, QRStats.class));
                             return true;
 
-                        } else if (id == R.id.menu_profile) {       // go to MyProfile
+                        } else if (id == R.id.menu_profile) { // go to MyProfile
                             startActivity(new Intent(NewMonsterActivity.this, MyProfile.class));
                             return true;
 
-                        } else if (id == R.id.menu_community) {     // go to Community
+                        } else if (id == R.id.menu_community) { // go to Community
                             startActivity(new Intent(NewMonsterActivity.this, Community.class));
                             return true;
                         }
@@ -209,37 +227,6 @@ public class NewMonsterActivity extends AppCompatActivity {
             }
 
         });
-    }
-
-    private void getLocationAndAdd(String codeID) {
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
-        try {
-            if ( AppContext.get().getCurrentPlayer().getPlayerPreferences().getRecordGeolocationPreference()  ) {
-                Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        GeoLocation itemGeoLocation;
-                        if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
-                            Location itemLocation = task.getResult();
-                            if (itemLocation != null) {
-                                itemGeoLocation = new GeoLocation(itemLocation.getLatitude(), itemLocation.getLongitude());
-                                Log.e("Markers", "itemLocation= " + itemGeoLocation);
-                                Database.getInstance().addScannableCodeMetadata(new CodeMetadata(codeID, itemGeoLocation)).complete(null);
-                            }
-                        } else {
-                            itemGeoLocation = null;
-                        }
-                    }
-                });
-            }
-        } catch (SecurityException e)  {
-            Log.e("Exception: %s", e.getMessage(), e);
-        }
     }
     private void init() {
 
@@ -280,6 +267,5 @@ public class NewMonsterActivity extends AppCompatActivity {
     public void setSkipPhotoButtonClickListener(View.OnClickListener listener) {
         skipPhotoButton.setOnClickListener(listener);
     }
-    
 
 }
