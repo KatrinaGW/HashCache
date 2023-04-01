@@ -57,6 +57,9 @@ public interface DatabasePort {
     CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation location, double radiusMeters);
     CompletableFuture<ArrayList<ScannableCode>> getScannableCodesWithinRadius(GeoLocation location, double radiusMeters);
     CompletableFuture<String> getUsernameForDevice();
+
+    CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image);
+    CompletableFuture<CodeMetadata> getPlayerCodeMetadataById(String userId, String scannableCodeId);
     CompletableFuture<Void> deleteLogin();
     void resetInstances();
     CompletableFuture<ArrayList<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds);
