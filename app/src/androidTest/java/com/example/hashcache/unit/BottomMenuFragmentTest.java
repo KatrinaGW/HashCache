@@ -49,6 +49,13 @@ public class BottomMenuFragmentTest {
         solo.clickOnButton("START CACHING");
     }
 
+    private void logout(){
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
+    }
+
     @Test
     public void checkAppHomeButton(){
         // Asserts that the menu button navigates to app home activity. Otherwise, show “Wrong Activity"
@@ -60,6 +67,7 @@ public class BottomMenuFragmentTest {
         solo.clickOnView(solo.getView(R.id.map_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        logout();
     }
 
     @Test
@@ -73,6 +81,10 @@ public class BottomMenuFragmentTest {
         solo.clickOnView(solo.getView(R.id.leaderboard_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnText("My QR Codes");
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
@@ -83,9 +95,11 @@ public class BottomMenuFragmentTest {
         solo.clickOnView(solo.getView(R.id.menu_button));
         solo.sleep(100);
         // select QRScan button
-        solo.clickOnView(solo.getView(R.id.scan_qr_button));
+        solo.clickOnView(solo.getView(R.id.scan_qr_button, 1));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", QRScanActivity.class);
+        solo.goBack();
+        logout();
     }
 
     @Test
@@ -99,6 +113,7 @@ public class BottomMenuFragmentTest {
         solo.clickOnView(solo.getView(R.id.my_codes_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
+        logout();
     }
 
     @Test
@@ -109,8 +124,9 @@ public class BottomMenuFragmentTest {
         solo.clickOnView(solo.getView(R.id.menu_button));
         solo.sleep(100);
         // select community button
-        solo.clickOnView(solo.getView(R.id.community_button));
+        solo.clickOnView(solo.getView(R.id.community_button, 1));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
+        logout();
     }
 }
