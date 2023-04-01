@@ -46,7 +46,7 @@ public class CodeMetadata {
      * @throws NoSuchAlgorithmException If the SHA-256 algorithm is not available on
      *                                  the current platform.
      */
-    public CodeMetadata(String scannableCodeId, GeoLocation location, String base64Image, String userId) {
+    public CodeMetadata(String scannableCodeId, String userId, GeoLocation location, String base64Image) {
         this.image = base64Image;
         this.location = location;
         this.geohash = GeoFireUtils.getGeoHashForLocation(location);
@@ -55,16 +55,15 @@ public class CodeMetadata {
         this.userId = userId;
     }
 
-    public CodeMetadata(String scannableCodeId, GeoLocation location, String base64Image) {
-        this(scannableCodeId, location, base64Image, null);
+    public CodeMetadata(String scannableCodeId, String userId, String base64Image) {
+        this(scannableCodeId, userId, null, base64Image);
+    }
+    public CodeMetadata(String scannableCodeId, String userId) {
+        this(scannableCodeId, userId, null, null);
     }
 
-    public CodeMetadata(String scannableCodeId, String base64Image) {
-        this(scannableCodeId, null, null, base64Image);
-    }
-
-    public CodeMetadata(String scannableCodeId, GeoLocation location) {
-        this(scannableCodeId, location, null);
+    public CodeMetadata(String scannableCodeId, String userId, GeoLocation location) {
+        this(scannableCodeId, userId, location, null);
     }
 
     public String getDocumentId() {
