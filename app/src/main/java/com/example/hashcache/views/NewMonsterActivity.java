@@ -1,10 +1,12 @@
 package com.example.hashcache.views;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,7 +14,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
@@ -59,12 +64,7 @@ public class NewMonsterActivity extends AppCompatActivity {
     private TextView takePhotoText;
     private ImageButton photoButton;
     private AppCompatButton skipPhotoButton;
-
-    private FusedLocationProviderClient fusedLocationProviderClient;
-
-    private Location itemLocation;
-
-    private GeoLocation itemGeoLocation;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,17 +74,37 @@ public class NewMonsterActivity extends AppCompatActivity {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         init();
+
+        ScannableCode curCode = Context.get().getCurrentScannableCode();
+        HashInfo curInfo = curCode.getHashInfo();
+        ActivityResultLauncher<Intent> startCapture = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if(result.getResultCode() == Activity.RESULT_OK) {
+                            Bundle imageData = result.getData().getExtras();
+
+                            Bitmap image = (Bitmap) imageData.get("data");
+
+                            // Sets the scannable code to the image
+                            curCode.setImage(image);
+
+                            // go to profile page
+                            startActivity(new Intent(NewMonsterActivity.this, MyProfile.class));
+                        }
+                    }
+                });
         // take location photo
         ImageButton photoButton = findViewById(R.id.photo_button);
         photoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // go to activity to take location photo
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startCapture.launch(intent);
             }
         });
 
-        ScannableCode curCode = AppContext.get().getCurrentScannableCode();
-        HashInfo curInfo = curCode.getHashInfo();
         setMonsterName(curInfo.getGeneratedName());
         setMonsterScore(curInfo.getGeneratedScore());
         ImageGenerator.getImageFromHash(curCode.getScannableCodeId()).thenAccept(drawable -> {

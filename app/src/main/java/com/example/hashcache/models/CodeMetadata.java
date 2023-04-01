@@ -11,15 +11,41 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
+/**
+ * 
+ * A class representing metadata for a scannable code.
+ * This metadata includes the code's document ID, scannable code ID,
+ * location (represented as a GeoLocation and geohash), and image (if
+ * available).
+ * This class uses the Firebase GeoFireUtils library to obtain a geohash for a
+ * given location.
+ * It also uses the SHA-256 algorithm to generate a unique document ID based on
+ * the scannable code ID and geohash.
+ */
 public class CodeMetadata {
-
+    // The unique document ID for this code metadata
     final private String documentId;
+    // The ID of the scannable code
     final String scannableCodeId;
+    // The location of the scannable code
     final private GeoLocation location;
+    // The geohash of the scannable code's location
     final private String geohash;
+    // The base64-encoded image of the scannable code (if available)
     private String image;
+    // The userId of the player this scannable code belongs to
     private String userId;
 
+    /**
+     * Constructs a new CodeMetadata object.
+     *
+     * @param scannableCodeId The ID of the scannable code.
+     * @param location        The location of the scannable code.
+     * @param base64Image     The base64-encoded image of the scannable code (if
+     *                        available).
+     * @throws NoSuchAlgorithmException If the SHA-256 algorithm is not available on
+     *                                  the current platform.
+     */
     public CodeMetadata(String scannableCodeId, GeoLocation location, String base64Image, String userId) {
         this.image = base64Image;
         this.location = location;
@@ -37,16 +63,12 @@ public class CodeMetadata {
         this(scannableCodeId, null, null, base64Image);
     }
 
-    public CodeMetadata(String scannableCodeId, GeoLocation location){
+    public CodeMetadata(String scannableCodeId, GeoLocation location) {
         this(scannableCodeId, location, null);
     }
 
     public String getDocumentId() {
         return documentId;
-    }
-
-    public String getScannableCodeId() {
-        return scannableCodeId;
     }
 
     public String getGeohash() {

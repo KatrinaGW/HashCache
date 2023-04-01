@@ -1,5 +1,7 @@
 package com.example.hashcache.models;
 
+import android.graphics.Bitmap;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -14,6 +16,7 @@ public class ScannableCode {
     private String codeLocationId;
     private HashInfo hashInfo;
     private ArrayList<Comment> comments;
+    private Bitmap image;
 
     /**
      * 
@@ -125,5 +128,13 @@ public class ScannableCode {
 
     public String getScannableCodeId() {
         return scannableCodeId;
+    }
+
+    public Bitmap getImage() {
+        return image;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
     }
 }
