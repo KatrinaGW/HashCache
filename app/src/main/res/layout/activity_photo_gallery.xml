@@ -30,14 +30,17 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_below="@+id/header"
-        android:layout_above="@+id/menu_button"
+        android:layout_above="@+id/back_button"
         android:layout_margin="24dp">
     </ListView>
 
     <Button
         android:id="@+id/back_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/menu_button"
+        android:layout_marginStart="24dp"
+        android:text="BACK"/>
 
     <ImageButton
         android:id="@+id/menu_button"
