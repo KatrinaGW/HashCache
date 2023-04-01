@@ -55,6 +55,7 @@
             android:layout_height="400dp"
             tools:context=".MapsActivity"
             map:mapId="@string/map_id"
+            map:uiTiltGestures= "false"
             tools:appContext=".MapsActivity"
             tools:ignore="ExtraText" />
         <androidx.appcompat.widget.SearchView
