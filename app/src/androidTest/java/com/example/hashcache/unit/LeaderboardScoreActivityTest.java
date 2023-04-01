@@ -54,8 +54,16 @@ public class LeaderboardScoreActivityTest {
 
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
-        solo.clickOnImageButton(3);
+        solo.clickOnView(solo.getView(R.id.menu_button));
         solo.clickOnView(solo.getView(R.id.leaderboard_button));
+        solo.clickOnView(solo.getView(R.id.leaderboard_button));
+    }
+
+    void logout(){
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnText("My QR Codes");
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
@@ -65,15 +73,17 @@ public class LeaderboardScoreActivityTest {
         solo.clickOnButton("# QR");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
+        logout();
     }
 
     @Test
     public void checkTopQRButton(){
         // Asserts that the current activity is the LeaderboardScoreActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
-        solo.clickOnButton("# QR");
+        solo.clickOnButton("TOP QR");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", LeaderboardTopQRActivity.class);
+        logout();
     }
 
     @Test
@@ -83,6 +93,7 @@ public class LeaderboardScoreActivityTest {
         solo.clickOnButton("REGION");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", LeaderboardRegionActivity.class);
+        logout();
     }
 
     @Test
@@ -93,6 +104,9 @@ public class LeaderboardScoreActivityTest {
         solo.clickOnText("Map");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
@@ -103,6 +117,8 @@ public class LeaderboardScoreActivityTest {
         solo.clickOnText("My QR Codes");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
@@ -113,6 +129,10 @@ public class LeaderboardScoreActivityTest {
         solo.clickOnText("Stats");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", QRStats.class);
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
@@ -123,6 +143,10 @@ public class LeaderboardScoreActivityTest {
         solo.clickOnText("Community");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
 }
