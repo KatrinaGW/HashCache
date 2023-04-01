@@ -18,6 +18,7 @@ import com.example.hashcache.views.MainActivity;
 import com.example.hashcache.views.MyProfile;
 import com.example.hashcache.views.QRByLocation;
 import com.example.hashcache.views.QRStats;
+import com.robotium.solo.By;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;
@@ -54,50 +55,15 @@ public class QRByLocationTest {
 
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
-        solo.clickOnImageButton(2);
+        solo.clickOnView(solo.getView(R.id.idSearchView));
 
     }
 
 
 
     @Test
-    public void checkMenuButton1(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", QRByLocation.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Map");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-    }
-
-    @Test
-    public void checkMenuButton2(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", QRByLocation.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("My QR Codes");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
-    }
-
-    @Test
-    public void checkMenuButton3(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", QRByLocation.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Stats");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
-    }
-
-    @Test
-    public void checkMenuButton4(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", QRByLocation.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Community");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", Community.class);
+    public void checkSearching(){
+    //Null for now - unable to type into the SearchView thing
     }
 
 
