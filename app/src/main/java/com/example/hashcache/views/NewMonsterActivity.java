@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
@@ -15,6 +13,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -23,26 +22,19 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.core.content.ContextCompat;
 
 import com.example.hashcache.R;
 import com.example.hashcache.appContext.AppContext;
-import com.example.hashcache.controllers.LocationController;
 import com.example.hashcache.controllers.hashInfo.ImageGenerator;
-import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
-import com.firebase.geofire.GeoLocation;
+import com.example.hashcache.models.database.DatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 import java.io.ByteArrayOutputStream;
-import java.security.NoSuchAlgorithmException;
 import java.util.function.Function;
 
 /**
@@ -101,15 +93,42 @@ public class NewMonsterActivity extends AppCompatActivity {
                             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                             image.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
                             byte[] byteArray = byteArrayOutputStream.toByteArray();
-                            String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-                            Log.d(TAG, String.format("Image taken. Size: %d bytes", encoded.getBytes().length));
+                            String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                            Log.d(TAG, String.format("Image taken. Size: %d bytes", encodedImage.getBytes().length));
                             Log.d("NewMonsterActivity - Camera", "Location photo successfully taken.");
                             // Log.d("New Monster Activity - Camera", encoded);
                             // Sets the scannable code to the image
                             curCode.setImage(image);
 
-                            // go to profile page
-                            startActivity(new Intent(NewMonsterActivity.this, MyProfile.class));
+                            String userId = AppContext.get().getCurrentPlayer().getUserId();
+                            String scannableCodeId = AppContext.get().getCurrentScannableCode().getScannableCodeId();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(NewMonsterActivity.this,
+                                            "Adding image location...",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            Database.getInstance().updatePlayerCodeMetadataImage(userId, scannableCodeId, encodedImage).thenAccept(v -> {
+                                Log.d(TAG, "Image successfully added!");
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(NewMonsterActivity.this,
+                                                "Image location added!",
+                                                Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(NewMonsterActivity.this, MyProfile.class));
+                                    }
+                                });
+                            }).exceptionally(new Function<Throwable, Void>() {
+                                @Override
+                                public Void apply(Throwable throwable) {
+                                    Log.d(TAG, throwable.getMessage());
+                                    return null;
+                                }
+                            });
+
                         }
                     }
                 });
@@ -233,7 +252,7 @@ public class NewMonsterActivity extends AppCompatActivity {
         monsterName = findViewById(R.id.monster_name);
         monsterScore = findViewById(R.id.monster_score);
         monsterImage = findViewById(R.id.monster_image);
-        miniMap = findViewById(R.id.mini_map);
+        miniMap = findViewById(R.id.location_image);
         menuButton = findViewById(R.id.menu_button);
         takePhotoText = findViewById(R.id.take_photo_text);
         photoButton = findViewById(R.id.photo_button);
