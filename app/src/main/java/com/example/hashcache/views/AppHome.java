@@ -34,16 +34,20 @@ import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import com.example.hashcache.R;
 import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
 import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.Player;
 
+import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
 import com.firebase.geofire.GeoLocation;
 import com.example.hashcache.appContext.AppContext;
@@ -57,6 +61,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -209,19 +214,33 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
 
 
                 GeoLocation currentLocation = new GeoLocation(map.getCameraPosition().target.latitude, map.getCameraPosition().target.longitude);
-                Database.getInstance().getCodeMetadataWithinRadius(currentLocation, radius).thenAccept(allMarkers -> {
-                    for (CodeMetadata mark: allMarkers){
-                        Database.getInstance().getScannableCodeById(mark.getScannableCodeId()).thenAccept(code ->{
-                            map.addMarker(new MarkerOptions()
-                                    .position(new LatLng(mark.getLocation().latitude, mark.getLocation().longitude))
-                                    .title(code.getHashInfo().getGeneratedName()));
-                        });
+                Database.getInstance().getCodeMetadataWithinRadius(currentLocation, radius).thenAccept(allMetadata -> {
+                    //https://kalpads.medium.com/fantastic-completablefuture-allof-and-how-to-handle-errors-27e8a97144a0
+                    ArrayList<CompletableFuture<ScannableCode>> parallelFutures = new ArrayList<>();
 
+                    for (CodeMetadata mark: allMetadata) {
+                        parallelFutures.add(Database.getInstance().getScannableCodeById(mark.getScannableCodeId()));
                     }
+                    CompletableFuture.allOf(parallelFutures.toArray(new CompletableFuture[parallelFutures.size()])).thenApply(codes -> parallelFutures.stream().map(future -> future.join()).collect(Collectors.toList())).thenAccept(scannableCodes -> {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                for(int i = 0; i < scannableCodes.size(); i++){
+                                    ScannableCode code = scannableCodes.get(i);
+                                    CodeMetadata metadata = allMetadata.get(i);
+                                    parallelFutures.add(Database.getInstance().getScannableCodeById(metadata.getScannableCodeId()));
+                                    Marker marker = map.addMarker(new MarkerOptions()
+                                            .position(new LatLng(metadata.getLocation().latitude, metadata.getLocation().longitude))
+                                            .title(code.getHashInfo().getGeneratedName()));
+
+                                    Map<String, Object> objMap = new HashMap<>();
+                                    objMap.put("scannableCode", code);
+                                    marker.setTag(objMap);
+                                }
+                            }
+                        });
+                    });
                 });
-
-                //LatLng right = new LatLng(map.getCameraPosition().target.latitude + radius, map.getCameraPosition().target.longitude + radius);
-
             }
         });
 
@@ -272,8 +291,6 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         super.onSaveInstanceState(outState);
     }
 
-
-
     //runs when the map is ready to receive user input
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -286,6 +303,15 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         updateLocationUI();
 
         getDeviceLocation();
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(@NonNull Marker marker) {
+                Map<String, Object> objMap = (Map<String, Object>) marker.getTag();
+                ScannableCode code = (ScannableCode) objMap.get("scannableCode");
+                AppContext.get().setCurrentScannableCode(code);
+                startActivity(new Intent(getApplicationContext(), DisplayMonsterActivity.class));
+            }
+        });
     }
 
 
