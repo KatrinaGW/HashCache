@@ -16,6 +16,7 @@ import com.example.hashcache.models.database.values.FieldNames;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
+import com.example.hashcache.models.database.values.NoPlayerWithUserIdException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -501,7 +502,7 @@ public class PlayersDatabaseAdapter {
         ArrayList<CompletableFuture<Pair<String, String>>> futureCfs = new ArrayList<>();
 
         for(String userId : userIds){
-            futureCfs.add(getUsernameById(userId));
+            futureCfs.add(getUsernameByIdOrNull(userId));
         }
 
         if(futureCfs.size()>0){
@@ -509,7 +510,9 @@ public class PlayersDatabaseAdapter {
                     .thenAccept(voidValue -> {
                         futureCfs.stream()
                                 .forEach(cf -> {
-                                    userIdsNames.add(cf.join());
+                                    if(cf.join().second!=null){
+                                        userIdsNames.add(cf.join());
+                                    }
                                 });
                         userIdsNamesCF.complete(userIdsNames);
                     })
@@ -554,7 +557,7 @@ public class PlayersDatabaseAdapter {
                                     }
                                 });
                     }else{
-                        cf.completeExceptionally(new Exception("No player exists with given userId!"));
+                        cf.completeExceptionally(new NoPlayerWithUserIdException());
                     }
                 }).exceptionally(new Function<Throwable, Void>() {
                     @Override
@@ -563,6 +566,32 @@ public class PlayersDatabaseAdapter {
                         return null;
                     }
                 });
+        return cf;
+    }
+
+    private CompletableFuture<Pair<String, String>> getUsernameByIdOrNull(String userId){
+        CompletableFuture<Pair<String, String>> cf = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            getUsernameById(userId)
+                    .thenAccept(usernameIdPair -> {
+                        cf.complete(new Pair<String, String>(userId,
+                                usernameIdPair.second));
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            if(throwable.getCause().getClass() == NoPlayerWithUserIdException.class){
+                                cf.complete(new Pair<String, String>(userId,
+                                        null));
+                            }else{
+                                cf.completeExceptionally(throwable);
+                            }
+                            return null;
+                        }
+                    });
+        });
+
         return cf;
     }
 
