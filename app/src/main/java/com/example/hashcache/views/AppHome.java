@@ -199,7 +199,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                 // RENDER ALL MARKERS IN VISION
                 double zoom = map.getCameraPosition().zoom;
                 Log.e("Zoom Level:", zoom + "");
-                double radius = ((40000/Math.pow(2,zoom)) * 2) * 1000;
+                double radius = ((40000/Math.pow(2,zoom))) * 500;
                 Log.e("Radius:", radius + "");
 
 
