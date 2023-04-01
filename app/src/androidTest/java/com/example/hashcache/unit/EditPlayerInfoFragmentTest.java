@@ -29,7 +29,7 @@ import java.util.Random;
  * Test class for MainActivity. All the UI tests are written here. Robotium test framework is
  used
  */
-public class EditPlayerInfoActivityTest {
+public class EditPlayerInfoFragmentTest {
 
     private Solo solo;
 
@@ -45,14 +45,6 @@ public class EditPlayerInfoActivityTest {
     @Before
     public void setUp() throws Exception{
         solo = new Solo(InstrumentationRegistry.getInstrumentation(),rule.getActivity());
-    }
-
-    /**
-     * Gets the Activity
-     * @throws Exception
-     */
-    @Test
-    public void start() throws Exception{
         Activity activity = rule.getActivity();
         final String ALLOWED_CHARACTERS = "0123456789qwertyuiopasdfghjklzxcvbnm";
         final Random random = new Random();
@@ -62,45 +54,50 @@ public class EditPlayerInfoActivityTest {
 
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
-        solo.clickOnImageButton(0);
-        solo.clickOnImageButton(0);
-        solo.clickOnImageButton(1);
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.edit_info_image));
     }
 
 
     @Test
     public void checkEmptyInput(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
-        //solo.assertCurrentActivity("Wrong Activity", EditPlayerInfoActivity.class);
-        solo.clickOnButton("CONFIRM");
+        solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
+        solo.waitForView(R.id.email_edit_text);
+        solo.clickOnView(solo.getView(R.id.confirm_player_info_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
-
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
 
-    /**
     @Test
     public void checkWrongFormat(){
         solo.enterText((EditText) solo.getView(R.id.email_edit_text), "Wrong Format 12345");
         solo.enterText((EditText) solo.getView(R.id.edit_phone_number), "This is not a number");
-        solo.clickOnButton("CONFIRM");
+        solo.clickOnView(solo.getView(R.id.confirm_player_info_button));
         solo.sleep(100);
-        solo.waitForText("Error with input!",1,2000);
-        solo.assertCurrentActivity("Wrong Activity", EditPlayerInfoActivity.class);
+        solo.waitForView(solo.getView(R.id.invalid_input_text));
+        solo.clickOnView(solo.getView(R.id.x_button));
+        solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
-    **/
 
 
     @Test
     public void checkCorrectFormat(){
+        String fakeEmail = "email@notadomain.com";
+        String fakePhoneNumber = "123-123-1234";
 
-        //random string generator
-        solo.enterText((EditText) solo.getView(R.id.email_edit_text), "example@domain.com");
-        solo.enterText((EditText) solo.getView(R.id.edit_phone_number), "111-111-1111");
-        solo.clickOnButton("CONFIRM");
+        solo.enterText((EditText) solo.getView(R.id.email_edit_text), fakeEmail);
+        solo.enterText((EditText) solo.getView(R.id.edit_phone_number), fakePhoneNumber);
+        solo.clickOnView(solo.getView(R.id.confirm_player_info_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
+        solo.waitForText(fakeEmail);
+        solo.waitForText(fakePhoneNumber);
+        solo.clickOnView(solo.getView(R.id.logout_button));
 
     }
 
