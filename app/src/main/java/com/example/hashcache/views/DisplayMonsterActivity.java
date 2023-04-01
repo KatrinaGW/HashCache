@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 
 import com.example.hashcache.R;
 import com.example.hashcache.appContext.AppContext;
@@ -48,8 +49,9 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
     private ImageView monsterImage;
     private ImageView locationImage;
     private ImageButton menuButton;
-    private Button viewCacherButton;
-    private Button deleteButton;
+    private AppCompatButton commentsButton;
+    private AppCompatButton photoButton;
+    private AppCompatButton deleteButton;
     private ScannableCode currentScannableCode;
     private boolean belongToCurrentUser;
     private TextView numPlayersValueView;
@@ -63,7 +65,7 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         belongToCurrentUser = intent.getBooleanExtra("belongsToCurrentUser", false);
 
         initializeViews();
-        // take location photo
+        // add functionality to delete button
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,8 +73,16 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
             }
         });
 
+        // add functionality to photos button
+        photoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPhotoButtonClicked();
+            }
+        });
+
         // add functionality to menu button
-        ImageButton menuButton = findViewById(R.id.menu_button);
+        menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -110,10 +120,11 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
                 return null;
             }
         });
-        viewCacherButton.setOnClickListener(new View.OnClickListener() {
+
+        commentsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onViewCacherCommentsButtonClicked();
+                onCommentsButtonClicked();
             }
         });
 
@@ -165,8 +176,9 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         monsterImage = findViewById(R.id.monster_image);
         locationImage = findViewById(R.id.location_image);
         menuButton = findViewById(R.id.menu_button);
+        commentsButton = findViewById(R.id.view_comments_button);
+        photoButton = findViewById(R.id.view_photos_button);
         deleteButton = findViewById(R.id.delete_button);
-        viewCacherButton = findViewById(R.id.view_comments_button);
         numPlayersValueView = findViewById(R.id.num_players_value);
 
         if(!belongToCurrentUser){
@@ -176,12 +188,21 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         }
     }
 
-    private void onViewCacherCommentsButtonClicked(){
+    // got to comments activity when comments button clicked
+    private void onCommentsButtonClicked(){
         Intent intent = new Intent(getApplicationContext(), DisplayCommentsActivity.class);
 
         startActivity(intent);
     }
 
+    // got to photo gallery when photo button clicked
+    private void onPhotoButtonClicked(){
+        Intent intent = new Intent(getApplicationContext(), AppHome.class);
+
+        startActivity(intent);
+    }
+
+    // delete monster from player wallet when delete button clicked
     private void onDeleteButtonClicked(){
         runOnUiThread(new Runnable() {
             @Override
