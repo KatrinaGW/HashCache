@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -13,19 +12,15 @@ import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hashcache.R;
-import com.example.hashcache.context.Context;
-import com.example.hashcache.controllers.AddCommentCommand;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database.DatabaseAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.CompletableFuture;
 
 public class DisplayCommentsActivity extends AppCompatActivity implements Observer {
     private ListView commentsList;
@@ -46,7 +41,7 @@ public class DisplayCommentsActivity extends AppCompatActivity implements Observ
      *
      * @param savedInstanceState the saved state of the activity, if it was
      *                           previously closed
-     * @see Context
+     * @see AppContext
      * @see Player
      */
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +58,7 @@ public class DisplayCommentsActivity extends AppCompatActivity implements Observ
 
         });
 
-        Context.get().addObserver(this);
+        AppContext.get().addObserver(this);
     }
 
     private void setCommentsAdapter(){
@@ -131,9 +126,9 @@ public class DisplayCommentsActivity extends AppCompatActivity implements Observ
     }
 
     private void init(){
-        userHasScanned = Context.get().getCurrentPlayer().getPlayerWallet().getScannedCodeIds()
-                .contains(Context.get().getCurrentScannableCode().getScannableCodeId());
-        comments = Context.get().getCurrentScannableCode().getComments();
+        userHasScanned = AppContext.get().getCurrentPlayer().getPlayerWallet().getScannedCodeIds()
+                .contains(AppContext.get().getCurrentScannableCode().getScannableCodeId());
+        comments = AppContext.get().getCurrentScannableCode().getComments();
         addCommentButton = findViewById(R.id.add_comment_button);
         commentsList = findViewById(R.id.comment_listview_content);
         setCommentsAdapter();

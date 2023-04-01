@@ -14,17 +14,13 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
-import com.example.hashcache.models.Player;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.context.Context;
-import com.example.hashcache.models.database.DatabaseAdapter;
 import com.example.hashcache.models.database.DatabasePort;
 import com.example.hashcache.models.database.values.FieldNames;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
 
@@ -50,7 +46,7 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_topqr);
 
-        Context context = Context.get();
+        AppContext context = AppContext.get();
         PlayerWallet playerWallet = context.getCurrentPlayer().getPlayerWallet();
 
         DatabasePort db = Database.getInstance();

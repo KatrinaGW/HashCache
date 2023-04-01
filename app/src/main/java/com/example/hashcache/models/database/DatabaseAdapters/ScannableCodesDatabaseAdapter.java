@@ -171,6 +171,7 @@ public class ScannableCodesDatabaseAdapter {
     public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesByIdInList(ArrayList<String> scannableCodeIds) {
         CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
         ArrayList<ScannableCode> scannableCodes = new ArrayList<>();
+        ArrayList<CompletableFuture<ScannableCode>> futureCfs = new ArrayList<>();
 
         if (scannableCodeIds.size() == 0) {
             cf.complete(scannableCodes);
@@ -180,30 +181,38 @@ public class ScannableCodesDatabaseAdapter {
                 docRef.get().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         int matches = 0;
-                        for (QueryDocumentSnapshot document : task.getResult()) {
+                        List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                        for (DocumentSnapshot document : documents) {
                             if (scannableCodeIds.contains(document.getId())) {
                                 matches++;
 
-                                scannableCodeDocumentConverter.getScannableCodeFromDocument(
+                                futureCfs.add(scannableCodeDocumentConverter.getScannableCodeFromDocument(
                                         document.getReference()
-                                ).thenAccept(scannableCode -> {
-                                    scannableCodes.add(scannableCode);
-                                    if (scannableCodes.size() == scannableCodeIds.size()) {
-                                        cf.complete(scannableCodes);
-                                    }
-                                }).exceptionally(new Function<Throwable, Void>() {
-                                    @Override
-                                    public Void apply(Throwable throwable) {
-                                        cf.completeExceptionally(throwable);
-                                        return null;
-                                    }
-                                });
+                                ));
                             }
                         }
 
                         if (matches != scannableCodeIds.size()) {
                             cf.completeExceptionally(new Exception("One or more player wallet code ids" +
                                     "could not be mapped to actual codes!"));
+                        }else if(futureCfs.size()>0){
+                            CompletableFuture.allOf(futureCfs.toArray(new CompletableFuture[futureCfs.size()]))
+                                    .thenAccept(nullValue -> {
+                                        futureCfs.stream()
+                                                .forEach(futureCf -> {
+                                                    scannableCodes.add(futureCf.join());
+                                                });
+                                        cf.complete(scannableCodes);
+                                    })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
+                        }else{
+                            cf.complete(scannableCodes);
                         }
 
                     } else {
@@ -234,7 +243,7 @@ public class ScannableCodesDatabaseAdapter {
             fireStoreHelper.documentWithIDExists(collectionReference, scannableCode.getScannableCodeId())
                     .thenAccept(exists -> {
                         if (!exists) {
-                            ScannableCodeDocumentConverter.addScannableCodeToCollection(scannableCode,
+                            scannableCodeDocumentConverter.addScannableCodeToCollection(scannableCode,
                                             collectionReference, fireStoreHelper)
                                     .thenAccept(scannableCodeId -> {
                                         cf.complete(scannableCodeId);
@@ -274,7 +283,7 @@ public class ScannableCodesDatabaseAdapter {
             fireStoreHelper.documentWithIDExists(this.collectionReference, scannableCodeId)
                     .thenAccept(exists -> {
                         if(exists){
-                            ScannableCodeDocumentConverter.addCommentToScannableCodeDocument(newComment,
+                            scannableCodeDocumentConverter.addCommentToScannableCodeDocument(newComment,
                                     collectionReference.document(scannableCodeId));
                             cf.complete(true);
                         }else{
@@ -324,76 +333,5 @@ public class ScannableCodesDatabaseAdapter {
             }
         });
         return registration;
-    }
-
-    /**
-     * Delete a comment from the database
-     *
-     * @param scannableCodeId the id of the scannable code that the comment belongs
-     *                        to
-     * @param commentId       the id of the comment to delete
-     * @return cf the CompleteableFuture indicating if the operation was successful or not
-     */
-    public CompletableFuture<Boolean> deleteComment(String scannableCodeId, String commentId) {
-        CompletableFuture<Boolean> cf = new CompletableFuture<>();
-
-        /**
-         * If the scananbleCode exists, then try to delete the comment from the
-         * collection
-         */
-        CompletableFuture.runAsync(()->{
-            fireStoreHelper.documentWithIDExists(collectionReference, scannableCodeId)
-                    .thenAccept(exists -> {
-                        if (exists) {
-                            CollectionReference commentCollection = collectionReference
-                                    .document(scannableCodeId)
-                                    .collection(CollectionNames.COMMENTS.collectionName);
-
-                            /**
-                             * If a comment with the commentId exists, delete it from the collection
-                             */
-                            fireStoreHelper.documentWithIDExists(commentCollection, commentId)
-                                    .thenAccept(commentExists -> {
-                                        if (commentExists) {
-                                            commentCollection.document(commentId)
-                                                    .delete()
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                                                            cf.complete(true);
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            cf.completeExceptionally(e);
-                                                        }
-                                                    });
-                                        } else {
-                                            cf.completeExceptionally(new Exception("No such comment with the" +
-                                                    "given id exists!"));
-                                        }
-                                    })
-                                    .exceptionally(new Function<Throwable, Void>() {
-                                        @Override
-                                        public Void apply(Throwable throwable) {
-                                            cf.completeExceptionally(throwable);
-                                            return null;
-                                        }
-                                    });
-                        } else {
-                            cf.completeExceptionally(new Exception("No such document with the given scannableCodeId exists!"));
-                        }
-                    }).exceptionally(new Function<Throwable, Void>() {
-                        @Override
-                        public Void apply(Throwable throwable) {
-                            cf.completeExceptionally(throwable);
-                            return null;
-                        }
-                    });
-        });
-
-        return cf;
     }
 }

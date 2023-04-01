@@ -20,13 +20,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.hashcache.R;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.controllers.LoginUserCommand;
 import com.example.hashcache.controllers.SetupUserCommand;
-import com.example.hashcache.controllers.checkLoginCommand;
+import com.example.hashcache.controllers.CheckLoginCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.context.Context;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
@@ -106,12 +106,12 @@ public class MainActivity extends AppCompatActivity {
                 .setProjectId("hashcache2")
                 .build());
 
-        Context.get();
+        AppContext.get();
 
         getOrMakeScannableCodesConnectionHandler();
         makeLoginsAdapter();
 
-        Context.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
+        AppContext.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID));
         loginUserCommand = new LoginUserCommand();
         playerList = PlayerList.getInstance();
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkDeviceId(){
-        checkLoginCommand.checkLogin(loginUserCommand)
+        CheckLoginCommand.checkLogin(Database.getInstance(), new SetupUserCommand())
                 .thenAccept(existed -> {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                loginUserCommand.loginUser(getUsername(), Database.getInstance(), Context.get(),
+                loginUserCommand.loginUser(getUsername(), Database.getInstance(), AppContext.get(),
                                  new SetupUserCommand())
                         .thenAccept(res -> {
                             Intent goHome = new Intent(MainActivity.this, AppHome.class);

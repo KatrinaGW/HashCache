@@ -11,7 +11,7 @@ import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.context.Context;
+import com.example.hashcache.appContext.AppContext;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -46,7 +46,7 @@ public class HashController {
                     // Generate hash information for the scannable code and check if it already exists in the database
                     HashInfoGenerator.generateHashInfo(byteArray).thenAccept(hashInfo -> {
                         Database.getInstance().scannableCodeExists(hash).thenAccept(exists -> {
-                            String userId = Context.get().getCurrentPlayer().getUserId();
+                            String userId = AppContext.get().getCurrentPlayer().getUserId();
                             ScannableCode sc = new ScannableCode(hash, hashInfo);
                             // If the scannable code already exists in the database, add it to the player's wallet
                             if(exists){
@@ -99,40 +99,38 @@ public class HashController {
     private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf,
                                                  ScannableCode sc) {
         Database.getInstance().addScannableCodeToPlayerWallet(userId, hash)
-                .thenAccept(created-> {
-                    Context context = Context.get();
-                    // Set the current scannable code to the newly added scannable code
-                    context.setCurrentScannableCode(sc);
+                .thenAccept(created->{
+            AppContext.get().setCurrentScannableCode(sc);
 
-                    PlayerWallet playerWallet = context.getCurrentPlayer().getPlayerWallet();
+            PlayerWallet playerWallet = AppContext.get().getCurrentPlayer().getPlayerWallet();
 
-                    if(userId.equals(Context.get().getCurrentPlayer().getUserId())){
-                        playerWallet.setQRCount(playerWallet.getQrCount() + 1);
+            if(userId.equals(AppContext.get().getCurrentPlayer().getUserId())){
+                playerWallet.setQRCount(playerWallet.getQrCount() + 1);
+            }
+
+            CompletableFuture.runAsync(() -> {
+                updateTotalMaxScore()
+                        .thenAccept(nullValue -> {
+                            Database.getInstance().updatePlayerScores(userId, playerWallet)
+                                    .thenAccept(success -> {
+                                        cf.complete(null);
+                                    })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
+
+                }).exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        cf.completeExceptionally(throwable);
+                        return null;
                     }
-
-                    CompletableFuture.runAsync(() -> {
-                        updateTotalMaxScore()
-                                .thenAccept(nullValue -> {
-                                    Database.getInstance().updatePlayerScores(userId, playerWallet)
-                                            .thenAccept(success -> {
-                                                cf.complete(null);
-                                            })
-                                            .exceptionally(new Function<Throwable, Void>() {
-                                                @Override
-                                                public Void apply(Throwable throwable) {
-                                                    cf.completeExceptionally(throwable);
-                                                    return null;
-                                                }
-                                            });
-
-                                }).exceptionally(new Function<Throwable, Void>() {
-                                    @Override
-                                    public Void apply(Throwable throwable) {
-                                        cf.completeExceptionally(throwable);
-                                        return null;
-                                    }
-                                });
-                    });
+                });
+            });
                 });
     }
     /**
@@ -145,7 +143,7 @@ public class HashController {
     public static CompletableFuture<Boolean> deleteScannableCodeFromWallet(String scannableCodeId,
                                                                            String userId) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
-        PlayerWallet playerWallet = Context.get().getCurrentPlayer().getPlayerWallet();
+        PlayerWallet playerWallet = AppContext.get().getCurrentPlayer().getPlayerWallet();
 
         CompletableFuture.runAsync(new Runnable() {
 
@@ -156,7 +154,7 @@ public class HashController {
                         .thenAccept(completed -> {
                             // If the scannable code was deleted successfully, update the current player's wallet
                             if(completed){
-                                Player currentPlayer = Context.get().getCurrentPlayer();
+                                Player currentPlayer = AppContext.get().getCurrentPlayer();
                                 // If the deleted scannable code belonged to the current player, remove it from their wallet
                                 if(currentPlayer.getUserId().equals(userId)){
                                     currentPlayer.getPlayerWallet().setQRCount(currentPlayer.getPlayerWallet().getQrCount() - 1);
@@ -168,7 +166,7 @@ public class HashController {
 
                                                 CompletableFuture.runAsync(() -> {
                                                     Database.getInstance().updatePlayerScores(userId,
-                                                                    Context.get().getCurrentPlayer().getPlayerWallet())
+                                                                    AppContext.get().getCurrentPlayer().getPlayerWallet())
                                                             .thenAccept(success -> {
                                                                 if (success) {
                                                                     cf.complete(completed);
@@ -217,21 +215,21 @@ public class HashController {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         ArrayList<CompletableFuture> futureCfs = new ArrayList<>();
         Database.getInstance()
-                .getPlayerWalletTotalScore(Context.get().getCurrentPlayer().getPlayerWallet()
+                .getPlayerWalletTotalScore(AppContext.get().getCurrentPlayer().getPlayerWallet()
                         .getScannedCodeIds())
                 .thenAccept(totalScore -> {
-                    Context.get().getCurrentPlayer().getPlayerWallet().setTotalScore(totalScore);
+                    AppContext.get().getCurrentPlayer().getPlayerWallet().setTotalScore(totalScore);
 
                     CompletableFuture.runAsync(() -> {
                         Database.getInstance().getPlayerWalletTopScore(
-                                        Context.get().getCurrentPlayer().getPlayerWallet().getScannedCodeIds()
+                                        AppContext.get().getCurrentPlayer().getPlayerWallet().getScannedCodeIds()
                                 )
                                 .thenAccept(topScore -> {
                                     long maxScore = 0;
                                     if(topScore != null){
                                         maxScore = topScore.getHashInfo().getGeneratedScore();
                                     }
-                                    Context.get().getCurrentPlayer().getPlayerWallet().setMaxScore(
+                                    AppContext.get().getCurrentPlayer().getPlayerWallet().setMaxScore(
                                             maxScore);
                                     cf.complete(null);
 

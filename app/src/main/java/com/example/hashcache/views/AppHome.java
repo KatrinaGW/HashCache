@@ -9,8 +9,6 @@
 
 package com.example.hashcache.views;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -19,9 +17,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -31,24 +26,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
 import com.example.hashcache.R;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.Player;
 
-import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database.DatabasePort;
-import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -57,18 +47,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
-import com.google.android.libraries.places.api.net.PlacesClient;
-
-import com.example.hashcache.context.Context;
 
 /**
 
@@ -126,10 +106,6 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         SharedPreferences settings = getSharedPreferences("UserInfo", 0);
         SharedPreferences.Editor editor = settings.edit();
 
-        DatabasePort db = Database.getInstance();
-        ArrayList<Pair<String, Long>> leaderboard = db.getTopKUsers(FieldNames.TOTAL_SCORE.fieldName, 3);
-
-        Log.i("LEADerboard", leaderboard.get(0).first);
 
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -227,9 +203,9 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         });
 
 
-        playerInfo = Context.get().getCurrentPlayer();
+        playerInfo = AppContext.get().getCurrentPlayer();
         setUIParams();
-        Context.get().addObserver(this);
+        AppContext.get().addObserver(this);
 
     }
 
@@ -452,7 +428,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
     }
 
     public void setUIParams(){
-        Player currentPlayer = Context.get().getCurrentPlayer();
+        Player currentPlayer = AppContext.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
         setScore(currentPlayer.getPlayerWallet().getTotalScore());
 

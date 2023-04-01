@@ -1,5 +1,6 @@
 package com.example.hashcache.views;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -12,9 +13,9 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.context.Context;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
@@ -43,7 +44,7 @@ public class LeaderboardScoreActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_score);
 
-        Context context = Context.get();
+        AppContext context = AppContext.get();
         PlayerWallet playerWallet = context.getCurrentPlayer().getPlayerWallet();
 
         // Sets the players numb qr codes
