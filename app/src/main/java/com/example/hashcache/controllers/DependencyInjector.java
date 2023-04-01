@@ -46,7 +46,7 @@ public class DependencyInjector {
      * Creates the static instance of the Logins Adapter
      */
     public static void makeLoginsAdapter(){
-        LoginsAdapter.makeInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
+        LoginsAdapter.makeOrGetInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
     }
 
     /**

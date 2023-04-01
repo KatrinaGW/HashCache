@@ -37,7 +37,7 @@ public class LoginsAdapterTest {
 
     private LoginsAdapter getLoginsAdapter(){
         LoginsAdapter.resetInstance();
-        LoginsAdapter.makeInstance(mockFireStoreHelper, mockDB);
+        LoginsAdapter.makeOrGetInstance(mockFireStoreHelper, mockDB);
 
         return LoginsAdapter.getInstance();
     }

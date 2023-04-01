@@ -55,7 +55,7 @@ public class LeaderboardScoreActivityTest {
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
         solo.clickOnImageButton(3);
-        solo.clickOnImageButton("LEADERBOARD");
+        solo.clickOnView(solo.getView(R.id.leaderboard_button));
     }
 
     @Test

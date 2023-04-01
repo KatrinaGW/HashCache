@@ -3,6 +3,7 @@ package com.example.hashcache.unit;
 import android.widget.EditText;
 
 import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
 
 import com.example.hashcache.R;
 import com.example.hashcache.views.AppHome;
@@ -11,6 +12,7 @@ import com.example.hashcache.views.LeaderboardScoreActivity;
 import com.example.hashcache.views.MainActivity;
 import com.example.hashcache.views.MyProfile;
 import com.example.hashcache.views.QRScanActivity;
+import com.robotium.solo.Solo;
 
 import org.junit.Before;
 import org.junit.Rule;

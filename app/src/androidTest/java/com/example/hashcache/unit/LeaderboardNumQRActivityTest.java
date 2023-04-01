@@ -31,7 +31,7 @@ import java.util.Random;
  * Test class for LeaderboardNumQRActivity. All the UI tests are written here. Robotium test framework is
  used
  */
-public class LeaderboardScoreActivityTest {
+public class LeaderboardNumQRActivityTest {
 
     private Solo solo;
     @Rule
@@ -54,27 +54,36 @@ public class LeaderboardScoreActivityTest {
 
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
-        solo.clickOnImageButton(3);
-        solo.clickOnImageButton("LEADERBOARD");
-        solo.clickOnImageButton("# QR");
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.leaderboard_button));
+        solo.clickOnView(solo.getView(R.id.numQR_tab_button));
+    }
+
+    void logout(){
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnText("My QR Codes");
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
     public void checkScoreButton(){
         // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
-        solo.clickOnButton("Score");
+        solo.clickOnButton("SCORE");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
+        logout();
     }
 
     @Test
     public void checkTopQRButton(){
         // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
-        solo.clickOnButton("# QR");
+        solo.clickOnButton("TOP QR");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", LeaderboardTopQRActivity.class);
+        logout();
     }
 
     @Test
@@ -84,16 +93,20 @@ public class LeaderboardScoreActivityTest {
         solo.clickOnButton("REGION");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", LeaderboardRegionActivity.class);
+        logout();
     }
 
     @Test
     public void checkMenuButton1(){
         // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
-        solo.clickOnImageButton(0);
+        solo.clickOnView(solo.getView(R.id.menu_button));
         solo.clickOnText("Map");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
@@ -104,6 +117,8 @@ public class LeaderboardScoreActivityTest {
         solo.clickOnText("My QR Codes");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
@@ -114,6 +129,10 @@ public class LeaderboardScoreActivityTest {
         solo.clickOnText("Stats");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", QRStats.class);
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
@@ -124,6 +143,10 @@ public class LeaderboardScoreActivityTest {
         solo.clickOnText("Community");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
 }
