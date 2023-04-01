@@ -98,7 +98,7 @@ public class QRStats extends AppCompatActivity implements Observer {
                 ScannableCode lowestScan = AppContext.get().getLowestScannableCode();
                 ScannableCode highestScan = AppContext.get().getHighestScannableCode();
                 long totalScore = AppContext.get().getCurrentPlayer().getPlayerWallet().getTotalScore();
-                setMyCodesValue(curWallet.getSize());
+                setMyCodesValue((int)curWallet.getQrCount());
                 setLowScoreValue(lowestScan);
                 setHighScoreValue(highestScan);
                 setTotalScoreValue(totalScore);

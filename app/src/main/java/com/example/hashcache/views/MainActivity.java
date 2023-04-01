@@ -14,6 +14,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,8 +28,11 @@ import com.example.hashcache.controllers.CheckLoginCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 import java.util.function.Function;
@@ -110,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         getOrMakeScannableCodesConnectionHandler();
         makeLoginsAdapter();
+        CodeMetadataDatabaseAdapter.makeInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
 
         AppContext.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID));
@@ -122,8 +127,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkDeviceId(){
+        Log.d("MainActivity", "Checking logging info...");
         CheckLoginCommand.checkLogin(Database.getInstance(), new SetupUserCommand())
                 .thenAccept(existed -> {
+                    Log.d("MainActivity", "Got login info!");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

@@ -14,6 +14,9 @@ public enum FieldNames {
     PHONE_NUMBER("phoneNumber"),
     RECORD_GEOLOCATION("recordGeoLocation"),
     USER_ID("userId"),
+    QR_COUNT("qrCount"),
+    MAX_SCORE("maxScore"),
+    TOTAL_SCORE("totalScore"),
     DEVICE_ID("deviceId"),
     COMMENTATOR_ID("commentatorId");
 

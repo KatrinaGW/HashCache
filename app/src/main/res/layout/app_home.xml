@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <RelativeLayout
@@ -52,7 +53,11 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            tools:appContext=".MapsActivity" />
+            tools:context=".MapsActivity"
+            map:mapId="@string/map_id"
+            map:uiTiltGestures= "false"
+            tools:appContext=".MapsActivity"
+            tools:ignore="ExtraText" />
         <androidx.appcompat.widget.SearchView
             android:id="@+id/idSearchView"
             android:layout_width="match_parent"
@@ -69,7 +74,7 @@
             android:layout_height="55dp"
             android:background="@drawable/circle_button"
             app:tint="@color/black"
-            android:src="@drawable/icon_search"
+            android:src="@android:drawable/ic_menu_view"
             android:layout_alignParentEnd="true"
             android:layout_alignBottom="@id/map"
             android:layout_marginTop="12dp"
