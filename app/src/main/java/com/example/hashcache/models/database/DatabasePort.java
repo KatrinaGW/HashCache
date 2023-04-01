@@ -8,6 +8,7 @@ import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
@@ -62,4 +63,6 @@ public interface DatabasePort {
     void onPlayerDataChanged(String userId, GetPlayerCallback callback);
     void onPlayerWalletChanged(String playerId, BooleanCallback callback);
     void onScannableCodeCommentsChanged(String scannableCodeId, GetScannableCodeCallback callback);
+    CompletableFuture<ArrayList<Pair<String, Long>>> getTopKUsers(String filter, int k);
+    CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet);
 }

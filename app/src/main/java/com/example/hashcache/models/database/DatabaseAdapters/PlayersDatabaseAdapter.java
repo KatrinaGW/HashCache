@@ -8,6 +8,7 @@ import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.PlayerDocumentConverter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.values.CollectionNames;
@@ -25,6 +26,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.zxing.PlanarYUVLuminanceSource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -261,9 +263,10 @@ public class PlayersDatabaseAdapter {
         return cf;
     }
 
+
     /**
      * Sets the player preferences of a user
-     * 
+     *
      * @param playerDocument    the document of the player to change the preferences
      *                          on
      * @param playerPreferences the preferences to set for the user
@@ -280,6 +283,7 @@ public class PlayersDatabaseAdapter {
         return cf;
     }
 
+
     /**
      * Updates the contact information of an existing user
      * 
@@ -293,6 +297,7 @@ public class PlayersDatabaseAdapter {
 
         return cf;
     }
+
 
     /**
      * Sets the contact information of a user
@@ -390,12 +395,38 @@ public class PlayersDatabaseAdapter {
         data.put(FieldNames.EMAIL.fieldName, "");
         data.put(FieldNames.PHONE_NUMBER.fieldName, "");
         data.put(FieldNames.RECORD_GEOLOCATION.fieldName, "");
+
+
         String userId = UUID.randomUUID().toString();
 
         fireStoreHelper.setDocumentReference(collectionReference.document(userId), data)
                         .thenAccept(successful -> {
                             if (successful) {
-                                cf.complete(userId);
+                                HashMap<String, Object> scoreData = new HashMap<>();
+                                scoreData.put(FieldNames.TOTAL_SCORE.fieldName, 0);
+                                scoreData.put(FieldNames.MAX_SCORE.fieldName, 0);
+                                scoreData.put(FieldNames.QR_COUNT.fieldName, 0);
+
+                                fireStoreHelper.addUpdateManyFieldsIntoDocument(
+                                        collectionReference.document(userId), scoreData
+                                )
+                                        .thenAccept(successfulAdd -> {
+                                            if(successfulAdd){
+                                                cf.complete(userId);
+                                            }else{
+                                                cf.completeExceptionally(
+                                                        new Exception("Something went wrong when" +
+                                                                "setting the score values")
+                                                );
+                                            }
+                                        })
+                                        .exceptionally(new Function<Throwable, Void>() {
+                                            @Override
+                                            public Void apply(Throwable throwable) {
+                                                cf.completeExceptionally(throwable);
+                                                return null;
+                                            }
+                                        });
                             } else {
                                 Log.e(TAG, "Something went wrong while setting the userId" +
                                         "on a new Playerdocument");

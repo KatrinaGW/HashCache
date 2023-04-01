@@ -2,6 +2,7 @@ package com.example.hashcache.appContext;
 
 import android.util.Log;
 
+import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
@@ -9,7 +10,12 @@ import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanC
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 
+import org.checkerframework.checker.units.qual.A;
+import org.checkerframework.checker.units.qual.C;
+
+import java.util.ArrayList;
 import java.util.Observable;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Holds the global state information for the app
@@ -157,9 +163,12 @@ public class AppContext extends Observable {
             @Override
             public void onCallback(Player player) {
                 System.out.println(String.format("Player data for %s has changed", currentPlayer.getUsername()));
-                setCurrentPlayer(player);
-                setChanged();
-                notifyObservers();
+                if(currentPlayer!=null && player!=null &&
+                        player.getUserId() == currentPlayer.getUserId()){
+                    setCurrentPlayer(player);
+                    setChanged();
+                    notifyObservers();
+                }
             }
         });
 
@@ -172,10 +181,10 @@ public class AppContext extends Observable {
                         setCurrentPlayer(playa);
                         setChanged();
                         notifyObservers();
+
                         Database.getInstance()
                                 .getPlayerWalletTotalScore(playa.getPlayerWallet().getScannedCodeIds())
                                 .thenAccept(totalScore -> {
-                                    getCurrentPlayer().getPlayerWallet().setTotalScore(totalScore.longValue());
                                     setChanged();
                                     notifyObservers();
                                 });
