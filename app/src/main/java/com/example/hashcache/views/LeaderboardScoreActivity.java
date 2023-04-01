@@ -3,6 +3,7 @@ package com.example.hashcache.views;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -16,6 +17,8 @@ import com.example.hashcache.R;
 import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.database.DatabasePort;
+import com.example.hashcache.models.database.values.FieldNames;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
@@ -43,33 +46,6 @@ public class LeaderboardScoreActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_score);
-
-        AppContext context = AppContext.get();
-        PlayerWallet playerWallet = context.getCurrentPlayer().getPlayerWallet();
-
-        // Sets the players numb qr codes
-        TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
-
-        playersNumQrCodes.setText(String.valueOf(playerWallet.getTotalScore()));
-
-        // Get the text views needed to set the leaderboard
-        ArrayList<TextView> userNames = new ArrayList<>();
-        userNames.add(findViewById(R.id.user_one));
-        userNames.add(findViewById(R.id.user_two));
-        userNames.add(findViewById(R.id.user_three));
-
-        for(TextView name: userNames) {
-            name.setText("Temp");
-        }
-
-        ArrayList<TextView> totalScores = new ArrayList<>();
-        totalScores.add(findViewById(R.id.score_one));
-        totalScores.add(findViewById(R.id.score_two));
-        totalScores.add(findViewById(R.id.score_three));
-
-        for(TextView scoreView: totalScores) {
-            scoreView.setText(String.valueOf(1));
-        }
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
@@ -167,6 +143,58 @@ public class LeaderboardScoreActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // go to topQR leaderboard page
                 startActivity(new Intent(LeaderboardScoreActivity.this, LeaderboardTopQRActivity.class));
+            }
+        });
+        setLeaderboard();
+    }
+
+    /**
+     * Sets the leaderboard scores
+     */
+    private void setLeaderboard() {
+        // Update the my QR code scores
+        AppContext appContext = AppContext.get();
+        PlayerWallet playerWallet = appContext.getCurrentPlayer().getPlayerWallet();
+
+        TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
+        playersNumQrCodes.setText(String.valueOf(playerWallet.getTotalScore()));
+
+        // Get access to the database
+        DatabasePort databaseAdapter = Database.getInstance();
+
+
+        // Get the text views needed to set the leaderboard
+        ArrayList<TextView> userNames = new ArrayList<>();
+        userNames.add(findViewById(R.id.user_three));
+        userNames.add(findViewById(R.id.user_two));
+        userNames.add(findViewById(R.id.user_one));
+
+        ArrayList<TextView> qrCounts = new ArrayList<>();
+        qrCounts.add(findViewById(R.id.score_three));
+        qrCounts.add(findViewById(R.id.score_two));
+        qrCounts.add(findViewById(R.id.score_one));
+
+        // Fetch the values from the database needed for the leaderboards
+        databaseAdapter.getTopKUsers(FieldNames.TOTAL_SCORE.fieldName, 3).thenAccept(score -> {
+            if (score.size() != 0) {
+                int count = 0;
+                for (TextView view : userNames) {
+                    if (count < score.size()) {
+                        view.setText(score.get(count++).first);
+                    } else {
+                        view.setText("NA");
+                    }
+                }
+                count = 0;
+                for (TextView view : qrCounts) {
+                    if(count < score.size()) {
+                        view.setText(String.valueOf(score.get(count++).second));
+                    } else {
+                        view.setText("0");
+                    }
+                }
+            } else {
+                Log.e("DATABASE", "Error in getting the top k users");
             }
         });
     }

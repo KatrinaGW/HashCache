@@ -623,6 +623,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
                 .get()
                 .addOnSuccessListener(result -> {
                     for(QueryDocumentSnapshot document: result) {
+                        Long temp = (Long) document.get(filter);
                         Pair<String, Long> pair = new Pair(document.get(FieldNames.USERNAME.fieldName),
                                 document.get(filter));
                         list.add(pair);

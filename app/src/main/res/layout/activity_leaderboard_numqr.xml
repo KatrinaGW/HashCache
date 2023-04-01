@@ -202,6 +202,7 @@
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold" />
+
         <TextView
             android:id="@+id/user_num_three"
             android:layout_width="wrap_content"
@@ -209,9 +210,9 @@
             android:layout_below="@id/user_three"
             android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/one_star"
-            android:text="# QR codes: 300"
+            android:text="# QR codes:"
             android:textColor="@color/black"
-            android:textSize="24sp"/>
+            android:textSize="24sp" />
         <TextView
             android:id="@+id/num_three"
             android:layout_width="wrap_content"

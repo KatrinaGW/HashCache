@@ -46,46 +46,6 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_topqr);
 
-        AppContext context = AppContext.get();
-        PlayerWallet playerWallet = context.getCurrentPlayer().getPlayerWallet();
-
-        DatabasePort db = Database.getInstance();
-        leaderboard = db.getTopKUsers(FieldNames.TOTAL_SCORE.fieldName, 3);
-
-        // Sets the players numb qr codes
-        TextView playersTopQrCode = findViewById(R.id.score_value_textview);
-        playersTopQrCode.setText(String.valueOf(playerWallet.getQrCount()));
-
-        // Gets the text view for the user names
-        ArrayList<TextView> userNames = new ArrayList<>();
-        userNames.add(findViewById(R.id.user_one));
-        userNames.add(findViewById(R.id.user_two));
-        userNames.add(findViewById(R.id.user_three));
-
-        for(TextView name: userNames) {
-            name.setText(leaderboard.get(0).first);
-        }
-
-        // Gets the text view for the total scores
-        ArrayList<TextView> totalScore = new ArrayList<>();
-        totalScore.add(findViewById(R.id.score_one));
-        totalScore.add(findViewById(R.id.score_two));
-        totalScore.add(findViewById(R.id.score_three));
-
-        for(TextView name: totalScore) {
-            name.setText("5");
-        }
-
-        // Gets the textview for the monster names
-        ArrayList<TextView> monsterNames = new ArrayList<>();
-        monsterNames.add(findViewById(R.id.monster_name_one));
-        monsterNames.add(findViewById(R.id.monster_name_two));
-        monsterNames.add(findViewById(R.id.monster_name_three));
-
-        for(TextView name: monsterNames) {
-            name.setText("Zorg");
-        }
-
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
@@ -174,6 +134,59 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // go to score leaderboard page
                 startActivity(new Intent(LeaderboardTopQRActivity.this, LeaderboardScoreActivity.class));
+            }
+        });
+
+        setLeaderboard();
+    }
+
+    /**
+     * Sets the leaderboard scores
+     */
+    private void setLeaderboard() {
+        // Update the my QR code scores
+        AppContext appContext = AppContext.get();
+        PlayerWallet playerWallet = appContext.getCurrentPlayer().getPlayerWallet();
+
+        TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
+        playersNumQrCodes.setText(String.valueOf(playerWallet.getMaxScore()));
+
+        // Get access to the database
+        DatabasePort databaseAdapter = Database.getInstance();
+
+
+        // Get the text views needed to set the leaderboard
+        ArrayList<TextView> userNames = new ArrayList<>();
+        userNames.add(findViewById(R.id.user_three));
+        userNames.add(findViewById(R.id.user_two));
+        userNames.add(findViewById(R.id.user_one));
+
+        ArrayList<TextView> qrCounts = new ArrayList<>();
+        qrCounts.add(findViewById(R.id.score_three));
+        qrCounts.add(findViewById(R.id.score_two));
+        qrCounts.add(findViewById(R.id.score_one));
+
+        // Fetch the values from the database needed for the leaderboards
+        databaseAdapter.getTopKUsers(FieldNames.MAX_SCORE.fieldName, 3).thenAccept(score -> {
+            if (score.size() != 0) {
+                int count = 0;
+                for (TextView view : userNames) {
+                    if (count < score.size()) {
+                        view.setText(score.get(count++).first);
+                    } else {
+                        view.setText("NA");
+                    }
+                }
+                count = 0;
+                for (TextView view : qrCounts) {
+                    if(count < score.size()) {
+                        view.setText(String.valueOf(score.get(count++).second));
+                    } else {
+                        view.setText("0");
+                    }
+                }
+            } else {
+                Log.e("DATABASE", "Error in getting the top k users");
             }
         });
     }
