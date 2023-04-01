@@ -1,5 +1,6 @@
 package com.example.hashcache.models.database;
 
+import android.content.pm.ComponentInfo;
 import android.util.Log;
 import android.util.Pair;
 
@@ -617,13 +618,15 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
 
-        QuerySnapshot queryDocumentSnapshot = collectionReference.orderBy(filter).limit(k).get().getResult();
-        for(QueryDocumentSnapshot document: queryDocumentSnapshot) {
-            Pair<String, Long> pair = new Pair(document.get(FieldNames.USERNAME.fieldName),
-                    document.get(filter));
-            list.add(pair);
-        }
-
+        collectionReference.orderBy(filter).limit(k).get().addOnSuccessListener(result -> {
+            for(QueryDocumentSnapshot document: result) {
+                Pair<String, Long> pair = new Pair(document.get(FieldNames.USERNAME.fieldName),
+                        document.get(filter));
+                list.add(pair);
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("DATABASE", "Error getting top k users");
+        });
 
 
         return list;

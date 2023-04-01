@@ -2,6 +2,7 @@ package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -14,7 +15,11 @@ import androidx.appcompat.widget.PopupMenu;
 import com.example.hashcache.R;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.models.database.DatabaseAdapter;
+import com.example.hashcache.models.database.DatabasePort;
+import com.example.hashcache.models.database.values.FieldNames;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -38,20 +43,15 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
 
+        // Get access to the database
+        DatabasePort databaseAdapter = Database.getInstance();
+
+        // Fetch the values from the database needed for the leaderboards
+        ArrayList<Pair<String, Long>> a = databaseAdapter.getTopKUsers(FieldNames.QR_COUNT.fieldName, 3);
+
         // Sets the players numb qr codes
         TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
-        AtomicLong numQrCodes = new AtomicLong();
-        Database.getInstance()
-                .getTotalScore(AppContext.get().getCurrentPlayer().getUserId())
-                .thenAccept( score -> {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            numQrCodes.set(score);
-                        }
-                    });
-                });
-        playersNumQrCodes.setText(String.valueOf(numQrCodes));
+        playersNumQrCodes.setText(String.valueOf(0));
 
         // Get the text views needed to set the leaderboard
         ArrayList<TextView> userNames = new ArrayList<>();
