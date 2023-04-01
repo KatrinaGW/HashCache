@@ -13,6 +13,8 @@ import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryBounds;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
@@ -146,23 +148,35 @@ public class CodeMetadataDatabaseAdapter {
         return cf;
     }
 
-    public CompletableFuture<Boolean> updatePlayerCodeMetadataImage(String scannableCodeId, String userId, String image) {
-        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+    public CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image) {
+
+        Log.d("updatePlayerCodeMetadataImage", String.format("scannableId: %s, userId: %s", scannableCodeId, userId));
+        CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             CollectionReference colRef = collectionReference;
             Query query = colRef.
                     whereEqualTo("scannableCodeId", scannableCodeId).
-                    whereEqualTo("userId", userId).limit(1);
+                    whereEqualTo("userId", userId);
             query.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     if (task.getResult().isEmpty()) {
-                        cf.complete(false);
+                        cf.completeExceptionally(new Exception("Code Metadata entry does not exist!"));
                     } else {
                         List<DocumentSnapshot> sn = task.getResult().getDocuments();
                         DocumentSnapshot ds = sn.get(0);
                         DocumentReference dr = ds.getReference();
-                        dr.update("base64Image", image);
-                        cf.complete(true);
+                        dr.update("base64Image", image).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                cf.complete(null);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                cf.completeExceptionally(e);
+                            }
+                        });
+
                     }
                 } else {
                     cf.completeExceptionally(new Exception("Could not fet code metadata"));
@@ -173,17 +187,17 @@ public class CodeMetadataDatabaseAdapter {
         return cf;
     }
 
-    public CompletableFuture<CodeMetadata> getPlayerCodeMetadataById(String scannableCodeId, String userId) {
+    public CompletableFuture<CodeMetadata> getPlayerCodeMetadataById(String userId, String scannableCodeId) {
         CompletableFuture<CodeMetadata> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             CollectionReference colRef = collectionReference;
             Query query = colRef.
                     whereEqualTo("scannableCodeId", scannableCodeId).
-                    whereEqualTo("userId", userId).limit(1);
+                    whereEqualTo("userId", userId);
             query.get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     if(task.getResult().isEmpty()){
-                        cf.complete(null);
+                        cf.completeExceptionally(new Exception(String.format("Code metadata entry does not exist: userId: %s, scannableCodeId: %s", userId, scannableCodeId)));
                     }else{
                         List<DocumentSnapshot> sn = task.getResult().getDocuments();
                         cf.complete(parseCodeMetadataDocument(sn.get(0)));
