@@ -52,6 +52,8 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
     private Button deleteButton;
     private ScannableCode currentScannableCode;
     private boolean belongToCurrentUser;
+    private boolean fromMap;
+    private String userId = null;
     private TextView numPlayersValueView;
 
     @Override
@@ -61,7 +63,8 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
 
         Intent intent = getIntent();
         belongToCurrentUser = intent.getBooleanExtra("belongsToCurrentUser", false);
-
+        fromMap = intent.getBooleanExtra("fromMap", false);
+        userId = intent.getStringExtra("userId");
         initializeViews();
         // take location photo
         deleteButton.setOnClickListener(new View.OnClickListener() {
@@ -134,8 +137,8 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
                     }
                 });
         AppContext.get().addObserver(this);
-        if(belongToCurrentUser){
-            String userId = AppContext.get().getCurrentPlayer().getUserId();
+        if(belongToCurrentUser || (fromMap && this.userId != null)){
+            String userId = fromMap ? this.userId : AppContext.get().getCurrentPlayer().getUserId();
             String scannableCodeId = currentScannableCode.getScannableCodeId();
             Database.getInstance().getPlayerCodeMetadataById(userId, scannableCodeId).thenAccept(codeMetadata -> {
                 String base64Image = codeMetadata.getImage();

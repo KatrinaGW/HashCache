@@ -238,10 +238,11 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                                     parallelFutures.add(Database.getInstance().getScannableCodeById(metadata.getScannableCodeId()));
                                     Marker marker = map.addMarker(new MarkerOptions()
                                             .position(new LatLng(metadata.getLocation().latitude, metadata.getLocation().longitude))
-                                            .title(code.getHashInfo().getGeneratedName()));
+                                            .title(code.getHashInfo().getGeneratedName()).snippet(String.format("Score: %d", code.getHashInfo().getGeneratedScore())));
 
                                     Map<String, Object> objMap = new HashMap<>();
                                     objMap.put("scannableCode", code);
+                                    objMap.put("userId", metadata.getUserId());
                                     marker.setTag(objMap);
                                 }
                             }
@@ -327,8 +328,13 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
             public void onInfoWindowClick(@NonNull Marker marker) {
                 Map<String, Object> objMap = (Map<String, Object>) marker.getTag();
                 ScannableCode code = (ScannableCode) objMap.get("scannableCode");
+                String userId = (String) objMap.get("userId");
                 AppContext.get().setCurrentScannableCode(code);
-                startActivity(new Intent(getApplicationContext(), DisplayMonsterActivity.class));
+
+                Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
+                intent.putExtra("fromMap", true);
+                intent.putExtra("userId", userId);
+                startActivity(intent);
             }
         });
     }
