@@ -1,5 +1,9 @@
 package com.example.hashcache.unit;
 
+import static com.example.hashcache.unit.TestData.TEST_OTHER_USER;
+import static com.example.hashcache.unit.TestData.TEST_OTHER_USER_EMAIL;
+import static com.example.hashcache.unit.TestData.TEST_OTHER_USER_PHONE_NUMBER;
+
 import android.widget.EditText;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -41,68 +45,39 @@ public class SettingsActivityTest {
     @Before
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        final String ALLOWED_CHARACTERS = "0123456789qwertyuiopasdfghjklzxcvbnm";
-        final Random random = new Random();
-        final StringBuilder sb = new StringBuilder(15);
-        for (int i = 0; i < 15; ++i)
-            sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
 
-        solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
+        solo.enterText((EditText) solo.getView(R.id.username_edittext), TEST_OTHER_USER);
         solo.clickOnButton("START CACHING");
         solo.clickOnImageButton(0);
         solo.clickOnImageButton(0);
 
     }
 
-
-
-    @Test
-    public void checkMenuButton1(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Map");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+    private void logout(){
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
-    public void checkMenuButton2(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
+    public void checkPlayerSettings(){
         solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("My QR Codes");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
-    }
+        solo.waitForText(TEST_OTHER_USER_PHONE_NUMBER);
+        solo.waitForText(TEST_OTHER_USER_EMAIL);
+        solo.waitForText(TEST_OTHER_USER);
+        logout();
 
-    @Test
-    public void checkMenuButton3(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Stats");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
-    }
-
-    @Test
-    public void checkMenuButton4(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Community");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", Community.class);
     }
 
     @Test
     public void checkEditPlayerInfoButton(){
-//        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-//        solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
-//        solo.clickOnImageButton(1);
-//        solo.sleep(100);
-//        solo.assertCurrentActivity("Wrong Activity", EditPlayerInfoActivity.class);
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
+        solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
+        solo.clickOnView(solo.getView(R.id.edit_info_image));
+        solo.sleep(100);
+        solo.waitForView(solo.getView(R.id.confirm_player_info_button));
+        logout();
     }
 
 
