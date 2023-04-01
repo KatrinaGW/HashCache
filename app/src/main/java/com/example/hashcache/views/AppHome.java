@@ -238,7 +238,9 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                                     parallelFutures.add(Database.getInstance().getScannableCodeById(metadata.getScannableCodeId()));
                                     Marker marker = map.addMarker(new MarkerOptions()
                                             .position(new LatLng(metadata.getLocation().latitude, metadata.getLocation().longitude))
+                                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.hc_character_noarms))
                                             .title(code.getHashInfo().getGeneratedName()).snippet(String.format("Score: %d", code.getHashInfo().getGeneratedScore())));
+
 
                                     Map<String, Object> objMap = new HashMap<>();
                                     objMap.put("scannableCode", code);
