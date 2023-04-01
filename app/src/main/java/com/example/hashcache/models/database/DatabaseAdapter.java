@@ -613,23 +613,28 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
      * score
      */
     @Override
-    public ArrayList<Pair<String, Long>> getTopKUsers(String filter, int k) {
+    public CompletableFuture<ArrayList<Pair<String, Long>>> getTopKUsers(String filter, int k) {
         ArrayList<Pair<String, Long>> list = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
+        CompletableFuture<ArrayList<Pair<String, Long>>> cf = new CompletableFuture<>();
 
-        collectionReference.orderBy(filter).limit(k).get().addOnSuccessListener(result -> {
-            for(QueryDocumentSnapshot document: result) {
-                Pair<String, Long> pair = new Pair(document.get(FieldNames.USERNAME.fieldName),
-                        document.get(filter));
-                list.add(pair);
-            }
-        }).addOnFailureListener(e -> {
+        collectionReference.orderBy(filter).limit(k)
+                .get()
+                .addOnSuccessListener(result -> {
+                    for(QueryDocumentSnapshot document: result) {
+                        Pair<String, Long> pair = new Pair(document.get(FieldNames.USERNAME.fieldName),
+                                document.get(filter));
+                        list.add(pair);
+                    }
+                    cf.complete(list);
+                })
+                .addOnFailureListener(e -> {
             Log.e("DATABASE", "Error getting top k users");
         });
 
 
-        return list;
+        return cf;
     }
 
     /**
