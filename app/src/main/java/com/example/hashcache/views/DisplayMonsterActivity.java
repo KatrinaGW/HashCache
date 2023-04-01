@@ -81,8 +81,15 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
             }
         });
 
+        // add functionality to comments button
+        commentsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onCommentsButtonClicked();
+            }
+        });
+
         // add functionality to menu button
-        menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -118,13 +125,6 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
             public Void apply(Throwable throwable) {
                 Log.d("NewMonsterActivity ERROR", throwable.getMessage());
                 return null;
-            }
-        });
-
-        commentsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onCommentsButtonClicked();
             }
         });
 
@@ -197,7 +197,7 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
 
     // got to photo gallery when photo button clicked
     private void onPhotoButtonClicked(){
-        Intent intent = new Intent(getApplicationContext(), AppHome.class);
+        Intent intent = new Intent(getApplicationContext(), PhotoGalleryActivity.class);
 
         startActivity(intent);
     }
@@ -248,13 +248,6 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         locationImage.setImageDrawable(drawable);
     }
 
-    public void setMenuButtonClickListener(View.OnClickListener listener) {
-        menuButton.setOnClickListener(listener);
-    }
-
-    public void setPhotoButtonClickListener(View.OnClickListener listener) {
-        deleteButton.setOnClickListener(listener);
-    }
 
     /**
      * Called when the observable object is updated

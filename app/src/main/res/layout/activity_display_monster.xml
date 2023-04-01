@@ -66,7 +66,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
-        android:background="@color/HC_ash_grey" />
+        android:background="@drawable/drip_gradient"/>
     <ImageView
         android:id="@+id/location_image"
         android:layout_width="150dp"
