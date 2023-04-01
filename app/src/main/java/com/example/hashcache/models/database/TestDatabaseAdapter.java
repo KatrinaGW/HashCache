@@ -10,10 +10,12 @@ import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 import com.firebase.geofire.GeoLocation;
+import com.google.rpc.Code;
 
 import org.checkerframework.checker.units.qual.C;
 
@@ -539,6 +541,16 @@ public class TestDatabaseAdapter implements DatabasePort {
         CompletableFuture<String> cf = new CompletableFuture<>();
         cf.complete("Jean Val Jean");
         return cf;
+    }
+
+    @Override
+    public CompletableFuture<Void> updatePlayerCodeMetadataImage(String scannableCodeId, String userId, String image) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<CodeMetadata> getPlayerCodeMetadataById(String userId, String scannableCodeId) {
+        return null;
     }
 
     /**
