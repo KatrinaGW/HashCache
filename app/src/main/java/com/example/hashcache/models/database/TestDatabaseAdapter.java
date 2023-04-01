@@ -498,7 +498,7 @@ public class TestDatabaseAdapter implements DatabasePort {
     }
 
     @Override
-    public CompletableFuture<ArrayList<Pair<String, Long>>> getTopKUsers(String filter, int k) {
+    public ArrayList<Pair<String, Long>> getTopKUsers(String filter, int k) {
         return null;
     }
 

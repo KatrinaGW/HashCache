@@ -12,6 +12,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.context.Context;
 
@@ -42,21 +43,13 @@ public class LeaderboardScoreActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_score);
 
+        Context context = Context.get();
+        PlayerWallet playerWallet = context.getCurrentPlayer().getPlayerWallet();
+
         // Sets the players numb qr codes
         TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
 
-        AtomicLong playerScores = new AtomicLong();
-        Database.getInstance()
-                .getTotalScore(Context.get().getCurrentPlayer().getUserId())
-                .thenAccept( score -> {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            playerScores.set(score);
-                        }
-                    });
-                });
-        playersNumQrCodes.setText(String.valueOf(playerScores));
+        playersNumQrCodes.setText(String.valueOf(playerWallet.getTotalScore()));
 
         // Get the text views needed to set the leaderboard
         ArrayList<TextView> userNames = new ArrayList<>();

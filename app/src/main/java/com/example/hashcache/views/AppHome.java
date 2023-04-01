@@ -19,6 +19,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +37,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -45,6 +47,8 @@ import com.example.hashcache.R;
 import com.example.hashcache.models.Player;
 
 import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.database.DatabasePort;
+import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -122,6 +126,10 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         SharedPreferences settings = getSharedPreferences("UserInfo", 0);
         SharedPreferences.Editor editor = settings.edit();
 
+        DatabasePort db = Database.getInstance();
+        ArrayList<Pair<String, Long>> leaderboard = db.getTopKUsers(FieldNames.TOTAL_SCORE.fieldName, 3);
+
+        Log.i("LEADerboard", leaderboard.get(0).first);
 
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {

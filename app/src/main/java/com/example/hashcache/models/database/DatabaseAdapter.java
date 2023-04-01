@@ -622,37 +622,27 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     /**
      * Returns the user id of the top k players with the given filter. Given a list containing user
      * names and the score of the user (determined by filter)
-     * @param filter
-     * @param k
-     * @return
+     * @param filter the filter you were to sort by
+     * @param k how many scores to get
+     * @return A array list contains pairs of strings and long. Which correspond to username and
+     * score
      */
     @Override
-    public CompletableFuture<ArrayList<Pair<String, Long>>> getTopKUsers(String filter, int k) {
-        CompletableFuture<ArrayList<Pair<String, Long>>> cf = new CompletableFuture<>();
-        ArrayList<Pair<String, Long>> arrayList = new ArrayList<>();
+    public ArrayList<Pair<String, Long>> getTopKUsers(String filter, int k) {
+        ArrayList<Pair<String, Long>> list = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
 
-        CompletableFuture.runAsync(() -> {
-            collectionReference.orderBy(filter).limit(k).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if(task.isSuccessful()) {
-                        for(QueryDocumentSnapshot document: task.getResult()) {
-                            Pair<String, Long> pair = new Pair(document.get(FieldNames.USERNAME.fieldName),
-                                            document.get(filter));
-                            arrayList.add(pair);
-                        }
-                        cf.complete(arrayList);
-                    } else {
-                        Log.e("DATABASE", "Error getting the top k users");
-                    }
-                }
-            });
+        QuerySnapshot queryDocumentSnapshot = collectionReference.orderBy(filter).limit(k).get().getResult();
+        for(QueryDocumentSnapshot document: queryDocumentSnapshot) {
+            Pair<String, Long> pair = new Pair(document.get(FieldNames.USERNAME.fieldName),
+                    document.get(filter));
+            list.add(pair);
+        }
 
-        });
 
-        return cf;
+
+        return list;
     }
 
     /**

@@ -2,6 +2,8 @@ package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -12,10 +14,16 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.models.Player;
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.context.Context;
+import com.example.hashcache.models.database.DatabaseAdapter;
+import com.example.hashcache.models.database.DatabasePort;
+import com.example.hashcache.models.database.values.FieldNames;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -27,6 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
  The user can navigate to different leaderboards - region, number of QR codes scanned, and scores - by clicking on the respective buttons.
  */
 public class LeaderboardTopQRActivity extends AppCompatActivity {
+    private ArrayList<Pair<String, Long>> leaderboard;
     /**
 
      This method sets up the activity, inflating the layout and adding functionality to the menu button,
@@ -41,21 +50,15 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_topqr);
 
+        Context context = Context.get();
+        PlayerWallet playerWallet = context.getCurrentPlayer().getPlayerWallet();
+
+        DatabasePort db = Database.getInstance();
+        leaderboard = db.getTopKUsers(FieldNames.TOTAL_SCORE.fieldName, 3);
 
         // Sets the players numb qr codes
         TextView playersTopQrCode = findViewById(R.id.score_value_textview);
-        AtomicLong playerTopQrScore = new AtomicLong();
-        Database.getInstance()
-                .getTotalScore(Context.get().getCurrentPlayer().getUserId())
-                .thenAccept( score -> {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            playerTopQrScore.set(score);
-                        }
-                    });
-                });
-        playersTopQrCode.setText(String.valueOf(playerTopQrScore));
+        playersTopQrCode.setText(String.valueOf(playerWallet.getQrCount()));
 
         // Gets the text view for the user names
         ArrayList<TextView> userNames = new ArrayList<>();
@@ -64,7 +67,7 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
         userNames.add(findViewById(R.id.user_three));
 
         for(TextView name: userNames) {
-            name.setText("Ryan");
+            name.setText(leaderboard.get(0).first);
         }
 
         // Gets the text view for the total scores

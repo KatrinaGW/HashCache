@@ -99,7 +99,7 @@ public class HashController {
     private static void addScannableCodeToPlayer(String hash, String userId, CompletableFuture<Void> cf,
                                                  ScannableCode sc) {
         Database.getInstance().addScannableCodeToPlayerWallet(userId, hash)
-                .thenAccept(created->{
+                .thenAccept(created-> {
                     Context context = Context.get();
                     // Set the current scannable code to the newly added scannable code
                     context.setCurrentScannableCode(sc);
