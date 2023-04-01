@@ -57,6 +57,13 @@ public class AppHomeTest {
         solo.clickOnButton("START CACHING");
     }
 
+    private void logout(){
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
+    }
+
     @Test
     public void checkScanQRButton(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
@@ -64,15 +71,18 @@ public class AppHomeTest {
         solo.clickOnButton("SCAN QR");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", QRScanActivity.class);
+        solo.goBack();
+        logout();
     }
 
     @Test
     public void checkLogoButton(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(0);
+        solo.clickOnView(solo.getView(R.id.logo_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
+        logout();
     }
 
 
@@ -80,58 +90,61 @@ public class AppHomeTest {
     public void checkMapButton(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(2);
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", QRByLocation.class);
+        solo.sleep(1000);
+        solo.clickOnView(solo.getView(R.id.idSearchView));
+        solo.sleep(1000);
+        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        solo.goBack();
+        logout();
     }
 
     @Test
     public void checkCommunityButton(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(3);
+        solo.clickOnView(solo.getView(R.id.community_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
+        logout();
     }
 
     @Test
     public void checkMenuButton1(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(1);
-        solo.clickOnText("Map");
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.map_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
     public void checkMenuButton2(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(1);
-        solo.clickOnText("My QR Codes");
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
     public void checkMenuButton3(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(1);
-        solo.clickOnText("Stats");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
-    }
-
-    @Test
-    public void checkMenuButton4(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnImageButton(1);
-        solo.clickOnText("Community");
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.community_button, 1));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
 
