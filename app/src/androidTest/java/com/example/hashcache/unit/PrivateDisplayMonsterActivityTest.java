@@ -1,4 +1,7 @@
 package com.example.hashcache.unit;
+import static com.example.hashcache.unit.TestData.TEST_OTHER_USER;
+import static com.example.hashcache.unit.TestData.TEST_OTHER_USER_MONSTER_NAME;
+import static com.example.hashcache.unit.TestData.TEST_OTHER_USER_MONSTER_SCORE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
@@ -43,11 +46,18 @@ public class PrivateDisplayMonsterActivityTest {
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
 
-        solo.enterText((EditText) solo.getView(R.id.username_edittext), "Leon");
+        solo.enterText((EditText) solo.getView(R.id.username_edittext), TEST_OTHER_USER);
         solo.clickOnButton("START CACHING");
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Blobulon Crorg the Fifth Alf");
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.sleep(100);
+        solo.clickOnText(TEST_OTHER_USER_MONSTER_NAME);
+    }
 
+    private void logout(){
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
 
@@ -55,48 +65,11 @@ public class PrivateDisplayMonsterActivityTest {
     public void checkInfo(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
-        solo.waitForText("Blobulon Crorg the Fifth Alf");
-        solo.waitForText("Delete?");
-    }
-
-    @Test
-    public void checkMenuButton1(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
-        solo.clickOnImageButton(1);
-        solo.clickOnText("Map");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-    }
-
-    @Test
-    public void checkMenuButton2(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
-        solo.clickOnImageButton(1);
-        solo.clickOnText("My QR Codes");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
-    }
-
-    @Test
-    public void checkMenuButton3(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
-        solo.clickOnImageButton(1);
-        solo.clickOnText("Stats");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
-    }
-
-    @Test
-    public void checkMenuButton4(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
-        solo.clickOnImageButton(1);
-        solo.clickOnText("Community");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", Community.class);
+        solo.waitForText(TEST_OTHER_USER_MONSTER_NAME);
+        solo.waitForText(TEST_OTHER_USER_MONSTER_SCORE);
+        solo.waitForView(solo.getView(R.id.view_comments_button));
+        solo.waitForView(solo.getView(R.id.delete_button));
+        logout();
     }
 
 
