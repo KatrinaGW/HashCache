@@ -63,7 +63,6 @@ public class PrivateDisplayMonsterActivityTest {
 
     @Test
     public void checkInfo(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
         solo.waitForText(TEST_OTHER_USER_MONSTER_NAME);
         solo.waitForText(TEST_OTHER_USER_MONSTER_SCORE);
@@ -71,6 +70,4 @@ public class PrivateDisplayMonsterActivityTest {
         solo.waitForView(solo.getView(R.id.delete_button));
         logout();
     }
-
-
 }

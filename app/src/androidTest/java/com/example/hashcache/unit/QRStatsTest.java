@@ -53,50 +53,30 @@ public class QRStatsTest {
 
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
-        solo.clickOnImageButton(1);
-        solo.clickOnText("Stats");
-
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.sleep(100);
+        solo.clickOnView(solo.getView(R.id.qr_stats_button));
     }
 
-
-    @Test
-    public void checkMenuButton1(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Map");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+    private void logout(){
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
     @Test
-    public void checkMenuButton2(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
+    public void checkComponents(){
         solo.assertCurrentActivity("Wrong Activity", QRStats.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("My QR Codes");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
-    }
+        solo.waitForText("0");
+        solo.waitForView(solo.getView(R.id.total_score_textview));
+        solo.waitForView(solo.getView(R.id.my_codes_textview));
+        solo.waitForView(solo.getView(R.id.top_score_textview));
+        solo.waitForView(solo.getView(R.id.low_score_textview));
+        solo.waitForView(solo.getView(R.id.menu_button));
+        assert(solo.getView(R.id.menu_button).isClickable());
+        logout();
 
-    @Test
-    public void checkMenuButton3(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Stats");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
-    }
-
-    @Test
-    public void checkMenuButton4(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Community");
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", Community.class);
     }
 
 
