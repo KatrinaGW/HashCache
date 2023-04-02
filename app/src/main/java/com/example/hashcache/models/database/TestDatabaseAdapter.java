@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import kotlin.Triple;
+
 /**
  * 
  * The TestPlayerDatabase class represents a test database of players that can
@@ -498,7 +500,7 @@ public class TestDatabaseAdapter implements DatabasePort {
     }
 
     @Override
-    public CompletableFuture<ArrayList<Pair<String, Long>>> getTopKUsers(String filter, int k) {
+    public CompletableFuture<ArrayList<Triple<String, Long, String>>> getTopUsers(String filter) {
         return null;
     }
 
@@ -587,6 +589,15 @@ public class TestDatabaseAdapter implements DatabasePort {
         return null;
     }
 
+    @Override
+    public CompletableFuture<String> getTopMonsterName(String userId) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<ArrayList<Pair<String,ScannableCode>>> getScannableCodesWithinRadiusSorted(Location location) {
+        return null;
+    }
     /**
      * Removes the metadata for a ScannableCodeId with a specific user
      * @param scannableCodeId the id of the scannable code to delete

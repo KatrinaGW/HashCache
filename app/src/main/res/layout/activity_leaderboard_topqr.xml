@@ -101,7 +101,7 @@
             android:layout_below="@id/user_one"
             android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/three_stars"
-            android:text="MonsterName1"
+            android:text="Loading..."
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="italic" />
@@ -155,7 +155,7 @@
             android:layout_below="@id/user_two"
             android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/two_stars"
-            android:text="MonsterName1"
+            android:text="Loading..."
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="italic" />
@@ -209,7 +209,7 @@
             android:layout_below="@id/user_three"
             android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/one_star"
-            android:text="MonsterName1"
+            android:text="Loading..."
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="italic" />

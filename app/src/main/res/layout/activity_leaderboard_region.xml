@@ -84,13 +84,14 @@
             android:scaleType="fitCenter"
             android:padding="6dp"
             android:layout_centerVertical="true" />
+
         <TextView
             android:id="@+id/user_one"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/three_stars"
-            android:text="SuperUser1"
+            android:text="N/A"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -101,7 +102,7 @@
             android:layout_below="@id/user_one"
             android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/three_stars"
-            android:text="MonsterName1"
+            android:text="N/A"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="italic" />
@@ -111,7 +112,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/monster_name_one"
             android:layout_toEndOf="@id/three_stars"
-            android:text="999999"
+            android:text="N/A"
             android:textColor="@color/HC_ash_grey"
             android:textSize="24sp"
             android:layout_marginStart="24dp"/>
@@ -144,7 +145,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/two_stars"
-            android:text="SuperUser2"
+            android:text="N/A"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -155,7 +156,7 @@
             android:layout_below="@id/user_two"
             android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/two_stars"
-            android:text="MonsterName1"
+            android:text="N/A"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="italic" />
@@ -165,7 +166,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/monster_name_two"
             android:layout_toEndOf="@id/two_stars"
-            android:text="888888"
+            android:text="N/A"
             android:textColor="@color/HC_ash_grey"
             android:textSize="24sp"
             android:layout_marginStart="24dp"/>
@@ -198,7 +199,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/one_star"
-            android:text="SuperUser3"
+            android:text="N/A"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -209,7 +210,7 @@
             android:layout_below="@id/user_three"
             android:layout_marginStart="24dp"
             android:layout_toEndOf="@id/one_star"
-            android:text="MonsterName1"
+            android:text="N/A"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="italic" />
@@ -219,7 +220,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/monster_name_three"
             android:layout_toEndOf="@id/one_star"
-            android:text="777777"
+            android:text="N/A"
             android:textColor="@color/HC_ash_grey"
             android:textSize="24sp"
             android:layout_marginStart="24dp"/>
@@ -249,7 +250,7 @@
             android:id="@+id/score_value_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="99999"
+            android:text="N/A"
             android:textSize="20sp"
             android:textColor="@color/white"
             android:textAlignment="center"
@@ -270,7 +271,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/region_textview"
             android:layout_above="@id/menu_button"
-            android:text="700"
+            android:text="N/A"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="20sp" />
