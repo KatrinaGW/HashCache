@@ -1,7 +1,12 @@
 package com.example.hashcache.models.database;
 
 import android.content.pm.ComponentInfo;
+
+import java.util.HashSet;
+import java.lang.reflect.Array;
 import android.util.Log;
+import com.example.hashcache.models.CodeMetadata;
+import android.location.Location;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
@@ -15,6 +20,8 @@ import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.database.DatabaseAdapters.LoginsAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
@@ -23,7 +30,9 @@ import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanC
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+
 import com.example.hashcache.models.database.values.CollectionNames;
+import com.firebase.geofire.GeoLocation;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -36,6 +45,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -650,6 +660,47 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return LoginsAdapter.getInstance().addLoginRecord(username);
     }
 
+    @Override
+    public CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata){
+        return CodeMetadataDatabaseAdapter.getInstance().createScannableCodeMetadata(codeMetadata);
+    }
+
+    @Override
+    public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation location, double radiusMeters) {
+        return CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataWithinRadius(location, radiusMeters);
+    }
+
+    @Override
+    public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesWithinRadius(GeoLocation location, double radiusMeters) {
+        CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(new Runnable() {
+            @Override
+            public void run() {
+                CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataWithinRadius(location, radiusMeters).thenAccept(cms -> {
+                    HashSet<String> scannableCodeIds = new HashSet<>();
+                    cms.forEach(cm -> {
+                        scannableCodeIds.add(cm.getScannableCodeId());
+                    });
+                    ArrayList<String> scannableCodeArray = new ArrayList<>();
+                    for(String id: scannableCodeIds){
+                        scannableCodeArray.add(id);
+                    }
+                    getScannableCodesByIdInList(scannableCodeArray).thenAccept(scodes -> {
+                        cf.complete(scodes);
+                    }).exceptionally(throwable -> {
+                        cf.completeExceptionally(throwable);
+                        return null;
+                    });
+
+                }).exceptionally(throwable -> {
+                    cf.completeExceptionally(throwable);
+                    return null;
+                });
+            }
+        });
+        return cf;
+    }
+
     /**
      * Gets the username to use if the device has had a login before
      * @return cf the CompletableFuture with the username of the associated user. Returns
@@ -657,6 +708,16 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
      */
     public CompletableFuture<String> getUsernameForDevice(){
         return LoginsAdapter.getInstance().getUsernameForDevice();
+    }
+
+    @Override
+    public CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image) {
+        return CodeMetadataDatabaseAdapter.getInstance().updatePlayerCodeMetadataImage(userId, scannableCodeId, image);
+    }
+
+    @Override
+    public CompletableFuture<CodeMetadata> getPlayerCodeMetadataById(String userId, String scannableCodeId) {
+        return CodeMetadataDatabaseAdapter.getInstance().getPlayerCodeMetadataById(userId, scannableCodeId);
     }
 
     /**
@@ -668,6 +729,8 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return LoginsAdapter.getInstance().deleteLogin();
     }
 
+    
+
     /**
      * Resets the static instances of the adapters
      */
@@ -675,6 +738,8 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         LoginsAdapter.resetInstance();
         PlayersDatabaseAdapter.resetInstance();
         ScannableCodesDatabaseAdapter.resetInstance();
+        CodeMetadataDatabaseAdapter.resetInstance();
+        CodeLocationDatabaseAdapter.resetInstance();
     }
 
     @Override

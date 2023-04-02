@@ -1,16 +1,21 @@
 package com.example.hashcache.models.database;
 
+import android.location.Location;
 import android.util.Pair;
 
+import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+import com.firebase.geofire.GeoLocation;
+import com.google.rpc.Code;
 
 import org.checkerframework.checker.units.qual.C;
 
@@ -513,6 +518,22 @@ public class TestDatabaseAdapter implements DatabasePort {
         return cf;
     }
 
+    @Override
+    public CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation location, double radiusMeters) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesWithinRadius(GeoLocation location, double radiusMeters) {
+        return null;
+    }
+
+
     /**
      * Gets the username to use if the device has had a login before
      * @return cf the CompletableFuture with the username of the associated user. Returns
@@ -522,6 +543,16 @@ public class TestDatabaseAdapter implements DatabasePort {
         CompletableFuture<String> cf = new CompletableFuture<>();
         cf.complete("Jean Val Jean");
         return cf;
+    }
+
+    @Override
+    public CompletableFuture<Void> updatePlayerCodeMetadataImage(String scannableCodeId, String userId, String image) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<CodeMetadata> getPlayerCodeMetadataById(String userId, String scannableCodeId) {
+        return null;
     }
 
     /**

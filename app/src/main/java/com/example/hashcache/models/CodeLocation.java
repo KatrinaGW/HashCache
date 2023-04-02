@@ -1,68 +1,49 @@
 package com.example.hashcache.models;
 
+import android.location.Location;
+
 import java.lang.reflect.Array;
 
 /**
  * Represents the location where a code was scanned
  */
 public class CodeLocation {
-    private String locationName;
-    private Coordinate coordinates;
+    private String codeLocationID;
+    private Location location;
     /**
      * Constructor for creating a new instance of CodeLocation
      *
-     * @param locationName The name of the location
-     * @param x The x-coordinate of the location
-     * @param y The y-coordinate of the location
-     * @param z The z-coordinate of the location
+     * @param QRString simply the string value of the QR code
+     * @param location the location instance containing the lattitude and longitutde
      */
-    public CodeLocation(String locationName, double x, double y, double z){
-        this.locationName = locationName;
-        this.coordinates = new Coordinate(x, y, z);
+    public CodeLocation(String QRString, Location location){
+        this.codeLocationID = QRString;
+        this.location = location;
+    }
+
+
+
+    /**
+     * Returns a location object with the location of the QR code
+     * @return a location object with the location of the QR code
+     */
+    public Location getLocation() {
+        return this.location;
     }
 
     /**
-     * Get the name of the location
-     * @return locationName The name of the location
+     * Sets the location of the QR code
+     * @param location the location object containing the information
      */
-    public String getLocationName() {
-        return locationName;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     /**
-     * Set a new location name
-     * @param locationName the name to use for the location
-     */
-    public void setLocationName(String locationName) {
-        this.locationName = locationName;
-    }
-
-    /**
-     * Get the 3-point coordinates of the location
-     * @return coordinates The 3-point coordinates of the location
-     */
-    public Coordinate getCoordinates() {
-        return coordinates;
-    }
-
-    /**
-     * Sets the 3-point coordinates of the location
-     * @param coordinates The 3-point coordinates of the location
-     */
-    public void setCoordinates(Coordinate coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    /**
-     * Gets the id of a codelocation based on the concatenation of its coordinates
-     * @return the concatenation of its coordinates
+     * Gets the id of a codelocation
+     * @return simply the value of the QR content
      */
     public String getId(){
-        double[] coordinates = this.coordinates.getCoordinates();
-        String x = Double.toString((Double) Array.get(coordinates, 0));
-        String y = Double.toString((Double) Array.get(coordinates, 1));
-        String z = Double.toString((Double) Array.get(coordinates, 2));
-
-        return x + y + z;
+        return this.codeLocationID;
     }
 }

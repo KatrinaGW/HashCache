@@ -1,8 +1,12 @@
 package com.example.hashcache.views;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -42,12 +46,14 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
     private TextView monsterName;
     private TextView monsterScore;
     private ImageView monsterImage;
-    private ImageView miniMap;
+    private ImageView locationImage;
     private ImageButton menuButton;
     private Button viewCacherButton;
     private Button deleteButton;
     private ScannableCode currentScannableCode;
     private boolean belongToCurrentUser;
+    private boolean fromMap;
+    private String userId = null;
     private TextView numPlayersValueView;
 
     @Override
@@ -57,7 +63,8 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
 
         Intent intent = getIntent();
         belongToCurrentUser = intent.getBooleanExtra("belongsToCurrentUser", false);
-
+        fromMap = intent.getBooleanExtra("fromMap", false);
+        userId = intent.getStringExtra("userId");
         initializeViews();
         // take location photo
         deleteButton.setOnClickListener(new View.OnClickListener() {
@@ -130,13 +137,36 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
                     }
                 });
         AppContext.get().addObserver(this);
+        if(belongToCurrentUser || (fromMap && this.userId != null)){
+            String userId = fromMap ? this.userId : AppContext.get().getCurrentPlayer().getUserId();
+            String scannableCodeId = currentScannableCode.getScannableCodeId();
+            Database.getInstance().getPlayerCodeMetadataById(userId, scannableCodeId).thenAccept(codeMetadata -> {
+                String base64Image = codeMetadata.getImage();
+                if(base64Image != null) {
+                    byte[] decodedImage = Base64.decode(base64Image, Base64.DEFAULT);
+                    Bitmap bitmapImage = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setMiniMapImage(new BitmapDrawable(getResources(), bitmapImage));
+                        }
+                    });
+                }
+            }).exceptionally(new Function<Throwable, Void>() {
+                @Override
+                public Void apply(Throwable throwable) {
+                    Log.d("ERROR", throwable.getMessage());
+                    return null;
+                }
+            });
+        }
     }
 
     private void initializeViews() {
         monsterName = findViewById(R.id.monster_name);
         monsterScore = findViewById(R.id.monster_score);
         monsterImage = findViewById(R.id.monster_image);
-        miniMap = findViewById(R.id.mini_map);
+        locationImage = findViewById(R.id.location_image);
         menuButton = findViewById(R.id.menu_button);
         deleteButton = findViewById(R.id.delete_button);
         viewCacherButton = findViewById(R.id.view_comments_button);
@@ -196,8 +226,8 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         numPlayersValueView.setText(Integer.toString(numPlayers));
     }
 
-    public void setMiniMapImage(int imageRes) {
-        miniMap.setImageResource(imageRes);
+    public void setMiniMapImage(Drawable drawable) {
+        locationImage.setImageDrawable(drawable);
     }
 
     public void setMenuButtonClickListener(View.OnClickListener listener) {
