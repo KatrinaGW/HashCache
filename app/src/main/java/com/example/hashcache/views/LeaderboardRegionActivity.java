@@ -1,11 +1,7 @@
 package com.example.hashcache.views;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
-import com.firebase.geofire.GeoLocation;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -14,18 +10,13 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.core.app.ActivityCompat;
 
 import com.example.hashcache.R;
 import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.database.Database;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
 
 /**
 
@@ -36,9 +27,6 @@ import java.util.function.Function;
  */
 
 public class LeaderboardRegionActivity extends AppCompatActivity {
-
-    private FusedLocationProviderClient fusedLocationClient;
-
     /**
 
      Initializes the activity, sets the layout, and adds functionality to the menu and navigation buttons.
@@ -50,12 +38,16 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_leaderboard_region);
 
 
+        // add functionality to menu button
+        ImageButton menuButton = findViewById(R.id.menu_button);
+
+
         // Sets the players numb qr codes
         TextView playersTotalScore = findViewById(R.id.score_value_textview);
         AtomicLong playerScores = new AtomicLong();
         Database.getInstance()
                 .getTotalScore(AppContext.get().getCurrentPlayer().getUserId())
-                .thenAccept(score -> {
+                .thenAccept( score -> {
                     playerScores.set(score);
                 });
 
@@ -67,7 +59,7 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         userNames.add(findViewById(R.id.user_two));
         userNames.add(findViewById(R.id.user_three));
 
-        for (TextView view : userNames) {
+        for(TextView view: userNames) {
             view.setText("Temp");
         }
 
@@ -76,7 +68,7 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         monsterNames.add(findViewById(R.id.user_two));
         monsterNames.add(findViewById(R.id.user_three));
 
-        for (TextView view : monsterNames) {
+        for(TextView view: monsterNames) {
             view.setText("Zorg");
         }
 
@@ -85,43 +77,48 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         totalScores.add(findViewById(R.id.score_two));
         totalScores.add(findViewById(R.id.score_three));
 
-        for (TextView view : totalScores) {
+        for(TextView view: totalScores) {
             view.setText(String.valueOf(42));
         }
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            return;
-        }
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            Database.getInstance().getCodeMetadataWithinRadius(new GeoLocation(
-                                    location.getLatitude(), location.getLongitude()), 1000)
-                                    .thenAccept(codes -> {
-                                        System.out.println("Here");
-                                    })
-                                    .exceptionally(new Function<Throwable, Void>() {
-                                        @Override
-                                        public Void apply(Throwable throwable) {
-                                            return null;
-                                        }
-                                    });
-                        }
-                    }
-                });
-
-        ImageButton menuButton = findViewById(R.id.menu_button);
+        /**
+         *
+         *
+         {@link View.OnClickListener} that creates and displays a popup menu when the menu button is clicked.
+         */
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                BottomMenuFragment bottomMenu = new BottomMenuFragment();
-                bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
+            public void onClick(View v) {
+
+                // create menu
+                PopupMenu menu = new PopupMenu(LeaderboardRegionActivity.this, menuButton);
+                menu.getMenuInflater()
+                        .inflate(R.menu.fragment_popup_menu, menu.getMenu());
+
+                // navigate to different activities based on menu item selected
+                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        int id = item.getItemId();
+
+                        if (id == R.id.menu_home) {                 // go to AppHome page
+                            startActivity(new Intent(LeaderboardRegionActivity.this, AppHome.class));
+                            return true;
+
+                        } else if (id == R.id.menu_stats) {         // go to QRStats page
+                            startActivity(new Intent(LeaderboardRegionActivity.this, QRStats.class));
+                            return true;
+
+                        } else if (id == R.id.menu_profile) {       // go to MyProfile
+                            startActivity(new Intent(LeaderboardRegionActivity.this, MyProfile.class));
+                            return true;
+
+                        } else if (id == R.id.menu_community) {     // go to Community
+                            startActivity(new Intent(LeaderboardRegionActivity.this, Community.class));
+                            return true;
+                        }
+                        return LeaderboardRegionActivity.super.onOptionsItemSelected(item);
+                    }
+                });
+                menu.show();
             }
         });
 

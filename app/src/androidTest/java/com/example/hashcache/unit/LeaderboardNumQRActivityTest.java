@@ -89,13 +89,12 @@ public class LeaderboardNumQRActivityTest {
 
     @Test
     public void checkRegionButton(){
-//        // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
-//        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
-//        solo.clickOnButton("REGION");
-//        solo.sleep(100);
-//        solo.assertCurrentActivity("Wrong Activity", LeaderboardRegionActivity.class);
-//        logout();
-        //broken for now - fix later
+        // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
+        solo.clickOnButton("REGION");
+        solo.sleep(100);
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardRegionActivity.class);
+        logout();
     }
 
 }
