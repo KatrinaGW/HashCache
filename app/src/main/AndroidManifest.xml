@@ -47,7 +47,8 @@
         <activity android:name=".views.OtherProfileInformationActivity"/>
         <activity android:name=".views.OtherCacheActivity"/>
         <activity android:name=".views.DisplayCommentsActivity"/>
-        <activity android:name=".views.AddCommentActivity"/>
+        <activity android:name=".views.AddCommentActivity" />
+        <activity android:name=".views.PhotoGalleryActivity"/>
 
         <provider
             android:name="com.google.firebase.provider.FirebaseInitProvider"
