@@ -69,4 +69,5 @@ public interface DatabasePort {
     void onScannableCodeCommentsChanged(String scannableCodeId, GetScannableCodeCallback callback);
     CompletableFuture<ArrayList<Pair<String, Long>>> getTopKUsers(String filter, int k);
     CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet);
+    CompletableFuture<Boolean> removeScannableCodeMetadata(String scannableCodeId, String userId);
 }

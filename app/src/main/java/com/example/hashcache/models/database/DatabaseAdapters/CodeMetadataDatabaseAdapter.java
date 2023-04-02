@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.database.values.CollectionNames;
+import com.example.hashcache.models.database.values.FieldNames;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryBounds;
@@ -165,6 +166,49 @@ public class CodeMetadataDatabaseAdapter {
                     cf.completeExceptionally(task.getException());
                 }
             });
+        });
+        return cf;
+    }
+
+    /**
+     * Removes the metadata for a ScannableCodeId with a specific user
+     * @param scannableCodeId the id of the scannable code to delete
+     * @param userId the id of the user to remove the scannable code metadata for
+     * @return cf the CompletableFuture which completes with True if the operation was successful
+     */
+    public CompletableFuture<Boolean> removeScannableCodeMetadata(String scannableCodeId, String userId){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
+        Query docRef = collectionReference.whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId)
+                .whereEqualTo(FieldNames.UserId.name, userId);
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                if(task.getResult().size()==1){
+                    DocumentReference doc = task.getResult().getDocuments().get(0).getReference();
+
+                    doc.delete()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    cf.complete(true);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Error deleting document", e);
+                                    cf.completeExceptionally(e);
+                                }
+                            });
+                }else{
+                    Log.d("CodeMetadataDatabaseAdapter", "User did not have any metadata for " +
+                            "deleted scannable code");
+                    cf.complete(true);
+                }
+            } else {
+                cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+            }
         });
         return cf;
     }
