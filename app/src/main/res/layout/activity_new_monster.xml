@@ -3,16 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient_yellow">
-    <ImageButton
-        android:id="@+id/menu_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/menu_button_dark"
-        android:src="@android:drawable/ic_dialog_dialer"
-        android:padding="6dp"
-        android:layout_marginEnd="18dp"
-        android:layout_alignParentEnd="true"
-        android:elevation="6dp"/>
     <TextView
         android:id="@+id/monster_name"
         android:layout_width="match_parent"
@@ -76,5 +66,16 @@
             android:textSize="22sp"
             android:background="@drawable/rounded_rect_green" />
     </LinearLayout>
+    <ImageButton
+        android:id="@+id/menu_button"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/semicircle_button"
+        android:elevation="6dp"
+        android:src="@drawable/half_logo"
+        android:scaleType="fitCenter"/>
 
 </RelativeLayout>

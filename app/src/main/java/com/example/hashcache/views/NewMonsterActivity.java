@@ -143,6 +143,7 @@ public class NewMonsterActivity extends AppCompatActivity {
             }
         });
 
+        // generate monster image and name
         setMonsterName(curInfo.getGeneratedName());
         setMonsterScore(curInfo.getGeneratedScore());
         ImageGenerator.getImageFromHash(curCode.getScannableCodeId()).thenAccept(drawable -> {
@@ -199,54 +200,16 @@ public class NewMonsterActivity extends AppCompatActivity {
              * activities based on the menu item
              * that was clicked.
              *
-             * @param v the view that was clicked (the menu button)
+             * @param view the view that was clicked (the menu button)
              */
             @Override
-            public void onClick(View v) {
-
-                // create menu
-                PopupMenu menu = new PopupMenu(NewMonsterActivity.this, menuButton);
-                menu.getMenuInflater()
-                        .inflate(R.menu.fragment_popup_menu, menu.getMenu());
-
-                // navigate to different activities based on menu item selected
-                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    /**
-                     * Called when a menu item is clicked.
-                     *
-                     * Navigates to the appropriate activity based on the menu item that was
-                     * clicked.
-                     *
-                     * @param item the menu item that was clicked
-                     * @return true if the menu item was handled, false otherwise
-                     */
-                    public boolean onMenuItemClick(MenuItem item) {
-                        int id = item.getItemId();
-
-                        if (id == R.id.menu_home) { // go to AppHome page
-                            startActivity(new Intent(NewMonsterActivity.this, AppHome.class));
-                            return true;
-
-                        } else if (id == R.id.menu_stats) { // go to QRStats page
-                            startActivity(new Intent(NewMonsterActivity.this, QRStats.class));
-                            return true;
-
-                        } else if (id == R.id.menu_profile) { // go to MyProfile
-                            startActivity(new Intent(NewMonsterActivity.this, MyProfile.class));
-                            return true;
-
-                        } else if (id == R.id.menu_community) { // go to Community
-                            startActivity(new Intent(NewMonsterActivity.this, Community.class));
-                            return true;
-                        }
-                        return NewMonsterActivity.super.onOptionsItemSelected(item);
-                    }
-                });
-                menu.show();
+            public void onClick(View view) {
+                BottomMenuFragment bottomMenu = new BottomMenuFragment();
+                bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
-
         });
     }
+
     private void init() {
 
         monsterName = findViewById(R.id.monster_name);
