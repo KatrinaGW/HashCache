@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import kotlin.Triple;
+
 public interface DatabasePort {
 
     CompletableFuture<Boolean> usernameExists(String username);
@@ -56,6 +58,7 @@ public interface DatabasePort {
     void onPlayerDataChanged(String userId, GetPlayerCallback callback);
     void onPlayerWalletChanged(String playerId, BooleanCallback callback);
     void onScannableCodeCommentsChanged(String scannableCodeId, GetScannableCodeCallback callback);
-    CompletableFuture<ArrayList<Pair<String, Long>>> getTopKUsers(String filter, int k);
+    CompletableFuture<ArrayList<Triple<String, Long, String>>> getTopUsers(String filter);
     CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet);
+    CompletableFuture<String> getTopMonsterName(String userId);
 }

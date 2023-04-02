@@ -213,7 +213,6 @@ public class HashController {
 
     private static CompletableFuture<Void> updateTotalMaxScore(){
         CompletableFuture<Void> cf = new CompletableFuture<>();
-        ArrayList<CompletableFuture> futureCfs = new ArrayList<>();
         Database.getInstance()
                 .getPlayerWalletTotalScore(AppContext.get().getCurrentPlayer().getPlayerWallet()
                         .getScannedCodeIds())

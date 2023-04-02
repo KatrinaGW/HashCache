@@ -21,6 +21,7 @@ import com.example.hashcache.models.database.DatabasePort;
 import com.example.hashcache.models.database.values.FieldNames;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
 
@@ -157,22 +158,29 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
 
         // Get the text views needed to set the leaderboard
         ArrayList<TextView> userNames = new ArrayList<>();
-        userNames.add(findViewById(R.id.user_three));
-        userNames.add(findViewById(R.id.user_two));
         userNames.add(findViewById(R.id.user_one));
+        userNames.add(findViewById(R.id.user_two));
+        userNames.add(findViewById(R.id.user_three));
 
+        // Get the text views for the monster names
+        ArrayList<TextView> monsterNames = new ArrayList<>();
+        monsterNames.add(findViewById(R.id.monster_name_one));
+        monsterNames.add(findViewById(R.id.monster_name_two));
+        monsterNames.add(findViewById(R.id.monster_name_three));
+
+        // Get the text view for the qr counts
         ArrayList<TextView> qrCounts = new ArrayList<>();
-        qrCounts.add(findViewById(R.id.score_three));
-        qrCounts.add(findViewById(R.id.score_two));
         qrCounts.add(findViewById(R.id.score_one));
+        qrCounts.add(findViewById(R.id.score_two));
+        qrCounts.add(findViewById(R.id.score_three));
 
         // Fetch the values from the database needed for the leaderboards
-        databaseAdapter.getTopKUsers(FieldNames.MAX_SCORE.fieldName, 3).thenAccept(score -> {
+        databaseAdapter.getTopUsers(FieldNames.MAX_SCORE.fieldName).thenAccept(score -> {
             if (score.size() != 0) {
                 int count = 0;
                 for (TextView view : userNames) {
                     if (count < score.size()) {
-                        view.setText(score.get(count++).first);
+                        view.setText(score.get(count++).getFirst());
                     } else {
                         view.setText("NA");
                     }
@@ -180,9 +188,32 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
                 count = 0;
                 for (TextView view : qrCounts) {
                     if(count < score.size()) {
-                        view.setText(String.valueOf(score.get(count++).second));
+                        view.setText(String.valueOf(score.get(count++).getSecond()));
                     } else {
                         view.setText("0");
+                    }
+                }
+
+                count = 0;
+                for(TextView view: monsterNames) {
+                    if(count < score.size()) {
+                        databaseAdapter.getTopMonsterName(score.get(count++).getThird()).thenAccept(view::setText);
+                    } else {
+                        view.setText("N/A");
+                    }
+                }
+
+                // Find the player rating
+                String userName = appContext.getCurrentPlayer().getUsername();
+
+                // Update the player rating
+                for(int i = 0; i < score.size(); i++) {
+                    if(Objects.equals(score.get(i).getFirst(), userName)) {
+                        TextView rankingView = findViewById(R.id.region_value_textview);
+                        rankingView.setText(String.valueOf(i + 1));
+
+                        // No need to keep looking
+                        break;
                     }
                 }
             } else {

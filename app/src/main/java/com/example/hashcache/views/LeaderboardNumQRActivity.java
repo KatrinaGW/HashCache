@@ -14,6 +14,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.appContext.AppContext;
@@ -23,6 +24,7 @@ import com.example.hashcache.models.database.values.FieldNames;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
@@ -145,22 +147,22 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
 
         // Get the text views needed to set the leaderboard
         ArrayList<TextView> userNames = new ArrayList<>();
-        userNames.add(findViewById(R.id.user_three));
-        userNames.add(findViewById(R.id.user_two));
         userNames.add(findViewById(R.id.user_one));
+        userNames.add(findViewById(R.id.user_two));
+        userNames.add(findViewById(R.id.user_three));
 
         ArrayList<TextView> qrCounts = new ArrayList<>();
-        qrCounts.add(findViewById(R.id.num_three));
-        qrCounts.add(findViewById(R.id.num_two));
         qrCounts.add(findViewById(R.id.num_one));
+        qrCounts.add(findViewById(R.id.num_two));
+        qrCounts.add(findViewById(R.id.num_three));
 
         // Fetch the values from the database needed for the leaderboards
-        databaseAdapter.getTopKUsers(FieldNames.QR_COUNT.fieldName, 3).thenAccept(score -> {
+        databaseAdapter.getTopUsers(FieldNames.QR_COUNT.fieldName).thenAccept(score -> {
                 if (score.size() != 0) {
                     int count = 0;
                     for (TextView view : userNames) {
                         if (count < score.size()) {
-                            view.setText(score.get(count++).first);
+                            view.setText(score.get(count++).getFirst());
                         } else {
                             view.setText("NA");
                         }
@@ -168,11 +170,27 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
                     count = 0;
                     for (TextView view : qrCounts) {
                         if(count < score.size()) {
-                            view.setText(String.valueOf(score.get(count++).second));
+                            view.setText(String.valueOf(score.get(count++).getSecond()));
                         } else {
                             view.setText("0");
                         }
                     }
+
+
+                    // Find the player rating
+                    String userName = appContext.getCurrentPlayer().getUsername();
+
+                    // Update the player rating
+                    for(int i = 0; i < score.size(); i++) {
+                        if(Objects.equals(score.get(i).getFirst(), userName)) {
+                            TextView rankingView = findViewById(R.id.region_value_textview);
+                            rankingView.setText(String.valueOf(i + 1));
+
+                            // No need to keep looking
+                            break;
+                        }
+                    }
+
                 } else {
                     Log.e("DATABASE", "Error in getting the top k users");
                 }

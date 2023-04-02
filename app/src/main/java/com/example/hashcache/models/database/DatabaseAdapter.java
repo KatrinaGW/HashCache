@@ -30,6 +30,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -37,6 +38,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+
+import kotlin.Triple;
 
 /**
  * 
@@ -608,25 +611,22 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
      * Returns the user id of the top k players with the given filter. Given a list containing user
      * names and the score of the user (determined by filter)
      * @param filter the filter you were to sort by
-     * @param k how many scores to get
-     * @return A array list contains pairs of strings and long. Which correspond to username and
-     * score
+     * @return A array list contains pairs of strings, long and strings. Which correspond to username,
+     * score and user Id
      */
     @Override
-    public CompletableFuture<ArrayList<Pair<String, Long>>> getTopKUsers(String filter, int k) {
-        ArrayList<Pair<String, Long>> list = new ArrayList<>();
+    public CompletableFuture<ArrayList<Triple<String, Long, String>>> getTopUsers(String filter) {
+        ArrayList<Triple<String, Long, String>> list = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
-        CompletableFuture<ArrayList<Pair<String, Long>>> cf = new CompletableFuture<>();
+        CompletableFuture<ArrayList<Triple<String, Long, String>>> cf = new CompletableFuture<>();
 
-        collectionReference.orderBy(filter).limit(k)
-                .get()
+        collectionReference.orderBy(filter, Query.Direction.DESCENDING).get()
                 .addOnSuccessListener(result -> {
                     for(QueryDocumentSnapshot document: result) {
-                        Long temp = (Long) document.get(filter);
-                        Pair<String, Long> pair = new Pair(document.get(FieldNames.USERNAME.fieldName),
-                                document.get(filter));
-                        list.add(pair);
+                        Triple<String, Long, String> tripple = new Triple<>((String) document.get(FieldNames.USERNAME.fieldName),
+                                (Long) document.get(filter), (String) document.getId());
+                        list.add(tripple);
                     }
                     cf.complete(list);
                 })
@@ -704,4 +704,21 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return cf;
     }
 
+    /**
+     * Gets the top monster name of a player given a user name
+     * @param userId The user Id of the
+     * @return
+     */
+    @Override
+    public CompletableFuture<String> getTopMonsterName(String userId) {
+        CompletableFuture<String> cf = new CompletableFuture<>();
+        PlayersDatabaseAdapter.getInstance().getPlayer(userId).thenAccept(player -> {
+            ArrayList<String> scannableCodeIds = player.getPlayerWallet().getScannedCodeIds();
+            PlayerWalletDatabaseAdapter.getInstance().getPlayerWalletTopScore(scannableCodeIds, Database.getInstance())
+                    .thenAccept(code -> {
+                        cf.complete(code.getHashInfo().getGeneratedName());
+            });
+        });
+        return cf;
+    }
 }
