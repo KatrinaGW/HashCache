@@ -44,6 +44,7 @@ public class ViewOtherCacheTest {
 
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
+        solo.clickOnView(solo.getView(R.id.menu_button));
         solo.clickOnView(solo.getView(R.id.menu_community_button));
         solo.sleep(100);
         solo.enterText((EditText) solo.getView(R.id.search_bar_edittext), TEST_OTHER_USER.substring(0, 4));
