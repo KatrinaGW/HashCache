@@ -9,9 +9,13 @@
 
 package com.example.hashcache.views;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -21,8 +25,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -31,13 +38,24 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import com.example.hashcache.R;
-import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.controllers.UpdateUserPreferencesCommand;
+import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.Player;
+
+import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.Database;
+import com.firebase.geofire.GeoLocation;
+import com.example.hashcache.appContext.AppContext;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -45,10 +63,16 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
 
 /**
 
@@ -78,8 +102,8 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
 
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
-    private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
-    private static final int DEFAULT_ZOOM = 15;
+    private final LatLng defaultLocation = new LatLng(45.564694, -81.462021);
+    private static final int DEFAULT_ZOOM = 13;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean locationPermissionGranted;
 
@@ -92,8 +116,13 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
     private static final String KEY_LOCATION = "location";
 
     SharedPreferences settings;
+    SharedPreferences.Editor editor;
 
     SearchView searchView;
+
+    View mMapView;
+
+    int test = 0;
 
 
 
@@ -103,8 +132,6 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         setContentView(R.layout.app_home);
         initView();
 
-        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
-        SharedPreferences.Editor editor = settings.edit();
 
 
         // Retrieve location and camera position from saved instance state.
@@ -124,6 +151,8 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
+        mMapView = mapFragment.getView();
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -138,15 +167,21 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Address address = addressList.get(0);
 
-                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    try{
+                        Address address = addressList.get(0);
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                    }
+                    catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(AppHome.this, "Couldn't find location!", Toast.LENGTH_SHORT).show();
+                    }
 
 
                     //not sure if we want a marker there or not
                     //map.addMarker(new MarkerOptions().position(latLng).title(location));
 
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+
                 }
                 return false;
             }
@@ -174,12 +209,48 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
 
 
         // add functionality to community button
-        ImageButton communityButton = findViewById(R.id.community_button);
-        communityButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton markerButton = findViewById(R.id.community_button);
+        markerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // go to community page
-                startActivity(new Intent(AppHome.this, Community.class));
+                // RENDER ALL MARKERS IN VISION
+                double zoom = map.getCameraPosition().zoom;
+                Log.e("Zoom Level:", zoom + "");
+                double radius = ((40000/Math.pow(2,zoom))) * 500;
+                Log.e("Radius:", radius + "");
+
+
+                GeoLocation currentLocation = new GeoLocation(map.getCameraPosition().target.latitude, map.getCameraPosition().target.longitude);
+                Database.getInstance().getCodeMetadataWithinRadius(currentLocation, radius).thenAccept(allMetadata -> {
+                    //https://kalpads.medium.com/fantastic-completablefuture-allof-and-how-to-handle-errors-27e8a97144a0
+                    ArrayList<CompletableFuture<ScannableCode>> parallelFutures = new ArrayList<>();
+
+                    for (CodeMetadata mark: allMetadata) {
+                        parallelFutures.add(Database.getInstance().getScannableCodeById(mark.getScannableCodeId()));
+                    }
+                    CompletableFuture.allOf(parallelFutures.toArray(new CompletableFuture[parallelFutures.size()])).thenApply(codes -> parallelFutures.stream().map(future -> future.join()).collect(Collectors.toList())).thenAccept(scannableCodes -> {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                for(int i = 0; i < scannableCodes.size(); i++){
+                                    ScannableCode code = scannableCodes.get(i);
+                                    CodeMetadata metadata = allMetadata.get(i);
+                                    parallelFutures.add(Database.getInstance().getScannableCodeById(metadata.getScannableCodeId()));
+                                    Marker marker = map.addMarker(new MarkerOptions()
+                                            .position(new LatLng(metadata.getLocation().latitude, metadata.getLocation().longitude))
+                                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.hc_character_noarms))
+                                            .title(code.getHashInfo().getGeneratedName()).snippet(String.format("Score: %d", code.getHashInfo().getGeneratedScore())));
+
+
+                                    Map<String, Object> objMap = new HashMap<>();
+                                    objMap.put("scannableCode", code);
+                                    objMap.put("userId", metadata.getUserId());
+                                    marker.setTag(objMap);
+                                }
+                            }
+                        });
+                    });
+                });
             }
         });
 
@@ -207,6 +278,25 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         setUIParams();
         AppContext.get().addObserver(this);
 
+        View locationButton = ((View) mMapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        // position on right bottom
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        rlp.setMargins(0, 0, 0, 750);
+
+    }
+
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorDrawableResourceId) {
+        //Drawable background = ContextCompat.getDrawable(context, R.drawable.hc_character);
+        //background.setBounds(0, 0, background.getIntrinsicWidth() - 200, background.getIntrinsicHeight()- 200);
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorDrawableResourceId);
+        vectorDrawable.setBounds(40, 20, vectorDrawable.getIntrinsicWidth() + 40, vectorDrawable.getIntrinsicHeight() + 20);
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        //background.draw(canvas);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitmap, 150,150,false));
     }
 
 
@@ -223,20 +313,32 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         super.onSaveInstanceState(outState);
     }
 
-
-
     //runs when the map is ready to receive user input
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.map = googleMap;
 
         Log.d("TEST", "Granted entry, permission is ok");
-
+        googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json));
         getLocationPermission();
 
         updateLocationUI();
 
         getDeviceLocation();
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(@NonNull Marker marker) {
+                Map<String, Object> objMap = (Map<String, Object>) marker.getTag();
+                ScannableCode code = (ScannableCode) objMap.get("scannableCode");
+                String userId = (String) objMap.get("userId");
+                AppContext.get().setCurrentScannableCode(code);
+
+                Intent intent = new Intent(getApplicationContext(), DisplayMonsterActivity.class);
+                intent.putExtra("fromMap", true);
+                intent.putExtra("userId", userId);
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -251,6 +353,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true;
+
 
         } else {
             ActivityCompat.requestPermissions(this,
@@ -269,6 +372,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 locationPermissionGranted = true;
+
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -286,12 +390,21 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
             if (locationPermissionGranted) {
                 map.setMyLocationEnabled(true);
                 map.getUiSettings().setMyLocationButtonEnabled(true);
+                UpdateUserPreferencesCommand.toggleGeoLocationPreference(true, AppContext.get(),
+                        Database.getInstance());
                 getDeviceLocation();
             } else {
                 map.setMyLocationEnabled(false);
+                map.moveCamera(CameraUpdateFactory
+                        .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                 map.getUiSettings().setMyLocationButtonEnabled(false);
                 lastKnownLocation = null;
+                UpdateUserPreferencesCommand.toggleGeoLocationPreference(false, AppContext.get(),
+                        Database.getInstance());
+
                 //getLocationPermission();
+
+
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());

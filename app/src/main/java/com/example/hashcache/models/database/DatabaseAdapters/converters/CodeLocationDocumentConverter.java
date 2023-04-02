@@ -1,5 +1,7 @@
 package com.example.hashcache.models.database.DatabaseAdapters.converters;
 
+import android.location.Location;
+
 import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.CodeLocation;
@@ -24,18 +26,14 @@ public class CodeLocationDocumentConverter {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            String name = codeLocation.getLocationName();
             String id = codeLocation.getId();
-            double[] coordinates = codeLocation.getCoordinates().getCoordinates();
-            String x = Double.toString((double)Array.get(coordinates, 0));
-            String y = Double.toString((double)Array.get(coordinates, 1));
-            String z = Double.toString((double)Array.get(coordinates, 2));
+            String lat = String.valueOf(codeLocation.getLocation().getLatitude());
+            String lng = String.valueOf(codeLocation.getLocation().getLongitude());
+
 
             HashMap<String, String> data = new HashMap<>();
-            data.put("name", name);
-            data.put("x", x);
-            data.put("y", y);
-            data.put("z", z);
+            data.put("Lat", lat);
+            data.put("Lng", lng);
 
             DocumentReference documentReference = collectionReference.document(id);
 
@@ -73,9 +71,9 @@ public class CodeLocationDocumentConverter {
      */
     public CompletableFuture<CodeLocation> convertDocumentReferenceToCodeLocation(DocumentReference documentReference){
         CompletableFuture<CodeLocation> cf = new CompletableFuture<>();
-        double[] coordinates = new double[3];
-        String[] locationName = new String[1];
-
+        String[] QRcontent = new String[1];
+        Location[] location = new Location[1];
+        location[0] = new Location("");
         /**
          * If the document exists, convert it into a CodeLocation object
          */
@@ -86,18 +84,13 @@ public class CodeLocationDocumentConverter {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             try {
-                                locationName[0] = (String) document.getData().get("name");
-                                Array.set(coordinates, 0,
-                                        Double.parseDouble((String) document.getData().get("x")));
-                                Array.set(coordinates, 1,
-                                        Double.parseDouble((String) document.getData().get("y")));
-                                Array.set(coordinates, 2,
-                                        Double.parseDouble((String) document.getData().get("z")));
 
-                                cf.complete(new CodeLocation(locationName[0],
-                                        (Double) Array.get(coordinates, 0),
-                                        (Double) Array.get(coordinates, 1),
-                                        (Double) Array.get(coordinates, 2)));
+                                QRcontent[0] = (String) document.getId();
+                                location[0].setLatitude((Double) document.getData().get("Lat"));
+                                location[0].setLongitude((Double) document.getData().get("Lng"));
+
+                                cf.complete(new CodeLocation(QRcontent[0],location[0]));
+
                             } catch (NullPointerException e) {
                                 cf.completeExceptionally(e);
                             }

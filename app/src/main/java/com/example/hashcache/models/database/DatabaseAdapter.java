@@ -1,17 +1,28 @@
 package com.example.hashcache.models.database;
 
+import android.content.pm.ComponentInfo;
+
+import java.util.HashSet;
+import java.lang.reflect.Array;
+import android.util.Log;
+import com.example.hashcache.models.CodeMetadata;
+import android.location.Location;
 import android.util.Pair;
 
-import java.lang.reflect.Array;
-import java.util.List;
+import androidx.annotation.NonNull;
+
+import java.lang.reflect.Field;
 import java.util.Observable;
 
-import com.example.hashcache.controllers.hashInfo.ImageGenerator;
 import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.database.DatabaseAdapters.LoginsAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
@@ -19,12 +30,26 @@ import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanC
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
+
+import com.example.hashcache.models.database.values.CollectionNames;
+import com.firebase.geofire.GeoLocation;
+import com.example.hashcache.models.database.values.FieldNames;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+
+import kotlin.Triple;
 
 /**
  * 
@@ -593,6 +618,37 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     }
 
     /**
+     * Returns the user id of the top k players with the given filter. Given a list containing user
+     * names and the score of the user (determined by filter)
+     * @param filter the filter you were to sort by
+     * @return A array list contains pairs of strings, long and strings. Which correspond to username,
+     * score and user Id
+     */
+    @Override
+    public CompletableFuture<ArrayList<Triple<String, Long, String>>> getTopUsers(String filter) {
+        ArrayList<Triple<String, Long, String>> list = new ArrayList<>();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
+        CompletableFuture<ArrayList<Triple<String, Long, String>>> cf = new CompletableFuture<>();
+
+        collectionReference.orderBy(filter, Query.Direction.DESCENDING).get()
+                .addOnSuccessListener(result -> {
+                    for(QueryDocumentSnapshot document: result) {
+                        Triple<String, Long, String> tripple = new Triple<>((String) document.get(FieldNames.USERNAME.fieldName),
+                                (Long) document.get(filter), (String) document.getId());
+                        list.add(tripple);
+                    }
+                    cf.complete(list);
+                })
+                .addOnFailureListener(e -> {
+            Log.e("DATABASE", "Error getting top k users");
+        });
+
+
+        return cf;
+    }
+
+    /**
      * Sets the userId for the user who has logged in with a specified device. Will overwrite any
      * existing login record for the device
      * @param username the name to use for the login record
@@ -604,6 +660,47 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return LoginsAdapter.getInstance().addLoginRecord(username);
     }
 
+    @Override
+    public CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata){
+        return CodeMetadataDatabaseAdapter.getInstance().createScannableCodeMetadata(codeMetadata);
+    }
+
+    @Override
+    public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation location, double radiusMeters) {
+        return CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataWithinRadius(location, radiusMeters);
+    }
+
+    @Override
+    public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesWithinRadius(GeoLocation location, double radiusMeters) {
+        CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(new Runnable() {
+            @Override
+            public void run() {
+                CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataWithinRadius(location, radiusMeters).thenAccept(cms -> {
+                    HashSet<String> scannableCodeIds = new HashSet<>();
+                    cms.forEach(cm -> {
+                        scannableCodeIds.add(cm.getScannableCodeId());
+                    });
+                    ArrayList<String> scannableCodeArray = new ArrayList<>();
+                    for(String id: scannableCodeIds){
+                        scannableCodeArray.add(id);
+                    }
+                    getScannableCodesByIdInList(scannableCodeArray).thenAccept(scodes -> {
+                        cf.complete(scodes);
+                    }).exceptionally(throwable -> {
+                        cf.completeExceptionally(throwable);
+                        return null;
+                    });
+
+                }).exceptionally(throwable -> {
+                    cf.completeExceptionally(throwable);
+                    return null;
+                });
+            }
+        });
+        return cf;
+    }
+
     /**
      * Gets the username to use if the device has had a login before
      * @return cf the CompletableFuture with the username of the associated user. Returns
@@ -611,6 +708,16 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
      */
     public CompletableFuture<String> getUsernameForDevice(){
         return LoginsAdapter.getInstance().getUsernameForDevice();
+    }
+
+    @Override
+    public CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image) {
+        return CodeMetadataDatabaseAdapter.getInstance().updatePlayerCodeMetadataImage(userId, scannableCodeId, image);
+    }
+
+    @Override
+    public CompletableFuture<CodeMetadata> getPlayerCodeMetadataById(String userId, String scannableCodeId) {
+        return CodeMetadataDatabaseAdapter.getInstance().getPlayerCodeMetadataById(userId, scannableCodeId);
     }
 
     /**
@@ -622,6 +729,8 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return LoginsAdapter.getInstance().deleteLogin();
     }
 
+    
+
     /**
      * Resets the static instances of the adapters
      */
@@ -629,6 +738,52 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         LoginsAdapter.resetInstance();
         PlayersDatabaseAdapter.resetInstance();
         ScannableCodesDatabaseAdapter.resetInstance();
+        CodeMetadataDatabaseAdapter.resetInstance();
+        CodeLocationDatabaseAdapter.resetInstance();
     }
 
+    @Override
+    public CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet) {
+
+
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            PlayerWalletDatabaseAdapter.getInstance().updatePlayerScores(userId, playerWallet,
+                            new FireStoreHelper())
+                    .thenAccept(success -> {
+                        if(success) {
+                            cf.complete(true);
+                        } else {
+                            Log.e("DATABASE", "Error adding score");
+                        }
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            Log.e("DATABASE", "Error adding score");
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
+        return cf;
+    }
+
+    /**
+     * Gets the top monster name of a player given a user name
+     * @param userId The user Id of the
+     * @return
+     */
+    @Override
+    public CompletableFuture<String> getTopMonsterName(String userId) {
+        CompletableFuture<String> cf = new CompletableFuture<>();
+        PlayersDatabaseAdapter.getInstance().getPlayer(userId).thenAccept(player -> {
+            ArrayList<String> scannableCodeIds = player.getPlayerWallet().getScannedCodeIds();
+            PlayerWalletDatabaseAdapter.getInstance().getPlayerWalletTopScore(scannableCodeIds, Database.getInstance())
+                    .thenAccept(code -> {
+                        cf.complete(code.getHashInfo().getGeneratedName());
+            });
+        });
+        return cf;
+    }
 }

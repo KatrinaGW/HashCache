@@ -1,7 +1,11 @@
 package com.example.hashcache.views;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import com.firebase.geofire.GeoLocation;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -10,13 +14,18 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.app.ActivityCompat;
 
 import com.example.hashcache.R;
 import com.example.hashcache.appContext.AppContext;
 import com.example.hashcache.models.database.Database;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 /**
 
@@ -27,6 +36,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 
 public class LeaderboardRegionActivity extends AppCompatActivity {
+
+    private FusedLocationProviderClient fusedLocationClient;
+
     /**
 
      Initializes the activity, sets the layout, and adds functionality to the menu and navigation buttons.
@@ -47,7 +59,7 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         AtomicLong playerScores = new AtomicLong();
         Database.getInstance()
                 .getTotalScore(AppContext.get().getCurrentPlayer().getUserId())
-                .thenAccept( score -> {
+                .thenAccept(score -> {
                     playerScores.set(score);
                 });
 
@@ -59,7 +71,7 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         userNames.add(findViewById(R.id.user_two));
         userNames.add(findViewById(R.id.user_three));
 
-        for(TextView view: userNames) {
+        for (TextView view : userNames) {
             view.setText("Temp");
         }
 
@@ -68,7 +80,7 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         monsterNames.add(findViewById(R.id.user_two));
         monsterNames.add(findViewById(R.id.user_three));
 
-        for(TextView view: monsterNames) {
+        for (TextView view : monsterNames) {
             view.setText("Zorg");
         }
 
@@ -77,9 +89,37 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         totalScores.add(findViewById(R.id.score_two));
         totalScores.add(findViewById(R.id.score_three));
 
-        for(TextView view: totalScores) {
+        for (TextView view : totalScores) {
             view.setText(String.valueOf(42));
         }
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            Database.getInstance().getCodeMetadataWithinRadius(new GeoLocation(
+                                    location.getLatitude(), location.getLongitude()), 1000)
+                                    .thenAccept(codes -> {
+                                        System.out.println("Here");
+                                    })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            return null;
+                                        }
+                                    });
+                        }
+                    }
+                });
+
         /**
          * 
          *
