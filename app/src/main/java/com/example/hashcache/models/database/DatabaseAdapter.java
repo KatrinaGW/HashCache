@@ -721,6 +721,11 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return CodeMetadataDatabaseAdapter.getInstance().getPlayerCodeMetadataById(userId, scannableCodeId);
     }
 
+    @Override
+    public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataById(String scannableCodeId) {
+        return CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataById(scannableCodeId);
+    }
+
     /**
      * Remove the login record for the current device
      * @return cf the CompletableFuture that completes exceptionally if the operation caused

@@ -25,7 +25,7 @@ import java.util.ArrayList;
  This adapter inflates the photo_gallery_content layout for each row in the ListView
  and sets the location image and location text.
  */
-public class PhotoGalleryArrayAdapter extends ArrayAdapter<Pair<String, Drawable>> {
+public class PhotoGalleryArrayAdapter extends ArrayAdapter<Pair<String, String>> {
 
     /**
      * Constructs a new PhotoGalleryArrayAdapter.
@@ -33,7 +33,7 @@ public class PhotoGalleryArrayAdapter extends ArrayAdapter<Pair<String, Drawable
      * @param context The context in which this adapter is being used.
      * @param photoStuff The location text and image to be displayed in the ListView.
      */
-    public PhotoGalleryArrayAdapter(Context context, ArrayList<Pair<String, Drawable>> photoStuff) {
+    public PhotoGalleryArrayAdapter(Context context, ArrayList<Pair<String, String>> photoStuff) {
         super(context, 0, photoStuff);
     }
 
@@ -58,14 +58,19 @@ public class PhotoGalleryArrayAdapter extends ArrayAdapter<Pair<String, Drawable
             view = convertView;
         }
 
-        Pair<String, Drawable> photoData = getItem(position);
+        Pair<String, String> photoData = getItem(position);
 
         TextView locationTextView = view.findViewById(R.id.location_text);
         ImageView locationPhotoView = view.findViewById(R.id.location_photo);
         locationTextView.setText(photoData.first);
-        locationPhotoView.setImageDrawable(photoData.second);
+        setLocationImage(photoData.second);
+        //locationPhotoView.setImageDrawable(photoData.second);
 
 
         return view;
+    }
+
+    private void setLocationImage(String base64Image) {
+
     }
 }

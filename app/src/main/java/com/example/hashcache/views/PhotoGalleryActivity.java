@@ -1,5 +1,6 @@
 package com.example.hashcache.views;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,12 +15,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hashcache.R;
 import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.HashInfo;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.Database;
+import com.firebase.geofire.GeoLocation;
 
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 
 /**
@@ -32,7 +38,6 @@ import java.util.Observer;
 public class PhotoGalleryActivity extends AppCompatActivity implements Observer {
     private ListView photoList;
     private PhotoGalleryArrayAdapter photoGalleryArrayAdapter;
-    //private ArrayList<<Pair> > photosList
 
     private TextView monsterName;
     private ImageButton menuButton;
@@ -75,7 +80,7 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
     protected void onResume() {
         super.onResume();
         setViews();
-        //setPhotoGalleryAdapter();
+        setPhotoGalleryAdapter();
     }
 
     private void initializeViews() {
@@ -93,13 +98,57 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
     }
 
 
-    // TODO: give location photos & text for scannable code to array adapter
+    /**
+     * Checks database for location photos of current scannable code
+     * Passes location photo and location information to PhotoGalleryArrayAdapter
+     * as Array<Pair<String, String>> (photo, location).
+     */
     private void setPhotoGalleryAdapter(){
-        // for each location photo attached to scannable code
-        // get location text if exists, get location photo
-        // add to list
-        ArrayList<Pair<String, Drawable>> photoTextAndLocation = new ArrayList<>();
-        photoGalleryArrayAdapter = new PhotoGalleryArrayAdapter(this, photoTextAndLocation);
+        String scannableCodeId = currentScannableCode.getScannableCodeId();
+        ArrayList<Pair<String, String>> photoListData = new ArrayList<>();
+
+        PhotoGalleryActivity activityContext = this;
+
+        // get metadata for all instances of this scannable code
+        Database.getInstance().getCodeMetadataById(scannableCodeId).thenAccept(codeMetadata -> {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    // for each instance of the scannable code
+                    for (CodeMetadata data : codeMetadata) {
+                        String base64Image = data.getImage();
+                        String location = "";
+
+                        // if there is a location photo
+                        if (base64Image != null) {
+                            GeoLocation geoLocation = data.getLocation();
+
+                            if (geoLocation != null) {
+                                // get location string
+                                String lat = String.valueOf(geoLocation.latitude);
+                                String lng = String.valueOf(geoLocation.longitude);
+                                location = lat + ", " + lng;
+                            }
+
+                            // add location image and text to array
+                            photoListData.add(new Pair<>(base64Image, location));
+                        }
+                    }
+                    // give info to array adapter
+                    photoGalleryArrayAdapter = new PhotoGalleryArrayAdapter(activityContext, photoListData);
+                    photoList.setAdapter(photoGalleryArrayAdapter);
+                }
+            });
+
+        });
+//        .exceptionally(new Function<Throwable, Void>() {
+//            @Override
+//            public Void apply(Throwable throwable) {
+//                Log.d("ERROR", throwable.getMessage());
+//                return null;
+//            }
+//        });
     }
 
 
