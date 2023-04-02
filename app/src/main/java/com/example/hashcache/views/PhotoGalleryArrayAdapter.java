@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import com.example.hashcache.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
 
@@ -29,7 +30,7 @@ import java.util.ArrayList;
  This adapter inflates the photo_gallery_content layout for each row in the ListView
  and sets the location image and location text.
  */
-public class PhotoGalleryArrayAdapter extends ArrayAdapter<Pair<String, String>> {
+public class PhotoGalleryArrayAdapter extends ArrayAdapter<HashMap<String, Object>> {
      Context context;
 
     /**
@@ -38,7 +39,7 @@ public class PhotoGalleryArrayAdapter extends ArrayAdapter<Pair<String, String>>
      * @param context The context in which this adapter is being used.
      * @param photoStuff The location image and text to be displayed in the ListView.
      */
-    public PhotoGalleryArrayAdapter(Context context, ArrayList<Pair<String, String>> photoStuff) {
+    public PhotoGalleryArrayAdapter(Context context, ArrayList<HashMap<String, Object>> photoStuff) {
         super(context, 0, photoStuff);
         this.context = context;
     }
@@ -65,15 +66,16 @@ public class PhotoGalleryArrayAdapter extends ArrayAdapter<Pair<String, String>>
         }
 
         // Pair<photo str, location str>
-        Pair<String, String> photoData = getItem(position);
+        HashMap<String, Object> photoData = getItem(position);
 
         // set location text
         TextView locationTextView = view.findViewById(R.id.location_text);
-        locationTextView.setText(photoData.second);
-
+        TextView usernameTextView = view.findViewById(R.id.username_text);
+        locationTextView.setText((String)photoData.get("locationText"));
+        usernameTextView.setText((String)photoData.get("userName"));
         // set location photo
         ImageView locationPhotoView = view.findViewById(R.id.location_photo);
-        Drawable drawable = makeDrawable(photoData.first);
+        Drawable drawable = makeDrawable((String)photoData.get("base64Image"));
         locationPhotoView.setImageDrawable(drawable);
 
         return view;

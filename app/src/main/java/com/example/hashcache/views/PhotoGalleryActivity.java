@@ -2,6 +2,10 @@ package com.example.hashcache.views;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -11,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hashcache.R;
@@ -22,6 +27,9 @@ import com.example.hashcache.models.database.Database;
 import com.firebase.geofire.GeoLocation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.CompletableFuture;
@@ -105,34 +113,61 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
      */
     private void setPhotoGalleryAdapter(){
         String scannableCodeId = currentScannableCode.getScannableCodeId();
-        ArrayList<Pair<String, String>> photoListData = new ArrayList<>();
+        ArrayList<HashMap<String, Object>> photoListData = new ArrayList<>();
 
         PhotoGalleryActivity activityContext = this;
 
         // get metadata for all instances of this scannable code
         Database.getInstance().getCodeMetadataById(scannableCodeId).thenAccept(codeMetadata -> {
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
 
                     // for each instance of the scannable code
                     for (CodeMetadata data : codeMetadata) {
-                        String base64Image = data.getImage();
-                        String location = "";
-
                         // if there is a location photo
-                        if (base64Image != null) {
-                            GeoLocation geoLocation = data.getLocation();
+                        if (data.hasImage() && data.hasLocation()) {
+                            String base64Image = data.getImage();
+                            Database.getInstance().getUsernameById(data.getUserId()).thenAccept(userName -> {
+                                Geocoder gc = new Geocoder(getApplicationContext());
+                                GeoLocation geoloc = data.getLocation();
+                                double lat = geoloc.latitude;
+                                double lng = geoloc.longitude;
+                                HashMap<String, Object> dataMap = new HashMap<>();
+                                dataMap.put("userName", userName.second);
+                                dataMap.put("base64Image", base64Image);
+                                dataMap.put("locationText", String.format("Lat: %f, Lng: %f", lat, lng));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    gc.getFromLocation(geoloc.latitude, geoloc.longitude, 1, new Geocoder.GeocodeListener() {
+                                        @Override
+                                        public void onGeocode(@NonNull List<Address> list) {
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    if(!list.isEmpty()){
+                                                        String addr = list.get(0).getAddressLine(0);
+                                                        if(addr != null){
+                                                            dataMap.put("locationText", addr);
+                                                        }
+                                                    }
+                                                    photoGalleryArrayAdapter.add(dataMap);
 
-                            if (geoLocation != null) {
-                                // get location string
-                                String lat = String.valueOf(geoLocation.latitude);
-                                String lng = String.valueOf(geoLocation.longitude);
-                                location = lat + "\n" + lng;
-                            }
-
-                            // add location image and text to array
-                            photoListData.add(new Pair<>(base64Image, location));
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                                else{
+                                    photoGalleryArrayAdapter.add(dataMap);
+                                }
+                            }).exceptionally(new Function<Throwable, Void>() {
+                                @Override
+                                public Void apply(Throwable throwable) {
+                                    Log.d("ERROR", throwable.getMessage());
+                                    return null;
+                                }
+                            });
                         }
                     }
                     // give info to array adapter
