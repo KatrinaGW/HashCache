@@ -72,6 +72,10 @@ public class CodeMetadata {
     public boolean hasLocation(){
         return this.hasLocation;
     }
+
+    public boolean hasImage(){
+        return image != null;
+    }
     public String getDocumentId() {
         return documentId;
     }
