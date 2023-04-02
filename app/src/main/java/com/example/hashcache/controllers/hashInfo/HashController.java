@@ -5,6 +5,7 @@ import static com.example.hashcache.controllers.UpdateUserScore.*;
 
 import android.location.Location;
 import android.util.Log;
+import android.util.Pair;
 
 import com.example.hashcache.controllers.LocationController;
 import com.example.hashcache.controllers.UpdateUserScore;
@@ -49,10 +50,9 @@ public class HashController {
 
                 try {
                     // Compute the SHA-256 hash of the QR code content
-                    MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-                    messageDigest.update(qrContent.getBytes());
-                    byte[] byteArray = messageDigest.digest();
-                    String hash = new BigInteger(1, byteArray).toString(16);
+                    Pair<String, byte[]> hashData = HashInfoGenerator.getHashFromQRContents(qrContent);
+                    String hash = hashData.first;
+                    byte[] byteArray = hashData.second;
                     // Generate hash information for the scannable code and check if it already exists in the database
                     HashInfoGenerator.generateHashInfo(byteArray).thenAccept(hashInfo -> {
                         Database.getInstance().scannableCodeExists(hash).thenAccept(exists -> {
