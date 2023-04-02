@@ -128,7 +128,7 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
                                 // get location string
                                 String lat = String.valueOf(geoLocation.latitude);
                                 String lng = String.valueOf(geoLocation.longitude);
-                                location = lat + ", " + lng;
+                                location = lat + "\n" + lng;
                             }
 
                             // add location image and text to array
