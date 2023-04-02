@@ -1,8 +1,12 @@
 package com.example.hashcache.views;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.util.Base64;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,15 +30,17 @@ import java.util.ArrayList;
  and sets the location image and location text.
  */
 public class PhotoGalleryArrayAdapter extends ArrayAdapter<Pair<String, String>> {
+     Context context;
 
     /**
      * Constructs a new PhotoGalleryArrayAdapter.
      *
      * @param context The context in which this adapter is being used.
-     * @param photoStuff The location text and image to be displayed in the ListView.
+     * @param photoStuff The location image and text to be displayed in the ListView.
      */
     public PhotoGalleryArrayAdapter(Context context, ArrayList<Pair<String, String>> photoStuff) {
         super(context, 0, photoStuff);
+        this.context = context;
     }
 
 
@@ -58,19 +64,26 @@ public class PhotoGalleryArrayAdapter extends ArrayAdapter<Pair<String, String>>
             view = convertView;
         }
 
+        // Pair<photo str, location str>
         Pair<String, String> photoData = getItem(position);
 
+        // set location text
         TextView locationTextView = view.findViewById(R.id.location_text);
-        ImageView locationPhotoView = view.findViewById(R.id.location_photo);
-        locationTextView.setText(photoData.first);
-        setLocationImage(photoData.second);
-        //locationPhotoView.setImageDrawable(photoData.second);
+        locationTextView.setText(photoData.second);
 
+        // set location photo
+        ImageView locationPhotoView = view.findViewById(R.id.location_photo);
+        Drawable drawable = makeDrawable(photoData.second);
+        locationPhotoView.setImageDrawable(drawable);
 
         return view;
     }
 
-    private void setLocationImage(String base64Image) {
+    public Drawable makeDrawable(String base64Image) {
+        byte[] decodedImage = Base64.decode(base64Image, Base64.DEFAULT);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
+        Drawable drawable = new BitmapDrawable(context.getResources(), bitmap);
 
+        return drawable;
     }
 }

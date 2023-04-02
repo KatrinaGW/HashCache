@@ -553,6 +553,12 @@ public class TestDatabaseAdapter implements DatabasePort {
         return null;
     }
 
+
+    @Override
+    public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataById(String scannableCodeId) {
+        return null;
+    }
+
     /**
      * Remove the login record for the current device
      * @return cf the CompletableFuture that completes exceptionally if the operation caused
