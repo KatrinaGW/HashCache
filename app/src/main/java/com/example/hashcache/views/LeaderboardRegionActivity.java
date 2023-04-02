@@ -50,10 +50,6 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_leaderboard_region);
 
 
-        // add functionality to menu button
-        ImageButton menuButton = findViewById(R.id.menu_button);
-
-
         // Sets the players numb qr codes
         TextView playersTotalScore = findViewById(R.id.score_value_textview);
         AtomicLong playerScores = new AtomicLong();
@@ -120,45 +116,12 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                     }
                 });
 
-        /**
-         * 
-         *
-         {@link View.OnClickListener} that creates and displays a popup menu when the menu button is clicked.
-         */
+        ImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
-                // create menu
-                PopupMenu menu = new PopupMenu(LeaderboardRegionActivity.this, menuButton);
-                menu.getMenuInflater()
-                        .inflate(R.menu.fragment_popup_menu, menu.getMenu());
-
-                // navigate to different activities based on menu item selected
-                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem item) {
-                        int id = item.getItemId();
-
-                        if (id == R.id.menu_home) {                 // go to AppHome page
-                            startActivity(new Intent(LeaderboardRegionActivity.this, AppHome.class));
-                            return true;
-
-                        } else if (id == R.id.menu_stats) {         // go to QRStats page
-                            startActivity(new Intent(LeaderboardRegionActivity.this, QRStats.class));
-                            return true;
-
-                        } else if (id == R.id.menu_profile) {       // go to MyProfile
-                            startActivity(new Intent(LeaderboardRegionActivity.this, MyProfile.class));
-                            return true;
-
-                        } else if (id == R.id.menu_community) {     // go to Community
-                            startActivity(new Intent(LeaderboardRegionActivity.this, Community.class));
-                            return true;
-                        }
-                        return LeaderboardRegionActivity.super.onOptionsItemSelected(item);
-                    }
-                });
-                menu.show();
+            public void onClick(View view) {
+                BottomMenuFragment bottomMenu = new BottomMenuFragment();
+                bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
         });
 
