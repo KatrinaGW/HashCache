@@ -69,9 +69,9 @@
         android:background="@drawable/drip_gradient"/>
     <ImageView
         android:id="@+id/location_image"
-        android:layout_width="150dp"
-        android:layout_height="140dp"
-        android:background="@color/HC_ash_grey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/icon_placeholder"
         android:layout_below="@+id/monster_image"
         android:layout_marginTop="24dp"
         android:layout_alignStart="@+id/monster_image"/>
@@ -86,7 +86,8 @@
         android:layout_toEndOf="@+id/location_image"
         android:background="@drawable/rounded_rect_green"
         android:drawableEnd="@drawable/icon_comment"
-        android:padding="12sp"
+        android:paddingHorizontal="12sp"
+        android:paddingVertical="8dp"
         android:text="COMMENTS   "
         android:textColor="@color/black"/>
 
@@ -100,7 +101,8 @@
         android:layout_toEndOf="@+id/location_image"
         android:background="@drawable/rounded_rect_green"
         android:drawableEnd="@drawable/icon_camera"
-        android:padding="12sp"
+        android:paddingHorizontal="16sp"
+        android:paddingVertical="8dp"
         android:text="PHOTOS   "
         android:textColor="@color/black"/>
 
