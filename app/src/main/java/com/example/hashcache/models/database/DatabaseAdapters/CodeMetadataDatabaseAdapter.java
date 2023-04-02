@@ -43,7 +43,7 @@ public class CodeMetadataDatabaseAdapter {
         ImageBase64("base64Image"),
         Latitude("lat"),
         Longitude("lon"),
-        UserId("userid"),
+        UserId("userId"),
         HasLocation("hasLocation");
         public final String name;
         FieldNames(String fieldName) {
