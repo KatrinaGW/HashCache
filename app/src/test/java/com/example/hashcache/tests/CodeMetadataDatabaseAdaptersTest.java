@@ -3,7 +3,6 @@ package com.example.hashcache.tests;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
