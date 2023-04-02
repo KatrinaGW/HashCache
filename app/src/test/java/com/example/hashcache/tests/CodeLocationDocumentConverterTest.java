@@ -25,7 +25,7 @@ public class CodeLocationDocumentConverterTest {
 
     @Test
     void addCodeLocationToCollectionTest(){
-        CodeLocation testCodeLocation = new CodeLocation("CodeLocationName", any(Location.class));
+        CodeLocation testCodeLocation = new CodeLocation("CodeLocationName", Mockito.mock(Location.class));
         CollectionReference mockCollectionReference = Mockito.mock(CollectionReference.class);
         FireStoreHelper mockFireStoreHelper = Mockito.mock(FireStoreHelper.class);
         DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
