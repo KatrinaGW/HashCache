@@ -7,9 +7,11 @@ import android.location.Location;
 import android.os.Bundle;
 
 import com.example.hashcache.models.CodeMetadata;
+import com.example.hashcache.models.ScannableCode;
 import com.firebase.geofire.GeoLocation;
 
 import android.util.Log;
+import android.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -26,9 +28,11 @@ import com.example.hashcache.models.database.Database;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
@@ -203,6 +207,9 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        // Set the score of the player
+        TextView scoreView = findViewById(R.id.score_value_textview);
+
         // Will return if the user does not have the correct permissions set
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -214,10 +221,8 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             Database.getInstance().getScannableCodesWithinRadiusSorted(location).thenAccept(data -> {
-                                Log.i("DATABASE", "nice");
 
                                 int count = 0;
-                                Log.i("DATA", String.valueOf(data.size()));
                                 for(TextView view: monsterNames) {
                                     if(count < data.size()) {
                                         view.setText(data.get(count++).second.getHashInfo().getGeneratedName());
@@ -235,7 +240,46 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                                     }
                                 }
 
-                                // Fetch the data base for user ids
+                                String playerUserId = AppContext.get().getCurrentPlayer().getUserId();
+                                // Use to make sure there rank is correct. And not associated with lowest scoring
+                                boolean got_rank = false;
+                                ArrayList<String> userIds = new ArrayList<>();
+                                TextView rankView = findViewById(R.id.region_value_textview);
+                                // Set the score of the player
+                                TextView scoreView = findViewById(R.id.score_value_textview);
+
+                                int j = 1;
+                                // Fetch the data base for user ids while also getting the players ranking
+                                // and score
+                                for(Pair<String, ScannableCode> pair: data) {
+                                    userIds.add(pair.first);
+                                    if(Objects.equals(pair.first, playerUserId) && !got_rank) {
+                                        rankView.setText(String.valueOf(j));
+                                        scoreView.setText(
+                                                String.valueOf(pair.second.getHashInfo().getGeneratedScore()));
+                                        got_rank = true;
+                                    }
+                                    j += 1;
+                                }
+
+                                // If they do not have a qr for this region
+                                if(!got_rank) {
+                                   rankView.setText("N/A");
+                                }
+
+
+                                Database.getInstance().getUsernamesByIds(userIds).thenAccept(names -> {
+                                    int i = 0;
+
+                                    for(TextView view: userNames) {
+                                        if(i < names.size()) {
+                                            view.setText(names.get(i++).second);
+                                        } else {
+                                            view.setText("N/A");
+                                        }
+                                    }
+                                });
+
                             });
                         }
                     }
