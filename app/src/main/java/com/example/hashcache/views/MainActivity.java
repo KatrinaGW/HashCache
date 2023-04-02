@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         getOrMakeScannableCodesConnectionHandler();
         makeLoginsAdapter();
-        CodeMetadataDatabaseAdapter.makeInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
+        CodeMetadataDatabaseAdapter.makeOrGetInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
 
         AppContext.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID));
