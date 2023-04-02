@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.util.Base64;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -73,7 +72,7 @@ public class PhotoGalleryArrayAdapter extends ArrayAdapter<Pair<String, String>>
 
         // set location photo
         ImageView locationPhotoView = view.findViewById(R.id.location_photo);
-        Drawable drawable = makeDrawable(photoData.second);
+        Drawable drawable = makeDrawable(photoData.first);
         locationPhotoView.setImageDrawable(drawable);
 
         return view;
