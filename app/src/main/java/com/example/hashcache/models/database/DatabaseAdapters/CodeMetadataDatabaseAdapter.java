@@ -1,13 +1,10 @@
 package com.example.hashcache.models.database.DatabaseAdapters;
 
-import android.location.Location;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.CodeMetadata;
-import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
@@ -24,9 +21,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.rpc.Code;
 
-import java.security.NoSuchAlgorithmException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +35,22 @@ public class CodeMetadataDatabaseAdapter {
     private CollectionReference collectionReference;
     private FireStoreHelper fireStoreHelper;
     private static CodeMetadataDatabaseAdapter INSTANCE;
+
+
+    private enum FieldNames {
+        Geohash("geohash"),
+        ScannableCodeId("scannableCodeId"),
+        ImageBase64("base64Image"),
+        Latitude("lat"),
+        Longitude("lon"),
+        UserId("userid"),
+        HasLocation("hasLocation");
+        public final String name;
+        FieldNames(String fieldName) {
+            this.name = fieldName;
+        }
+    }
+
 
     /**
      * Creates a connection to the CodeLocation collection in the database and keeps
@@ -72,17 +84,14 @@ public class CodeMetadataDatabaseAdapter {
      *         CodeLocationConnectionHandler
      *         class to use for all actions concerning the CodeLocation database
      *         collection
-     *
-     * @throws IllegalArgumentException if the INSTANCE has already been initialized
-     */
-    public static CodeMetadataDatabaseAdapter makeInstance(FireStoreHelper fireStoreHelper,
-                                                           FirebaseFirestore db) {
-        if (INSTANCE != null) {
-            throw new IllegalArgumentException("CodeMetadataDatabaseAdapter INSTANCE already " +
-                    "exists!");
+     **/
+    public static CodeMetadataDatabaseAdapter makeOrGetInstance(FireStoreHelper fireStoreHelper,
+                                                                FirebaseFirestore db) {
+        if (INSTANCE == null) {
+            INSTANCE = new CodeMetadataDatabaseAdapter(fireStoreHelper, db);
+
         }
 
-        INSTANCE = new CodeMetadataDatabaseAdapter(fireStoreHelper, db);
         return INSTANCE;
     }
 
@@ -113,7 +122,7 @@ public class CodeMetadataDatabaseAdapter {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             Map<String, Object> objMap = new HashMap<>();
-            objMap.put("image", base64Image);
+            objMap.put(FieldNames.ImageBase64.name, base64Image);
             DocumentReference docRef = collectionReference.document(codeMetadataId);
             docRef.update(objMap).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -133,15 +142,20 @@ public class CodeMetadataDatabaseAdapter {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             String documentId = codeMetadata.getDocumentId();
-            double lat = codeMetadata.getLocation().latitude;
-            double lng = codeMetadata.getLocation().longitude;
+
+            boolean hasLocation = codeMetadata.hasLocation();
             Map<String, Object> objMap = new HashMap<>();
-            objMap.put("geohash", codeMetadata.getGeohash());
-            objMap.put("lat", lat);
-            objMap.put("lng", lng);
-            objMap.put("base64Image", codeMetadata.getImage());
-            objMap.put("scannableCodeId", codeMetadata.getScannableCodeId());
-            objMap.put("userId", codeMetadata.getUserId());
+            objMap.put(FieldNames.ScannableCodeId.name, codeMetadata.getScannableCodeId());
+            objMap.put(FieldNames.UserId.name, codeMetadata.getUserId());
+            if(hasLocation){
+                GeoLocation loc = codeMetadata.getLocation();
+                objMap.put(FieldNames.Latitude.name, loc.latitude);
+                objMap.put(FieldNames.Longitude.name, loc.longitude);
+                objMap.put(FieldNames.Geohash.name, codeMetadata.getGeohash());
+            }
+            objMap.put(FieldNames.HasLocation.name, codeMetadata.hasLocation());
+            String image = codeMetadata.getImage();
+            objMap.put(FieldNames.ImageBase64.name, image);
             DocumentReference docRef = collectionReference.document(documentId);
             docRef.set(objMap).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -162,8 +176,8 @@ public class CodeMetadataDatabaseAdapter {
         CompletableFuture.runAsync(() -> {
             CollectionReference colRef = collectionReference;
             Query query = colRef.
-                    whereEqualTo("scannableCodeId", scannableCodeId).
-                    whereEqualTo("userId", userId);
+                    whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId).
+                    whereEqualTo(FieldNames.UserId.name, userId);
             query.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     if (task.getResult().isEmpty()) {
@@ -172,7 +186,7 @@ public class CodeMetadataDatabaseAdapter {
                         List<DocumentSnapshot> sn = task.getResult().getDocuments();
                         DocumentSnapshot ds = sn.get(0);
                         DocumentReference dr = ds.getReference();
-                        dr.update("base64Image", image).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        dr.update(FieldNames.ImageBase64.name, image).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
                                 cf.complete(null);
@@ -199,19 +213,23 @@ public class CodeMetadataDatabaseAdapter {
         CompletableFuture.runAsync(() -> {
             CollectionReference colRef = collectionReference;
             Query query = colRef.
-                    whereEqualTo("scannableCodeId", scannableCodeId).
-                    whereEqualTo("userId", userId);
+                    whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId).
+                    whereEqualTo(FieldNames.UserId.name, userId);
             query.get().addOnCompleteListener(task -> {
-                if(task.isSuccessful()){
-                    if(task.getResult().isEmpty()){
-                        cf.completeExceptionally(new Exception(String.format("Code metadata entry does not exist: userId: %s, scannableCodeId: %s", userId, scannableCodeId)));
-                    }else{
-                        List<DocumentSnapshot> sn = task.getResult().getDocuments();
-                        cf.complete(parseCodeMetadataDocument(sn.get(0)));
+                try {
+                    if (task.isSuccessful()) {
+                        if (task.getResult().isEmpty()) {
+                            cf.completeExceptionally(new Exception(String.format("Code metadata entry does not exist: userId: %s, scannableCodeId: %s", userId, scannableCodeId)));
+                        } else {
+                            List<DocumentSnapshot> sn = task.getResult().getDocuments();
+                            cf.complete(parseCodeMetadataDocument(sn.get(0)));
+                        }
+                    } else {
+                        cf.completeExceptionally(new Exception("Could not fet code metadata"));
                     }
                 }
-                else{
-                    cf.completeExceptionally(new Exception("Could not fet code metadata"));
+                catch(Exception e){
+                    cf.completeExceptionally(e);
                 }
             });
 
@@ -223,7 +241,7 @@ public class CodeMetadataDatabaseAdapter {
         CompletableFuture<ArrayList<CodeMetadata>> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             CollectionReference colRef = collectionReference;
-            Query query = colRef.whereEqualTo("scannableCodeId", scannableCodeId);
+            Query query = colRef.whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId);
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -255,7 +273,7 @@ public class CodeMetadataDatabaseAdapter {
             final List<Task<QuerySnapshot>> tasks = new ArrayList<>();
             for (GeoQueryBounds b : bounds) {
                 Query q = collectionReference
-                        .orderBy("geohash")
+                        .orderBy(FieldNames.Geohash.name)
                         .startAt(b.startHash)
                         .endAt(b.endHash);
                 tasks.add(q.get());
@@ -268,15 +286,17 @@ public class CodeMetadataDatabaseAdapter {
                             QuerySnapshot snap = task.getResult();
                             for (DocumentSnapshot doc : snap.getDocuments()) {
                                 try {
+                                    if(doc.getBoolean(FieldNames.HasLocation.name))
+                                    {
+                                        double lat = doc.getDouble(FieldNames.Latitude.name);
+                                        double lng = doc.getDouble(FieldNames.Longitude.name);
+                                        GeoLocation docLocation = new GeoLocation(lat, lng);
+                                        double distanceInM = GeoFireUtils.getDistanceBetween(docLocation, center);
+                                        if (distanceInM <= radiusMeters) {
+                                            CodeMetadata cm = parseCodeMetadataDocument(doc);
+                                            matchingMetadata.add(cm);
 
-                                    double lat = doc.getDouble("lat");
-                                    double lng = doc.getDouble("lng");
-                                    GeoLocation docLocation = new GeoLocation(lat, lng);
-                                    double distanceInM = GeoFireUtils.getDistanceBetween(docLocation, center);
-                                    if (distanceInM <= radiusMeters) {
-                                        CodeMetadata cm = parseCodeMetadataDocument(doc);
-                                        matchingMetadata.add(cm);
-
+                                        }
                                     }
                                 } catch (Exception e) {
 
@@ -292,12 +312,19 @@ public class CodeMetadataDatabaseAdapter {
 
     @NonNull
     private CodeMetadata parseCodeMetadataDocument(DocumentSnapshot doc) {
-        String image = doc.getString("base64Image");
-        String scannableCodeId = doc.getString("scannableCodeId");
-        double lat = doc.getDouble("lat");
-        double lng = doc.getDouble("lng");
-        String userId = doc.getString("userId");
-        CodeMetadata cm = new CodeMetadata(scannableCodeId, userId, new GeoLocation(lat, lng), image);
-        return cm;
+        String scannableCodeId = doc.getString(FieldNames.ScannableCodeId.name);
+        String userId = doc.getString(FieldNames.UserId.name);
+        String image = null;
+        if(doc.contains(FieldNames.ImageBase64.name)){
+            image = doc.getString(FieldNames.ImageBase64.name);
+        }
+        if(doc.getBoolean(FieldNames.HasLocation.name)){
+            double lat = doc.getDouble(FieldNames.Latitude.name);
+            double lng = doc.getDouble(FieldNames.Longitude.name);
+            return new CodeMetadata(scannableCodeId, userId, new GeoLocation(lat, lng), image);
+        }
+        else{
+            return new CodeMetadata(scannableCodeId, userId, image);
+        }
     }
 }
