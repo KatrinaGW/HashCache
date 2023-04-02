@@ -26,6 +26,7 @@ import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
 import com.firebase.geofire.GeoLocation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -149,36 +150,20 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
                                     double lng = geoloc.longitude;
                                     dataMap.put("locationText", String.format("Lat: %f, Lng: %f", lat, lng));
                                     Log.d("ImageGallery API", "API Level: " + Build.VERSION.SDK_INT);
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                        gc.getFromLocation(geoloc.latitude, geoloc.longitude, 1,
-                                                new Geocoder.GeocodeListener() {
-                                                    @Override
-                                                    public void onGeocode(@NonNull List<Address> list) {
-                                                        runOnUiThread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                if (!list.isEmpty()) {
-                                                                    String addr = list.get(0).getAddressLine(0);
-                                                                    if (addr != null) {
-                                                                        dataMap.put("locationText", addr);
-                                                                        Log.d("ImageGallery", "Adding adapter entry. 2..");
-                                                                    }
-                                                                }
-                                                                photoGalleryArrayAdapter.add(dataMap);
 
-                                                            }
-                                                        });
-                                                    }
-                                                });
-                                    }
-                                    else{
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Log.d("ImageGallery", "Adding adapter entry 3...");
-                                                photoGalleryArrayAdapter.add(dataMap);
+                                    try {
+                                        List<Address> list = gc.getFromLocation(geoloc.latitude, geoloc.longitude, 1);
+                                        if (!list.isEmpty()) {
+                                            String addr = list.get(0).getAddressLine(0);
+                                            if (addr != null) {
+                                                dataMap.put("locationText", addr);
+                                                Log.d("ImageGallery", "Adding adapter entry. 2..");
                                             }
-                                        });
+                                        }
+                                        photoGalleryArrayAdapter.add(dataMap);
+                                    } catch (IOException e) {
+                                        photoGalleryArrayAdapter.add(dataMap);
+                                        e.printStackTrace();
                                     }
                                 } else {
                                     runOnUiThread(new Runnable() {

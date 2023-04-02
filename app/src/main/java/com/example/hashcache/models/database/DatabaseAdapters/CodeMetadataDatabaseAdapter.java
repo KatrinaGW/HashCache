@@ -38,20 +38,6 @@ public class CodeMetadataDatabaseAdapter {
     private static CodeMetadataDatabaseAdapter INSTANCE;
 
 
-    public enum FieldNames {
-        Geohash("geohash"),
-        ScannableCodeId("scannableCodeId"),
-        ImageBase64("base64Image"),
-        Latitude("lat"),
-        Longitude("lon"),
-        UserId("userId"),
-        HasLocation("hasLocation");
-        public final String name;
-        FieldNames(String fieldName) {
-            this.name = fieldName;
-        }
-    }
-
 
     /**
      * Creates a connection to the CodeLocation collection in the database and keeps
@@ -147,7 +133,7 @@ public class CodeMetadataDatabaseAdapter {
             boolean hasLocation = codeMetadata.hasLocation();
             Map<String, Object> objMap = new HashMap<>();
             objMap.put(FieldNames.ScannableCodeId.name, codeMetadata.getScannableCodeId());
-            objMap.put(FieldNames.UserId.name, codeMetadata.getUserId());
+            objMap.put(FieldNames.USER_ID.name, codeMetadata.getUserId());
             if(hasLocation){
                 GeoLocation loc = codeMetadata.getLocation();
                 objMap.put(FieldNames.Latitude.name, loc.latitude);
@@ -221,7 +207,7 @@ public class CodeMetadataDatabaseAdapter {
             CollectionReference colRef = collectionReference;
             Query query = colRef.
                     whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId).
-                    whereEqualTo(FieldNames.UserId.name, userId);
+                    whereEqualTo(FieldNames.USER_ID.name, userId);
             query.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     if (task.getResult().isEmpty()) {
@@ -258,7 +244,7 @@ public class CodeMetadataDatabaseAdapter {
             CollectionReference colRef = collectionReference;
             Query query = colRef.
                     whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId).
-                    whereEqualTo(FieldNames.UserId.name, userId);
+                    whereEqualTo(FieldNames.USER_ID.name, userId);
             query.get().addOnCompleteListener(task -> {
                 try {
                     if (task.isSuccessful()) {
@@ -357,7 +343,7 @@ public class CodeMetadataDatabaseAdapter {
     @NonNull
     private CodeMetadata parseCodeMetadataDocument(DocumentSnapshot doc) {
         String scannableCodeId = doc.getString(FieldNames.ScannableCodeId.name);
-        String userId = doc.getString(FieldNames.UserId.name);
+        String userId = doc.getString(FieldNames.USER_ID.name);
         String image = null;
         if(doc.contains(FieldNames.ImageBase64.name)){
             image = doc.getString(FieldNames.ImageBase64.name);
