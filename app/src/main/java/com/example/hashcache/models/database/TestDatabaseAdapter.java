@@ -10,7 +10,12 @@ import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
 import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.LoginsAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.ScannableCodesDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
@@ -570,7 +575,11 @@ public class TestDatabaseAdapter implements DatabasePort {
      * Resets the static instances of the adapters
      */
     public void resetInstances(){
-        return;
+        CodeLocationDatabaseAdapter.resetInstance();
+        CodeMetadataDatabaseAdapter.resetInstance();
+        LoginsAdapter.resetInstance();
+        PlayersDatabaseAdapter.resetInstance();
+        ScannableCodesDatabaseAdapter.resetInstance();
     }
 
     @Override

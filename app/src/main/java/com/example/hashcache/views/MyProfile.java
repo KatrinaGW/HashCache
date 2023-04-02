@@ -154,33 +154,6 @@ public class MyProfile extends AppCompatActivity implements Observer {
     }
 
     /**
-     * Sets the listener for the logo button.
-     *
-     * @param listener the listener to be set for the logo button
-     * @see ImageButton
-     * @see SettingsActivity
-     */
-    public void setLogoButtonListener(View.OnClickListener listener) {
-        mLogoButton.setOnClickListener(listener);
-    }
-
-    /**
-     * Sets the listener for the menu button.
-     *
-     * @param listener the listener to be set for the menu button
-     * @see ImageButton
-     * @see PopupMenu
-     * @see MenuItem
-     * @see AppHome
-     * @see QRStats
-     * @see Community
-     */
-
-    public void setMenuButtonListener(View.OnClickListener listener) {
-        mMenuButton.setOnClickListener(listener);
-    }
-
-    /**
      * Sets the username displayed on the profile page.
      *
      * @param username the username to be set
@@ -201,24 +174,6 @@ public class MyProfile extends AppCompatActivity implements Observer {
     public void setScore(long score) {
         TextView scoreTv = findViewById(R.id.score_textview);
         scoreTv.setText("Score: " + score);
-    }
-
-    /**
-     * 
-     * Sets the click listener for the QR Stats button on the MyProfile page.
-     * This method takes a View.OnClickListener as a parameter and sets it as the
-     * click listener for the mQRStatsButton,
-     * which is an instance of AppCompatButton. When the user clicks on the QR Stats
-     * button, the listener's onClick()
-     * method is called. This method can be used to perform some action when the
-     * button is clicked, such as navigating to
-     * the QR Stats page.
-     * 
-     * @param listener the View.OnClickListener to set as the click listener for the
-     *                 QR Stats button
-     */
-    public void setQRStatsButtonListener(View.OnClickListener listener) {
-        mQRStatsButton.setOnClickListener(listener);
     }
 
     @Override
