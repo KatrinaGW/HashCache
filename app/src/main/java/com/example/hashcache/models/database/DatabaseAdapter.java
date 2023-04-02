@@ -126,7 +126,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
                                     }).exceptionally(new Function<Throwable, Void>() {
                                 @Override
                                 public Void apply(Throwable throwable) {
-                                    System.out.println("There was an error getting the scannableCodes.");
+                                    System.out.println("There was an error getting the scannableCodes 2.");
                                     cf.completeExceptionally(throwable);
                                     return null;
                                 }
@@ -154,7 +154,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
                     }).exceptionally(new Function<Throwable, Void>() {
                         @Override
                         public Void apply(Throwable throwable) {
-                            System.out.println("There was an error getting the scannableCodes.");
+                            System.out.println("There was an error getting the scannableCodes. 4");
                             cf.completeExceptionally(throwable);
                             return null;
                         }
@@ -629,24 +629,11 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
      */
     @Override
     public CompletableFuture<ArrayList<Triple<String, Long, String>>> getTopUsers(String filter) {
-        ArrayList<Triple<String, Long, String>> list = new ArrayList<>();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
         CompletableFuture<ArrayList<Triple<String, Long, String>>> cf = new CompletableFuture<>();
 
-        collectionReference.orderBy(filter, Query.Direction.DESCENDING).get()
-                .addOnSuccessListener(result -> {
-                    for(QueryDocumentSnapshot document: result) {
-                        Triple<String, Long, String> tripple = new Triple<>((String) document.get(FieldNames.USERNAME.fieldName),
-                                (Long) document.get(filter), (String) document.getId());
-                        list.add(tripple);
-                    }
-                    cf.complete(list);
-                })
-                .addOnFailureListener(e -> {
-            Log.e("DATABASE", "Error getting top k users");
+        PlayersDatabaseAdapter.getInstance().getTopUsers(filter).thenAccept(result -> {
+            cf.complete(result);
         });
-
 
         return cf;
     }
@@ -825,7 +812,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
                                 user_id_scannable.sort(new Comparator<Pair<String, ScannableCode>>() {
                                     @Override
                                     public int compare(Pair<String, ScannableCode> o1, Pair<String, ScannableCode> o2) {
-                                        return (int)o1.second.getHashInfo().getGeneratedScore() - (int)o2.second.getHashInfo().getGeneratedScore();
+                                        return (int)o2.second.getHashInfo().getGeneratedScore() - (int)o1.second.getHashInfo().getGeneratedScore();
                                     }
                                 });
 

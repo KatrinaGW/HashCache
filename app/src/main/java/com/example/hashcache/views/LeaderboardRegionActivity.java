@@ -62,37 +62,6 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
 
-
-
-
-        // Get the text views needed to set the leaderboard
-        ArrayList<TextView> userNames = new ArrayList<>();
-        userNames.add(findViewById(R.id.user_one));
-        userNames.add(findViewById(R.id.user_two));
-        userNames.add(findViewById(R.id.user_three));
-
-        for (TextView view : userNames) {
-            view.setText("Temp");
-        }
-
-        ArrayList<TextView> monsterNames = new ArrayList<>();
-        monsterNames.add(findViewById(R.id.user_one));
-        monsterNames.add(findViewById(R.id.user_two));
-        monsterNames.add(findViewById(R.id.user_three));
-
-        for (TextView view : monsterNames) {
-            view.setText("Zorg");
-        }
-
-        ArrayList<TextView> totalScores = new ArrayList<>();
-        totalScores.add(findViewById(R.id.score_one));
-        totalScores.add(findViewById(R.id.score_two));
-        totalScores.add(findViewById(R.id.score_three));
-
-        for (TextView view : totalScores) {
-            view.setText(String.valueOf(42));
-        }
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -226,8 +195,6 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                                 for(TextView view: monsterNames) {
                                     if(count < data.size()) {
                                         view.setText(data.get(count++).second.getHashInfo().getGeneratedName());
-                                    } else {
-                                        view.setText("N/A");
                                     }
                                 }
 
@@ -235,8 +202,6 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                                 for(TextView view: maxScores) {
                                     if(count < data.size()) {
                                         view.setText(String.valueOf(data.get(count++).second.getHashInfo().getGeneratedScore()));
-                                    } else {
-                                        view.setText("N/A");
                                     }
                                 }
 
@@ -255,31 +220,38 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                                     userIds.add(pair.first);
                                     if(Objects.equals(pair.first, playerUserId) && !got_rank) {
                                         rankView.setText(String.valueOf(j));
-                                        scoreView.setText(
-                                                String.valueOf(pair.second.getHashInfo().getGeneratedScore()));
+                                        long userScore = pair.second.getHashInfo().getGeneratedScore();
+                                        Log.i("UserScore: ", String.valueOf(userScore));
+                                        scoreView.setText(String.valueOf(userScore));
                                         got_rank = true;
                                     }
                                     j += 1;
                                 }
 
-                                // If they do not have a qr for this region
-                                if(!got_rank) {
-                                   rankView.setText("N/A");
-                                }
 
 
                                 Database.getInstance().getUsernamesByIds(userIds).thenAccept(names -> {
                                     int i = 0;
+                                    Log.i("DATA" ,"here");
 
                                     for(TextView view: userNames) {
                                         if(i < names.size()) {
                                             view.setText(names.get(i++).second);
-                                        } else {
-                                            view.setText("N/A");
                                         }
+                                    }
+                                }).exceptionally(new Function<Throwable, Void>() {
+                                    @Override
+                                    public Void apply(Throwable throwable) {
+                                        return null;
                                     }
                                 });
 
+                            }).exceptionally(new Function<Throwable, Void>() {
+                                @Override
+                                public Void apply(Throwable throwable) {
+
+                                    return null;
+                                }
                             });
                         }
                     }
