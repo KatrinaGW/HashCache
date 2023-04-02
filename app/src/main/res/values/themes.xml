@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.HashCache" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.HashCache" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/HC_purple</item>
         <item name="colorPrimaryVariant">@color/HC_dark_purple</item>
