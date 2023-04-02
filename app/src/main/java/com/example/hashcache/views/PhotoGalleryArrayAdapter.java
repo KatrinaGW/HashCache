@@ -3,6 +3,7 @@ package com.example.hashcache.views;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Base64;
@@ -81,8 +82,16 @@ public class PhotoGalleryArrayAdapter extends ArrayAdapter<Pair<String, String>>
     public Drawable makeDrawable(String base64Image) {
         byte[] decodedImage = Base64.decode(base64Image, Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
-        Drawable drawable = new BitmapDrawable(context.getResources(), bitmap);
+        Bitmap rotatedBitmap = RotateBitmap(bitmap, 90);
+        Drawable drawable = new BitmapDrawable(context.getResources(), rotatedBitmap);
 
         return drawable;
+    }
+
+    public static Bitmap RotateBitmap(Bitmap bitmap, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 }
