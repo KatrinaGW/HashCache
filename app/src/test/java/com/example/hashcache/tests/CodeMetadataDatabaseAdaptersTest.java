@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
+import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -54,10 +55,10 @@ public class CodeMetadataDatabaseAdaptersTest {
         Task<Void> mockTaskVoid = Mockito.mock(Task.class);
 
         when(mockDb.collection(anyString())).thenReturn(mockCollectionReference);
-        when(mockCollectionReference.whereEqualTo(CodeMetadataDatabaseAdapter.FieldNames.ScannableCodeId.name, testScannableCodeId))
+        when(mockCollectionReference.whereEqualTo(FieldNames.SCANNABLE_CODE_ID.fieldName, testScannableCodeId))
                 .thenReturn(mockQuery);
         when(mockQuery.get()).thenReturn(mockTaskQS);
-        when(mockQuery.whereEqualTo(CodeMetadataDatabaseAdapter.FieldNames.UserId.name, testUsername))
+        when(mockQuery.whereEqualTo(FieldNames.USER_ID.fieldName, testUsername))
                 .thenReturn(mockQuery);
         when(mockTaskQS.isSuccessful()).thenReturn(true);
         when(mockTaskQS.getResult()).thenReturn(mockQS);
@@ -75,7 +76,7 @@ public class CodeMetadataDatabaseAdaptersTest {
         doAnswer(invocation -> {
             OnSuccessListener onSuccessListener = invocation.getArgumentAt(0, OnSuccessListener.class);
             onSuccessListener.onSuccess(null);
-            return null;
+            return mockTaskVoid;
         }).when(mockTaskVoid).addOnSuccessListener(any(OnSuccessListener.class));
 
         boolean result = getCodeMetaDatabaseAdapter().removeScannableCodeMetadata(testScannableCodeId,

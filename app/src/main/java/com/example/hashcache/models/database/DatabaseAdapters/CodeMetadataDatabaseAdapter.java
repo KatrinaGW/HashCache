@@ -166,7 +166,7 @@ public class CodeMetadataDatabaseAdapter {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
         Query docRef = collectionReference.whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId)
-                .whereEqualTo(FieldNames.UserId.name, userId);
+                .whereEqualTo(FieldNames.USER_ID.fieldName, userId);
 
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
