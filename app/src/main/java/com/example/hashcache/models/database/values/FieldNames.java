@@ -18,11 +18,19 @@ public enum FieldNames {
     MAX_SCORE("maxScore"),
     TOTAL_SCORE("totalScore"),
     DEVICE_ID("deviceId"),
-    COMMENTATOR_ID("commentatorId");
+    COMMENTATOR_ID("commentatorId"),
+    Geohash("geohash"),
+    ScannableCodeId("scannableCodeId"),
+    ImageBase64("base64Image"),
+    Latitude("lat"),
+    Longitude("lon"),
+    HasLocation("hasLocation");
 
     public final String fieldName;
-
+    public final String name;
     private FieldNames(String fieldName) {
+
         this.fieldName = fieldName;
+        this.name = fieldName;
     }
 }
