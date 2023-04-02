@@ -202,6 +202,7 @@
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold" />
+
         <TextView
             android:id="@+id/user_num_three"
             android:layout_width="wrap_content"
@@ -211,7 +212,7 @@
             android:layout_toEndOf="@id/one_star"
             android:text="# QR codes:"
             android:textColor="@color/black"
-            android:textSize="24sp"/>
+            android:textSize="24sp" />
         <TextView
             android:id="@+id/num_three"
             android:layout_width="wrap_content"
@@ -235,24 +236,50 @@
             android:layout_height="148dp"
             android:background="@color/HC_ash_grey"
             android:layout_alignParentBottom="true"/>
+
         <TextView
             android:id="@+id/my_score_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_above="@id/score_value_textview"
             android:text="My # QR codes"
-            android:textSize="28sp"
-            android:textColor="@color/HC_light_green"
             android:textAlignment="center"
-            android:layout_above="@id/score_value_textview"/>
+            android:textColor="@color/HC_light_green"
+            android:textSize="22sp" />
+
         <TextView
             android:id="@+id/score_value_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_above="@id/region_textview"
             android:text="15"
-            android:textSize="28sp"
-            android:textColor="@color/white"
             android:textAlignment="center"
-            android:layout_above="@id/menu_button"/>
+            android:textColor="@color/white"
+            android:textSize="22sp" />
+
+
+        <TextView
+            android:id="@+id/region_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/menu_button"
+            android:layout_alignEnd="@+id/menu_button"
+            android:text="Ranking: "
+            android:textAlignment="center"
+            android:textColor="@color/HC_light_green"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/region_value_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/region_textview"
+            android:layout_above="@id/menu_button"
+            android:text="700"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
         <ImageButton
             android:id="@+id/menu_button"
             android:layout_width="80dp"

@@ -2,6 +2,8 @@ package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -13,10 +15,13 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
 import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.database.DatabasePort;
+import com.example.hashcache.models.database.values.FieldNames;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Objects;
 
 /**
 
@@ -27,6 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
  The user can navigate to different leaderboards - region, number of QR codes scanned, and scores - by clicking on the respective buttons.
  */
 public class LeaderboardTopQRActivity extends AppCompatActivity {
+    private ArrayList<Pair<String, Long>> leaderboard;
     /**
 
      This method sets up the activity, inflating the layout and adding functionality to the menu button,
@@ -40,52 +46,6 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
         // setup the activity and inflate the layout
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_topqr);
-
-
-        // Sets the players numb qr codes
-        TextView playersTopQrCode = findViewById(R.id.score_value_textview);
-        AtomicLong playerTopQrScore = new AtomicLong();
-        Database.getInstance()
-                .getTotalScore(AppContext.get().getCurrentPlayer().getUserId())
-                .thenAccept( score -> {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            playerTopQrScore.set(score);
-                        }
-                    });
-                });
-        playersTopQrCode.setText(String.valueOf(playerTopQrScore));
-
-        // Gets the text view for the user names
-        ArrayList<TextView> userNames = new ArrayList<>();
-        userNames.add(findViewById(R.id.user_one));
-        userNames.add(findViewById(R.id.user_two));
-        userNames.add(findViewById(R.id.user_three));
-
-        for(TextView name: userNames) {
-            name.setText("Ryan");
-        }
-
-        // Gets the text view for the total scores
-        ArrayList<TextView> totalScore = new ArrayList<>();
-        totalScore.add(findViewById(R.id.score_one));
-        totalScore.add(findViewById(R.id.score_two));
-        totalScore.add(findViewById(R.id.score_three));
-
-        for(TextView name: totalScore) {
-            name.setText("5");
-        }
-
-        // Gets the textview for the monster names
-        ArrayList<TextView> monsterNames = new ArrayList<>();
-        monsterNames.add(findViewById(R.id.monster_name_one));
-        monsterNames.add(findViewById(R.id.monster_name_two));
-        monsterNames.add(findViewById(R.id.monster_name_three));
-
-        for(TextView name: monsterNames) {
-            name.setText("Zorg");
-        }
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
@@ -175,6 +135,89 @@ public class LeaderboardTopQRActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // go to score leaderboard page
                 startActivity(new Intent(LeaderboardTopQRActivity.this, LeaderboardScoreActivity.class));
+            }
+        });
+
+        setLeaderboard();
+    }
+
+    /**
+     * Sets the leaderboard scores
+     */
+    private void setLeaderboard() {
+        // Update the my QR code scores
+        AppContext appContext = AppContext.get();
+        PlayerWallet playerWallet = appContext.getCurrentPlayer().getPlayerWallet();
+
+        TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
+        playersNumQrCodes.setText(String.valueOf(playerWallet.getMaxScore()));
+
+        // Get access to the database
+        DatabasePort databaseAdapter = Database.getInstance();
+
+
+        // Get the text views needed to set the leaderboard
+        ArrayList<TextView> userNames = new ArrayList<>();
+        userNames.add(findViewById(R.id.user_one));
+        userNames.add(findViewById(R.id.user_two));
+        userNames.add(findViewById(R.id.user_three));
+
+        // Get the text views for the monster names
+        ArrayList<TextView> monsterNames = new ArrayList<>();
+        monsterNames.add(findViewById(R.id.monster_name_one));
+        monsterNames.add(findViewById(R.id.monster_name_two));
+        monsterNames.add(findViewById(R.id.monster_name_three));
+
+        // Get the text view for the qr counts
+        ArrayList<TextView> qrCounts = new ArrayList<>();
+        qrCounts.add(findViewById(R.id.score_one));
+        qrCounts.add(findViewById(R.id.score_two));
+        qrCounts.add(findViewById(R.id.score_three));
+
+        // Fetch the values from the database needed for the leaderboards
+        databaseAdapter.getTopUsers(FieldNames.MAX_SCORE.fieldName).thenAccept(score -> {
+            if (score.size() != 0) {
+                int count = 0;
+                for (TextView view : userNames) {
+                    if (count < score.size()) {
+                        view.setText(score.get(count++).getFirst());
+                    } else {
+                        view.setText("NA");
+                    }
+                }
+                count = 0;
+                for (TextView view : qrCounts) {
+                    if(count < score.size()) {
+                        view.setText(String.valueOf(score.get(count++).getSecond()));
+                    } else {
+                        view.setText("0");
+                    }
+                }
+
+                count = 0;
+                for(TextView view: monsterNames) {
+                    if(count < score.size()) {
+                        databaseAdapter.getTopMonsterName(score.get(count++).getThird()).thenAccept(view::setText);
+                    } else {
+                        view.setText("N/A");
+                    }
+                }
+
+                // Find the player rating
+                String userName = appContext.getCurrentPlayer().getUsername();
+
+                // Update the player rating
+                for(int i = 0; i < score.size(); i++) {
+                    if(Objects.equals(score.get(i).getFirst(), userName)) {
+                        TextView rankingView = findViewById(R.id.region_value_textview);
+                        rankingView.setText(String.valueOf(i + 1));
+
+                        // No need to keep looking
+                        break;
+                    }
+                }
+            } else {
+                Log.e("DATABASE", "Error in getting the top k users");
             }
         });
     }
