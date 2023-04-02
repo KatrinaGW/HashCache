@@ -1,7 +1,7 @@
 # Welcome to HashCache!
 
 HashCache turns your mobile device into a state-of-the-art monster hunting machine! Scan QR codes to collect rare creatures and earn points! Compete with other users for the top spot on the leaderboard!  
-How many monsters will you cache?  
+_How many monsters will you cache?_  
 
 ## Walkthrough
 ### Capturing Monsters
@@ -18,13 +18,13 @@ Checkout the leaderboards to see who has the highest scoring monsters. Visit the
 [screenshot here]
 
 ### Privacy
- - Scanned QR codes are _hashed_ - meaning the original information is not saved. This means it's safe to scan any code, even your vaccine passport!  
+ - Scanned QR codes are _hashed_ - so the original information is not saved. This means it's safe to scan any code, even your vaccine passport!  
  - Users can turn off location in user settings.  
 [screenshot here]  
 
 ## Acknowledgement
 Source code incorporates elements from University of Alberta CMPUT301 Winter 2023 course materials. Other accessed resources include StackOverflow and Android Developer.  
-For more detailed information, see [Sources & Citations].(https://github.com/CMPUT301W23T01/HashCache/wiki/Sources-%26-Citations/_edit).
+For more detailed information, see [Sources & Citations](https://github.com/CMPUT301W23T01/HashCache/wiki/Sources-%26-Citations/_edit).
 
 ## License
 Developed by Team 01 - CMPUT301, Winter 2023 under [Apache License 2.0](https://github.com/CMPUT301W23T01/HashCache/blob/main/LICENSE).
