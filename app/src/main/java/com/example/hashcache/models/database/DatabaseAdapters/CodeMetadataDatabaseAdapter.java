@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.database.values.CollectionNames;
+import com.example.hashcache.models.database.values.FieldNames;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryBounds;
@@ -36,20 +37,6 @@ public class CodeMetadataDatabaseAdapter {
     private FireStoreHelper fireStoreHelper;
     private static CodeMetadataDatabaseAdapter INSTANCE;
 
-
-    private enum FieldNames {
-        Geohash("geohash"),
-        ScannableCodeId("scannableCodeId"),
-        ImageBase64("base64Image"),
-        Latitude("lat"),
-        Longitude("lon"),
-        UserId("userid"),
-        HasLocation("hasLocation");
-        public final String name;
-        FieldNames(String fieldName) {
-            this.name = fieldName;
-        }
-    }
 
 
     /**
@@ -146,7 +133,7 @@ public class CodeMetadataDatabaseAdapter {
             boolean hasLocation = codeMetadata.hasLocation();
             Map<String, Object> objMap = new HashMap<>();
             objMap.put(FieldNames.ScannableCodeId.name, codeMetadata.getScannableCodeId());
-            objMap.put(FieldNames.UserId.name, codeMetadata.getUserId());
+            objMap.put(FieldNames.USER_ID.name, codeMetadata.getUserId());
             if(hasLocation){
                 GeoLocation loc = codeMetadata.getLocation();
                 objMap.put(FieldNames.Latitude.name, loc.latitude);
@@ -169,6 +156,49 @@ public class CodeMetadataDatabaseAdapter {
         return cf;
     }
 
+    /**
+     * Removes the metadata for a ScannableCodeId with a specific user
+     * @param scannableCodeId the id of the scannable code to delete
+     * @param userId the id of the user to remove the scannable code metadata for
+     * @return cf the CompletableFuture which completes with True if the operation was successful
+     */
+    public CompletableFuture<Boolean> removeScannableCodeMetadata(String scannableCodeId, String userId){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
+        Query docRef = collectionReference.whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId)
+                .whereEqualTo(FieldNames.USER_ID.fieldName, userId);
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                if(task.getResult().size()==1){
+                    DocumentReference doc = task.getResult().getDocuments().get(0).getReference();
+
+                    doc.delete()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    cf.complete(true);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Error deleting document", e);
+                                    cf.completeExceptionally(e);
+                                }
+                            });
+                }else{
+                    Log.d("CodeMetadataDatabaseAdapter", "User did not have any metadata for " +
+                            "deleted scannable code");
+                    cf.complete(true);
+                }
+            } else {
+                cf.completeExceptionally(new Exception("[usernameExists] Could not complete query"));
+            }
+        });
+        return cf;
+    }
+
     public CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image) {
 
         Log.d("updatePlayerCodeMetadataImage", String.format("scannableId: %s, userId: %s", scannableCodeId, userId));
@@ -177,7 +207,7 @@ public class CodeMetadataDatabaseAdapter {
             CollectionReference colRef = collectionReference;
             Query query = colRef.
                     whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId).
-                    whereEqualTo(FieldNames.UserId.name, userId);
+                    whereEqualTo(FieldNames.USER_ID.name, userId);
             query.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     if (task.getResult().isEmpty()) {
@@ -214,7 +244,7 @@ public class CodeMetadataDatabaseAdapter {
             CollectionReference colRef = collectionReference;
             Query query = colRef.
                     whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId).
-                    whereEqualTo(FieldNames.UserId.name, userId);
+                    whereEqualTo(FieldNames.USER_ID.name, userId);
             query.get().addOnCompleteListener(task -> {
                 try {
                     if (task.isSuccessful()) {
@@ -262,6 +292,40 @@ public class CodeMetadataDatabaseAdapter {
         return cf;
     }
 
+
+    public CompletableFuture<Boolean> codeMetadataEntryExists(String userId, String scannableCodeId){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            CollectionReference colRef = collectionReference;
+            Query query = colRef.
+                    whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId).
+                    whereEqualTo(FieldNames.USER_ID.name, userId);
+            query.get().addOnCompleteListener(task -> {
+                try {
+                    if (task.isSuccessful()) {
+                        if (task.getResult().isEmpty()) {
+                            cf.complete(false);
+                        } else {
+                            List<DocumentSnapshot> sn = task.getResult().getDocuments();
+                            if(sn.isEmpty()){
+                                cf.complete(false);
+                            }
+                            else{
+                                cf.complete(true);
+                            }
+                        }
+                    } else {
+                        cf.completeExceptionally(new Exception("Could not fetch code metadata"));
+                    }
+                }
+                catch(Exception e){
+                    cf.completeExceptionally(e);
+                }
+            });
+
+        });
+        return cf;
+    }
     // Based on:
     // https://firebase.google.com/docs/firestore/solutions/geoqueries#java
     public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation loc,
@@ -313,7 +377,7 @@ public class CodeMetadataDatabaseAdapter {
     @NonNull
     private CodeMetadata parseCodeMetadataDocument(DocumentSnapshot doc) {
         String scannableCodeId = doc.getString(FieldNames.ScannableCodeId.name);
-        String userId = doc.getString(FieldNames.UserId.name);
+        String userId = doc.getString(FieldNames.USER_ID.name);
         String image = null;
         if(doc.contains(FieldNames.ImageBase64.name)){
             image = doc.getString(FieldNames.ImageBase64.name);

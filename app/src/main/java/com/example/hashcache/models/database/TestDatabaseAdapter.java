@@ -546,6 +546,11 @@ public class TestDatabaseAdapter implements DatabasePort {
     }
 
     @Override
+    public CompletableFuture<Boolean> codeMetadataEntryExists(String userId, String scannableCodeId) {
+        return null;
+    }
+
+    @Override
     public CompletableFuture<Void> updatePlayerCodeMetadataImage(String scannableCodeId, String userId, String image) {
         return null;
     }
@@ -592,5 +597,14 @@ public class TestDatabaseAdapter implements DatabasePort {
     @Override
     public CompletableFuture<ArrayList<Pair<String,ScannableCode>>> getScannableCodesWithinRadiusSorted(Location location) {
         return null;
+    }
+    /**
+     * Removes the metadata for a ScannableCodeId with a specific user
+     * @param scannableCodeId the id of the scannable code to delete
+     * @param userId the id of the user to remove the scannable code metadata for
+     * @return cf the CompletableFuture which completes with True if the operation was successful
+     */
+    public CompletableFuture<Boolean> removeScannableCodeMetadata(String scannableCodeId, String userId){
+        return CodeMetadataDatabaseAdapter.getInstance().removeScannableCodeMetadata(scannableCodeId, userId);
     }
 }

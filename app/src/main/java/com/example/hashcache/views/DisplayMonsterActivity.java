@@ -216,8 +216,13 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    AppContext.get().setCurrentScannableCode(null);
-                                    startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
+                                    Database.getInstance().removeScannableCodeMetadata(
+                                            currentScannableCode.getScannableCodeId(),
+                                            AppContext.get().getCurrentPlayer().getUserId())
+                                                    .thenAccept(success -> {
+                                                        AppContext.get().setCurrentScannableCode(null);
+                                                        startActivity(new Intent(DisplayMonsterActivity.this, MyProfile.class));
+                                                    });
                                 }
                             });
                         })

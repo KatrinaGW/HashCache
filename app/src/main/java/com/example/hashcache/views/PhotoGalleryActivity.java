@@ -26,6 +26,7 @@ import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
 import com.firebase.geofire.GeoLocation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -119,6 +120,9 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
         String scannableCodeId = currentScannableCode.getScannableCodeId();
         ArrayList<HashMap<String, Object>> photoListData = new ArrayList<>();
 
+        // give info to array adapter
+        photoGalleryArrayAdapter = new PhotoGalleryArrayAdapter(this, photoListData);
+        photoList.setAdapter(photoGalleryArrayAdapter);
         PhotoGalleryActivity activityContext = this;
 
         // get metadata for all instances of this scannable code
@@ -136,7 +140,8 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
                             String base64Image = data.getImage();
                             dataMap.put("base64Image", base64Image);
                             dataMap.put("codeMetadata", data);
-                            Database.getInstance().getUsernameById(data.getUserId()).thenAccept(userName -> {
+                            String userId = data.getUserId();
+                            Database.getInstance().getUsernameById(userId).thenAccept(userName -> {
                                 dataMap.put("userName", userName.second);
                                 if (data.hasLocation()) {
                                     Geocoder gc = new Geocoder(getApplicationContext());
@@ -144,30 +149,30 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
                                     double lat = geoloc.latitude;
                                     double lng = geoloc.longitude;
                                     dataMap.put("locationText", String.format("Lat: %f, Lng: %f", lat, lng));
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                        gc.getFromLocation(geoloc.latitude, geoloc.longitude, 1,
-                                                new Geocoder.GeocodeListener() {
-                                                    @Override
-                                                    public void onGeocode(@NonNull List<Address> list) {
-                                                        runOnUiThread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                if (!list.isEmpty()) {
-                                                                    String addr = list.get(0).getAddressLine(0);
-                                                                    if (addr != null) {
-                                                                        dataMap.put("locationText", addr);
-                                                                    }
-                                                                }
-                                                                photoGalleryArrayAdapter.add(dataMap);
+                                    Log.d("ImageGallery API", "API Level: " + Build.VERSION.SDK_INT);
 
-                                                            }
-                                                        });
-                                                    }
-                                                });
+                                    try {
+                                        List<Address> list = gc.getFromLocation(geoloc.latitude, geoloc.longitude, 1);
+                                        if (!list.isEmpty()) {
+                                            String addr = list.get(0).getAddressLine(0);
+                                            if (addr != null) {
+                                                dataMap.put("locationText", addr);
+                                                Log.d("ImageGallery", "Adding adapter entry. 2..");
+                                            }
+                                        }
+                                        photoGalleryArrayAdapter.add(dataMap);
+                                    } catch (IOException e) {
+                                        photoGalleryArrayAdapter.add(dataMap);
+                                        e.printStackTrace();
                                     }
-                                }
-                                else{
-                                    photoGalleryArrayAdapter.add(dataMap);
+                                } else {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            photoGalleryArrayAdapter.add(dataMap);
+                                        }
+                                    });
+
                                 }
                             }).exceptionally(new Function<Throwable, Void>() {
                                 @Override
@@ -179,9 +184,6 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
 
                         }
                     }
-                    // give info to array adapter
-                    photoGalleryArrayAdapter = new PhotoGalleryArrayAdapter(activityContext, photoListData);
-                    photoList.setAdapter(photoGalleryArrayAdapter);
                 }
             });
 

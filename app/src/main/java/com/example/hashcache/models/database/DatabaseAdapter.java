@@ -701,6 +701,11 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     }
 
     @Override
+    public CompletableFuture<Boolean> codeMetadataEntryExists(String userId, String scannableCodeId) {
+        return CodeMetadataDatabaseAdapter.getInstance().codeMetadataEntryExists(userId, scannableCodeId);
+    }
+
+    @Override
     public CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image) {
         return CodeMetadataDatabaseAdapter.getInstance().updatePlayerCodeMetadataImage(userId, scannableCodeId, image);
     }
@@ -722,6 +727,16 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
      */
     public CompletableFuture<Void> deleteLogin(){
         return LoginsAdapter.getInstance().deleteLogin();
+    }
+
+    /**
+     * Removes the metadata for a ScannableCodeId with a specific user
+     * @param scannableCodeId the id of the scannable code to delete
+     * @param userId the id of the user to remove the scannable code metadata for
+     * @return cf the CompletableFuture which completes with True if the operation was successful
+     */
+    public CompletableFuture<Boolean> removeScannableCodeMetadata(String scannableCodeId, String userId){
+        return CodeMetadataDatabaseAdapter.getInstance().removeScannableCodeMetadata(scannableCodeId, userId);
     }
 
     
