@@ -721,6 +721,11 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return CodeMetadataDatabaseAdapter.getInstance().getPlayerCodeMetadataById(userId, scannableCodeId);
     }
 
+    @Override
+    public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataById(String scannableCodeId) {
+        return CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataById(scannableCodeId);
+    }
+
     /**
      * Remove the login record for the current device
      * @return cf the CompletableFuture that completes exceptionally if the operation caused
@@ -728,6 +733,16 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
      */
     public CompletableFuture<Void> deleteLogin(){
         return LoginsAdapter.getInstance().deleteLogin();
+    }
+
+    /**
+     * Removes the metadata for a ScannableCodeId with a specific user
+     * @param scannableCodeId the id of the scannable code to delete
+     * @param userId the id of the user to remove the scannable code metadata for
+     * @return cf the CompletableFuture which completes with True if the operation was successful
+     */
+    public CompletableFuture<Boolean> removeScannableCodeMetadata(String scannableCodeId, String userId){
+        return CodeMetadataDatabaseAdapter.getInstance().removeScannableCodeMetadata(scannableCodeId, userId);
     }
 
     

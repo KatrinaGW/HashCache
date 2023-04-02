@@ -60,6 +60,7 @@ public interface DatabasePort {
 
     CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image);
     CompletableFuture<CodeMetadata> getPlayerCodeMetadataById(String userId, String scannableCodeId);
+    CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataById(String scannableCodeId);
     CompletableFuture<Void> deleteLogin();
     void resetInstances();
     CompletableFuture<ArrayList<Pair<String, String>>> getUsernamesByIds(ArrayList<String> userIds);
@@ -68,4 +69,5 @@ public interface DatabasePort {
     void onScannableCodeCommentsChanged(String scannableCodeId, GetScannableCodeCallback callback);
     CompletableFuture<ArrayList<Pair<String, Long>>> getTopKUsers(String filter, int k);
     CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet);
+    CompletableFuture<Boolean> removeScannableCodeMetadata(String scannableCodeId, String userId);
 }

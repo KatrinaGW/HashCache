@@ -4,6 +4,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
+import android.location.Location;
+
 import com.example.hashcache.models.CodeLocation;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
@@ -23,7 +25,7 @@ public class CodeLocationDocumentConverterTest {
 
     @Test
     void addCodeLocationToCollectionTest(){
-        CodeLocation testCodeLocation = new CodeLocation("CodeLocationName", 1, 2, 3);
+        CodeLocation testCodeLocation = new CodeLocation("CodeLocationName", Mockito.mock(Location.class));
         CollectionReference mockCollectionReference = Mockito.mock(CollectionReference.class);
         FireStoreHelper mockFireStoreHelper = Mockito.mock(FireStoreHelper.class);
         DocumentReference mockDocumentReference = Mockito.mock(DocumentReference.class);
