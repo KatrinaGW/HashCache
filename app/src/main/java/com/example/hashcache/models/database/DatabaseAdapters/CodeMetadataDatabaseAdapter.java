@@ -292,6 +292,40 @@ public class CodeMetadataDatabaseAdapter {
         return cf;
     }
 
+
+    public CompletableFuture<Boolean> codeMetadataEntryExists(String userId, String scannableCodeId){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            CollectionReference colRef = collectionReference;
+            Query query = colRef.
+                    whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId).
+                    whereEqualTo(FieldNames.USER_ID.name, userId);
+            query.get().addOnCompleteListener(task -> {
+                try {
+                    if (task.isSuccessful()) {
+                        if (task.getResult().isEmpty()) {
+                            cf.complete(false);
+                        } else {
+                            List<DocumentSnapshot> sn = task.getResult().getDocuments();
+                            if(sn.isEmpty()){
+                                cf.complete(false);
+                            }
+                            else{
+                                cf.complete(true);
+                            }
+                        }
+                    } else {
+                        cf.completeExceptionally(new Exception("Could not fetch code metadata"));
+                    }
+                }
+                catch(Exception e){
+                    cf.completeExceptionally(e);
+                }
+            });
+
+        });
+        return cf;
+    }
     // Based on:
     // https://firebase.google.com/docs/firestore/solutions/geoqueries#java
     public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation loc,

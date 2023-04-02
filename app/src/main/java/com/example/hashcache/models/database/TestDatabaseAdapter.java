@@ -544,6 +544,11 @@ public class TestDatabaseAdapter implements DatabasePort {
     }
 
     @Override
+    public CompletableFuture<Boolean> codeMetadataEntryExists(String userId, String scannableCodeId) {
+        return null;
+    }
+
+    @Override
     public CompletableFuture<Void> updatePlayerCodeMetadataImage(String scannableCodeId, String userId, String image) {
         return null;
     }

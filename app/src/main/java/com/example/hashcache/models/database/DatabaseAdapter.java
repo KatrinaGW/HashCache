@@ -712,6 +712,11 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     }
 
     @Override
+    public CompletableFuture<Boolean> codeMetadataEntryExists(String userId, String scannableCodeId) {
+        return CodeMetadataDatabaseAdapter.getInstance().codeMetadataEntryExists(userId, scannableCodeId);
+    }
+
+    @Override
     public CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image) {
         return CodeMetadataDatabaseAdapter.getInstance().updatePlayerCodeMetadataImage(userId, scannableCodeId, image);
     }

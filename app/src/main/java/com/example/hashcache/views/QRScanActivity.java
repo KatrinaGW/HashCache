@@ -60,6 +60,22 @@ public class QRScanActivity extends AppCompatActivity {
      * @param savedInstanceState saved state of the activity, if it was previously
      *                           closed.
      */
+
+    public void handleError(String message, Throwable e){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(QRScanActivity.this,
+                        message,
+                        Toast.LENGTH_SHORT).show();
+                Log.d("QRScanActivity", e.getMessage());
+                e.printStackTrace();
+                Intent intent = new Intent(QRScanActivity.this, AppHome.class);
+                startActivity(intent);
+            }
+        });
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,57 +108,59 @@ public class QRScanActivity extends AppCompatActivity {
                             Pair<String, byte[]> hashData = HashInfoGenerator.getHashFromQRContents(qrContent);
                             String scannableCodeId = hashData.first;
                             String userId = AppContext.get().getCurrentPlayer().getUserId();
-                            HashController.initCodeMetadata(scannableCodeId, userId, fusedLocationProviderClient).
-                            thenCompose(codeMetadata -> Database.getInstance().addScannableCodeMetadata(codeMetadata)).
-                            thenCompose(ex -> HashController.addScannableCode(qrContent)
-                                    .thenAccept(noReturn -> {
-                                        Log.d("QRScanActivity", "Successfully added Code Metadata!");
-                                        System.out.println("Have added QR code!!");
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Toast.makeText(QRScanActivity.this, "Added QR code!",
-                                                        Toast.LENGTH_SHORT)
-                                                        .show();
-                                            }
-                                        });
-                                        Intent intent = new Intent(QRScanActivity.this, NewMonsterActivity.class);
-                                        startActivity(intent);
+                            Database.getInstance().codeMetadataEntryExists(userId, scannableCodeId)
+                                    .thenAccept(exists -> {
+                                        if (!exists) {
+                                            HashController
+                                                    .initCodeMetadata(scannableCodeId, userId,
+                                                            fusedLocationProviderClient)
+                                                    .thenCompose(codeMetadata -> Database.getInstance()
+                                                            .addScannableCodeMetadata(codeMetadata))
+                                                    .thenCompose(ex -> HashController.addScannableCode(qrContent)
+                                                            .thenAccept(noReturn -> {
+                                                                Log.d("QRScanActivity",
+                                                                        "Successfully added Code Metadata!");
+                                                                System.out.println("Have added QR code!!");
+                                                                runOnUiThread(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        Toast.makeText(QRScanActivity.this,
+                                                                                "Added QR code!",
+                                                                                Toast.LENGTH_SHORT)
+                                                                                .show();
+                                                                    }
+                                                                });
+                                                                Intent intent = new Intent(QRScanActivity.this,
+                                                                        NewMonsterActivity.class);
+                                                                startActivity(intent);
+
+                                                            }).exceptionally(new Function<Throwable, Void>() {
+                                                                @Override
+                                                                public Void apply(Throwable throwable) {
+                                                                    runOnUiThread(new Runnable() {
+                                                                        @Override
+                                                                        public void run() {
+                                                                            handleError("ERROR: There was an error adding the QR code", throwable);
+                                                                        }
+                                                                    });
+
+                                                                    return null;
+                                                                }
+                                                            }));
+                                        } else {
+                                            handleError("ERROR: You have already scanned this QR code!", new Throwable("QR Code already scanned"));
+                                        }
 
                                     }).exceptionally(new Function<Throwable, Void>() {
                                         @Override
                                         public Void apply(Throwable throwable) {
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-
-                                                    if (throwable instanceof HashExceptions.AlreadyHasCodeEx) {
-                                                        Toast.makeText(QRScanActivity.this,
-                                                                "ERROR: You already have QR code on your wallet!",
-                                                                Toast.LENGTH_SHORT).show();
-                                                    } else {
-                                                        Toast.makeText(QRScanActivity.this,
-                                                                "ERROR: There was an error adding QR code!",
-                                                                Toast.LENGTH_SHORT).show();
-                                                    }
-                                                    Log.d("QRScanActivity", throwable.getMessage());
-                                                    Intent intent = new Intent(QRScanActivity.this, AppHome.class);
-                                                    startActivity(intent);
-                                                }
-                                            });
-                                            System.out.println("Could not add QR code" + throwable.getMessage());
+                                            handleError("ERROR: There was an error adding the QR code", throwable);
                                             return null;
                                         }
-                                    }));
+                                    });
+
                         } catch (NoSuchAlgorithmException e) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(QRScanActivity.this,
-                                            "Oops: There was an error adding QR code!",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            handleError("ERROR: There was an error adding the QR code - SHA 256 ALgorithm not found", e);
                             e.printStackTrace();
                         }
                     }
