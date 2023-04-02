@@ -1,13 +1,10 @@
 package com.example.hashcache.models.database.DatabaseAdapters;
 
-import android.location.Location;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.CodeMetadata;
-import com.example.hashcache.models.ScannableCode;
-import com.example.hashcache.models.database.DatabaseAdapters.converters.CodeLocationDocumentConverter;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
@@ -24,9 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.rpc.Code;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +55,7 @@ public class CodeMetadataDatabaseAdapter {
     }
 
     /**
-     * Create the static instance of the CodeLocationConnectionHandler class
+     * Creates or gets the static instance of the CodeLocationConnectionHandler class
      *
      * @param fireStoreHelper the instance of the FireStoreHelper class to call upon
      *                        to perform
@@ -72,17 +67,13 @@ public class CodeMetadataDatabaseAdapter {
      *         CodeLocationConnectionHandler
      *         class to use for all actions concerning the CodeLocation database
      *         collection
-     *
-     * @throws IllegalArgumentException if the INSTANCE has already been initialized
-     */
-    public static CodeMetadataDatabaseAdapter makeInstance(FireStoreHelper fireStoreHelper,
-                                                           FirebaseFirestore db) {
-        if (INSTANCE != null) {
-            throw new IllegalArgumentException("CodeMetadataDatabaseAdapter INSTANCE already " +
-                    "exists!");
+     **/
+    public static CodeMetadataDatabaseAdapter makeOrGetInstanceCodeMetaDataDatabaseAdapterInstance
+    (FireStoreHelper fireStoreHelper, FirebaseFirestore db) {
+        if (INSTANCE == null) {
+            INSTANCE = new CodeMetadataDatabaseAdapter(fireStoreHelper, db);
         }
 
-        INSTANCE = new CodeMetadataDatabaseAdapter(fireStoreHelper, db);
         return INSTANCE;
     }
 

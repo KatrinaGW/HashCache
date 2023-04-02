@@ -8,6 +8,7 @@ package com.example.hashcache.views;
 
 import static com.example.hashcache.controllers.DependencyInjector.getOrMakeScannableCodesConnectionHandler;
 import static com.example.hashcache.controllers.DependencyInjector.makeLoginsAdapter;
+import static com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter.makeOrGetInstanceCodeMetaDataDatabaseAdapterInstance;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -28,7 +29,6 @@ import com.example.hashcache.controllers.CheckLoginCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.Database;
-import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -114,8 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         getOrMakeScannableCodesConnectionHandler();
         makeLoginsAdapter();
-        CodeMetadataDatabaseAdapter.makeInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
-
+        makeOrGetInstanceCodeMetaDataDatabaseAdapterInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
         AppContext.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID));
         loginUserCommand = new LoginUserCommand();

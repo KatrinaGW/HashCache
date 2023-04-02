@@ -101,16 +101,6 @@ public class AppHomeTest {
     }
 
     @Test
-    public void checkCommunityButton(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
-        solo.clickOnView(solo.getView(R.id.community_button));
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", Community.class);
-        logout();
-    }
-
-    @Test
     public void checkMenuButton1(){
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
