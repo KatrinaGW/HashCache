@@ -100,6 +100,7 @@ public class BottomMenuFragmentTest {
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", QRScanActivity.class);
         solo.goBack();
+        solo.goBack();
         logout();
     }
 
@@ -125,7 +126,7 @@ public class BottomMenuFragmentTest {
         solo.clickOnView(solo.getView(R.id.menu_button));
         solo.sleep(100);
         // select community button
-        solo.clickOnView(solo.getView(R.id.community_button, 1));
+        solo.clickOnView(solo.getView(R.id.menu_community_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
         logout();

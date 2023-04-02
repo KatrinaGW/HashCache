@@ -47,9 +47,9 @@ public class AddCommentActivityTest {
         solo.clickOnView(solo.getView(R.id.menu_button));
         solo.clickOnView(solo.getView(R.id.my_codes_button));
         solo.clickOnView(solo.getView(R.id.logo_button));
-        solo.sleep(3000);
+        solo.sleep(100);
         solo.clickOnView(solo.getView(R.id.logout_button));
-        solo.sleep(1000);
+        solo.sleep(100);
     }
 
     @Test

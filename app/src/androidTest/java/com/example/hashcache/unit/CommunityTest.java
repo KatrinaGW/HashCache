@@ -5,8 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.widget.EditText;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -15,12 +13,10 @@ import androidx.test.rule.ActivityTestRule;
 import com.example.hashcache.R;
 import com.example.hashcache.views.AppHome;
 import com.example.hashcache.views.Community;
-import com.example.hashcache.views.LeaderboardScoreActivity;
 import com.example.hashcache.views.MainActivity;
 import com.example.hashcache.views.MyProfile;
 import com.example.hashcache.views.OtherCacheActivity;
 import com.example.hashcache.views.OtherProfileInformationActivity;
-import com.example.hashcache.views.QRStats;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;
@@ -57,7 +53,8 @@ public class CommunityTest {
 
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
-        solo.clickOnView(solo.getView(R.id.community_button));
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.menu_community_button));
         solo.sleep(100);
 
     }
@@ -122,7 +119,7 @@ public class CommunityTest {
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", Community.class);
         solo.clickOnView(solo.getView(R.id.menu_button));
-        solo.clickOnView(solo.getView(R.id.community_button));
+        solo.clickOnView(solo.getView(R.id.menu_community_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
         solo.clickOnView(solo.getView(R.id.menu_button));

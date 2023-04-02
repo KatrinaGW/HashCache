@@ -10,7 +10,6 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.example.hashcache.R;
-import com.example.hashcache.views.Community;
 import com.example.hashcache.views.MainActivity;
 import com.example.hashcache.views.OtherProfileInformationActivity;
 import com.robotium.solo.Solo;
@@ -43,7 +42,7 @@ public class OtherProfileInformationTest {
 
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
-        solo.clickOnView(solo.getView(R.id.community_button));
+        solo.clickOnView(solo.getView(R.id.menu_community_button));
         solo.sleep(100);
         solo.enterText((EditText) solo.getView(R.id.search_bar_edittext), TEST_OTHER_USER.substring(0, 4));
         solo.clickOnView(solo.getView(R.id.search_button));

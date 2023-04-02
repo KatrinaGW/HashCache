@@ -4,8 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.widget.EditText;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -16,9 +14,7 @@ import com.example.hashcache.views.AppHome;
 import com.example.hashcache.views.Community;
 import com.example.hashcache.views.MainActivity;
 import com.example.hashcache.views.MyProfile;
-import com.example.hashcache.views.QRByLocation;
 import com.example.hashcache.views.QRScanActivity;
-import com.example.hashcache.views.QRStats;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;
@@ -74,6 +70,7 @@ public class AppHomeTest {
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", QRScanActivity.class);
         solo.goBack();
+        solo.goBack();
         logout();
     }
 
@@ -97,6 +94,14 @@ public class AppHomeTest {
         solo.sleep(1000);
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
         solo.goBack();
+        logout();
+    }
+
+    @Test
+    public void testEyecon(){
+        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        solo.clickOnView(solo.getView(R.id.eye_button));
+        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
         logout();
     }
 
@@ -130,7 +135,7 @@ public class AppHomeTest {
         // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
         solo.clickOnView(solo.getView(R.id.menu_button));
-        solo.clickOnView(solo.getView(R.id.community_button, 1));
+        solo.clickOnView(solo.getView(R.id.menu_community_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
         solo.clickOnView(solo.getView(R.id.menu_button));

@@ -209,7 +209,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
 
 
         // add functionality to community button
-        ImageButton markerButton = findViewById(R.id.community_button);
+        ImageButton markerButton = findViewById(R.id.eye_button);
         markerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -450,7 +450,7 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         mUsernameTextView = findViewById(R.id.username_textview);
         mScoreTextView = findViewById(R.id.score_textview);
         mMenuButton = findViewById(R.id.menu_button);
-        mCommunityButton = findViewById(R.id.community_button);
+        mCommunityButton = findViewById(R.id.menu_community_button);
         mMap = findViewById(R.id.map);
         mScanQrButton = findViewById(R.id.scan_qr_button);
     }
