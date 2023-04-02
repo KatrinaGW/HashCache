@@ -535,6 +535,10 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         mMap.setOnClickListener(listener);
     }
 
+    public GoogleMap getMap() {
+        return map;
+    }
+
     @Override
     public void update(Observable observable, Object o) {
         setUIParams();
