@@ -1,5 +1,7 @@
 package com.example.hashcache.views;
 
+import static java.lang.Math.min;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -229,22 +231,13 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                                 }
 
 
-
-                                Database.getInstance().getUsernamesByIds(userIds).thenAccept(names -> {
-                                    int i = 0;
-                                    Log.i("DATA" ,"here");
-
-                                    for(TextView view: userNames) {
-                                        if(i < names.size()) {
-                                            view.setText(names.get(i++).second);
-                                        }
-                                    }
-                                }).exceptionally(new Function<Throwable, Void>() {
-                                    @Override
-                                    public Void apply(Throwable throwable) {
-                                        return null;
-                                    }
-                                });
+                                for(int i = 0; i < min(userIds.size(), 3); i++){
+                                    int finalI = i;
+                                    Database.getInstance().getUsernameById(userIds.get(i)).thenAccept(userPair -> {
+                                        String username = userPair.second;
+                                        userNames.get(finalI).setText(username);
+                                    });
+                                }
 
                             }).exceptionally(new Function<Throwable, Void>() {
                                 @Override
