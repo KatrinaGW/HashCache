@@ -71,4 +71,6 @@ public interface DatabasePort {
     CompletableFuture<ArrayList<Triple<String, Long, String>>> getTopUsers(String filter);
     CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet);
     CompletableFuture<String> getTopMonsterName(String userId);
+    CompletableFuture<ArrayList<Pair<String, ScannableCode>>> getScannableCodesWithinRadiusSorted(Location location);
+
 }

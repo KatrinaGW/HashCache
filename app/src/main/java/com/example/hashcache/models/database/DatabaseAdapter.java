@@ -2,6 +2,7 @@ package com.example.hashcache.models.database;
 
 import android.content.pm.ComponentInfo;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.lang.reflect.Array;
 import android.util.Log;
@@ -42,6 +43,8 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -784,6 +787,54 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
                         cf.complete(code.getHashInfo().getGeneratedName());
             });
         });
+        return cf;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public CompletableFuture<ArrayList<Pair<String, ScannableCode>>> getScannableCodesWithinRadiusSorted(Location location) {
+        CompletableFuture<ArrayList<Pair<String, ScannableCode>>> cf = new CompletableFuture<>();
+        Database.getInstance().getCodeMetadataWithinRadius(new GeoLocation(
+                        location.getLatitude(), location.getLongitude()), 1000)
+                .thenAccept(codes -> {
+                    // Get the scanableCode that associate with the scannableCodeId
+                    ArrayList<String> scannableCodeIds = new ArrayList<>();
+                    ArrayList<String> userIds = new ArrayList<>();
+                    for(CodeMetadata metadata: codes) {
+                        scannableCodeIds.add(metadata.getScannableCodeId());
+                        userIds.add(metadata.getUserId());
+                    }
+
+                    Database.getInstance().getScannableCodesByIdInList(scannableCodeIds)
+                            .thenAccept(scannableCodes -> {
+                                ArrayList<Pair<String, ScannableCode>> user_id_scannable = new ArrayList<>();
+
+                                for(int i = 0; i < scannableCodeIds.size(); i++) {
+                                    user_id_scannable.add(new Pair<>(userIds.get(i), scannableCodes.get(i)));
+                                }
+
+                                // Sort the scannable codes by score
+                                user_id_scannable.sort(new Comparator<Pair<String, ScannableCode>>() {
+                                    @Override
+                                    public int compare(Pair<String, ScannableCode> o1, Pair<String, ScannableCode> o2) {
+                                        return (int)o1.second.getHashInfo().getGeneratedScore() - (int)o2.second.getHashInfo().getGeneratedScore();
+                                    }
+                                });
+
+                                cf.complete(user_id_scannable);
+                            });
+
+
+                })
+                .exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        return null;
+                    }
+                });
         return cf;
     }
 }

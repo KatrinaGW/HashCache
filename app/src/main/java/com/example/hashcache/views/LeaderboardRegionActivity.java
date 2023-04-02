@@ -5,7 +5,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+
+import com.example.hashcache.models.CodeMetadata;
 import com.firebase.geofire.GeoLocation;
+
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -24,6 +28,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
@@ -54,16 +59,7 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         ImageButton menuButton = findViewById(R.id.menu_button);
 
 
-        // Sets the players numb qr codes
-        TextView playersTotalScore = findViewById(R.id.score_value_textview);
-        AtomicLong playerScores = new AtomicLong();
-        Database.getInstance()
-                .getTotalScore(AppContext.get().getCurrentPlayer().getUserId())
-                .thenAccept(score -> {
-                    playerScores.set(score);
-                });
 
-        playersTotalScore.setText(String.valueOf(playerScores));
 
         // Get the text views needed to set the leaderboard
         ArrayList<TextView> userNames = new ArrayList<>();
@@ -99,29 +95,9 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
 
             return;
         }
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            Database.getInstance().getCodeMetadataWithinRadius(new GeoLocation(
-                                    location.getLatitude(), location.getLongitude()), 1000)
-                                    .thenAccept(codes -> {
-                                        System.out.println("Here");
-                                    })
-                                    .exceptionally(new Function<Throwable, Void>() {
-                                        @Override
-                                        public Void apply(Throwable throwable) {
-                                            return null;
-                                        }
-                                    });
-                        }
-                    }
-                });
 
         /**
-         * 
+         *
          *
          {@link View.OnClickListener} that creates and displays a popup menu when the menu button is clicked.
          */
@@ -201,6 +177,69 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                 startActivity(new Intent(LeaderboardRegionActivity.this, LeaderboardTopQRActivity.class));
             }
         });
+        setLeaderboard();
+    }
+
+    private void setLeaderboard() {
+
+        // Sets the players numb qr codes
+        TextView playersMaxScore = findViewById(R.id.score_value_textview);
+
+        // Get the text views needed to set the leaderboard
+        ArrayList<TextView> userNames = new ArrayList<>();
+        userNames.add(findViewById(R.id.user_one));
+        userNames.add(findViewById(R.id.user_two));
+        userNames.add(findViewById(R.id.user_three));
+
+        ArrayList<TextView> monsterNames = new ArrayList<>();
+        monsterNames.add(findViewById(R.id.monster_name_one));
+        monsterNames.add(findViewById(R.id.monster_name_two));
+        monsterNames.add(findViewById(R.id.monster_name_three));
+
+        ArrayList<TextView> maxScores = new ArrayList<>();
+        maxScores.add(findViewById(R.id.score_one));
+        maxScores.add(findViewById(R.id.score_two));
+        maxScores.add(findViewById(R.id.score_three));
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Will return if the user does not have the correct permissions set
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            Database.getInstance().getScannableCodesWithinRadiusSorted(location).thenAccept(data -> {
+                                Log.i("DATABASE", "nice");
+
+                                int count = 0;
+                                Log.i("DATA", String.valueOf(data.size()));
+                                for(TextView view: monsterNames) {
+                                    if(count < data.size()) {
+                                        view.setText(data.get(count++).second.getHashInfo().getGeneratedName());
+                                    } else {
+                                        view.setText("N/A");
+                                    }
+                                }
+
+                                count = 0;
+                                for(TextView view: maxScores) {
+                                    if(count < data.size()) {
+                                        view.setText(String.valueOf(data.get(count++).second.getHashInfo().getGeneratedScore()));
+                                    } else {
+                                        view.setText("N/A");
+                                    }
+                                }
+
+                                // Fetch the data base for user ids
+                            });
+                        }
+                    }
+                });
     }
 }
 

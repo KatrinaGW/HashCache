@@ -582,4 +582,9 @@ public class TestDatabaseAdapter implements DatabasePort {
     public CompletableFuture<String> getTopMonsterName(String userId) {
         return null;
     }
+
+    @Override
+    public CompletableFuture<ArrayList<Pair<String,ScannableCode>>> getScannableCodesWithinRadiusSorted(Location location) {
+        return null;
+    }
 }
