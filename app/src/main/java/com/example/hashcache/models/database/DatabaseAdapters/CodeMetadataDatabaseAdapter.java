@@ -38,7 +38,7 @@ public class CodeMetadataDatabaseAdapter {
     private static CodeMetadataDatabaseAdapter INSTANCE;
 
 
-    private enum FieldNames {
+    public enum FieldNames {
         Geohash("geohash"),
         ScannableCodeId("scannableCodeId"),
         ImageBase64("base64Image"),
