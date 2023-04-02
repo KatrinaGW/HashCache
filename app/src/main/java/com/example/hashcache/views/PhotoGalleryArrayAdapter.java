@@ -13,12 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.hashcache.R;
+import com.example.hashcache.models.CodeMetadata;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,11 +70,22 @@ public class PhotoGalleryArrayAdapter extends ArrayAdapter<HashMap<String, Objec
         // Pair<photo str, location str>
         HashMap<String, Object> photoData = getItem(position);
 
-        // set location text
+        CodeMetadata cm = (CodeMetadata) photoData.get("codeMetadata");
+
+        LinearLayout locationLayout = view.findViewById(R.id.location_layout);
         TextView locationTextView = view.findViewById(R.id.location_text);
+        if(cm.hasLocation()){
+
+            locationTextView.setText((String)photoData.get("locationText"));
+        }
+        else{
+            // If it doesn't have a location we will only show the image with the username of who took it
+//            locationLayout.setVisibility(View.GONE);
+            locationTextView.setText("No location available.\nGeolocation recording was disabled.");
+        }
         TextView usernameTextView = view.findViewById(R.id.username_text);
-        locationTextView.setText((String)photoData.get("locationText"));
         usernameTextView.setText((String)photoData.get("userName"));
+
         // set location photo
         ImageView locationPhotoView = view.findViewById(R.id.location_photo);
         Drawable drawable = makeDrawable((String)photoData.get("base64Image"));

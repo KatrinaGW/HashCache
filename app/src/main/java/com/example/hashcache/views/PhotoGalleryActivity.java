@@ -35,13 +35,15 @@ import java.util.Observer;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-
 /**
-
- The PhotoGalleryActivity displays all the location photos for a scannable code.
- This activity sets up the UI elements (a scrollable list of photos and associated location text).
- The back button allows users to return to the monster info page for the scannable code.
- The menu button allows users to navigate to different activities in the app.
+ * 
+ * The PhotoGalleryActivity displays all the location photos for a scannable
+ * code.
+ * This activity sets up the UI elements (a scrollable list of photos and
+ * associated location text).
+ * The back button allows users to return to the monster info page for the
+ * scannable code.
+ * The menu button allows users to navigate to different activities in the app.
  */
 public class PhotoGalleryActivity extends AppCompatActivity implements Observer {
     private ListView photoList;
@@ -56,9 +58,11 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
     /**
      * Called when the activity is created.
      *
-     * Initializes the activity by setting up the UI elements and adding functionality to the buttons.
+     * Initializes the activity by setting up the UI elements and adding
+     * functionality to the buttons.
      *
-     * @param savedInstanceState saved state of the activity, if it was previously closed.
+     * @param savedInstanceState saved state of the activity, if it was previously
+     *                           closed.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +84,9 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
         // add functionality to menu button
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { onMenuButtonClicked(); }
+            public void onClick(View view) {
+                onMenuButtonClicked();
+            }
         });
     }
 
@@ -98,20 +104,18 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
         photoList = findViewById(R.id.photo_list);
     }
 
-
     private void setViews() {
         currentScannableCode = AppContext.get().getCurrentScannableCode();
         HashInfo currentHashInfo = currentScannableCode.getHashInfo();
         setMonsterName(currentHashInfo.getGeneratedName());
     }
 
-
     /**
      * Checks database for location photos of current scannable code
      * Passes location photo and location information to PhotoGalleryArrayAdapter
      * as Array<Pair<String, String>> (photo, location).
      */
-    private void setPhotoGalleryAdapter(){
+    private void setPhotoGalleryAdapter() {
         String scannableCodeId = currentScannableCode.getScannableCodeId();
         ArrayList<HashMap<String, Object>> photoListData = new ArrayList<>();
 
@@ -127,36 +131,40 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
                     // for each instance of the scannable code
                     for (CodeMetadata data : codeMetadata) {
                         // if there is a location photo
-                        if (data.hasImage() && data.hasLocation()) {
+                        if (data.hasImage()) {
+                            HashMap<String, Object> dataMap = new HashMap<>();
                             String base64Image = data.getImage();
+                            dataMap.put("base64Image", base64Image);
+                            dataMap.put("codeMetadata", data);
                             Database.getInstance().getUsernameById(data.getUserId()).thenAccept(userName -> {
-                                Geocoder gc = new Geocoder(getApplicationContext());
-                                GeoLocation geoloc = data.getLocation();
-                                double lat = geoloc.latitude;
-                                double lng = geoloc.longitude;
-                                HashMap<String, Object> dataMap = new HashMap<>();
                                 dataMap.put("userName", userName.second);
-                                dataMap.put("base64Image", base64Image);
-                                dataMap.put("locationText", String.format("Lat: %f, Lng: %f", lat, lng));
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    gc.getFromLocation(geoloc.latitude, geoloc.longitude, 1, new Geocoder.GeocodeListener() {
-                                        @Override
-                                        public void onGeocode(@NonNull List<Address> list) {
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    if(!list.isEmpty()){
-                                                        String addr = list.get(0).getAddressLine(0);
-                                                        if(addr != null){
-                                                            dataMap.put("locationText", addr);
-                                                        }
-                                                    }
-                                                    photoGalleryArrayAdapter.add(dataMap);
+                                if (data.hasLocation()) {
+                                    Geocoder gc = new Geocoder(getApplicationContext());
+                                    GeoLocation geoloc = data.getLocation();
+                                    double lat = geoloc.latitude;
+                                    double lng = geoloc.longitude;
+                                    dataMap.put("locationText", String.format("Lat: %f, Lng: %f", lat, lng));
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                        gc.getFromLocation(geoloc.latitude, geoloc.longitude, 1,
+                                                new Geocoder.GeocodeListener() {
+                                                    @Override
+                                                    public void onGeocode(@NonNull List<Address> list) {
+                                                        runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                if (!list.isEmpty()) {
+                                                                    String addr = list.get(0).getAddressLine(0);
+                                                                    if (addr != null) {
+                                                                        dataMap.put("locationText", addr);
+                                                                    }
+                                                                }
+                                                                photoGalleryArrayAdapter.add(dataMap);
 
-                                                }
-                                            });
-                                        }
-                                    });
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                    }
                                 }
                                 else{
                                     photoGalleryArrayAdapter.add(dataMap);
@@ -168,6 +176,7 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
                                     return null;
                                 }
                             });
+
                         }
                     }
                     // give info to array adapter
@@ -177,15 +186,14 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
             });
 
         });
-//        .exceptionally(new Function<Throwable, Void>() {
-//            @Override
-//            public Void apply(Throwable throwable) {
-//                Log.d("ERROR", throwable.getMessage());
-//                return null;
-//            }
-//        });
+        // .exceptionally(new Function<Throwable, Void>() {
+        // @Override
+        // public Void apply(Throwable throwable) {
+        // Log.d("ERROR", throwable.getMessage());
+        // return null;
+        // }
+        // });
     }
-
 
     // go back to monster info activity when back button clicked
     private void onBackButtonClicked() {
@@ -193,25 +201,23 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
         finish();
     }
 
-
     // open menu when button clicked
     private void onMenuButtonClicked() {
         BottomMenuFragment bottomMenu = new BottomMenuFragment();
         bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
     }
 
-
     // set monster name in header to name of current monster
     public void setMonsterName(String name) {
         monsterName.setText(name);
     }
 
-
     /**
      * Called when the observable object is updated
-     * @param o     the observable object.
-     * @param arg   an argument passed to the {@code notifyObservers}
-     *                 method.
+     * 
+     * @param o   the observable object.
+     * @param arg an argument passed to the {@code notifyObservers}
+     *            method.
      */
     @Override
     public void update(Observable o, Object arg) {
