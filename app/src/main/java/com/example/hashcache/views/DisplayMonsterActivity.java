@@ -263,7 +263,7 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
     }
 
     private void setMiniMapImage(Drawable drawable) {
-        locationImage.setImageDrawable(drawable);
+        locationImage.setBackgroundDrawable(drawable);
     }
 
 
