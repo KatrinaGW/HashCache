@@ -88,7 +88,7 @@ public class BottomMenuFragment extends BottomSheetDialogFragment {
         });
 
         // add functionality to community button
-        ImageButton communityButton = view.findViewById(R.id.community_button);
+        ImageButton communityButton = view.findViewById(R.id.menu_community_button);
         communityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

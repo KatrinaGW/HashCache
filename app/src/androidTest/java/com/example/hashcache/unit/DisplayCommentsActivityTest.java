@@ -1,37 +1,26 @@
 package com.example.hashcache.unit;
+
+import static com.example.hashcache.unit.TestData.EXISTING_COMMENT_BODY;
 import static com.example.hashcache.unit.TestData.TEST_OTHER_USER;
 import static com.example.hashcache.unit.TestData.TEST_OTHER_USER_MONSTER_NAME;
-import static com.example.hashcache.unit.TestData.TEST_OTHER_USER_MONSTER_SCORE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import android.widget.EditText;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.example.hashcache.views.AppHome;
-import com.example.hashcache.views.Community;
-import com.example.hashcache.views.DisplayMonsterActivity;
-import com.example.hashcache.views.MainActivity;
-import com.example.hashcache.views.MyProfile;
-import com.example.hashcache.views.QRStats;
 import com.example.hashcache.R;
+import com.example.hashcache.views.DisplayCommentsActivity;
+import com.example.hashcache.views.MainActivity;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Random;
 
-/**
- * Test class for AppHome. All the UI tests are written here. Robotium test framework is
- used
- */
-public class PrivateDisplayMonsterActivityTest {
-
+public class DisplayCommentsActivityTest {
     private Solo solo;
     @Rule
     public ActivityTestRule<MainActivity> rule =
@@ -51,6 +40,8 @@ public class PrivateDisplayMonsterActivityTest {
         solo.clickOnView(solo.getView(R.id.logo_button));
         solo.sleep(100);
         solo.clickOnText(TEST_OTHER_USER_MONSTER_NAME);
+        solo.sleep(100);
+        solo.clickOnView(solo.getView(R.id.view_comments_button));
     }
 
     private void logout(){
@@ -60,14 +51,11 @@ public class PrivateDisplayMonsterActivityTest {
         solo.clickOnView(solo.getView(R.id.logout_button));
     }
 
-
     @Test
-    public void checkInfo(){
-        solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
-        solo.waitForText(TEST_OTHER_USER_MONSTER_NAME);
-        solo.waitForText(TEST_OTHER_USER_MONSTER_SCORE);
-        solo.waitForView(solo.getView(R.id.view_comments_button));
-        solo.waitForView(solo.getView(R.id.delete_button));
+    public void assertDisplayCommentsPage() throws Exception {
+        solo.assertCurrentActivity("Wrong Activity!", DisplayCommentsActivity.class);
+        solo.waitForView(solo.getView(R.id.comments_header));
+        solo.waitForText(EXISTING_COMMENT_BODY);
         logout();
     }
 }

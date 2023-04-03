@@ -1,22 +1,17 @@
 package com.example.hashcache.unit;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
-import android.app.Activity;
-import android.content.Intent;
+import static com.example.hashcache.unit.TestData.TEST_OTHER_USER;
+import static com.example.hashcache.unit.TestData.TEST_OTHER_USER_EMAIL;
+import static com.example.hashcache.unit.TestData.TEST_OTHER_USER_PHONE_NUMBER;
+
 import android.widget.EditText;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.example.hashcache.R;
-import com.example.hashcache.views.AppHome;
-import com.example.hashcache.views.Community;
 import com.example.hashcache.views.MainActivity;
-import com.example.hashcache.views.MyProfile;
-import com.example.hashcache.views.QRStats;
+import com.example.hashcache.views.OtherProfileInformationActivity;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;
@@ -25,13 +20,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
-
-/**
- * Test class for AppHome. All the UI tests are written here. Robotium test framework is
- used
- */
-public class QRStatsTest {
-
+public class OtherProfileInformationTest {
     private Solo solo;
     @Rule
     public ActivityTestRule<MainActivity> rule =
@@ -39,9 +28,11 @@ public class QRStatsTest {
 
     /**
      * Runs before all tests and creates solo instance.
+     *
+     * @throws Exception
      */
     @Before
-    public void setUp(){
+    public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         final String ALLOWED_CHARACTERS = "0123456789qwertyuiopasdfghjklzxcvbnm";
         final Random random = new Random();
@@ -51,31 +42,29 @@ public class QRStatsTest {
 
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
-        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.menu_community_button));
         solo.sleep(100);
-        solo.clickOnView(solo.getView(R.id.qr_stats_button));
+        solo.enterText((EditText) solo.getView(R.id.search_bar_edittext), TEST_OTHER_USER.substring(0, 4));
+        solo.clickOnView(solo.getView(R.id.search_button));
+        solo.sleep(100);
+        solo.waitForText(TEST_OTHER_USER);
+        solo.clickOnText(TEST_OTHER_USER);
     }
 
-    private void logout(){
+    @Test
+    public void testUsername(){
+        solo.assertCurrentActivity("Wrong Activity", OtherProfileInformationActivity.class);
+        solo.sleep(100);
+        solo.waitForView(solo.getView(R.id.other_username_textview));
+        solo.waitForText(TEST_OTHER_USER);
+        solo.waitForView(solo.getView(R.id.other_email_textview));
+        solo.waitForText(TEST_OTHER_USER_EMAIL);
+        solo.waitForView(solo.getView(R.id.other_phone_textview));
+        solo.waitForText(TEST_OTHER_USER_PHONE_NUMBER);
         solo.clickOnView(solo.getView(R.id.menu_button));
         solo.clickOnView(solo.getView(R.id.my_codes_button));
         solo.clickOnView(solo.getView(R.id.logo_button));
         solo.clickOnView(solo.getView(R.id.logout_button));
     }
-
-    @Test
-    public void checkComponents(){
-        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
-        solo.waitForText("0");
-        solo.waitForView(solo.getView(R.id.total_score_textview));
-        solo.waitForView(solo.getView(R.id.my_codes_textview));
-        solo.waitForView(solo.getView(R.id.top_score_textview));
-        solo.waitForView(solo.getView(R.id.low_score_textview));
-        solo.waitForView(solo.getView(R.id.menu_button));
-        assert(solo.getView(R.id.menu_button).isClickable());
-        logout();
-
-    }
-
-
 }
