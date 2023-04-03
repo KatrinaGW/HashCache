@@ -14,9 +14,13 @@ The map page lets you see nearby scanned QR codes. You can also search for codes
 ### Connecting with Others
 Checkout the leaderboards to see who has the highest scoring monsters. Visit the community page to search for other users and view their profiles.  
 
+## Specs  
 ### Privacy  
  - Scanned QR codes are _hashed_ - so the original information is not saved. This means it's safe to scan any code, even your vaccine passport!  
- - Users can turn off location in user settings.  
+ - When the app is opened for the first time after installation, users are prompted to allow access to the device's geolocation and data. These permissions can be turned off in the device's settings.
+ 
+ ### Testing  
+ - Before running intent tests, geolocation and camera permissions must be turned OFF.
 
 ## Acknowledgement
 HashCache uses CompileSDK 33
