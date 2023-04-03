@@ -209,21 +209,18 @@ public class CodeMetadataDatabaseAdaptersTest {
         DocumentSnapshot mockDS = Mockito.mock(DocumentSnapshot.class);
         List<DocumentSnapshot> testList = new ArrayList<>();
         testList.add(mockDS);
-        DocumentReference mockDocRef = Mockito.mock(DocumentReference.class);
         Task<Void> mockTaskVoid = Mockito.mock(Task.class);
 
         when(mockDb.collection(anyString())).thenReturn(mockCollectionReference);
         when(mockCollectionReference.whereEqualTo(FieldNames.ScannableCodeId.name, testScannableCodeId))
                 .thenReturn(mockQuery);
-        when(mockQuery.get()).thenReturn(mockTaskQS);
-        when(mockQuery.whereEqualTo(FieldNames.USER_ID.fieldName, testUsername))
+        when(mockQuery.whereEqualTo(FieldNames.USER_ID.name, testUsername))
                 .thenReturn(mockQuery);
+        when(mockQuery.get()).thenReturn(mockTaskQS);
         when(mockTaskQS.isSuccessful()).thenReturn(true);
         when(mockTaskQS.getResult()).thenReturn(mockQS);
-        when(mockQS.size()).thenReturn(1);
+        when(mockQS.isEmpty()).thenReturn(false);
         when(mockQS.getDocuments()).thenReturn(testList);
-        when(mockDS.getReference()).thenReturn(mockDocRef);
-        when(mockDocRef.delete()).thenReturn(mockTaskVoid);
 
         doAnswer(invocation -> {
             OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
