@@ -60,8 +60,8 @@ public class LoginsAdapter {
      * @return INSTANCE the newly created INSTANCE of the LoginsAdapter
      * @throws IllegalArgumentException when the INSTANCE already exists
      */
-    public static LoginsAdapter makeInstance(FireStoreHelper fireStoreHelper,
-                                            FirebaseFirestore firebaseFirestore){
+    public static LoginsAdapter makeOrGetInstance(FireStoreHelper fireStoreHelper,
+                                                  FirebaseFirestore firebaseFirestore){
         if(INSTANCE == null){
             INSTANCE = new LoginsAdapter(fireStoreHelper, firebaseFirestore);
             return INSTANCE;

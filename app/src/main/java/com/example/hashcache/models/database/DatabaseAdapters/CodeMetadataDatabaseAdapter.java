@@ -62,7 +62,7 @@ public class CodeMetadataDatabaseAdapter {
     }
 
     /**
-     * Create the static instance of the CodeLocationConnectionHandler class
+     * Creates or gets the static instance of the CodeLocationConnectionHandler class
      *
      * @param fireStoreHelper the instance of the FireStoreHelper class to call upon
      *                        to perform

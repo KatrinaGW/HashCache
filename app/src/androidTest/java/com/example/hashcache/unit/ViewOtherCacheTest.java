@@ -1,38 +1,29 @@
 package com.example.hashcache.unit;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
+
+import static com.example.hashcache.unit.TestData.TEST_OTHER_USER;
+
 import static org.junit.Assert.assertTrue;
 
 import android.widget.EditText;
+import android.widget.ListView;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.example.hashcache.R;
-import com.example.hashcache.views.AppHome;
-import com.example.hashcache.views.Community;
+import com.example.hashcache.views.DisplayMonsterActivity;
 import com.example.hashcache.views.MainActivity;
-import com.example.hashcache.views.MyProfile;
-import com.example.hashcache.views.QRStats;
-import com.example.hashcache.views.SettingsActivity;
+import com.example.hashcache.views.OtherCacheActivity;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Random;
-
-
-/**
- * Test class for AppHome. All the UI tests are written here. Robotium test framework is
- used
- */
-public class MyProfileTest {
-
+public class ViewOtherCacheTest {
     private Solo solo;
-    private String sbStr;
     @Rule
     public ActivityTestRule<MainActivity> rule =
             new ActivityTestRule<>(MainActivity.class, true, true);
@@ -50,12 +41,19 @@ public class MyProfileTest {
         final StringBuilder sb = new StringBuilder(15);
         for (int i = 0; i < 15; ++i)
             sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
-        sbStr = sb.toString();
 
         solo.enterText((EditText) solo.getView(R.id.username_edittext), sb.toString());
         solo.clickOnButton("START CACHING");
-        solo.clickOnView(solo.getView(R.id.logo_button));
-
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.menu_community_button));
+        solo.sleep(100);
+        solo.enterText((EditText) solo.getView(R.id.search_bar_edittext), TEST_OTHER_USER.substring(0, 4));
+        solo.clickOnView(solo.getView(R.id.search_button));
+        solo.sleep(100);
+        solo.waitForText(TEST_OTHER_USER);
+        solo.clickOnText(TEST_OTHER_USER);
+        solo.sleep(100);
+        solo.clickOnView(solo.getView(R.id.view_other_player_codes));
     }
 
     private void logout(){
@@ -66,23 +64,23 @@ public class MyProfileTest {
     }
 
     @Test
-    public void checkComponents(){
-        solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
-        solo.waitForView(solo.getView(R.id.username_textview));
-        solo.waitForView(solo.getView(R.id.score_textview));
-        solo.waitForText(sbStr);
-        solo.waitForView(solo.getView(R.id.scannable_codes_list));
-        solo.waitForView(solo.getView(R.id.qr_stats_button));
+    public void otherCodesVisibleTest(){
+        solo.assertCurrentActivity("Wrong Activity", OtherCacheActivity.class);
+        solo.waitForText(TEST_OTHER_USER);
+        ArrayList<ListView> list = solo.getCurrentViews(ListView.class);
+        solo.sleep(100);
+        assertTrue(list.size()>0);
         logout();
     }
 
     @Test
-    public void checkLogoButton(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
-        solo.clickOnImageButton(0);
-        solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", SettingsActivity.class);
-        solo.clickOnView(solo.getView(R.id.logout_button));
+    public void otherPlayerMonsterClickableTest(){
+        solo.assertCurrentActivity("Wrong Activity", OtherCacheActivity.class);
+        solo.waitForText(TEST_OTHER_USER);
+        ArrayList<ListView> list = solo.getCurrentViews(ListView.class);
+        assertTrue(list.size()>0);
+        solo.clickInList(0, 0);
+        solo.assertCurrentActivity("Wrong Activity", DisplayMonsterActivity.class);
+        logout();
     }
 }

@@ -165,11 +165,14 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
 
     private void setValues(){
         Player playerInfo = AppContext.get().getCurrentPlayer();
-        usernameView.setVisibility(View.VISIBLE);
-        setUsername(playerInfo.getUsername());
 
-        setEmail(playerInfo.getContactInfo().getEmail());
-        setPhoneNumber(playerInfo.getContactInfo().getPhoneNumber());
+        if(playerInfo!=null){
+            usernameView.setVisibility(View.VISIBLE);
+            setUsername(playerInfo.getUsername());
+
+            setEmail(playerInfo.getContactInfo().getEmail());
+            setPhoneNumber(playerInfo.getContactInfo().getPhoneNumber());
+        }
     }
 
     /**

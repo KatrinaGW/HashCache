@@ -62,7 +62,7 @@
         android:scaleType="fitCenter"/>
 
     <ImageButton
-        android:id="@+id/community_button"
+        android:id="@+id/menu_community_button"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_alignParentTop="true"

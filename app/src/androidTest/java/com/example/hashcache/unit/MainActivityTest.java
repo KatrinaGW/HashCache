@@ -32,6 +32,7 @@ import java.util.Random;
 public class MainActivityTest {
 
     private Solo solo;
+    private final String testUsername = "Hal";
 
     @Rule
     public ActivityTestRule<MainActivity> rule =
@@ -47,13 +48,20 @@ public class MainActivityTest {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(),rule.getActivity());
     }
 
+    private void logout(){
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
+        solo.clickOnView(solo.getView(R.id.logo_button));
+        solo.clickOnView(solo.getView(R.id.logout_button));
+    }
+
     /**
      * Gets the Activity
      * @throws Exception
      */
     @Test
     public void start() throws Exception{
-        Activity activity = rule.getActivity();
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
     }
 
 
@@ -62,19 +70,20 @@ public class MainActivityTest {
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
         solo.clickOnButton("START CACHING");
         solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        logout();
 
     }
 
     @Test
     public void checkUsedUsername(){
-        solo.enterText((EditText) solo.getView(R.id.username_edittext), "a");
+        solo.enterText((EditText) solo.getView(R.id.username_edittext), testUsername);
         solo.clickOnButton("START CACHING");
         solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        solo.waitForText(testUsername);
+        logout();
     }
-
-
 
     @Test
     public void checkCorrectInput(){
@@ -90,40 +99,8 @@ public class MainActivityTest {
         solo.clickOnButton("START CACHING");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        solo.waitForText(sb.toString());
+        logout();
 
     }
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
