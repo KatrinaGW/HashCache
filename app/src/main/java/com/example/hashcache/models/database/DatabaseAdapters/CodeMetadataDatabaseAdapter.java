@@ -283,7 +283,9 @@ public class CodeMetadataDatabaseAdapter {
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if(task.isSuccessful()){
                         ArrayList<CodeMetadata> cms = new ArrayList<>();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        List<DocumentSnapshot> documents = querySnapshot.getDocuments();
+                        for (DocumentSnapshot document : documents) {
                             CodeMetadata cm = parseCodeMetadataDocument(document);
                             cms.add(cm);
                         }
