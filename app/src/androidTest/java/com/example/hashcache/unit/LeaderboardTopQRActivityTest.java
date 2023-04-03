@@ -61,7 +61,7 @@ public class LeaderboardTopQRActivityTest {
 
     void logout(){
         solo.clickOnView(solo.getView(R.id.menu_button));
-        solo.clickOnText("My QR Codes");
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
         solo.clickOnView(solo.getView(R.id.logo_button));
         solo.clickOnView(solo.getView(R.id.logout_button));
     }
@@ -97,11 +97,11 @@ public class LeaderboardTopQRActivityTest {
     }
 
     @Test
-    public void checkMenuButton1(){
-        // Asserts that the current activity is the LeaderboardTopQRActivity. Otherwise, show “Wrong Activity"
+    public void checkMenuButtonMap(){
+        // Asserts that the current activity is the LeaderboardRegionActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", LeaderboardTopQRActivity.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Map");
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.map_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
         solo.clickOnView(solo.getView(R.id.logo_button));
@@ -110,11 +110,11 @@ public class LeaderboardTopQRActivityTest {
     }
 
     @Test
-    public void checkMenuButton2(){
-        // Asserts that the current activity is the LeaderboardTopQRActivity. Otherwise, show “Wrong Activity"
+    public void checkMenuButtonProfile(){
+        // Asserts that the current activity is the LeaderboardRegionActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", LeaderboardTopQRActivity.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("My QR Codes");
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", MyProfile.class);
         solo.clickOnView(solo.getView(R.id.logo_button));
@@ -122,13 +122,13 @@ public class LeaderboardTopQRActivityTest {
     }
 
     @Test
-    public void checkMenuButton3(){
-        // Asserts that the current activity is the LeaderboardTopQRActivity. Otherwise, show “Wrong Activity"
+    public void checkMenuButtonLeaderboard(){
+        // Asserts that the current activity is the LeaderboardRegionActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", LeaderboardTopQRActivity.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Stats");
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.leaderboard_button));
         solo.sleep(100);
-        solo.assertCurrentActivity("Wrong Activity", QRStats.class);
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
         solo.clickOnView(solo.getView(R.id.menu_button));
         solo.clickOnView(solo.getView(R.id.my_codes_button));
         solo.clickOnView(solo.getView(R.id.logo_button));
@@ -136,11 +136,11 @@ public class LeaderboardTopQRActivityTest {
     }
 
     @Test
-    public void checkMenuButton4(){
-        // Asserts that the current activity is the LeaderboardTopQRActivity. Otherwise, show “Wrong Activity"
+    public void checkMenuButtonCommunity(){
+        // Asserts that the current activity is the LeaderboardRegionActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", LeaderboardTopQRActivity.class);
-        solo.clickOnImageButton(0);
-        solo.clickOnText("Community");
+        solo.clickOnView(solo.getView(R.id.menu_button));
+        solo.clickOnView(solo.getView(R.id.menu_community_button));
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", Community.class);
         solo.clickOnView(solo.getView(R.id.menu_button));
