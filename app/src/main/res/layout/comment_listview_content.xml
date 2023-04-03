@@ -17,23 +17,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="5dp"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="8dp"
             android:textStyle="bold"
             android:text="Commentator"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:textColor="@color/HC_light_green"
+            android:textSize="18sp"/>
 
         <TextView
             android:id="@+id/comment_body_listview_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingHorizontal="10dp"
+            android:paddingHorizontal="24dp"
             android:paddingVertical="5dp"
             android:text="Comment body"
-            android:textColor="#FFFFFF"
-            android:textSize="11sp" />
+            android:textColor="@color/white"
+            android:textSize="16sp" />
 
     </LinearLayout>
 
