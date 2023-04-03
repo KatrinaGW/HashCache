@@ -62,16 +62,8 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_region);
 
-
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            return;
-        }
 
         /**
          *
@@ -187,6 +179,8 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
@@ -260,6 +254,12 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                                                 }
                                             }
 
+                                        })
+                                        .exceptionally(new Function<Throwable, Void>() {
+                                            @Override
+                                            public Void apply(Throwable throwable) {
+                                                return null;
+                                            }
                                         });
 
                             }).exceptionally(new Function<Throwable, Void>() {
