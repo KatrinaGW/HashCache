@@ -64,9 +64,10 @@ public class LoginsAdapter {
                                                   FirebaseFirestore firebaseFirestore){
         if(INSTANCE == null){
             INSTANCE = new LoginsAdapter(fireStoreHelper, firebaseFirestore);
+            return INSTANCE;
+        }else{
+            return INSTANCE;
         }
-
-        return INSTANCE;
     }
 
     /**

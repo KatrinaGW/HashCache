@@ -75,10 +75,11 @@ public class CodeMetadataDatabaseAdapter {
      *         class to use for all actions concerning the CodeLocation database
      *         collection
      **/
-    public static CodeMetadataDatabaseAdapter makeOrGetInstanceCodeMetaDataDatabaseAdapterInstance
-    (FireStoreHelper fireStoreHelper, FirebaseFirestore db) {
+    public static CodeMetadataDatabaseAdapter makeOrGetInstance(FireStoreHelper fireStoreHelper,
+                                                                FirebaseFirestore db) {
         if (INSTANCE == null) {
             INSTANCE = new CodeMetadataDatabaseAdapter(fireStoreHelper, db);
+
         }
 
         return INSTANCE;

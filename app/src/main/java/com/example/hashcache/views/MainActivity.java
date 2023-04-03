@@ -8,7 +8,6 @@ package com.example.hashcache.views;
 
 import static com.example.hashcache.controllers.DependencyInjector.getOrMakeScannableCodesConnectionHandler;
 import static com.example.hashcache.controllers.DependencyInjector.makeLoginsAdapter;
-import static com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter.makeOrGetInstanceCodeMetaDataDatabaseAdapterInstance;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -115,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         getOrMakeScannableCodesConnectionHandler();
         makeLoginsAdapter();
-        CodeMetadataDatabaseAdapter.makeOrGetInstanceCodeMetaDataDatabaseAdapterInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
+        CodeMetadataDatabaseAdapter.makeOrGetInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
 
         AppContext.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID));

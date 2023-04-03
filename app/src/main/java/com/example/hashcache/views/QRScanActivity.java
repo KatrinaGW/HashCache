@@ -110,7 +110,9 @@ public class QRScanActivity extends AppCompatActivity {
                         try {
                             Pair<String, byte[]> hashData = HashInfoGenerator.getHashFromQRContents(qrContent);
                             String scannableCodeId = hashData.first;
+
                             String userId = AppContext.get().getCurrentPlayer().getUserId();
+                            Log.d("QR SCAN ACTIVIYT",scannableCodeId + "UserId" + userId);
                             Database.getInstance().codeMetadataEntryExists(userId, scannableCodeId)
                                     .thenAccept(exists -> {
                                         if (!exists) {

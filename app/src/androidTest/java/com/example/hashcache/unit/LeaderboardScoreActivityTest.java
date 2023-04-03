@@ -69,7 +69,7 @@ public class LeaderboardScoreActivityTest {
     @Test
     public void checkScoreButton(){
         // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
         logout();
     }
 
@@ -86,7 +86,7 @@ public class LeaderboardScoreActivityTest {
     @Test
     public void checkRegionButton(){
         // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
         solo.clickOnButton("REGION");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", LeaderboardRegionActivity.class);
@@ -96,7 +96,7 @@ public class LeaderboardScoreActivityTest {
     @Test
     public void checkMenuButton1(){
         // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
         solo.clickOnImageButton(0);
         solo.clickOnText("Map");
         solo.sleep(100);
@@ -109,7 +109,7 @@ public class LeaderboardScoreActivityTest {
     @Test
     public void checkMenuButton2(){
         // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
         solo.clickOnImageButton(0);
         solo.clickOnText("My QR Codes");
         solo.sleep(100);
@@ -121,7 +121,7 @@ public class LeaderboardScoreActivityTest {
     @Test
     public void checkMenuButton3(){
         // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
         solo.clickOnImageButton(0);
         solo.clickOnText("Stats");
         solo.sleep(100);
@@ -135,7 +135,7 @@ public class LeaderboardScoreActivityTest {
     @Test
     public void checkMenuButton4(){
         // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
         solo.clickOnImageButton(0);
         solo.clickOnText("Community");
         solo.sleep(100);
