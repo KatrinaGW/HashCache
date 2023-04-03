@@ -15,6 +15,9 @@ import static org.mockito.Mockito.when;
 import android.media.Image;
 import android.util.Pair;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
@@ -27,6 +30,7 @@ import com.example.hashcache.models.database.DatabasePort;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -36,15 +40,24 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.checkerframework.checker.units.qual.A;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
+
+import kotlin.Triple;
 
 public class PlayersDatabaseAdapterTest {
     private PlayerDocumentConverter mockPlayerDocumentConverter;
@@ -438,11 +451,49 @@ public class PlayersDatabaseAdapterTest {
 
 
     @Test
-    private void getTopUsersTest() {
-        DatabasePort db = Database.getInstance();
+    void getTopUsersTest() {
+        PlayersDatabaseAdapter playersDatabaseAdapterTest = getPlayersDatabaseAdapter();
+        String filter = FieldNames.TOTAL_SCORE.fieldName;
+        Query mockQuery = Mockito.mock(Query.class);
+        Task<QuerySnapshot> mockTask = Mockito.mock(Task.class);
+        QuerySnapshot mockQuerySnapShot = Mockito.mock(QuerySnapshot.class);
+        DocumentSnapshot mockDocSnap1 = Mockito.mock(DocumentSnapshot.class);
+        DocumentSnapshot mockDocSnap2 = Mockito.mock(DocumentSnapshot.class);
+        List mockList = mock(List.class);
+
+        when(mockCollectionReference.orderBy(filter, Query.Direction.DESCENDING))
+                .thenReturn(mockQuery);
+
+        when(mockQuery.get()).thenReturn(mockTask);
+        doAnswer(result -> {
+            OnSuccessListener onSuccessListener = result.getArgumentAt(0, OnSuccessListener.class);
+            onSuccessListener.onSuccess(mockQuerySnapShot);
+            return null;
+        }).when(mockTask).addOnSuccessListener(any());
+
+        when(mockTask.isSuccessful()).thenReturn(true);
+        when(mockTask.getResult()).thenReturn(mockQuerySnapShot);
+        when(mockQuerySnapShot.getDocuments()).thenReturn(mockList);
+
+        when(mockList.size()).thenReturn(2);
+        when(mockList.get(0)).thenReturn(mockDocSnap1);
+        when(mockList.get(1)).thenReturn(mockDocSnap2);
+
+        when(mockDocSnap1.get(FieldNames.USERNAME.fieldName)).thenReturn("Ryan");
+        when(mockDocSnap2.get(FieldNames.USERNAME.fieldName)).thenReturn("Joe");
+        when(mockDocSnap1.get(filter)).thenReturn(10L);
+        when(mockDocSnap2.get(filter)).thenReturn(5L);
+        when(mockDocSnap1.getId()).thenReturn("1234");
+        when(mockDocSnap2.getId()).thenReturn("4321");
 
 
+        ArrayList<Triple<String, Long, String>> result = playersDatabaseAdapterTest.getTopUsers(filter).join();
 
-        db.getTopUsers(FieldNames.TOTAL_SCORE.fieldName);
+        assertEquals("Ryan", result.get(0).getFirst());
+        assertEquals("Joe", result.get(1).getFirst());
+        assert(10L == result.get(0).getSecond());
+        assert(5L == result.get(1).getSecond());
+        assertEquals("1234", result.get(0).getThird());
+        assertEquals("4321", result.get(1).getThird());
     }
 }
