@@ -20,10 +20,10 @@ Checkout the leaderboards to see who has the highest scoring monsters. Visit the
  - When the app is opened for the first time after installation, users are prompted to allow access to the device's geolocation and data. These permissions can be turned off in the device's settings.
  
  ### Testing  
- - Before running intent tests, geolocation and camera permissions must be turned OFF.
+ - Before running intent tests, geolocation and camera permissions must be turned OFF.  
+ - HashCache uses CompileSDK 33  
 
 ## Acknowledgement
-HashCache uses CompileSDK 33
 Source code incorporates elements from University of Alberta CMPUT301 Winter 2023 course materials. Other accessed resources include StackOverflow and Android Developer.  
 For more detailed information, see [Sources & Citations](https://github.com/CMPUT301W23T01/HashCache/wiki/Sources-%26-Citations/_edit).
 
