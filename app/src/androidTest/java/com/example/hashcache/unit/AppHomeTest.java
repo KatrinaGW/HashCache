@@ -4,8 +4,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import android.view.View;
 import android.widget.EditText;
 
+import androidx.appcompat.widget.SearchView;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
@@ -15,6 +17,7 @@ import com.example.hashcache.views.Community;
 import com.example.hashcache.views.MainActivity;
 import com.example.hashcache.views.MyProfile;
 import com.example.hashcache.views.QRScanActivity;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;
@@ -101,6 +104,42 @@ public class AppHomeTest {
     public void testEyecon(){
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
         solo.clickOnView(solo.getView(R.id.eye_button));
+        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        logout();
+    }
+
+    @Test
+    public void testSearch(){
+        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        solo.typeText(1, "Beijing");
+        solo.sendKey(Solo.ENTER);
+        solo.sleep(3000);
+        assertTrue(solo.searchText("Beijing", 1));
+        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        logout();
+    }
+
+    @Test
+    public void testSearchNotFound(){
+        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        solo.typeText(1, "abababaababababaab");
+        solo.sendKey(Solo.ENTER);
+        assertFalse(solo.searchText("Beijing", 1));
+        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        logout();
+    }
+
+    @Test
+    public void testCurrentLocationButton(){
+        solo.assertCurrentActivity("Wrong Activity", AppHome.class);
+        solo.sleep(3000);
+        //View mapView = solo.getCurrentActivity().getFragmentManager().findFragmentById(R.id.map).getView();
+        //View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+        //solo.typeText(1, "Beijing");
+        //solo.sendKey(Solo.ENTER);
+        //solo.sleep(3000);
+        //assertTrue(solo.searchText("Beijing", 1));
+        //solo.clickOnView(locationButton);
         solo.assertCurrentActivity("Wrong Activity", AppHome.class);
         logout();
     }
