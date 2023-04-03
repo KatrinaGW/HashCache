@@ -2,45 +2,59 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_gradient_yellow">
+    android:background="@drawable/drip_gradient_green">
+
     <TextView
         android:id="@+id/monster_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Monster Name"
-        android:textSize="36sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
+        android:layout_marginStart="36dp"
         android:layout_marginTop="36dp"
-        android:layout_marginStart="36dp" />
+        android:layout_marginBottom="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Monster Name"
+        android:textColor="@color/black"
+        android:textSize="36sp"
+        android:textStyle="bold" />
     <TextView
         android:id="@+id/monster_score"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="score: 123456"
-        android:textSize="28sp"
-        android:layout_marginStart="36dp"
-        android:layout_below="@+id/monster_name" />
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:layout_marginHorizontal="24dp"
+        android:paddingVertical="4dp"
+        android:paddingHorizontal="14dp"
+        android:layout_below="@+id/monster_name"
+        android:background="@drawable/rounded_rect_white_transparent"/>
+
     <ImageView
         android:id="@+id/monster_image"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:layout_margin="24dp"
-        android:background="@color/HC_ash_grey"
-        android:layout_below="@+id/monster_score"/>
+        android:layout_below="@+id/monster_score"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="54dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/rounded_rect_white_transparent" />
 
     <TextView
         android:id="@+id/take_photo_text"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Take location photo?"
-        android:textColor="@color/black"
+        android:textColor="@color/HC_light_grey"
         android:textSize="24dp"
-        android:textStyle="bold"
+        android:textStyle="italic"
         android:layout_below="@+id/monster_image"
         android:layout_centerHorizontal="true"
         android:textAlignment="center"
-        android:layout_marginTop="24dp"/>
+        android:layout_marginTop="48dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/background_gradient"
+        android:paddingVertical="6dp"/>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,19 +66,21 @@
             android:id="@+id/photo_button"
             android:layout_width="wrap_content"
             android:layout_height="54dp"
-            android:background="@drawable/rounded_rect_green"
+            android:background="@drawable/rounded_rect_purple"
             android:src="@drawable/icon_camera"
             android:layout_marginEnd="36dp"
             android:scaleType="fitCenter"
             android:paddingHorizontal="18dp"
-            android:paddingVertical="8dp"/>
+            android:paddingVertical="8dp"
+            android:elevation="5dp"/>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/skip_photo_button"
             android:layout_width="wrap_content"
             android:layout_height="54dp"
             android:text="skip"
             android:textSize="22sp"
-            android:background="@drawable/rounded_rect_green" />
+            android:background="@drawable/rounded_rect_purple"
+            android:elevation="5dp"/>
     </LinearLayout>
     <ImageButton
         android:id="@+id/menu_button"
