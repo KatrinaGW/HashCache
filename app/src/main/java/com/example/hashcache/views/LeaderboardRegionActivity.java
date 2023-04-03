@@ -45,7 +45,6 @@ import java.util.function.Function;
  It includes a menu button and four navigation buttons to switch between different leaderboards.
 
  */
-
 public class LeaderboardRegionActivity extends AppCompatActivity {
 
     private FusedLocationProviderClient fusedLocationClient;

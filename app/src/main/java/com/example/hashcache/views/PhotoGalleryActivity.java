@@ -91,6 +91,9 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
         });
     }
 
+    /**
+     * Called when the activity resumes
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -188,13 +191,6 @@ public class PhotoGalleryActivity extends AppCompatActivity implements Observer 
             });
 
         });
-        // .exceptionally(new Function<Throwable, Void>() {
-        // @Override
-        // public Void apply(Throwable throwable) {
-        // Log.d("ERROR", throwable.getMessage());
-        // return null;
-        // }
-        // });
     }
 
     // go back to monster info activity when back button clicked

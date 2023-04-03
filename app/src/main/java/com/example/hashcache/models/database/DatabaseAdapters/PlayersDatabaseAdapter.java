@@ -139,7 +139,6 @@ public class PlayersDatabaseAdapter {
      *
      * @param username the username to use to pull the player with
      */
-
     public CompletableFuture<Boolean> usernameExists(String username) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
@@ -651,6 +650,11 @@ public class PlayersDatabaseAdapter {
                 return cf;
     }
 
+    /**
+     * Gets the top users
+     * @param filter the filter to apply when getting the users
+     * @return cf the CompletableFuture with the list of the top users matching the filter
+     */
     public CompletableFuture<ArrayList<Triple<String, Long, String>>> getTopUsers(String filter) {
         ArrayList<Triple<String, Long, String>> list = new ArrayList<>();
         CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);

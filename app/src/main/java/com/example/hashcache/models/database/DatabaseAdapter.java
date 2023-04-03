@@ -650,16 +650,33 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return LoginsAdapter.getInstance().addLoginRecord(username);
     }
 
+    /**
+     * Adds a CodeMetadata to the database
+     * @param codeMetadata the metadata object to add to the database
+     * @return cf the CompletableFuture that compeltes with true if the operation was successful
+     */
     @Override
     public CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata){
         return CodeMetadataDatabaseAdapter.getInstance().createScannableCodeMetadata(codeMetadata);
     }
 
+    /**
+     * Gets the metadata for all the scannableCodes within a certain radius of a certain location
+     * @param location the location to use as the centre point
+     * @param radiusMeters the radius to find all scananbleCodes in
+     * @return cf the CompletableFuture with a list of the codes in the radius
+     */
     @Override
     public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation location, double radiusMeters) {
         return CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataWithinRadius(location, radiusMeters);
     }
 
+    /**
+     * Gets the metadata for all the scannableCodes within a certain radius of a certain location
+     * @param location the location to use as the centre point
+     * @param radiusMeters the radius to find all scananbleCodes in
+     * @return cf the CompletableFuture with a list of the codes in the radius
+     */
     @Override
     public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesWithinRadius(GeoLocation location, double radiusMeters) {
         CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
@@ -700,21 +717,45 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return LoginsAdapter.getInstance().getUsernameForDevice();
     }
 
+    /**
+     * Checks if a document exists for a code metadata with a specific userid and scannableCodeId
+     * @param userId the id of the user
+     * @param scannableCodeId the id of the scannableCode
+     * @return cf the CompletableFuture that completes with whether or not the document exists
+     */
     @Override
     public CompletableFuture<Boolean> codeMetadataEntryExists(String userId, String scannableCodeId) {
         return CodeMetadataDatabaseAdapter.getInstance().codeMetadataEntryExists(userId, scannableCodeId);
     }
 
+    /**
+     * Updates the image a player took of a scannable code
+     * @param userId the id of the player
+     * @param scannableCodeId the id of the scannablecode the player photographed
+     * @param image the image to update with
+     * @return cf the CompletableFuture that completes successfully if the operation was successful
+     */
     @Override
     public CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image) {
         return CodeMetadataDatabaseAdapter.getInstance().updatePlayerCodeMetadataImage(userId, scannableCodeId, image);
     }
 
+    /**
+     * Gets the metadata for a player's specific scannableCode
+     * @param userId the id of the player to get the metadata for
+     * @param scannableCodeId the id of the code to get the metadata for
+     * @return cf the CompletableFuture with the CodeMetadata
+     */
     @Override
     public CompletableFuture<CodeMetadata> getPlayerCodeMetadataById(String userId, String scannableCodeId) {
         return CodeMetadataDatabaseAdapter.getInstance().getPlayerCodeMetadataById(userId, scannableCodeId);
     }
 
+    /**
+     * Gets all the CodeMetadata objects for a specific ScannableCode
+     * @param scannableCodeId the id of the scannableCode
+     * @return cf the CompletableFuture with all the CodeMetadatas that had the specific scananbleCodeId
+     */
     @Override
     public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataById(String scannableCodeId) {
         return CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataById(scannableCodeId);
@@ -752,6 +793,12 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         CodeLocationDatabaseAdapter.resetInstance();
     }
 
+    /**
+     * Updates the player score values on the player document
+     * @param userId the id of the user whose score values need to be updated
+     * @param playerWallet the wallet of the player
+     * @return cf the CompletableFuture that completes with true if the operation was successful
+     */
     @Override
     public CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet) {
 
@@ -798,8 +845,9 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     }
 
     /**
-     *
-     * @return
+     * Gets the scannableCodes within a certain radius of a location
+     * @param location the location to use as the center point
+     * @return cf the CompletableFuture with the scannable codes within a radius
      */
     @Override
     public CompletableFuture<ArrayList<Pair<String, ScannableCode>>> getScannableCodesWithinRadiusSorted(Location location) {

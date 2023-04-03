@@ -58,6 +58,13 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
     private String userId = null;
     private TextView numPlayersValueView;
 
+    /**
+     * Called when the activity is started
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +109,9 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         });
     }
 
+    /**
+     * Called when the activity resumes
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -236,15 +246,15 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         });
     }
 
-    public void setMonsterName(String name) {
+    private void setMonsterName(String name) {
         monsterName.setText(name);
     }
 
-    public void setMonsterScore(long score) {
+    private void setMonsterScore(long score) {
         monsterScore.setText("Score: " + score);
     }
 
-    public void setMonsterImage(Drawable image) {
+    private void setMonsterImage(Drawable image) {
         monsterImage.setImageDrawable(image);
     }
 
@@ -252,7 +262,7 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         numPlayersValueView.setText(Integer.toString(numPlayers));
     }
 
-    public void setMiniMapImage(Drawable drawable) {
+    private void setMiniMapImage(Drawable drawable) {
         locationImage.setImageDrawable(drawable);
     }
 

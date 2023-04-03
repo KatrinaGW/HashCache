@@ -75,7 +75,6 @@ public class HashInfoGenerator {
      * @param QRContents the byte array to convert
      * @return a String with the hash.
      */
-
     public static Pair<String, byte[]> getHashFromQRContents(String QRContents) throws NoSuchAlgorithmException {
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
         messageDigest.update(QRContents.getBytes());

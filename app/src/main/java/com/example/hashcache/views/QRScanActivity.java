@@ -51,16 +51,10 @@ public class QRScanActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     /**
-     * Called when the activity is created.
-     *
-     * Initializes the activity by setting up the camera view and scanner, and
-     * adding a callback function for when a
-     * QR code is successfully scanned.
-     *
-     * @param savedInstanceState saved state of the activity, if it was previously
-     *                           closed.
+     * Called when an error occurs in the scanning process
+     * @param message the error message
+     * @param e the error itself
      */
-
     public void handleError(String message, Throwable e){
         runOnUiThread(new Runnable() {
             @Override
@@ -76,6 +70,15 @@ public class QRScanActivity extends AppCompatActivity {
         });
 
     }
+
+    /**
+     * Called whenever the activity start
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

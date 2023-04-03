@@ -8,6 +8,9 @@ import com.example.hashcache.models.database.DatabasePort;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+/**
+ * A controller to handle setting up a user
+ */
 public class SetupUserCommand {
     /**
      * Sets up the user with the given username after the user has been logged in or created.

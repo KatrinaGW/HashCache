@@ -157,7 +157,6 @@ public class HashController {
      * @param userId the ID of the player whose wallet the scannable code should be deleted from
      * @return a CompletableFuture that completes with a boolean indicating whether the scannable code was deleted successfully
      */
-
     public static CompletableFuture<CodeMetadata> initCodeMetadata(String scannableCodeId, String userId, FusedLocationProviderClient fusedLocationProviderClient){
         CompletableFuture<CodeMetadata> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(new Runnable() {
@@ -182,6 +181,13 @@ public class HashController {
         });
         return cf;
     }
+
+    /**
+     * Deletse a specific scannableCode from a user's wallet
+     * @param scannableCodeId the id to remove from the user's wallet
+     * @param userId the id of the user to remove the code from
+     * @return cf the CompletableFuture that completes with True if the operation was successful
+     */
     public static CompletableFuture<Boolean> deleteScannableCodeFromWallet(String scannableCodeId,
                                                                            String userId) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
@@ -253,6 +259,10 @@ public class HashController {
         return cf;
     }
 
+    /**
+     * Update the stored maximum score for the current user
+     * @return cf the CompletableFuture that completes successfully if the operation is successful
+     */
     private static CompletableFuture<Void> updateTotalMaxScore(){
         CompletableFuture<Void> cf = new CompletableFuture<>();
         Database.getInstance()

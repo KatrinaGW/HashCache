@@ -4,6 +4,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Generates a random name for a scannableCode
+ */
 public class NameGenerator {
     // Singleton variable for names
     private static ArrayList<String> NAMES;

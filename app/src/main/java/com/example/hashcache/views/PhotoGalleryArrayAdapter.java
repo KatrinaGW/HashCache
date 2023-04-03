@@ -94,7 +94,7 @@ public class PhotoGalleryArrayAdapter extends ArrayAdapter<HashMap<String, Objec
         return view;
     }
 
-    public Drawable makeDrawable(String base64Image) {
+    private Drawable makeDrawable(String base64Image) {
         byte[] decodedImage = Base64.decode(base64Image, Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
         Bitmap rotatedBitmap = RotateBitmap(bitmap, 90);
@@ -103,7 +103,7 @@ public class PhotoGalleryArrayAdapter extends ArrayAdapter<HashMap<String, Objec
         return drawable;
     }
 
-    public static Bitmap RotateBitmap(Bitmap bitmap, float angle)
+    private static Bitmap RotateBitmap(Bitmap bitmap, float angle)
     {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);

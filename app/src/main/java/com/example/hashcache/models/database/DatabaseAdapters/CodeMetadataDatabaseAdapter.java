@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * A class to handle interfacing with the CodeMetadata collection in the database
+ */
 public class CodeMetadataDatabaseAdapter {
     private String TAG = "CodeMetadataDatabaseAdapter";
     private FirebaseFirestore db;
@@ -105,6 +108,12 @@ public class CodeMetadataDatabaseAdapter {
         INSTANCE = null;
     }
 
+    /**
+     * Updates the image for a specific scannableCode
+     * @param codeMetadataId the id of the document to update the image on
+     * @param base64Image the base64 version of the image
+     * @return cf the CompletableFuture that completes successful if the operation was successful
+     */
     public CompletableFuture<Void> updateLocationImage(String codeMetadataId, String base64Image) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
@@ -125,6 +134,12 @@ public class CodeMetadataDatabaseAdapter {
 
     // Based on:
     // https://firebase.google.com/docs/firestore/solutions/geoqueries#java
+
+    /**
+     * Adds a CodeMetadata to the database
+     * @param codeMetadata the metadata object to add to the database
+     * @return cf the CompletableFuture that compeltes with true if the operation was successful
+     */
     public CompletableFuture<Void> createScannableCodeMetadata(CodeMetadata codeMetadata) {
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
@@ -199,6 +214,13 @@ public class CodeMetadataDatabaseAdapter {
         return cf;
     }
 
+    /**
+     * Updates the image a player took of a scannable code
+     * @param userId the id of the player
+     * @param scannableCodeId the id of the scannablecode the player photographed
+     * @param image the image to update with
+     * @return cf the CompletableFuture that completes successfully if the operation was successful
+     */
     public CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image) {
 
         Log.d("updatePlayerCodeMetadataImage", String.format("scannableId: %s, userId: %s", scannableCodeId, userId));
@@ -238,6 +260,12 @@ public class CodeMetadataDatabaseAdapter {
         return cf;
     }
 
+    /**
+     * Gets the metadata for a player's specific scannableCode
+     * @param userId the id of the player to get the metadata for
+     * @param scannableCodeId the id of the code to get the metadata for
+     * @return cf the CompletableFuture with the CodeMetadata
+     */
     public CompletableFuture<CodeMetadata> getPlayerCodeMetadataById(String userId, String scannableCodeId) {
         CompletableFuture<CodeMetadata> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
@@ -267,6 +295,11 @@ public class CodeMetadataDatabaseAdapter {
         return cf;
     }
 
+    /**
+     * Gets all the CodeMetadata objects for a specific ScannableCode
+     * @param scannableCodeId the id of the scannableCode
+     * @return cf the CompletableFuture with all the CodeMetadatas that had the specific scananbleCodeId
+     */
     public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataById(String scannableCodeId) {
         CompletableFuture<ArrayList<CodeMetadata>> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
@@ -292,7 +325,12 @@ public class CodeMetadataDatabaseAdapter {
         return cf;
     }
 
-
+    /**
+     * Checks if a document exists for a code metadata with a specific userid and scannableCodeId
+     * @param userId the id of the user
+     * @param scannableCodeId the id of the scannableCode
+     * @return cf the CompletableFuture that completes with whether or not the document exists
+     */
     public CompletableFuture<Boolean> codeMetadataEntryExists(String userId, String scannableCodeId){
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
@@ -326,6 +364,13 @@ public class CodeMetadataDatabaseAdapter {
         });
         return cf;
     }
+
+    /**
+     * Gets the metadata for all the scannableCodes within a certain radius of a certain location
+     * @param loc the location to use as the centre point
+     * @param radiusMeters the radius to find all scananbleCodes in
+     * @return cf the CompletableFuture with a list of the codes in the radius
+     */
     // Based on:
     // https://firebase.google.com/docs/firestore/solutions/geoqueries#java
     public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation loc,
@@ -374,6 +419,11 @@ public class CodeMetadataDatabaseAdapter {
         return cf;
     }
 
+    /**
+     * Turn a CodeMetadata document into an object
+     * @param doc the document to turn into an object
+     * @return the object version of the document
+     */
     @NonNull
     private CodeMetadata parseCodeMetadataDocument(DocumentSnapshot doc) {
         String scannableCodeId = doc.getString(FieldNames.ScannableCodeId.name);

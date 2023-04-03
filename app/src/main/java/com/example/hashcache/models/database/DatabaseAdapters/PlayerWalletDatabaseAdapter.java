@@ -67,6 +67,10 @@ public class PlayerWalletDatabaseAdapter {
         return reg;
     }
 
+    /**
+     * Creates an instance of this class with the injected database
+     * @param db
+     */
     public PlayerWalletDatabaseAdapter(FirebaseFirestore db) {
         this.db = db;
     }
@@ -78,6 +82,12 @@ public class PlayerWalletDatabaseAdapter {
         INSTANCE = null;
     }
 
+    /**
+     * Gets the current static instance of this class or creates a new one with the injected
+     * FireStoreHelper
+     * @param fireStoreHelper the instance of the FireStoreHelper to use
+     * @return INSTANCE the static instance of this class
+     */
     public static PlayerWalletDatabaseAdapter getInstance(FireStoreHelper fireStoreHelper) {
         if (INSTANCE == null) {
             INSTANCE = new PlayerWalletDatabaseAdapter(fireStoreHelper);
@@ -85,6 +95,12 @@ public class PlayerWalletDatabaseAdapter {
         return INSTANCE;
     }
 
+    /**
+     * Gets the current static instance of this class or creates a new one with the injected
+     * FirebaseFirestore
+     * @param db the instance of the FirebaseFirestore to use
+     * @return INSTANCE the static instance of this class
+     */
     public static PlayerWalletDatabaseAdapter getInstance(FirebaseFirestore db) {
         if (INSTANCE == null) {
             INSTANCE = new PlayerWalletDatabaseAdapter(db);
@@ -92,6 +108,10 @@ public class PlayerWalletDatabaseAdapter {
         return INSTANCE;
     }
 
+    /**
+     * Gets the current static instance of this class or creates a new one with a FireStoreHelper
+     * @return INSTANCE the static instance of this class
+     */
     public static PlayerWalletDatabaseAdapter getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new PlayerWalletDatabaseAdapter(FirebaseFirestore.getInstance());
