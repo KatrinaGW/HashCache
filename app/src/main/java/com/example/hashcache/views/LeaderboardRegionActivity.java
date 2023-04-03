@@ -219,12 +219,21 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                                 TextView scoreView = findViewById(R.id.score_value_textview);
 
                                 int j = 1;
+                                int rankingCount = 1;
+                                ArrayList<String> foundIds = new ArrayList<>();
+                                int countAgain = 0;
                                 // Fetch the data base for user ids while also getting the players ranking
                                 // and score
                                 for(Pair<String, ScannableCode> pair: data) {
                                     userIds.add(pair.first);
-                                    if(j<4){
-                                        userIdRanking.put(j, pair.first);
+                                    if(rankingCount < 4){
+                                        if(!foundIds.contains(pair.second.getScannableCodeId())){
+                                            userIdRanking.put(rankingCount, pair.first);
+                                            countAgain++;
+                                            rankingCount++;
+                                            foundIds.add(pair.second.getScannableCodeId());
+                                        }
+
                                     }
                                     if(playerScannedCodeIds.contains(pair.second.getScannableCodeId()) && !got_rank) {
                                         rankView.setText(String.valueOf(j));
@@ -265,4 +274,3 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                 });
     }
 }
-
