@@ -3,6 +3,7 @@ package com.example.hashcache.views;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -31,7 +32,7 @@ import java.util.function.Function;
 
 /**
 
- The NewMonsterActivity class represents an activity in the app that allows users to create a new monster.
+ The DisplayMonsterActivity class represents an activity in the app that allows users to create a new monster.
  This activity sets up the UI elements and adds functionality to the buttons, including taking a location photo
  for the new monster or skipping the photo and navigating to the MyProfile activity. The menu button is also
  functional, allowing users to navigate to different activities in the app.
@@ -118,6 +119,9 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         setViews();
     }
 
+    /**
+     * set the content of the views for DisplayMonster activity
+     */
     private void setViews(){
         currentScannableCode = AppContext.get().getCurrentScannableCode();
         HashInfo currentHashInfo = currentScannableCode.getHashInfo();
@@ -166,10 +170,12 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
                 if(base64Image != null) {
                     byte[] decodedImage = Base64.decode(base64Image, Base64.DEFAULT);
                     Bitmap bitmapImage = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
+                    Bitmap rotatedBitmap = rotateScaleBitmap(bitmapImage, 90, 350);
+                    bitmapImage.recycle();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            setMiniMapImage(new BitmapDrawable(getResources(), bitmapImage));
+                            setMiniMapImage(new BitmapDrawable(getResources(), rotatedBitmap));
                         }
                     });
                 }
@@ -183,6 +189,34 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         }
     }
 
+    /**
+     * Rotates and scales a supplied bitmap image <angle> degrees. Returns the rotated and scaled bitmap.
+     * Source: https://stackoverflow.com/
+     * Question: https://stackoverflow.com/questions/9015372/how-to-rotate-a-bitmap-90-degrees
+     * Answer: https://stackoverflow.com/a/16219591
+     * @param bitmap The bitmap image to be rotated
+     * @param angle The angle to rotate the bitmap, as a float
+     * @param newW The new width of the bitmap, as an integer
+     * @return The rotated and scaled bitmap image
+     */
+    private static Bitmap rotateScaleBitmap(Bitmap bitmap, float angle, int newW) {
+        int w = bitmap.getWidth();
+        int h = bitmap.getHeight();
+        float scale = ((float)newW) / w;
+
+        Matrix matrix = new Matrix();
+
+        // scale bitmap
+        matrix.postScale(scale, scale);
+        // rotate bitmap
+        matrix.postRotate(angle);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, w, h, matrix, true);
+    }
+
+    /**
+     * initialize views and determine if delete button should be visible
+     */
     private void initializeViews() {
         monsterName = findViewById(R.id.monster_name);
         monsterScore = findViewById(R.id.monster_score);
@@ -194,6 +228,7 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         deleteButton = findViewById(R.id.delete_button);
         numPlayersValueView = findViewById(R.id.num_players_value);
 
+        // show the delete button ONLY if the monster is in the current user's cache
         if(!belongToCurrentUser){
             deleteButton.setVisibility(View.GONE);
         }else{
@@ -201,21 +236,27 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         }
     }
 
-    // got to comments activity when comments button clicked
+    /** go to comments activity when comments button clicked
+     *
+     */
     private void onCommentsButtonClicked(){
         Intent intent = new Intent(getApplicationContext(), DisplayCommentsActivity.class);
 
         startActivity(intent);
     }
 
-    // got to photo gallery when photo button clicked
+    /** got to photo gallery when photo button clicked
+     *
+     */
     private void onPhotoButtonClicked(){
         Intent intent = new Intent(getApplicationContext(), PhotoGalleryActivity.class);
 
         startActivity(intent);
     }
 
-    // delete monster from player wallet when delete button clicked
+    /** delete monster from player wallet when delete button clicked
+     *
+     */
     private void onDeleteButtonClicked(){
         runOnUiThread(new Runnable() {
             @Override
@@ -246,24 +287,44 @@ public class DisplayMonsterActivity extends AppCompatActivity implements Observe
         });
     }
 
+    /**
+     * Sets the monster name TextView in the activity header to the name of the current monster
+     * @param name The name of the monster (String)
+     */
     private void setMonsterName(String name) {
         monsterName.setText(name);
     }
 
+    /**
+     * Sets the score TextView in the activity header to the monster's score
+     * @param score The score of the monster (Long)
+     */
     private void setMonsterScore(long score) {
         monsterScore.setText("Score: " + score);
     }
 
+    /**
+     * Sets the monster image
+     * @param image The Drawable object to use as a monster image
+     */
     private void setMonsterImage(Drawable image) {
         monsterImage.setImageDrawable(image);
     }
 
+    /**
+     * Displays the number of other users that have also scanned this QR code
+     * @param numPlayers The number of players (Integer)
+     */
     private void setNumPlayersCached(int numPlayers){
         numPlayersValueView.setText(Integer.toString(numPlayers));
     }
 
+    /**
+     * Sets the location image (photo of where the QR code was scanned)
+     * @param drawable The Drawable object to set as the location image
+     */
     private void setMiniMapImage(Drawable drawable) {
-        locationImage.setImageDrawable(drawable);
+        locationImage.setBackgroundDrawable(drawable);
     }
 
 

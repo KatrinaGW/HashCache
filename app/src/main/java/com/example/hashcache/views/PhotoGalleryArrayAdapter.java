@@ -94,16 +94,30 @@ public class PhotoGalleryArrayAdapter extends ArrayAdapter<HashMap<String, Objec
         return view;
     }
 
+    /**
+     * Generates a Drawable object from a String representing a base64 image.
+     * @param base64Image The base64 image String to turn into a Drawable object
+     * @return The Drawable object generated from the base 64 image String
+     */
     private Drawable makeDrawable(String base64Image) {
         byte[] decodedImage = Base64.decode(base64Image, Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
-        Bitmap rotatedBitmap = RotateBitmap(bitmap, 90);
+        Bitmap rotatedBitmap = rotateBitmap(bitmap, 90);
         Drawable drawable = new BitmapDrawable(context.getResources(), rotatedBitmap);
 
         return drawable;
     }
 
-    private static Bitmap RotateBitmap(Bitmap bitmap, float angle)
+    /**
+     * Rotates a supplied bitmap image <angle> degrees. Returns the rotated bitmap.
+     * Source: https://stackoverflow.com/
+     * Question: https://stackoverflow.com/questions/9015372/how-to-rotate-a-bitmap-90-degrees
+     * Answer: https://stackoverflow.com/a/16219591
+     * @param bitmap The bitmap image to be rotated
+     * @param angle The angle to rotate the bitmap, as a float
+     * @return The rotated bitmap image
+     */
+    private static Bitmap rotateBitmap(Bitmap bitmap, float angle)
     {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
