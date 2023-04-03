@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.hashcache.models.Comment;
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanCallback;
 import com.example.hashcache.models.database.Database;
@@ -66,6 +67,10 @@ public class PlayerWalletDatabaseAdapter {
         return reg;
     }
 
+    /**
+     * Creates an instance of this class with the injected database
+     * @param db
+     */
     public PlayerWalletDatabaseAdapter(FirebaseFirestore db) {
         this.db = db;
     }
@@ -77,6 +82,12 @@ public class PlayerWalletDatabaseAdapter {
         INSTANCE = null;
     }
 
+    /**
+     * Gets the current static instance of this class or creates a new one with the injected
+     * FireStoreHelper
+     * @param fireStoreHelper the instance of the FireStoreHelper to use
+     * @return INSTANCE the static instance of this class
+     */
     public static PlayerWalletDatabaseAdapter getInstance(FireStoreHelper fireStoreHelper) {
         if (INSTANCE == null) {
             INSTANCE = new PlayerWalletDatabaseAdapter(fireStoreHelper);
@@ -84,6 +95,12 @@ public class PlayerWalletDatabaseAdapter {
         return INSTANCE;
     }
 
+    /**
+     * Gets the current static instance of this class or creates a new one with the injected
+     * FirebaseFirestore
+     * @param db the instance of the FirebaseFirestore to use
+     * @return INSTANCE the static instance of this class
+     */
     public static PlayerWalletDatabaseAdapter getInstance(FirebaseFirestore db) {
         if (INSTANCE == null) {
             INSTANCE = new PlayerWalletDatabaseAdapter(db);
@@ -91,6 +108,10 @@ public class PlayerWalletDatabaseAdapter {
         return INSTANCE;
     }
 
+    /**
+     * Gets the current static instance of this class or creates a new one with a FireStoreHelper
+     * @return INSTANCE the static instance of this class
+     */
     public static PlayerWalletDatabaseAdapter getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new PlayerWalletDatabaseAdapter(FirebaseFirestore.getInstance());
@@ -346,4 +367,83 @@ public class PlayerWalletDatabaseAdapter {
         });
         return cf;
     }
+
+    private CompletableFuture<Void> setPlayerScores(DocumentReference playerDocument,
+                                               PlayerWallet playerWallet) {
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+
+        HashMap<String, Object> data = new HashMap<>();
+        data.put(FieldNames.TOTAL_SCORE.fieldName, playerWallet.getTotalScore());
+        data.put(FieldNames.MAX_SCORE.fieldName, playerWallet.getMaxScore());
+        data.put(FieldNames.QR_COUNT.fieldName, playerWallet.getQrCount());
+
+        CompletableFuture.runAsync(() -> {
+            fireStoreHelper.addUpdateManyFieldsIntoDocument(playerDocument, data)
+                    .thenAccept(success -> {
+                        if(success){
+                            cf.complete(null);
+                        }else{
+                            cf.completeExceptionally(
+                                    new Exception("Something went wrong while setting the" +
+                                            "user scores!")
+                            );
+                        }
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
+
+        return  cf;
+    }
+
+    /**
+     * Updates the player score values on the player document
+     * @param userId the id of the user whose score values need to be updated
+     * @param playerWallet the wallet of the player
+     * @return cf the CompletableFuture that completes with true if the operation was successful
+     */
+    public CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet,
+                                                         FireStoreHelper fireStoreHelper) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+        CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
+        this.fireStoreHelper = fireStoreHelper;
+
+        CompletableFuture.runAsync(() -> {
+            fireStoreHelper.documentWithIDExists(collectionReference, userId)
+                    .thenAccept(exists -> {
+                        if(exists){
+                            DocumentReference playerDocument = collectionReference.document(userId);
+                            setPlayerScores(playerDocument, playerWallet)
+                                    .thenAccept(nullValue -> {
+                                        cf.complete(true);
+                                    })
+                                    .exceptionally(new Function<Throwable, Void>() {
+                                        @Override
+                                        public Void apply(Throwable throwable) {
+                                            cf.completeExceptionally(throwable);
+                                            return null;
+                                        }
+                                    });
+                        }else{
+                            cf.completeExceptionally(new IllegalArgumentException("The player" +
+                                    "id doesn't exist!"));
+                        }
+                    })
+                    .exceptionally(new Function<Throwable, Void>() {
+                        @Override
+                        public Void apply(Throwable throwable) {
+                            cf.completeExceptionally(throwable);
+                            return null;
+                        }
+                    });
+        });
+
+        return cf;
+    }
+
 }

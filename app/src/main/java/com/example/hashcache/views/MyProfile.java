@@ -80,7 +80,6 @@ public class MyProfile extends AppCompatActivity implements Observer {
      * @see AppContext
      * @see Player
      */
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.my_profile);
@@ -154,39 +153,11 @@ public class MyProfile extends AppCompatActivity implements Observer {
     }
 
     /**
-     * Sets the listener for the logo button.
-     *
-     * @param listener the listener to be set for the logo button
-     * @see ImageButton
-     * @see SettingsActivity
-     */
-    public void setLogoButtonListener(View.OnClickListener listener) {
-        mLogoButton.setOnClickListener(listener);
-    }
-
-    /**
-     * Sets the listener for the menu button.
-     *
-     * @param listener the listener to be set for the menu button
-     * @see ImageButton
-     * @see PopupMenu
-     * @see MenuItem
-     * @see AppHome
-     * @see QRStats
-     * @see Community
-     */
-
-    public void setMenuButtonListener(View.OnClickListener listener) {
-        mMenuButton.setOnClickListener(listener);
-    }
-
-    /**
      * Sets the username displayed on the profile page.
      *
      * @param username the username to be set
      * @see TextView
      */
-
     public void setUsername(String username) {
         TextView tv = findViewById(R.id.username_textview);
         tv.setText(username);
@@ -204,29 +175,17 @@ public class MyProfile extends AppCompatActivity implements Observer {
     }
 
     /**
-     * 
-     * Sets the click listener for the QR Stats button on the MyProfile page.
-     * This method takes a View.OnClickListener as a parameter and sets it as the
-     * click listener for the mQRStatsButton,
-     * which is an instance of AppCompatButton. When the user clicks on the QR Stats
-     * button, the listener's onClick()
-     * method is called. This method can be used to perform some action when the
-     * button is clicked, such as navigating to
-     * the QR Stats page.
-     * 
-     * @param listener the View.OnClickListener to set as the click listener for the
-     *                 QR Stats button
+     * Called when the observable for this observer updates
+     * @param observable     the observable object.
+     * @param o   an argument passed to the {@code notifyObservers}
+     *                 method.
      */
-    public void setQRStatsButtonListener(View.OnClickListener listener) {
-        mQRStatsButton.setOnClickListener(listener);
-    }
-
     @Override
     public void update(Observable observable, Object o) {
         setUIParams();
     }
 
-    public void setUIParams() {
+    private void setUIParams() {
         Player currentPlayer = AppContext.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
         setScore(currentPlayer.getPlayerWallet().getTotalScore());

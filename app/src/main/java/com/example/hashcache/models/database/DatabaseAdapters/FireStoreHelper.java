@@ -1,5 +1,6 @@
 package com.example.hashcache.models.database.DatabaseAdapters;
 
+import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
@@ -69,6 +70,63 @@ public class FireStoreHelper {
 
         documentReference
                 .update(key, value)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        cf.complete(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        cf.completeExceptionally(e);
+                    }
+                });
+        return cf;
+    }
+
+    /**
+     * Adds a number field to the document
+     * @param documentReference document to add the field to
+     * @param key key of the field
+     * @param value integer value for the field
+     * @return returns true on success
+     */
+    public CompletableFuture<Boolean> addNumberFieldToDocument(DocumentReference documentReference,
+                                                               String key, Long value) {
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
+        Log.i("DATABASE", "Adding / Changing number field to document");
+        documentReference
+                .update(key, value)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        cf.complete(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("Database", "Failed to add number field to document");
+                        cf.completeExceptionally(e);
+                    }
+                });
+
+        return cf;
+    }
+
+    /**
+     * Adds or updates fields in the document
+     * @param documentReference the document to change
+     * @param data the data to add or update in the document
+     * @return cf the CompletableFuture that completes with true if the operation was successful
+     */
+    public CompletableFuture<Boolean> addUpdateManyFieldsIntoDocument(DocumentReference documentReference,
+                                                                   HashMap<String, Object> data){
+        CompletableFuture<Boolean> cf = new CompletableFuture<>();
+
+        documentReference.update(data)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

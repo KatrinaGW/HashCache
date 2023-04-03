@@ -9,6 +9,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.location.Location;
+
 import com.example.hashcache.models.CodeLocation;
 import com.example.hashcache.models.database.DatabaseAdapters.CodeLocationDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
@@ -53,7 +55,7 @@ public class CodeLocationDatabaseAdapterTest {
         fireStoreCF.complete(false);
         CompletableFuture<Boolean> converterCF = new CompletableFuture<>();
         converterCF.complete(true);
-        CodeLocation testCodeLocation = new CodeLocation("My Swamp!", 1, 2, 3);
+        CodeLocation testCodeLocation = new CodeLocation("My Swamp!", Mockito.mock(Location.class));
 
         when(mockFireStoreHelper.documentWithIDExists(mockCollectionReference, testCodeLocation.getId()))
                 .thenReturn(fireStoreCF);

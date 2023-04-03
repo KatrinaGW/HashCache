@@ -14,6 +14,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,8 +28,11 @@ import com.example.hashcache.controllers.CheckLoginCommand;
 import com.example.hashcache.controllers.hashInfo.NameGenerator;
 import com.example.hashcache.models.PlayerList;
 import com.example.hashcache.models.database.Database;
+import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
+import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 import java.util.function.Function;
@@ -98,18 +102,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(!hasBeenInitialized) FirebaseApp.initializeApp(this, new FirebaseOptions.Builder()
-                .setApplicationId("1:901109849854:android:59c5ab124b7d20ef1d4faf")
-                .setApiKey("AIzaSyBbOhuWDn2sYOsEkslCjercBYitb2MLMho")
-                .setDatabaseUrl("https://hashcache2.firebaseio.com/")
-                .setGcmSenderId("901109849854")
-                .setStorageBucket("hashcache2.appspot.com")
-                .setProjectId("hashcache2")
+                .setApplicationId("1:867369236696:android:66b025b68d73cf62b23fad")
+                .setApiKey("AIzaSyDZ-92CsgRrFuuvcyZpJAesFg4xdfeBuDw")
+                .setDatabaseUrl("https://hashcachefinal-default-rtdb.firebaseio.com")
+                .setGcmSenderId("867369236696")
+                .setStorageBucket("hashcachefinal.appspot.com")
+                .setProjectId("hashcachefinal")
                 .build());
 
         AppContext.get();
 
         getOrMakeScannableCodesConnectionHandler();
         makeLoginsAdapter();
+        CodeMetadataDatabaseAdapter.makeOrGetInstance(new FireStoreHelper(), FirebaseFirestore.getInstance());
 
         AppContext.get().setDeviceId(Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID));
@@ -122,8 +127,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkDeviceId(){
+        Log.d("MainActivity", "Checking logging info...");
         CheckLoginCommand.checkLogin(Database.getInstance(), new SetupUserCommand())
                 .thenAccept(existed -> {
+                    Log.d("MainActivity", "Got login info!");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

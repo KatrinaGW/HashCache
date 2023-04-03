@@ -66,7 +66,6 @@ public class PlayerWalletTest {
         PlayerWallet playerWallet = new PlayerWallet();
         playerWallet.addScannableCode(randomId);
 
-        assertTrue(playerWallet.getSize() == 1);
         assertEquals(playerWallet.getScannedCodeIds().get(0), randomId);
     }
 
@@ -77,7 +76,6 @@ public class PlayerWalletTest {
         PlayerWallet playerWallet = new PlayerWallet();
         playerWallet.addScannableCode(randomId, mockImage);
 
-        assertTrue(playerWallet.getSize() == 1);
         assertEquals(playerWallet.getScannedCodeIds().get(0), randomId);
         assertEquals(mockImage, playerWallet.getScannableCodeLocationImage(randomId));
     }
@@ -104,13 +102,10 @@ public class PlayerWalletTest {
     @Test
     void getSizeTest(){
         PlayerWallet playerWallet= new PlayerWallet();
-        ScannableCode firstMockScannableCode = new ScannableCode("123", new HashInfo(null, "name1", 321), String.valueOf(1234));
-        ScannableCode secondMockScannableCode = new ScannableCode("124", new HashInfo(null, "name2", 321), String.valueOf(1234));
 
-        playerWallet.addScannableCode(firstMockScannableCode.getScannableCodeId());
-        playerWallet.addScannableCode(secondMockScannableCode.getScannableCodeId());
+        playerWallet.setQRCount(2);
 
-        assertEquals(2, playerWallet.getSize());
+        assertEquals(2, playerWallet.getQrCount());
     }
 
     @Test
@@ -122,11 +117,8 @@ public class PlayerWalletTest {
         playerWallet.addScannableCode(firstMockScannableCode.getScannableCodeId());
         playerWallet.addScannableCode(secondMockScannableCode.getScannableCodeId());
 
-        assertEquals(2, playerWallet.getSize());
-
         playerWallet.deleteScannableCode(firstMockScannableCode.getScannableCodeId());
 
-        assertTrue(playerWallet.getSize() == 1);
         assertTrue(playerWallet.getScannedCodeIds().get(0) == secondMockScannableCode.getScannableCodeId());
     }
 }

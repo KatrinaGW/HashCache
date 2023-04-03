@@ -2,6 +2,7 @@ package com.example.hashcache.appContext;
 
 import android.util.Log;
 
+import com.example.hashcache.models.Comment;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.ScannableCode;
 import com.example.hashcache.models.database.Database;
@@ -9,7 +10,12 @@ import com.example.hashcache.models.database.DatabaseAdapters.callbacks.BooleanC
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetScannableCodeCallback;
 
+import org.checkerframework.checker.units.qual.A;
+import org.checkerframework.checker.units.qual.C;
+
+import java.util.ArrayList;
 import java.util.Observable;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Holds the global state information for the app
@@ -55,10 +61,18 @@ public class AppContext extends Observable {
     }
 
 
+    /**
+     * Sets which player has been selected by the user to view
+     * @param player the player to set as selected
+     */
     public void setSelectedPlayer(Player player){
         selectedPlayer = player;
     }
 
+    /**
+     * Gets the player that is currently selected
+     * @return selectedPlayer the currently selected player
+     */
     public Player getSelectedPlayer(){
         return selectedPlayer;
     }
@@ -101,6 +115,10 @@ public class AppContext extends Observable {
         this.highestScannableCode = scanCode;
     }
 
+    /**
+     * Get the scananbleCode that's been marked as the highest scoring one for the player
+     * @return highestScannableCode the current user's highest scannableCode
+     */
     public ScannableCode getHighestScannableCode() {
         return this.highestScannableCode;
     }
@@ -109,10 +127,18 @@ public class AppContext extends Observable {
         this.lowestScannableCode = scanCode;
     }
 
+    /**
+     * Get the scananbleCode that's been marked as the lowest scoring one for the player
+     * @return lowestScannableCode the current user's lowest scannableCode
+     */
     public ScannableCode getLowestScannableCode() {
         return this.lowestScannableCode;
     }
 
+    /**
+     * Get the current selected scannableCode
+     * @return
+     */
     public ScannableCode getCurrentScannableCode() {
         return currentScannableCode;
     }
@@ -151,15 +177,21 @@ public class AppContext extends Observable {
         }
     }
 
+    /**
+     * Set up the listeners for the database collections
+     */
     public void setupListeners() {
         String userId = getCurrentPlayer().getUserId();
         Database.getInstance().onPlayerDataChanged(userId, new GetPlayerCallback() {
             @Override
             public void onCallback(Player player) {
                 System.out.println(String.format("Player data for %s has changed", currentPlayer.getUsername()));
-                setCurrentPlayer(player);
-                setChanged();
-                notifyObservers();
+                if(currentPlayer!=null && player!=null &&
+                        player.getUserId() == currentPlayer.getUserId()){
+                    setCurrentPlayer(player);
+                    setChanged();
+                    notifyObservers();
+                }
             }
         });
 
@@ -172,10 +204,10 @@ public class AppContext extends Observable {
                         setCurrentPlayer(playa);
                         setChanged();
                         notifyObservers();
+
                         Database.getInstance()
                                 .getPlayerWalletTotalScore(playa.getPlayerWallet().getScannedCodeIds())
                                 .thenAccept(totalScore -> {
-                                    getCurrentPlayer().getPlayerWallet().setTotalScore(totalScore.longValue());
                                     setChanged();
                                     notifyObservers();
                                 });

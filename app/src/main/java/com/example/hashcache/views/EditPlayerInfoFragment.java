@@ -20,6 +20,9 @@ import com.example.hashcache.controllers.UpdateContactInfoCommand;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.database.Database;
 
+/**
+ * Fragment to allow users to edit their contact information
+ */
 public class EditPlayerInfoFragment extends Fragment {
     EditText emailEditText;
     EditText phoneNumberEditText;
@@ -32,6 +35,18 @@ public class EditPlayerInfoFragment extends Fragment {
         void dismissFragment(ContactInfo newContactInfo);
     }
 
+    /**
+     * Called when the view is created
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return the created View object
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
@@ -41,6 +56,10 @@ public class EditPlayerInfoFragment extends Fragment {
                 container, false);
     }
 
+    /**
+     * Called when the view is attached to an activity
+     * @param context the context that the fragment is attached to
+     */
     @Override
     public void onAttach(@NonNull Context context){
         super.onAttach(context);
@@ -50,6 +69,12 @@ public class EditPlayerInfoFragment extends Fragment {
         }
     }
 
+    /**
+     * Called after the view is created
+     * @param view The View returned by {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     */
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState){
         init();

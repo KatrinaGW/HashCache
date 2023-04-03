@@ -8,6 +8,7 @@ import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.PlayerDocumentConverter;
 import com.example.hashcache.models.database.DatabaseAdapters.callbacks.GetPlayerCallback;
 import com.example.hashcache.models.database.values.CollectionNames;
@@ -26,6 +27,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.zxing.PlanarYUVLuminanceSource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +36,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+
+import kotlin.Triple;
 
 /**
  * Handles all calls to the Firebase Players database
@@ -135,7 +139,6 @@ public class PlayersDatabaseAdapter {
      *
      * @param username the username to use to pull the player with
      */
-
     public CompletableFuture<Boolean> usernameExists(String username) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
@@ -232,7 +235,7 @@ public class PlayersDatabaseAdapter {
                                                 .exceptionally(new Function<Throwable, Void>() {
                                                     @Override
                                                     public Void apply(Throwable throwable) {
-                                                        System.out.println("There was an error getting the scannableCodes.");
+                                                        System.out.println("There was an error getting the scannableCodes. 5");
                                                         cf.completeExceptionally(throwable);
                                                         return null;
                                                     }
@@ -262,9 +265,10 @@ public class PlayersDatabaseAdapter {
         return cf;
     }
 
+
     /**
      * Sets the player preferences of a user
-     * 
+     *
      * @param playerDocument    the document of the player to change the preferences
      *                          on
      * @param playerPreferences the preferences to set for the user
@@ -281,6 +285,7 @@ public class PlayersDatabaseAdapter {
         return cf;
     }
 
+
     /**
      * Updates the contact information of an existing user
      * 
@@ -294,6 +299,7 @@ public class PlayersDatabaseAdapter {
 
         return cf;
     }
+
 
     /**
      * Sets the contact information of a user
@@ -391,12 +397,38 @@ public class PlayersDatabaseAdapter {
         data.put(FieldNames.EMAIL.fieldName, "");
         data.put(FieldNames.PHONE_NUMBER.fieldName, "");
         data.put(FieldNames.RECORD_GEOLOCATION.fieldName, "");
+
+
         String userId = UUID.randomUUID().toString();
 
         fireStoreHelper.setDocumentReference(collectionReference.document(userId), data)
                         .thenAccept(successful -> {
                             if (successful) {
-                                cf.complete(userId);
+                                HashMap<String, Object> scoreData = new HashMap<>();
+                                scoreData.put(FieldNames.TOTAL_SCORE.fieldName, 0);
+                                scoreData.put(FieldNames.MAX_SCORE.fieldName, 0);
+                                scoreData.put(FieldNames.QR_COUNT.fieldName, 0);
+
+                                fireStoreHelper.addUpdateManyFieldsIntoDocument(
+                                        collectionReference.document(userId), scoreData
+                                )
+                                        .thenAccept(successfulAdd -> {
+                                            if(successfulAdd){
+                                                cf.complete(userId);
+                                            }else{
+                                                cf.completeExceptionally(
+                                                        new Exception("Something went wrong when" +
+                                                                "setting the score values")
+                                                );
+                                            }
+                                        })
+                                        .exceptionally(new Function<Throwable, Void>() {
+                                            @Override
+                                            public Void apply(Throwable throwable) {
+                                                cf.completeExceptionally(throwable);
+                                                return null;
+                                            }
+                                        });
                             } else {
                                 Log.e(TAG, "Something went wrong while setting the userId" +
                                         "on a new Playerdocument");
@@ -617,4 +649,30 @@ public class PlayersDatabaseAdapter {
                 });
                 return cf;
     }
+
+    /**
+     * Gets the top users
+     * @param filter the filter to apply when getting the users
+     * @return cf the CompletableFuture with the list of the top users matching the filter
+     */
+    public CompletableFuture<ArrayList<Triple<String, Long, String>>> getTopUsers(String filter) {
+        ArrayList<Triple<String, Long, String>> list = new ArrayList<>();
+        CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
+        CompletableFuture<ArrayList<Triple<String, Long, String>>> cf = new CompletableFuture<>();
+
+        collectionReference.orderBy(filter, Query.Direction.DESCENDING).get()
+                .addOnSuccessListener(result -> {
+                    for (QueryDocumentSnapshot document : result) {
+                        Triple<String, Long, String> tripple = new Triple<>((String) document.get(FieldNames.USERNAME.fieldName),
+                                (Long) document.get(filter), (String) document.getId());
+                        list.add(tripple);
+                    }
+                    cf.complete(list);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("DATABASE", "Error getting top k users");
+                });
+        return cf;
+    }
+
 }

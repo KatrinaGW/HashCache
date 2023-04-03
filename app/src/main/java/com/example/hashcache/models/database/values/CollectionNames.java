@@ -11,7 +11,8 @@ public enum CollectionNames {
     PLAYER_PREFERENCES("playerPreferences"),
     PLAYER_WALLET("playerWallet"),
     LOGINS("logins"),
-    COMMENTS("comments");
+    COMMENTS("comments"),
+    CODE_METADATA("CodeMetadata");
     public final String collectionName;
 
     private CollectionNames(String collectionName) {

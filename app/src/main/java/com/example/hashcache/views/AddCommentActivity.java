@@ -21,7 +21,13 @@ public class AddCommentActivity extends AppCompatActivity {
     private TextView bodyEditText;
     boolean belongToCurrentUser;
 
-
+    /**
+     * Called whenever the activity starts
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +36,9 @@ public class AddCommentActivity extends AppCompatActivity {
         belongToCurrentUser = intent.getBooleanExtra("belongsToCurrentUser", false);
     }
 
+    /**
+     * Called whenever the activity resumes
+     */
     @Override
     protected void onResume() {
         super.onResume();

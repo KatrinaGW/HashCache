@@ -44,7 +44,6 @@ public class QRStats extends AppCompatActivity implements Observer {
      * @param savedInstanceState a Bundle object containing the activity's
      *                           previously saved state, if any
      */
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +83,9 @@ public class QRStats extends AppCompatActivity implements Observer {
         AppContext.get().addObserver(this);
     }
 
+    /**
+     * Called whenever the activity resumes
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -98,7 +100,7 @@ public class QRStats extends AppCompatActivity implements Observer {
                 ScannableCode lowestScan = AppContext.get().getLowestScannableCode();
                 ScannableCode highestScan = AppContext.get().getHighestScannableCode();
                 long totalScore = AppContext.get().getCurrentPlayer().getPlayerWallet().getTotalScore();
-                setMyCodesValue(curWallet.getSize());
+                setMyCodesValue((int)curWallet.getQrCount());
                 setLowScoreValue(lowestScan);
                 setHighScoreValue(highestScan);
                 setTotalScoreValue(totalScore);
@@ -129,7 +131,7 @@ public class QRStats extends AppCompatActivity implements Observer {
         myCodesTextView = findViewById(R.id.my_codes_value);
     }
 
-    public void setHighScoreValue(ScannableCode highestScoring) {
+    private void setHighScoreValue(ScannableCode highestScoring) {
         if(highestScoring!=null){
             topScoreValueTextView.setText(String.valueOf(highestScoring.getHashInfo().getGeneratedScore()));
             topScoreValueTextView.setClickable(true);
@@ -139,7 +141,7 @@ public class QRStats extends AppCompatActivity implements Observer {
         }
     }
 
-    public void setLowScoreValue(ScannableCode lowestScoring) {
+    private void setLowScoreValue(ScannableCode lowestScoring) {
         if(lowestScoring!=null){
             lowScoreValueTextView.setText(Long.toString(lowestScoring.getHashInfo().getGeneratedScore()));
             lowScoreValueTextView.setClickable(true);
@@ -150,23 +152,24 @@ public class QRStats extends AppCompatActivity implements Observer {
 
     }
 
-    public void setTotalScoreValue(long score) {
+    private void setTotalScoreValue(long score) {
         totalScoreTextView.setText(String.valueOf(score));
     }
 
-    public void setMyCodesValue(int value) {
+    private void setMyCodesValue(int value) {
         myCodesTextView.setText(String.valueOf(value));
     }
 
-    public ImageButton getMenuButton() {
+    private ImageButton getMenuButton() {
         return menuButton;
     }
 
-    public ImageButton getScoreIcon() {
-        return scoreIcon;
-    }
-
-
+    /**
+     * Called when the observer's observable object updates
+     * @param observable     the observable object.
+     * @param o   an argument passed to the {@code notifyObservers}
+     *                 method.
+     */
     @Override
     public void update(Observable observable, Object o) {
         updateValues();

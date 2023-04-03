@@ -18,7 +18,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.protobuf.FieldMask;
 
+import java.lang.reflect.Field;
+import java.net.FileNameMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -42,11 +45,13 @@ public class PlayerDocumentConverter {
         CompletableFuture.runAsync(()->{
             CompletableFuture<Player> thing = getPersonalDetails(documentReference);
                     thing.thenAccept(playerDetails -> {
-                        getPlayerWallet(documentReference.collection(CollectionNames.PLAYER_WALLET.collectionName))
+                        getPlayerWallet(documentReference.collection(CollectionNames.PLAYER_WALLET.collectionName), documentReference)
                                 .thenAccept(playerWallet -> {
-                                    cf.complete(new Player(playerDetails.getUserId(),
-                                            playerDetails.getUsername(), playerDetails.getContactInfo(),
-                                            playerDetails.getPlayerPreferences(), playerWallet));
+                                    getPlayerScores(documentReference, playerWallet).thenAccept(pWallet -> {
+                                        cf.complete(new Player(playerDetails.getUserId(),
+                                                playerDetails.getUsername(), playerDetails.getContactInfo(),
+                                                playerDetails.getPlayerPreferences(), pWallet));
+                                    });
                                 })
                                 .exceptionally(new Function<Throwable, Void>() {
                                     @Override
@@ -60,7 +65,7 @@ public class PlayerDocumentConverter {
                     .exceptionally(new Function<Throwable, Void>() {
                         @Override
                         public Void apply(Throwable throwable) {
-                            System.out.println("There was an error getting the scannableCodes.");
+                            System.out.println("There was an error getting the scannableCodes. 3");
                             cf.completeExceptionally(throwable);
                             return null;
                         }
@@ -76,9 +81,10 @@ public class PlayerDocumentConverter {
      *                            images in it
      * @return cf the CompletableFuture with the PlayerWallet
      */
-    private CompletableFuture<PlayerWallet> getPlayerWallet(CollectionReference collectionReference){
+    private CompletableFuture<PlayerWallet> getPlayerWallet(CollectionReference collectionReference, DocumentReference documentReference){
         CompletableFuture<PlayerWallet> cf = new CompletableFuture<>();
         PlayerWallet playerWallet = new PlayerWallet();
+
         collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -103,6 +109,7 @@ public class PlayerDocumentConverter {
                         }
                     }
                 });
+
         return cf;
     }
 
@@ -165,4 +172,45 @@ public class PlayerDocumentConverter {
         });
         return cf;
     }
+
+    /**
+     * Take in a playerWallet and fills the score area with those in the player document in the database.
+     * Used when first fetching the player information from the database.
+     * @param playerDocument a access point to get player document information
+     * @param playerWallet the wallet you want to update with the new player scores
+     * @return A Completable futre of the Player wallet
+     */
+    private CompletableFuture<PlayerWallet> getPlayerScores(DocumentReference playerDocument, PlayerWallet playerWallet) {
+        CompletableFuture<PlayerWallet> cf = new CompletableFuture<>();
+        playerDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+
+                    Long strTotalScore = (Long)
+                            document.getData().get(FieldNames.TOTAL_SCORE.fieldName);
+                    if (strTotalScore != null) {
+                        playerWallet.setTotalScore(strTotalScore);
+                    }
+                    Long strQRCount = (Long) document.getData().get(FieldNames.QR_COUNT.fieldName);
+                    if (strQRCount != null) {
+                        playerWallet.setQRCount(strQRCount);
+                    }
+
+                    Long strMaxScore = (Long) document.getData().get(FieldNames.MAX_SCORE.fieldName);
+
+                    if (strMaxScore != null) {
+                        playerWallet.setMaxScore(strMaxScore);
+                    }
+                    cf.complete(playerWallet);
+                }else {
+                        cf.completeExceptionally(new Exception(task.getException()));
+                    }
+
+            }
+        });
+        return cf;
+    }
+
 }
