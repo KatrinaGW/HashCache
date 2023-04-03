@@ -7,6 +7,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.media.Image;
@@ -63,6 +65,7 @@ public class CodeMetadataDatabaseAdaptersTest {
         testResult.add(mockDS);
         DocumentReference mockDocRef = Mockito.mock(DocumentReference.class);
         Task<Void> mockTaskVoid = Mockito.mock(Task.class);
+        String mockImage = "This is definitely an image";
 
         when(mockDb.collection(anyString())).thenReturn(mockCollectionReference);
         when(mockCollectionReference.whereEqualTo(FieldNames.ScannableCodeId.fieldName, testScannableCodeId))
@@ -75,13 +78,24 @@ public class CodeMetadataDatabaseAdaptersTest {
         when(mockQS.isEmpty()).thenReturn(false);
         when(mockQS.getDocuments()).thenReturn(testResult);
         when(mockDS.getReference()).thenReturn(mockDocRef);
-        when(mockDocRef.update(anyString(), any(Image.class)));
+        when(mockDocRef.update(anyString(), any(Image.class))).thenReturn(mockTaskVoid);
 
         doAnswer(invocation -> {
             OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
             onCompleteListener.onComplete(mockTaskQS);
             return null;
         }).when(mockTaskQS).addOnCompleteListener(any(OnCompleteListener.class));
+        doAnswer(invocation -> {
+            OnSuccessListener onSuccessListener = invocation.getArgumentAt(0, OnSuccessListener.class);
+            onSuccessListener.onSuccess(null);
+            return null;
+        }).when(mockTaskVoid).addOnSuccessListener(any(OnSuccessListener.class));
+
+        CompletableFuture<Void> result = getCodeMetaDatabaseAdapter().updatePlayerCodeMetadataImage(testUserId,
+                testScannableCodeId, mockImage);
+
+        assertNull(result.join());
+        verify(mockDocRef, times(1)).update(FieldNames.ImageBase64.name, mockImage);
     }
 
     @Test
