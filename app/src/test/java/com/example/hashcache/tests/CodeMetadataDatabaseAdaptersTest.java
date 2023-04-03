@@ -138,6 +138,44 @@ public class CodeMetadataDatabaseAdaptersTest {
     }
 
     @Test
+    void getCodeMetadataByIdTest(){
+        String testUserId = "userId";
+        String testScannableCodeId = "scananbleCodeId";
+        Query mockQuery = Mockito.mock(Query.class);
+        CollectionReference mockCollectionReference = Mockito.mock(CollectionReference.class);
+        Task<QuerySnapshot> mockTaskQS = Mockito.mock(Task.class);
+        QuerySnapshot mockQS = Mockito.mock(QuerySnapshot.class);
+        DocumentSnapshot mockDS = Mockito.mock(DocumentSnapshot.class);
+        List<DocumentSnapshot> testResult = new ArrayList<>();
+        testResult.add(mockDS);
+
+        when(mockDb.collection(anyString())).thenReturn(mockCollectionReference);
+        when(mockCollectionReference.whereEqualTo(FieldNames.ScannableCodeId.name, testScannableCodeId))
+                .thenReturn(mockQuery);
+        when(mockQuery.get()).thenReturn(mockTaskQS);
+        when(mockTaskQS.isSuccessful()).thenReturn(true);
+        when(mockTaskQS.getResult()).thenReturn(mockQS);
+        when(mockQS.getDocuments()).thenReturn(testResult);
+        when(mockDS.getString(FieldNames.ScannableCodeId.name)).thenReturn(testScannableCodeId);
+        when(mockDS.getString(FieldNames.USER_ID.name)).thenReturn(testUserId);
+        when(mockDS.contains(FieldNames.ImageBase64.name)).thenReturn(false);
+        when(mockDS.getBoolean(FieldNames.HasLocation.name)).thenReturn(false);
+
+        doAnswer(invocation -> {
+            OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
+            onCompleteListener.onComplete(mockTaskQS);
+            return null;
+        }).when(mockTaskQS).addOnCompleteListener(any(OnCompleteListener.class));
+
+        ArrayList<CodeMetadata> result = getCodeMetaDatabaseAdapter().getCodeMetadataById(
+                testScannableCodeId).join();
+
+        assertNotNull(result);
+        assertEquals(result.get(0).getScannableCodeId(), testScannableCodeId);
+        assertEquals(result.get(0).getUserId(), testUserId);
+    }
+
+    @Test
     void removeScannableCodeMetadataTest(){
         Query mockQuery = Mockito.mock(Query.class);
         String testUsername = "Jerry Seinfield";
