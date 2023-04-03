@@ -59,7 +59,7 @@ public class CodeMetadataDatabaseAdaptersTest {
         Task<Void> mockTaskVoid = Mockito.mock(Task.class);
 
         when(mockDb.collection(anyString())).thenReturn(mockCollectionReference);
-        when(mockCollectionReference.whereEqualTo(FieldNames.SCANNABLE_CODE_ID.fieldName, testScannableCodeId))
+        when(mockCollectionReference.whereEqualTo(FieldNames.ScannableCodeId.name, testScannableCodeId))
                 .thenReturn(mockQuery);
         when(mockQuery.get()).thenReturn(mockTaskQS);
         when(mockQuery.whereEqualTo(FieldNames.USER_ID.fieldName, testUsername))

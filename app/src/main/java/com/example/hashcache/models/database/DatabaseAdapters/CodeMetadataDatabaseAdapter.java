@@ -156,10 +156,10 @@ public class CodeMetadataDatabaseAdapter {
     public CompletableFuture<Boolean> removeScannableCodeMetadata(String scannableCodeId, String userId){
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
 
-        Query docRef = collectionReference.whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId)
-                .whereEqualTo(FieldNames.USER_ID.fieldName, userId);
+        Query query = collectionReference.whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId);
+        query = query.whereEqualTo(FieldNames.USER_ID.fieldName, userId);
 
-        docRef.get().addOnCompleteListener(task -> {
+        query.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 if(task.getResult().size()==1){
                     DocumentReference doc = task.getResult().getDocuments().get(0).getReference();
