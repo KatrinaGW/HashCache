@@ -196,14 +196,10 @@
     <RelativeLayout
         android:id="@+id/footer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <View
-            android:id="@+id/grey_rect"
-            android:layout_width="match_parent"
-            android:layout_height="148dp"
-            android:background="@color/HC_ash_grey"
-            android:layout_alignParentBottom="true"/>
-
+        android:layout_height="170dp"
+        android:background="@color/HC_ash_grey"
+        android:layout_alignParentBottom="true"
+        >
         <TextView
             android:id="@+id/my_score_textview"
             android:layout_width="match_parent"
