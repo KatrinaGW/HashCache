@@ -198,8 +198,6 @@ public class CodeMetadataDatabaseAdapter {
      * @return cf the CompletableFuture that completes successfully if the operation was successful
      */
     public CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image) {
-
-        Log.d("updatePlayerCodeMetadataImage", String.format("scannableId: %s, userId: %s", scannableCodeId, userId));
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             CollectionReference colRef = collectionReference;

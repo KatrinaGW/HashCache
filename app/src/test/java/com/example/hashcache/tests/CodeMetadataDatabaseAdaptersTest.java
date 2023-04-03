@@ -4,9 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
+
+import android.media.Image;
 
 import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
@@ -45,6 +48,40 @@ public class CodeMetadataDatabaseAdaptersTest {
     private CodeMetadataDatabaseAdapter getCodeMetaDatabaseAdapter(){
         CodeMetadataDatabaseAdapter.resetInstance();
         return CodeMetadataDatabaseAdapter.makeOrGetInstance(mockFireStoreHelper, mockDb);
+    }
+
+    @Test
+    void updatePlayerCodeMetadataImageTest(){
+        String testUserId = "userId";
+        String testScannableCodeId = "scananbleCodeId";
+        Query mockQuery = Mockito.mock(Query.class);
+        CollectionReference mockCollectionReference = Mockito.mock(CollectionReference.class);
+        Task<QuerySnapshot> mockTaskQS = Mockito.mock(Task.class);
+        QuerySnapshot mockQS = Mockito.mock(QuerySnapshot.class);
+        DocumentSnapshot mockDS = Mockito.mock(DocumentSnapshot.class);
+        List<DocumentSnapshot> testResult = new ArrayList<>();
+        testResult.add(mockDS);
+        DocumentReference mockDocRef = Mockito.mock(DocumentReference.class);
+        Task<Void> mockTaskVoid = Mockito.mock(Task.class);
+
+        when(mockDb.collection(anyString())).thenReturn(mockCollectionReference);
+        when(mockCollectionReference.whereEqualTo(FieldNames.ScannableCodeId.fieldName, testScannableCodeId))
+                .thenReturn(mockQuery);
+        when(mockQuery.whereEqualTo(FieldNames.USER_ID.fieldName, testUserId))
+                .thenReturn(mockQuery);
+        when(mockQuery.get()).thenReturn(mockTaskQS);
+        when(mockTaskQS.isSuccessful()).thenReturn(true);
+        when(mockTaskQS.getResult()).thenReturn(mockQS);
+        when(mockQS.isEmpty()).thenReturn(false);
+        when(mockQS.getDocuments()).thenReturn(testResult);
+        when(mockDS.getReference()).thenReturn(mockDocRef);
+        when(mockDocRef.update(anyString(), any(Image.class)));
+
+        doAnswer(invocation -> {
+            OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
+            onCompleteListener.onComplete(mockTaskQS);
+            return null;
+        }).when(mockTaskQS).addOnCompleteListener(any(OnCompleteListener.class));
     }
 
     @Test
@@ -205,5 +242,4 @@ public class CodeMetadataDatabaseAdaptersTest {
 
         assert(result);
     }
-
 }
