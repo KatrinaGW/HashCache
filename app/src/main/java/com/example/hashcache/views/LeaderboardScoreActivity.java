@@ -55,47 +55,12 @@ public class LeaderboardScoreActivity extends AppCompatActivity {
              * This method is called when the menu button is clicked.
              * It displays a popup menu of different activities to navigate to.
              *
-             * @param v The view that was clicked
+             * @param view The view that was clicked
              */
             @Override
-            public void onClick(View v) {
-
-                // create menu
-                PopupMenu menu = new PopupMenu(LeaderboardScoreActivity.this, menuButton);
-                menu.getMenuInflater()
-                        .inflate(R.menu.fragment_popup_menu, menu.getMenu());
-
-                // navigate to different activities based on menu item selected
-                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    /**
-                     * This method is called when a menu item is clicked.
-                     *
-                     * @param item The menu item that was clicked
-                     * @return true if the event was handled, false otherwise.
-                     */
-                    public boolean onMenuItemClick(MenuItem item) {
-                        int id = item.getItemId();
-
-                        if (id == R.id.menu_home) {                 // go to AppHome page
-                            startActivity(new Intent(LeaderboardScoreActivity.this, AppHome.class));
-                            return true;
-
-                        } else if (id == R.id.menu_stats) {         // go to QRStats page
-                            startActivity(new Intent(LeaderboardScoreActivity.this, QRStats.class));
-                            return true;
-
-                        } else if (id == R.id.menu_profile) {       // go to MyProfile
-                            startActivity(new Intent(LeaderboardScoreActivity.this, MyProfile.class));
-                            return true;
-
-                        } else if (id == R.id.menu_community) {     // go to Community
-                            startActivity(new Intent(LeaderboardScoreActivity.this, Community.class));
-                            return true;
-                        }
-                        return LeaderboardScoreActivity.super.onOptionsItemSelected(item);
-                    }
-                });
-                menu.show();
+            public void onClick(View view) {
+                BottomMenuFragment bottomMenu = new BottomMenuFragment();
+                bottomMenu.show(getSupportFragmentManager(), bottomMenu.getTag());
             }
         });
 

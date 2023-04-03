@@ -61,7 +61,7 @@ public class LeaderboardNumQRActivityTest {
 
     void logout(){
         solo.clickOnView(solo.getView(R.id.menu_button));
-        solo.clickOnText("My QR Codes");
+        solo.clickOnView(solo.getView(R.id.my_codes_button));
         solo.clickOnView(solo.getView(R.id.logo_button));
         solo.clickOnView(solo.getView(R.id.logout_button));
     }
