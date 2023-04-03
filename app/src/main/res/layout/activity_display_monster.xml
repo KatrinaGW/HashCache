@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:appContext="com.example.hashcache.views.DisplayMonsterActivity"
-    android:background="@drawable/background_gradient_yellow">
+    android:background="@drawable/dark_purple_gradient">
 
     <TextView
         android:id="@+id/monster_name"
@@ -13,9 +13,14 @@
         android:text="Monster Name"
         android:textSize="36sp"
         android:textStyle="bold"
-        android:textColor="@color/black"
-        android:layout_marginTop="36dp"
-        android:layout_marginStart="36dp"/>
+        android:textAlignment="center"
+        android:textColor="@color/HC_ash_grey"
+        android:layout_marginTop="40dp"
+        android:layout_marginHorizontal="24dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
+        android:background="@drawable/rounded_rect_green"
+        android:elevation="6dp"/>
     <TextView
         android:id="@+id/monster_score"
         android:layout_width="match_parent"
@@ -23,6 +28,7 @@
         android:text="score: 123456"
         android:textSize="28sp"
         android:layout_marginStart="36dp"
+        android:layout_marginTop="16dp"
         android:layout_below="@+id/monster_name" />
 
     <LinearLayout
@@ -61,64 +67,70 @@
     <ImageView
         android:id="@+id/monster_image"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="225dp"
         android:layout_below="@+id/num_players_layout"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
-        android:background="@drawable/drip_gradient"/>
-    <ImageView
-        android:id="@+id/location_image"
-        android:layout_width="wrap_content"
+        android:background="@drawable/drip_gradient_reverse" />
+
+    <RelativeLayout
+        android:id="@+id/button_box"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/icon_placeholder"
         android:layout_below="@+id/monster_image"
         android:layout_marginTop="24dp"
-        android:layout_alignStart="@+id/monster_image"/>
+        android:paddingVertical="20dp">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/view_comments_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginHorizontal="24dp"
-        android:layout_below="@id/monster_image"
-        android:layout_toEndOf="@+id/location_image"
-        android:background="@drawable/rounded_rect_green"
-        android:drawableEnd="@drawable/icon_comment"
-        android:paddingHorizontal="12sp"
-        android:paddingVertical="8dp"
-        android:text="COMMENTS   "
-        android:textColor="@color/black"/>
+        <ImageView
+            android:id="@+id/location_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/icon_placeholder"
+            android:layout_marginStart="24dp"/>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/view_photos_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginHorizontal="24dp"
-        android:layout_alignBottom="@id/location_image"
-        android:layout_toEndOf="@+id/location_image"
-        android:background="@drawable/rounded_rect_green"
-        android:drawableEnd="@drawable/icon_camera"
-        android:paddingHorizontal="16sp"
-        android:paddingVertical="8dp"
-        android:text="PHOTOS   "
-        android:textColor="@color/black"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/view_comments_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_toEndOf="@+id/location_image"
+            android:background="@drawable/rounded_rect_green"
+            android:drawableEnd="@drawable/icon_comment"
+            android:paddingHorizontal="12sp"
+            android:paddingVertical="8dp"
+            android:text="COMMENTS   "
+            android:textColor="@color/black"
+            android:elevation="6dp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/view_photos_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_alignBottom="@id/location_image"
+            android:layout_toEndOf="@+id/location_image"
+            android:background="@drawable/rounded_rect_green"
+            android:drawableEnd="@drawable/icon_camera"
+            android:paddingHorizontal="16sp"
+            android:paddingVertical="8dp"
+            android:text="PHOTOS   "
+            android:textColor="@color/black"
+            android:elevation="6dp"/>
+    </RelativeLayout>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/delete_button"
         android:layout_width="wrap_content"
         android:layout_height="44sp"
-        android:layout_below="@+id/view_photos_button"
+        android:layout_below="@+id/button_box"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="36dp"
         android:layout_marginHorizontal="24dp"
         android:background="@drawable/rounded_rect_white_transparent"
         android:drawableStart="@android:drawable/ic_menu_close_clear_cancel"
         android:paddingHorizontal="12dp"
-        android:text=" DELETE "
-        android:textSize="18sp" />
+        android:text=" DELETE MONSTER "
+        android:textSize="18sp"
+        android:elevation="6dp"/>
 
     <ImageButton
         android:id="@+id/menu_button"
