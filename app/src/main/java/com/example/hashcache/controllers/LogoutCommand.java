@@ -5,6 +5,9 @@ import com.example.hashcache.models.database.DatabasePort;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+/**
+ * A controller for handling the logout commands
+ */
 public class LogoutCommand {
     /**
      * Logs the current device out of the current account, and deletes the login

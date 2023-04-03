@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 
  An ArrayAdapter for displaying comment data in a ListView.
  This adapter is used to populate a ListView with comment data, where each comment is represented
- by a Pair<String, String> object containing the commentator's name and the comment body.
+ by a Pair object containing the commentator's name and the comment body.
  This adapter inflates the comment_listview_content layout for each row in the ListView and sets the commentator name and comment body text.
  */
 public class CommentsDataArrayAdapter extends ArrayAdapter<Pair<String, String>> {

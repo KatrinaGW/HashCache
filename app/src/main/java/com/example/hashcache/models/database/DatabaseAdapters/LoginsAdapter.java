@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+/**
+ * Handles the interactions with the logins collection in the database
+ */
 public class LoginsAdapter {
     private static LoginsAdapter INSTANCE;
     private FireStoreHelper fireStoreHelper;

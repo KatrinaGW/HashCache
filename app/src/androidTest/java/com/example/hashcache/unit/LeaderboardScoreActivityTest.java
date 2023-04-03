@@ -28,7 +28,7 @@ import org.junit.Test;
 import java.util.Random;
 
 /**
- * Test class for LeaderboardScoreActivity. All the UI tests are written here. Robotium test framework is
+ * Test class for LeaderboardNumQRActivity. All the UI tests are written here. Robotium test framework is
  used
  */
 public class LeaderboardScoreActivityTest {
@@ -67,11 +67,8 @@ public class LeaderboardScoreActivityTest {
     }
 
     @Test
-    public void checkNumQRButton(){
-        // Asserts that the current activity is the LeaderboardScoreActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
-        solo.clickOnButton("# QR");
-        solo.sleep(100);
+    public void checkScoreButton(){
+        // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
         solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
         logout();
     }
@@ -88,8 +85,8 @@ public class LeaderboardScoreActivityTest {
 
     @Test
     public void checkRegionButton(){
-        // Asserts that the current activity is the LeaderboardScoreActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
+        // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
         solo.clickOnButton("REGION");
         solo.sleep(100);
         solo.assertCurrentActivity("Wrong Activity", LeaderboardRegionActivity.class);
@@ -98,8 +95,8 @@ public class LeaderboardScoreActivityTest {
 
     @Test
     public void checkMenuButton1(){
-        // Asserts that the current activity is the LeaderboardScoreActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
+        // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
         solo.clickOnImageButton(0);
         solo.clickOnText("Map");
         solo.sleep(100);
@@ -111,8 +108,8 @@ public class LeaderboardScoreActivityTest {
 
     @Test
     public void checkMenuButton2(){
-        // Asserts that the current activity is the LeaderboardScoreActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
+        // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
         solo.clickOnImageButton(0);
         solo.clickOnText("My QR Codes");
         solo.sleep(100);
@@ -123,8 +120,8 @@ public class LeaderboardScoreActivityTest {
 
     @Test
     public void checkMenuButton3(){
-        // Asserts that the current activity is the LeaderboardScoreActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
+        // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
         solo.clickOnImageButton(0);
         solo.clickOnText("Stats");
         solo.sleep(100);
@@ -137,8 +134,8 @@ public class LeaderboardScoreActivityTest {
 
     @Test
     public void checkMenuButton4(){
-        // Asserts that the current activity is the LeaderboardScoreActivity. Otherwise, show “Wrong Activity"
-        solo.assertCurrentActivity("Wrong Activity", LeaderboardScoreActivity.class);
+        // Asserts that the current activity is the LeaderboardNumQRActivity. Otherwise, show “Wrong Activity"
+        solo.assertCurrentActivity("Wrong Activity", LeaderboardNumQRActivity.class);
         solo.clickOnImageButton(0);
         solo.clickOnText("Community");
         solo.sleep(100);

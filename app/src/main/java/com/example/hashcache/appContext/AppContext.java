@@ -63,10 +63,18 @@ public class AppContext extends Observable {
     }
 
 
+    /**
+     * Sets which player has been selected by the user to view
+     * @param player the player to set as selected
+     */
     public void setSelectedPlayer(Player player){
         selectedPlayer = player;
     }
 
+    /**
+     * Gets the player that is currently selected
+     * @return selectedPlayer the currently selected player
+     */
     public Player getSelectedPlayer(){
         return selectedPlayer;
     }
@@ -109,6 +117,10 @@ public class AppContext extends Observable {
         this.highestScannableCode = scanCode;
     }
 
+    /**
+     * Get the scananbleCode that's been marked as the highest scoring one for the player
+     * @return highestScannableCode the current user's highest scannableCode
+     */
     public ScannableCode getHighestScannableCode() {
         return this.highestScannableCode;
     }
@@ -117,10 +129,18 @@ public class AppContext extends Observable {
         this.lowestScannableCode = scanCode;
     }
 
+    /**
+     * Get the scananbleCode that's been marked as the lowest scoring one for the player
+     * @return lowestScannableCode the current user's lowest scannableCode
+     */
     public ScannableCode getLowestScannableCode() {
         return this.lowestScannableCode;
     }
 
+    /**
+     * Get the current selected scannableCode
+     * @return
+     */
     public ScannableCode getCurrentScannableCode() {
         return currentScannableCode;
     }
@@ -159,6 +179,9 @@ public class AppContext extends Observable {
         }
     }
 
+    /**
+     * Set up the listeners for the database collections
+     */
     public void setupListeners() {
         String userId = getCurrentPlayer().getUserId();
         Database.getInstance().onPlayerDataChanged(userId, new GetPlayerCallback() {

@@ -22,8 +22,18 @@ import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+/**
+ * A class to handle converting between scannableCode objects and document references
+ */
 public class ScannableCodeDocumentConverter {
 
+    /**
+     * Adds a scananbleCode object to the scannableCode collection in the database
+     * @param scannableCode
+     * @param collectionReference
+     * @param fireStoreHelper
+     * @return
+     */
     public CompletableFuture<String> addScannableCodeToCollection(ScannableCode scannableCode,
                                                                        CollectionReference collectionReference,
                                                                        FireStoreHelper fireStoreHelper){

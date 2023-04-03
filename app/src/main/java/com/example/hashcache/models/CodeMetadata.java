@@ -31,10 +31,12 @@ public class CodeMetadata {
     final private GeoLocation location;
     // The geohash of the scannable code's location
     final private String geohash;
+    final private boolean hasLocation;
     // The base64-encoded image of the scannable code (if available)
     private String image;
     // The userId of the player this scannable code belongs to
     private String userId;
+
 
     /**
      * Constructs a new CodeMetadata object.
@@ -43,49 +45,106 @@ public class CodeMetadata {
      * @param location        The location of the scannable code.
      * @param base64Image     The base64-encoded image of the scannable code (if
      *                        available).
-     * @throws NoSuchAlgorithmException If the SHA-256 algorithm is not available on
-     *                                  the current platform.
      */
     public CodeMetadata(String scannableCodeId, String userId, GeoLocation location, String base64Image) {
         this.image = base64Image;
         this.location = location;
-        this.geohash = GeoFireUtils.getGeoHashForLocation(location);
+        this.hasLocation = location != null;
+        this.geohash = this.hasLocation ? GeoFireUtils.getGeoHashForLocation(location): null;
         this.scannableCodeId = scannableCodeId;
         this.documentId = UUID.randomUUID().toString();
         this.userId = userId;
     }
 
+    /**
+     * Creates a new CodeMetadata object
+     * @param scannableCodeId the id of the scannable code
+     * @param userId the id of the user
+     * @param base64Image the base64 representation of the image taken
+     */
     public CodeMetadata(String scannableCodeId, String userId, String base64Image) {
         this(scannableCodeId, userId, null, base64Image);
     }
+
+    /**
+     * Creates a CodeMetadata object with a specific scannableCodeId and userId
+     * @param scannableCodeId the id of the scananble code
+     * @param userId the id of the user
+     */
     public CodeMetadata(String scannableCodeId, String userId) {
         this(scannableCodeId, userId, null, null);
     }
 
+    /**
+     * Creates a new CodeMetadata object
+     * @param scannableCodeId the id of the scannable code
+     * @param userId the id of the user
+     * @param location the location where the image was taken
+     */
     public CodeMetadata(String scannableCodeId, String userId, GeoLocation location) {
         this(scannableCodeId, userId, location, null);
     }
 
+    /**
+     * Checks if this CodeMEtadata has a location
+     * @return hasLocation which is true if the CodeMetadata has a location
+     */
+    public boolean hasLocation(){
+        return this.hasLocation;
+    }
+
+    /**
+     * Checks if this CodeMEtadata has a image
+     * @return True if the CodeMetadata has a image
+     */
+    public boolean hasImage(){
+        return image != null;
+    }
+
+    /**
+     * Gets the id of the the document in the database
+     * @return documentId the id of the document in the database
+     */
     public String getDocumentId() {
         return documentId;
     }
 
+    /**
+     * Gets the scannableCodeId
+     * @return scannableCodeId the id for the scannable code
+     */
     public String getScannableCodeId(){
         return scannableCodeId;
     }
 
+    /**
+     * Gets the geohash
+     * @return geohash the has of the geolocation
+     */
     public String getGeohash() {
         return geohash;
     }
 
+    /**
+     * Gets the userId
+     * @return userId the id for the user
+     */
     public String getUserId() {
         return userId;
     }
 
+    /**
+     * Gets the image
+     * @return image the image in the metadata
+     */
     public String getImage() {
         return image;
     }
 
+    /**
+     * Gets the location
+     * @return location the location in the metadata
+     */
     public GeoLocation getLocation() {
         return location;
     }

@@ -15,10 +15,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+/**
+ * A controller to handle updating the score values saved in a user document
+ */
 public class UpdateUserScore {
 
-    public static CompletableFuture<Boolean> updateUserScore(AppContext context, DatabasePort db) throws ExecutionException, InterruptedException {
-        Log.i("USER", "CALLED");
+    /**
+     * Updates the user's score fields in the database
+     * @param context the current app context to use
+     * @param db the database instance to use
+     * @return cf the CompletableFuture indicating if the operation was successful or not
+     */
+    public static CompletableFuture<Boolean> updateUserScore(AppContext context, DatabasePort db) {
         Player currentPlayer = context.getCurrentPlayer();
         PlayerWallet currentPlayerWallet = currentPlayer.getPlayerWallet();
         CompletableFuture<Boolean> cf = new CompletableFuture<>();

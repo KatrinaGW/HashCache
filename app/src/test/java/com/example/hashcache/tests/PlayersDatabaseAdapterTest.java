@@ -18,10 +18,12 @@ import android.util.Pair;
 import com.example.hashcache.models.ContactInfo;
 import com.example.hashcache.models.Player;
 import com.example.hashcache.models.PlayerPreferences;
+import com.example.hashcache.models.database.Database;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayerWalletDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.converters.PlayerDocumentConverter;
+import com.example.hashcache.models.database.DatabasePort;
 import com.example.hashcache.models.database.values.CollectionNames;
 import com.example.hashcache.models.database.values.FieldNames;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -432,5 +434,15 @@ public class PlayersDatabaseAdapterTest {
 
         assertTrue(result.join()==1);
 
+    }
+
+
+    @Test
+    private void getTopUsersTest() {
+        DatabasePort db = Database.getInstance();
+
+
+
+        db.getTopUsers(FieldNames.TOTAL_SCORE.fieldName);
     }
 }

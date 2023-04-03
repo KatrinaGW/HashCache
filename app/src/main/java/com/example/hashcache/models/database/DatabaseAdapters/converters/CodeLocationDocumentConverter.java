@@ -18,8 +18,18 @@ import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+/**
+ * A class to convert between code location objects and code location documents
+ */
 public class CodeLocationDocumentConverter {
 
+    /**
+     * Adds a code location object to the code location collection in the database
+     * @param codeLocation the code location to add to the database
+     * @param collectionReference the reference to the collection to add it to
+     * @param fireStoreHelper the instance of FireStoreHelper to use
+     * @return cf the CompletableFuture that completes with true if the operation was successful
+     */
     public CompletableFuture<Boolean> addCodeLocationToCollection(CodeLocation codeLocation,
                                                                          CollectionReference collectionReference,
                                                                          FireStoreHelper fireStoreHelper){

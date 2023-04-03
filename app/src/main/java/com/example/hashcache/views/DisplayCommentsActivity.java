@@ -23,6 +23,9 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.function.Function;
 
+/**
+ * Displays all the comments for a ScannableCode
+ */
 public class DisplayCommentsActivity extends AppCompatActivity implements Observer {
     private ListView commentsList;
     private CommentsDataArrayAdapter commentsDataArrayAdapter;

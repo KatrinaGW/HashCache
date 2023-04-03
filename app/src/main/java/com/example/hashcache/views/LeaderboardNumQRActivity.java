@@ -39,8 +39,6 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
      *
      * @param savedInstanceState A Bundle object containing the activity's previously saved state.
      */
-
-    // Set the player scores can just use singleton don't have to fetch from the database
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

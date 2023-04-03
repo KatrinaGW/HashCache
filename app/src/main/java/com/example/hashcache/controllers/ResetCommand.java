@@ -7,6 +7,9 @@ import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDataba
 import com.example.hashcache.models.database.DatabaseAdapters.LoginsAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.PlayersDatabaseAdapter;
 
+/**
+ * A controller for resetting the app state
+ */
 public class ResetCommand {
     /**
      * Resets the app context and any static instances

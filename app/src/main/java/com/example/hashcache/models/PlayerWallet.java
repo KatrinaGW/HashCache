@@ -112,20 +112,26 @@ public class PlayerWallet {
         }
     }
 
+    /**
+     * Gets the max score for a player wallet
+     * @return maxScore the highest score in the player wallet
+     */
     public long getMaxScore() {
         return maxScore;
     }
 
-    public void updateMaxScore(long candidateScore) {
-        if (candidateScore > maxScore) {
-            this.maxScore = candidateScore;
-        }
-    }
-
+    /**
+     * Gets the number of qr codes in the playerWallet
+     * @param qrCount the number of qr codes in the playerWallet
+     */
     public void setQRCount(long qrCount) {
         this.qrCount = qrCount;
     }
 
+    /**
+     * Sets the highest score in the playerWallet
+     * @param maxScore the highest score to use in the player wallet
+     */
     public void setMaxScore(long maxScore) {
         this.maxScore = maxScore;
     }

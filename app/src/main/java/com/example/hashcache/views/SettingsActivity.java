@@ -132,6 +132,9 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
 
     }
 
+    /**
+     * Called when the activity resumes
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -173,18 +176,6 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
     }
 
     /**
-     * Called when the geolocation preference checkbox is clicked.
-     *
-     * @param view The checkbox view that was clicked.
-     */
-    public void onCheckboxClicked(View view) {
-
-        boolean checked = ((CheckBox) view).isChecked();
-
-        UpdateUserPreferencesCommand.toggleGeoLocationPreference(checked, AppContext.get(),
-                Database.getInstance());
-    }
-    /**
      * Sets the username of the current user in the username view.
      *
      * @param username The username of the current user.
@@ -221,6 +212,12 @@ EditPlayerInfoFragment.EditPlayerInfoFragmentDismisser{
         }
     }
 
+    /**
+     * Called then the observer's observable updates
+     * @param observable     the observable object.
+     * @param o   an argument passed to the {@code notifyObservers}
+     *                 method.
+     */
     @Override
     public void update(Observable observable, Object o) {
         setValues();

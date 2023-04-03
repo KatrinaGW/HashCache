@@ -80,7 +80,6 @@ public class MyProfile extends AppCompatActivity implements Observer {
      * @see AppContext
      * @see Player
      */
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.my_profile);
@@ -159,7 +158,6 @@ public class MyProfile extends AppCompatActivity implements Observer {
      * @param username the username to be set
      * @see TextView
      */
-
     public void setUsername(String username) {
         TextView tv = findViewById(R.id.username_textview);
         tv.setText(username);
@@ -176,12 +174,18 @@ public class MyProfile extends AppCompatActivity implements Observer {
         scoreTv.setText("Score: " + score);
     }
 
+    /**
+     * Called when the observable for this observer updates
+     * @param observable     the observable object.
+     * @param o   an argument passed to the {@code notifyObservers}
+     *                 method.
+     */
     @Override
     public void update(Observable observable, Object o) {
         setUIParams();
     }
 
-    public void setUIParams() {
+    private void setUIParams() {
         Player currentPlayer = AppContext.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
         setScore(currentPlayer.getPlayerWallet().getTotalScore());

@@ -5,6 +5,7 @@ import static com.example.hashcache.controllers.UpdateUserScore.*;
 
 import android.location.Location;
 import android.util.Log;
+import android.util.Pair;
 
 import com.example.hashcache.controllers.LocationController;
 import com.example.hashcache.controllers.UpdateUserScore;
@@ -49,10 +50,9 @@ public class HashController {
 
                 try {
                     // Compute the SHA-256 hash of the QR code content
-                    MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-                    messageDigest.update(qrContent.getBytes());
-                    byte[] byteArray = messageDigest.digest();
-                    String hash = new BigInteger(1, byteArray).toString(16);
+                    Pair<String, byte[]> hashData = HashInfoGenerator.getHashFromQRContents(qrContent);
+                    String hash = hashData.first;
+                    byte[] byteArray = hashData.second;
                     // Generate hash information for the scannable code and check if it already exists in the database
                     HashInfoGenerator.generateHashInfo(byteArray).thenAccept(hashInfo -> {
                         Database.getInstance().scannableCodeExists(hash).thenAccept(exists -> {
@@ -157,7 +157,6 @@ public class HashController {
      * @param userId the ID of the player whose wallet the scannable code should be deleted from
      * @return a CompletableFuture that completes with a boolean indicating whether the scannable code was deleted successfully
      */
-
     public static CompletableFuture<CodeMetadata> initCodeMetadata(String scannableCodeId, String userId, FusedLocationProviderClient fusedLocationProviderClient){
         CompletableFuture<CodeMetadata> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(new Runnable() {
@@ -182,6 +181,13 @@ public class HashController {
         });
         return cf;
     }
+
+    /**
+     * Deletse a specific scannableCode from a user's wallet
+     * @param scannableCodeId the id to remove from the user's wallet
+     * @param userId the id of the user to remove the code from
+     * @return cf the CompletableFuture that completes with True if the operation was successful
+     */
     public static CompletableFuture<Boolean> deleteScannableCodeFromWallet(String scannableCodeId,
                                                                            String userId) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
@@ -253,6 +259,10 @@ public class HashController {
         return cf;
     }
 
+    /**
+     * Update the stored maximum score for the current user
+     * @return cf the CompletableFuture that completes successfully if the operation is successful
+     */
     private static CompletableFuture<Void> updateTotalMaxScore(){
         CompletableFuture<Void> cf = new CompletableFuture<>();
         Database.getInstance()
