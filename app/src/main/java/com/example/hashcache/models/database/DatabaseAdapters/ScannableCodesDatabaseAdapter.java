@@ -193,9 +193,10 @@ public class ScannableCodesDatabaseAdapter {
                         }
 
                         if (matches != scannableCodeIds.size()) {
-                            cf.completeExceptionally(new Exception("One or more player wallet code ids" +
-                                    "could not be mapped to actual codes!"));
-                        }else if(futureCfs.size()>0){
+                            Log.d("ScannableCodesDatabaseAdapter", "One or more player wallet code ids" +
+                                    "could not be mapped to actual codes!");
+                        }
+                        if(futureCfs.size()>0){
                             CompletableFuture.allOf(futureCfs.toArray(new CompletableFuture[futureCfs.size()]))
                                     .thenAccept(nullValue -> {
                                         futureCfs.stream()

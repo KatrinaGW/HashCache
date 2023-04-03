@@ -858,17 +858,20 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
                     // Get the scanableCode that associate with the scannableCodeId
                     ArrayList<String> scannableCodeIds = new ArrayList<>();
                     ArrayList<String> userIds = new ArrayList<>();
+                    HashMap<String,String> codeUserId = new HashMap<>();
                     for(CodeMetadata metadata: codes) {
                         scannableCodeIds.add(metadata.getScannableCodeId());
                         userIds.add(metadata.getUserId());
+                        codeUserId.put(metadata.getScannableCodeId(), metadata.getUserId());
                     }
 
                     Database.getInstance().getScannableCodesByIdInList(scannableCodeIds)
                             .thenAccept(scannableCodes -> {
                                 ArrayList<Pair<String, ScannableCode>> user_id_scannable = new ArrayList<>();
 
-                                for(int i = 0; i < scannableCodeIds.size(); i++) {
-                                    user_id_scannable.add(new Pair<>(userIds.get(i), scannableCodes.get(i)));
+                                for(ScannableCode scannableCode : scannableCodes) {
+                                    user_id_scannable.add(new Pair<>(codeUserId.get(scannableCode.getScannableCodeId()),
+                                            scannableCode));
                                 }
 
                                 // Sort the scannable codes by score
@@ -880,6 +883,13 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
                                 });
 
                                 cf.complete(user_id_scannable);
+                            })
+                            .exceptionally(new Function<Throwable, Void>() {
+                                @Override
+                                public Void apply(Throwable throwable) {
+                                    cf.completeExceptionally(throwable);
+                                    return null;
+                                }
                             });
 
 

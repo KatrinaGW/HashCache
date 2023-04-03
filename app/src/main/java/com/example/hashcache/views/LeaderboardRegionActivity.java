@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.ArrayRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
@@ -32,8 +33,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.util.Assert;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -59,16 +62,8 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard_region);
 
-
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            return;
-        }
 
         /**
          *
@@ -184,6 +179,8 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
@@ -191,7 +188,6 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             Database.getInstance().getScannableCodesWithinRadiusSorted(location).thenAccept(data -> {
-
                                 int count = 0;
                                 for(TextView view: monsterNames) {
                                     if(count < data.size()) {
@@ -206,20 +202,34 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                                     }
                                 }
 
-                                String playerUserId = AppContext.get().getCurrentPlayer().getUserId();
+                                ArrayList<String> playerScannedCodeIds = AppContext.get().getCurrentPlayer()
+                                        .getPlayerWallet().getScannedCodeIds();
                                 // Use to make sure there rank is correct. And not associated with lowest scoring
                                 boolean got_rank = false;
                                 ArrayList<String> userIds = new ArrayList<>();
+                                HashMap<Integer, String> userIdRanking = new HashMap<>();
                                 TextView rankView = findViewById(R.id.region_value_textview);
                                 // Set the score of the player
                                 TextView scoreView = findViewById(R.id.score_value_textview);
 
                                 int j = 1;
+                                int rankingCount = 1;
+                                ArrayList<String> foundIds = new ArrayList<>();
+                                int countAgain = 0;
                                 // Fetch the data base for user ids while also getting the players ranking
                                 // and score
                                 for(Pair<String, ScannableCode> pair: data) {
                                     userIds.add(pair.first);
-                                    if(Objects.equals(pair.first, playerUserId) && !got_rank) {
+                                    if(rankingCount < 4){
+                                        if(!foundIds.contains(pair.second.getScannableCodeId())){
+                                            userIdRanking.put(rankingCount, pair.first);
+                                            countAgain++;
+                                            rankingCount++;
+                                            foundIds.add(pair.second.getScannableCodeId());
+                                        }
+
+                                    }
+                                    if(playerScannedCodeIds.contains(pair.second.getScannableCodeId()) && !got_rank) {
                                         rankView.setText(String.valueOf(j));
                                         long userScore = pair.second.getHashInfo().getGeneratedScore();
                                         Log.i("UserScore: ", String.valueOf(userScore));
@@ -229,14 +239,28 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                                     j += 1;
                                 }
 
+                                Database.getInstance().getUsernamesByIds(userIds)
+                                        .thenAccept(userIdsNames -> {
+                                            for(Pair<String, String> idName : userIdsNames){
+                                                if(userIdRanking.containsKey(1) && userIdRanking.get(1).contains(idName.first)){
+                                                    userNames.get(0).setText(idName.second);
 
-                                for(int i = 0; i < min(userIds.size(), 3); i++){
-                                    int finalI = i;
-                                    Database.getInstance().getUsernameById(userIds.get(i)).thenAccept(userPair -> {
-                                        String username = userPair.second;
-                                        userNames.get(finalI).setText(username);
-                                    });
-                                }
+                                                }
+                                                if(userIdRanking.containsKey(2) && userIdRanking.get(2).contains(idName.first)){
+                                                    userNames.get(1).setText(idName.second);
+                                                }
+                                                if(userIdRanking.containsKey(3) && userIdRanking.get(3).contains(idName.first)){
+                                                    userNames.get(2).setText(idName.second);
+                                                }
+                                            }
+
+                                        })
+                                        .exceptionally(new Function<Throwable, Void>() {
+                                            @Override
+                                            public Void apply(Throwable throwable) {
+                                                return null;
+                                            }
+                                        });
 
                             }).exceptionally(new Function<Throwable, Void>() {
                                 @Override
@@ -250,4 +274,3 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                 });
     }
 }
-

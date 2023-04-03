@@ -198,8 +198,6 @@ public class CodeMetadataDatabaseAdapter {
      * @return cf the CompletableFuture that completes successfully if the operation was successful
      */
     public CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image) {
-
-        Log.d("updatePlayerCodeMetadataImage", String.format("scannableId: %s, userId: %s", scannableCodeId, userId));
         CompletableFuture<Void> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             CollectionReference colRef = collectionReference;
@@ -246,9 +244,8 @@ public class CodeMetadataDatabaseAdapter {
         CompletableFuture<CodeMetadata> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             CollectionReference colRef = collectionReference;
-            Query query = colRef.
-                    whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId).
-                    whereEqualTo(FieldNames.USER_ID.name, userId);
+            Query query = colRef.whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId);
+            query = query.whereEqualTo(FieldNames.USER_ID.name, userId);
             query.get().addOnCompleteListener(task -> {
                 try {
                     if (task.isSuccessful()) {
@@ -286,7 +283,9 @@ public class CodeMetadataDatabaseAdapter {
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if(task.isSuccessful()){
                         ArrayList<CodeMetadata> cms = new ArrayList<>();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        List<DocumentSnapshot> documents = querySnapshot.getDocuments();
+                        for (DocumentSnapshot document : documents) {
                             CodeMetadata cm = parseCodeMetadataDocument(document);
                             cms.add(cm);
                         }
