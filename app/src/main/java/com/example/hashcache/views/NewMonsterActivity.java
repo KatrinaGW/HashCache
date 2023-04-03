@@ -69,6 +69,13 @@ public class NewMonsterActivity extends AppCompatActivity {
     private AppCompatButton skipPhotoButton;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
+    /**
+     * Called when the activity is created
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -211,7 +218,6 @@ public class NewMonsterActivity extends AppCompatActivity {
     }
 
     private void init() {
-
         monsterName = findViewById(R.id.monster_name);
         monsterScore = findViewById(R.id.monster_score);
         monsterImage = findViewById(R.id.monster_image);
@@ -222,32 +228,15 @@ public class NewMonsterActivity extends AppCompatActivity {
         skipPhotoButton = findViewById(R.id.skip_photo_button);
     }
 
-    public void setMonsterName(String name) {
+    private void setMonsterName(String name) {
         monsterName.setText(name);
     }
 
-    public void setMonsterScore(long score) {
+    private void setMonsterScore(long score) {
         monsterScore.setText("Score: " + score);
     }
 
-    public void setMonsterImage(Drawable image) {
+    private void setMonsterImage(Drawable image) {
         monsterImage.setImageDrawable(image);
     }
-
-    public void setMiniMapImage(int imageRes) {
-        miniMap.setImageResource(imageRes);
-    }
-
-    public void setMenuButtonClickListener(View.OnClickListener listener) {
-        menuButton.setOnClickListener(listener);
-    }
-
-    public void setPhotoButtonClickListener(View.OnClickListener listener) {
-        photoButton.setOnClickListener(listener);
-    }
-
-    public void setSkipPhotoButtonClickListener(View.OnClickListener listener) {
-        skipPhotoButton.setOnClickListener(listener);
-    }
-
 }

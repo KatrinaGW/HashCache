@@ -18,7 +18,15 @@ import com.google.android.gms.tasks.Task;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+/**
+ * Handles the commands for the code location database collection
+ */
 public class LocationController {
+    /**
+     * Gets the last location of the user
+     * @param fusedLocationProviderClient an instance of FusedLocationProviderClient to use
+     * @return cf the CompletableFuture that completes with the last location
+     */
     public static CompletableFuture<Location> getLastLocation(FusedLocationProviderClient fusedLocationProviderClient){
         CompletableFuture<Location>  cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {

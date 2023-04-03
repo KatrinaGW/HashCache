@@ -65,7 +65,7 @@ public class PlayerDocumentConverter {
                     .exceptionally(new Function<Throwable, Void>() {
                         @Override
                         public Void apply(Throwable throwable) {
-                            System.out.println("There was an error getting the scannableCodes.");
+                            System.out.println("There was an error getting the scannableCodes. 3");
                             cf.completeExceptionally(throwable);
                             return null;
                         }

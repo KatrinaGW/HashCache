@@ -7,6 +7,9 @@ import com.example.hashcache.models.database.DatabasePort;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+/**
+ * A controller for checking if a user has logged in on their device before
+ */
 public class CheckLoginCommand {
 
     /**

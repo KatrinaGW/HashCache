@@ -62,16 +62,4 @@ public class DependencyInjector {
         return PlayersDatabaseAdapter.makeInstance(new PlayerDocumentConverter(),
                 fireStoreHelper, FirebaseFirestore.getInstance(), new PlayerWalletDatabaseAdapter(fireStoreHelper));
     }
-
-    /**
-     * Create and return an instance of the CodeLocationConnectionHandler with its necessary
-     * dependencies
-     * @return CodeLocationConnectionHandler.INSTANCE the static INSTANCE of the CodeLocationConnectionHandler
-     * class
-     */
-    public static CodeLocationDatabaseAdapter makeCodeLocationConnectionHandler(){
-        return CodeLocationDatabaseAdapter.makeInstance(new FireStoreHelper(),
-                FirebaseFirestore.getInstance(), new CodeLocationDocumentConverter());
-    }
-
 }

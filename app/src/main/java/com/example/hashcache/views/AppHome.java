@@ -122,10 +122,14 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
 
     View mMapView;
 
-    int test = 0;
 
-
-
+    /**
+     * Called when the activity is started
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -299,8 +303,6 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         return BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitmap, 150,150,false));
     }
 
-
-
     /**
      * Saves the state of the map when the activity is paused.
      */
@@ -313,7 +315,10 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         super.onSaveInstanceState(outState);
     }
 
-    //runs when the map is ready to receive user input
+    /**
+     * runs when the map is ready to receive user input
+     * @param googleMap the map to use in the activity
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.map = googleMap;
@@ -342,7 +347,6 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
     }
 
 
-    //asks the user for permission to get their location
     private void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
@@ -361,7 +365,17 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
-    //Handles the result of the request for location permissions
+
+    /**
+     * Called when the permissions are being requested
+     * @param requestCode The request code passed in {@link #requestPermissions(
+     * android.app.Activity, String[], int)}
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
+     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     *
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -455,6 +469,9 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         mScanQrButton = findViewById(R.id.scan_qr_button);
     }
 
+    /**
+     * Called whenever the activity resumes
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -535,11 +552,28 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
         mMap.setOnClickListener(listener);
     }
 
+    /**
+     * Gets the GoogleMap
+     * @return map the GoogleMap
+     */
+    public GoogleMap getMap() {
+        return map;
+    }
+
+    /**
+     * Called whenever the observable for this observer changes
+     * @param observable     the observable object.
+     * @param o   an argument passed to the {@code notifyObservers}
+     *                 method.
+     */
     @Override
     public void update(Observable observable, Object o) {
         setUIParams();
     }
 
+    /**
+     * Sets the UI parameters for the activity
+     */
     public void setUIParams(){
         Player currentPlayer = AppContext.get().getCurrentPlayer();
         setUsername(currentPlayer.getUsername());
@@ -547,6 +581,10 @@ public class AppHome extends AppCompatActivity implements Observer, OnMapReadyCa
 
     }
 
+    /**
+     * Called when the window pointer capture has changed
+     * @param hasCapture True if the window has pointer capture.
+     */
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
         super.onPointerCaptureChanged(hasCapture);

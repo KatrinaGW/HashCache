@@ -37,6 +37,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+import kotlin.Triple;
+
 /**
  * Handles all calls to the Firebase Players database
  */
@@ -137,7 +139,6 @@ public class PlayersDatabaseAdapter {
      *
      * @param username the username to use to pull the player with
      */
-
     public CompletableFuture<Boolean> usernameExists(String username) {
         CompletableFuture<Boolean> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
@@ -234,7 +235,7 @@ public class PlayersDatabaseAdapter {
                                                 .exceptionally(new Function<Throwable, Void>() {
                                                     @Override
                                                     public Void apply(Throwable throwable) {
-                                                        System.out.println("There was an error getting the scannableCodes.");
+                                                        System.out.println("There was an error getting the scannableCodes. 5");
                                                         cf.completeExceptionally(throwable);
                                                         return null;
                                                     }
@@ -648,4 +649,30 @@ public class PlayersDatabaseAdapter {
                 });
                 return cf;
     }
+
+    /**
+     * Gets the top users
+     * @param filter the filter to apply when getting the users
+     * @return cf the CompletableFuture with the list of the top users matching the filter
+     */
+    public CompletableFuture<ArrayList<Triple<String, Long, String>>> getTopUsers(String filter) {
+        ArrayList<Triple<String, Long, String>> list = new ArrayList<>();
+        CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
+        CompletableFuture<ArrayList<Triple<String, Long, String>>> cf = new CompletableFuture<>();
+
+        collectionReference.orderBy(filter, Query.Direction.DESCENDING).get()
+                .addOnSuccessListener(result -> {
+                    for (QueryDocumentSnapshot document : result) {
+                        Triple<String, Long, String> tripple = new Triple<>((String) document.get(FieldNames.USERNAME.fieldName),
+                                (Long) document.get(filter), (String) document.getId());
+                        list.add(tripple);
+                    }
+                    cf.complete(list);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("DATABASE", "Error getting top k users");
+                });
+        return cf;
+    }
+
 }

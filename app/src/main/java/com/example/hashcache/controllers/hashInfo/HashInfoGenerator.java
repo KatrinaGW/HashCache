@@ -6,6 +6,7 @@ import static com.example.hashcache.controllers.hashInfo.Constants.totalOnesProb
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.util.Log;
+import android.util.Pair;
 
 import com.example.hashcache.models.HashInfo;
 import com.google.android.material.color.utilities.Score;
@@ -16,6 +17,8 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -63,5 +66,20 @@ public class HashInfoGenerator {
      */
     public static long getIntegerIdFromHash(byte[] byteArray){
         return new BigInteger(byteArray).longValue();
+    }
+
+
+    /**
+     * Hashes the QR contents to a unique identifier using SHA-256.
+     *
+     * @param QRContents the byte array to convert
+     * @return a String with the hash.
+     */
+    public static Pair<String, byte[]> getHashFromQRContents(String QRContents) throws NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+        messageDigest.update(QRContents.getBytes());
+        byte[] byteArray = messageDigest.digest();
+        String hash = new BigInteger(1, byteArray).toString(16);
+        return new Pair<>(hash, byteArray);
     }
 }

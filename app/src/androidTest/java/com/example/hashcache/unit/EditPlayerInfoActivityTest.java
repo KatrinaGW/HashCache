@@ -80,7 +80,6 @@ public class EditPlayerInfoActivityTest {
 
 
     /**
-    @Test
     public void checkWrongFormat(){
         solo.enterText((EditText) solo.getView(R.id.email_edit_text), "Wrong Format 12345");
         solo.enterText((EditText) solo.getView(R.id.edit_phone_number), "This is not a number");

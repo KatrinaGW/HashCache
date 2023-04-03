@@ -39,11 +39,9 @@ public class QRStatsTest {
 
     /**
      * Runs before all tests and creates solo instance.
-     *
-     * @throws Exception
      */
     @Before
-    public void setUp() throws Exception {
+    public void setUp(){
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         final String ALLOWED_CHARACTERS = "0123456789qwertyuiopasdfghjklzxcvbnm";
         final Random random = new Random();

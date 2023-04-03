@@ -1,6 +1,8 @@
 package com.example.hashcache.models.database;
 
+import android.content.pm.ComponentInfo;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.lang.reflect.Array;
 import android.util.Log;
@@ -38,14 +40,19 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+
+import kotlin.Triple;
 
 /**
  * 
@@ -119,7 +126,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
                                     }).exceptionally(new Function<Throwable, Void>() {
                                 @Override
                                 public Void apply(Throwable throwable) {
-                                    System.out.println("There was an error getting the scannableCodes.");
+                                    System.out.println("There was an error getting the scannableCodes 2.");
                                     cf.completeExceptionally(throwable);
                                     return null;
                                 }
@@ -147,7 +154,7 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
                     }).exceptionally(new Function<Throwable, Void>() {
                         @Override
                         public Void apply(Throwable throwable) {
-                            System.out.println("There was an error getting the scannableCodes.");
+                            System.out.println("There was an error getting the scannableCodes. 4");
                             cf.completeExceptionally(throwable);
                             return null;
                         }
@@ -616,34 +623,16 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
     /**
      * Returns the user id of the top k players with the given filter. Given a list containing user
      * names and the score of the user (determined by filter)
-     * @param filter
-     * @param k
-     * @return
+     * @param filter the filter you were to sort by
+     * @return A array list contains pairs of strings, long and strings. Which correspond to username,
+     * score and user Id
      */
     @Override
-    public CompletableFuture<ArrayList<Pair<String, Long>>> getTopKUsers(String filter, int k) {
-        CompletableFuture<ArrayList<Pair<String, Long>>> cf = new CompletableFuture<>();
-        ArrayList<Pair<String, Long>> arrayList = new ArrayList<>();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
+    public CompletableFuture<ArrayList<Triple<String, Long, String>>> getTopUsers(String filter) {
+        CompletableFuture<ArrayList<Triple<String, Long, String>>> cf = new CompletableFuture<>();
 
-        CompletableFuture.runAsync(() -> {
-            collectionReference.orderBy(filter).limit(k).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if(task.isSuccessful()) {
-                        for(QueryDocumentSnapshot document: task.getResult()) {
-                            Pair<String, Long> pair = new Pair(document.get(FieldNames.USERNAME.fieldName),
-                                            document.get(filter));
-                            arrayList.add(pair);
-                        }
-                        cf.complete(arrayList);
-                    } else {
-                        Log.e("DATABASE", "Error getting the top k users");
-                    }
-                }
-            });
-
+        PlayersDatabaseAdapter.getInstance().getTopUsers(filter).thenAccept(result -> {
+            cf.complete(result);
         });
 
         return cf;
@@ -661,16 +650,33 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return LoginsAdapter.getInstance().addLoginRecord(username);
     }
 
+    /**
+     * Adds a CodeMetadata to the database
+     * @param codeMetadata the metadata object to add to the database
+     * @return cf the CompletableFuture that compeltes with true if the operation was successful
+     */
     @Override
     public CompletableFuture<Void> addScannableCodeMetadata(CodeMetadata codeMetadata){
         return CodeMetadataDatabaseAdapter.getInstance().createScannableCodeMetadata(codeMetadata);
     }
 
+    /**
+     * Gets the metadata for all the scannableCodes within a certain radius of a certain location
+     * @param location the location to use as the centre point
+     * @param radiusMeters the radius to find all scananbleCodes in
+     * @return cf the CompletableFuture with a list of the codes in the radius
+     */
     @Override
     public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataWithinRadius(GeoLocation location, double radiusMeters) {
         return CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataWithinRadius(location, radiusMeters);
     }
 
+    /**
+     * Gets the metadata for all the scannableCodes within a certain radius of a certain location
+     * @param location the location to use as the centre point
+     * @param radiusMeters the radius to find all scananbleCodes in
+     * @return cf the CompletableFuture with a list of the codes in the radius
+     */
     @Override
     public CompletableFuture<ArrayList<ScannableCode>> getScannableCodesWithinRadius(GeoLocation location, double radiusMeters) {
         CompletableFuture<ArrayList<ScannableCode>> cf = new CompletableFuture<>();
@@ -711,16 +717,45 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return LoginsAdapter.getInstance().getUsernameForDevice();
     }
 
+    /**
+     * Checks if a document exists for a code metadata with a specific userid and scannableCodeId
+     * @param userId the id of the user
+     * @param scannableCodeId the id of the scannableCode
+     * @return cf the CompletableFuture that completes with whether or not the document exists
+     */
+    @Override
+    public CompletableFuture<Boolean> codeMetadataEntryExists(String userId, String scannableCodeId) {
+        return CodeMetadataDatabaseAdapter.getInstance().codeMetadataEntryExists(userId, scannableCodeId);
+    }
+
+    /**
+     * Updates the image a player took of a scannable code
+     * @param userId the id of the player
+     * @param scannableCodeId the id of the scannablecode the player photographed
+     * @param image the image to update with
+     * @return cf the CompletableFuture that completes successfully if the operation was successful
+     */
     @Override
     public CompletableFuture<Void> updatePlayerCodeMetadataImage(String userId, String scannableCodeId, String image) {
         return CodeMetadataDatabaseAdapter.getInstance().updatePlayerCodeMetadataImage(userId, scannableCodeId, image);
     }
 
+    /**
+     * Gets the metadata for a player's specific scannableCode
+     * @param userId the id of the player to get the metadata for
+     * @param scannableCodeId the id of the code to get the metadata for
+     * @return cf the CompletableFuture with the CodeMetadata
+     */
     @Override
     public CompletableFuture<CodeMetadata> getPlayerCodeMetadataById(String userId, String scannableCodeId) {
         return CodeMetadataDatabaseAdapter.getInstance().getPlayerCodeMetadataById(userId, scannableCodeId);
     }
 
+    /**
+     * Gets all the CodeMetadata objects for a specific ScannableCode
+     * @param scannableCodeId the id of the scannableCode
+     * @return cf the CompletableFuture with all the CodeMetadatas that had the specific scananbleCodeId
+     */
     @Override
     public CompletableFuture<ArrayList<CodeMetadata>> getCodeMetadataById(String scannableCodeId) {
         return CodeMetadataDatabaseAdapter.getInstance().getCodeMetadataById(scannableCodeId);
@@ -758,6 +793,12 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         CodeLocationDatabaseAdapter.resetInstance();
     }
 
+    /**
+     * Updates the player score values on the player document
+     * @param userId the id of the user whose score values need to be updated
+     * @param playerWallet the wallet of the player
+     * @return cf the CompletableFuture that completes with true if the operation was successful
+     */
     @Override
     public CompletableFuture<Boolean> updatePlayerScores(String userId, PlayerWallet playerWallet) {
 
@@ -785,4 +826,70 @@ public class DatabaseAdapter extends Observable implements DatabasePort {
         return cf;
     }
 
+    /**
+     * Gets the top monster name of a player given a user name
+     * @param userId The user Id of the
+     * @return
+     */
+    @Override
+    public CompletableFuture<String> getTopMonsterName(String userId) {
+        CompletableFuture<String> cf = new CompletableFuture<>();
+        PlayersDatabaseAdapter.getInstance().getPlayer(userId).thenAccept(player -> {
+            ArrayList<String> scannableCodeIds = player.getPlayerWallet().getScannedCodeIds();
+            PlayerWalletDatabaseAdapter.getInstance().getPlayerWalletTopScore(scannableCodeIds, Database.getInstance())
+                    .thenAccept(code -> {
+                        cf.complete(code.getHashInfo().getGeneratedName());
+            });
+        });
+        return cf;
+    }
+
+    /**
+     * Gets the scannableCodes within a certain radius of a location
+     * @param location the location to use as the center point
+     * @return cf the CompletableFuture with the scannable codes within a radius
+     */
+    @Override
+    public CompletableFuture<ArrayList<Pair<String, ScannableCode>>> getScannableCodesWithinRadiusSorted(Location location) {
+        CompletableFuture<ArrayList<Pair<String, ScannableCode>>> cf = new CompletableFuture<>();
+        Database.getInstance().getCodeMetadataWithinRadius(new GeoLocation(
+                        location.getLatitude(), location.getLongitude()), 1000)
+                .thenAccept(codes -> {
+                    // Get the scanableCode that associate with the scannableCodeId
+                    ArrayList<String> scannableCodeIds = new ArrayList<>();
+                    ArrayList<String> userIds = new ArrayList<>();
+                    for(CodeMetadata metadata: codes) {
+                        scannableCodeIds.add(metadata.getScannableCodeId());
+                        userIds.add(metadata.getUserId());
+                    }
+
+                    Database.getInstance().getScannableCodesByIdInList(scannableCodeIds)
+                            .thenAccept(scannableCodes -> {
+                                ArrayList<Pair<String, ScannableCode>> user_id_scannable = new ArrayList<>();
+
+                                for(int i = 0; i < scannableCodeIds.size(); i++) {
+                                    user_id_scannable.add(new Pair<>(userIds.get(i), scannableCodes.get(i)));
+                                }
+
+                                // Sort the scannable codes by score
+                                user_id_scannable.sort(new Comparator<Pair<String, ScannableCode>>() {
+                                    @Override
+                                    public int compare(Pair<String, ScannableCode> o1, Pair<String, ScannableCode> o2) {
+                                        return (int)o2.second.getHashInfo().getGeneratedScore() - (int)o1.second.getHashInfo().getGeneratedScore();
+                                    }
+                                });
+
+                                cf.complete(user_id_scannable);
+                            });
+
+
+                })
+                .exceptionally(new Function<Throwable, Void>() {
+                    @Override
+                    public Void apply(Throwable throwable) {
+                        return null;
+                    }
+                });
+        return cf;
+    }
 }

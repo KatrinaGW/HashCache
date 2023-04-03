@@ -1,5 +1,8 @@
 package com.example.hashcache.controllers.hashInfo;
 
+/**
+ * Constants for generating the random values
+ */
 public class Constants {
 
     final public static long MAX_SCORE = 100000;

@@ -2,6 +2,8 @@ package com.example.hashcache.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -12,24 +14,31 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.example.hashcache.R;
+import com.example.hashcache.models.Player;
+import com.example.hashcache.models.PlayerWallet;
 import com.example.hashcache.models.database.Database;
 import com.example.hashcache.appContext.AppContext;
+import com.example.hashcache.models.database.DatabaseAdapter;
+import com.example.hashcache.models.database.DatabasePort;
+import com.example.hashcache.models.database.values.FieldNames;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 /**
  * The LeaderboardNumQRActivity class extends the AppCompatActivity and is used to display the
  * leaderboard based on the number of QR codes scanned.
  */
 public class LeaderboardNumQRActivity extends AppCompatActivity {
+    private ArrayList<Pair<String, Long>> scores;
     /**
      * onCreate method is used to initialize the activity and is called when the activity is first created.
      *
      * @param savedInstanceState A Bundle object containing the activity's previously saved state.
      */
-
-    // Set the player scores can just use singleton don't have to fetch from the database
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,40 +46,6 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
 
         // add functionality to menu button
         ImageButton menuButton = findViewById(R.id.menu_button);
-
-        // Sets the players numb qr codes
-        TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
-        AtomicLong numQrCodes = new AtomicLong();
-        Database.getInstance()
-                .getTotalScore(AppContext.get().getCurrentPlayer().getUserId())
-                .thenAccept( score -> {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            numQrCodes.set(score);
-                        }
-                    });
-                });
-        playersNumQrCodes.setText(String.valueOf(numQrCodes));
-
-        // Get the text views needed to set the leaderboard
-        ArrayList<TextView> userNames = new ArrayList<>();
-        userNames.add(findViewById(R.id.user_one));
-        userNames.add(findViewById(R.id.user_two));
-        userNames.add(findViewById(R.id.user_three));
-
-        for(TextView view: userNames) {
-            view.setText("Temp");
-        }
-
-        ArrayList<TextView> qrCounts = new ArrayList<>();
-        qrCounts.add(findViewById(R.id.num_one));
-        qrCounts.add(findViewById(R.id.num_two));
-        qrCounts.add(findViewById(R.id.num_three));
-
-        for(TextView view: qrCounts) {
-            view.setText(String.valueOf(42));
-        }
 
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,6 +122,76 @@ public class LeaderboardNumQRActivity extends AppCompatActivity {
                 // go to topQR leaderboard page
                 startActivity(new Intent(LeaderboardNumQRActivity.this, LeaderboardTopQRActivity.class));
             }
+        });
+
+        // Sets the leaderboard scores and username for Num qr
+        setLeaderboard();
+    }
+
+    /**
+     * Sets the leaderboard scores
+     */
+    private void setLeaderboard() {
+        // Update the my QR code scores
+        AppContext appContext = AppContext.get();
+        PlayerWallet playerWallet = appContext.getCurrentPlayer().getPlayerWallet();
+
+        TextView playersNumQrCodes = findViewById(R.id.score_value_textview);
+        playersNumQrCodes.setText(String.valueOf(playerWallet.getQrCount()));
+
+        // Get access to the database
+        DatabasePort databaseAdapter = Database.getInstance();
+
+
+        // Get the text views needed to set the leaderboard
+        ArrayList<TextView> userNames = new ArrayList<>();
+        userNames.add(findViewById(R.id.user_one));
+        userNames.add(findViewById(R.id.user_two));
+        userNames.add(findViewById(R.id.user_three));
+
+        ArrayList<TextView> qrCounts = new ArrayList<>();
+        qrCounts.add(findViewById(R.id.num_one));
+        qrCounts.add(findViewById(R.id.num_two));
+        qrCounts.add(findViewById(R.id.num_three));
+
+        // Fetch the values from the database needed for the leaderboards
+        databaseAdapter.getTopUsers(FieldNames.QR_COUNT.fieldName).thenAccept(score -> {
+                if (score.size() != 0) {
+                    int count = 0;
+                    for (TextView view : userNames) {
+                        if (count < score.size()) {
+                            view.setText(score.get(count++).getFirst());
+                        } else {
+                            view.setText("NA");
+                        }
+                    }
+                    count = 0;
+                    for (TextView view : qrCounts) {
+                        if(count < score.size()) {
+                            view.setText(String.valueOf(score.get(count++).getSecond()));
+                        } else {
+                            view.setText("0");
+                        }
+                    }
+
+
+                    // Find the player rating
+                    String userName = appContext.getCurrentPlayer().getUsername();
+
+                    // Update the player rating
+                    for(int i = 0; i < score.size(); i++) {
+                        if(Objects.equals(score.get(i).getFirst(), userName)) {
+                            TextView rankingView = findViewById(R.id.region_value_textview);
+                            rankingView.setText(String.valueOf(i + 1));
+
+                            // No need to keep looking
+                            break;
+                        }
+                    }
+
+                } else {
+                    Log.e("DATABASE", "Error in getting the top k users");
+                }
         });
     }
 }

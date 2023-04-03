@@ -34,7 +34,7 @@ public class ScannableCodesArrayAdapter extends ArrayAdapter<ScannableCode> {
      *        always of the right type (see {@link #getViewTypeCount()} and
      *        {@link #getItemViewType(int)}).
      * @param parent The parent that this view will eventually be attached to
-     * @return
+     * @return view the created View object
      */
     @NonNull
     @Override
