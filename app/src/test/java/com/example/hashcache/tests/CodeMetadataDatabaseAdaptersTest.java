@@ -41,6 +41,7 @@ public class CodeMetadataDatabaseAdaptersTest {
     }
 
     private CodeMetadataDatabaseAdapter getCodeMetaDatabaseAdapter(){
+        CodeMetadataDatabaseAdapter.resetInstance();
         return CodeMetadataDatabaseAdapter.makeOrGetInstance(mockFireStoreHelper, mockDb);
     }
 
