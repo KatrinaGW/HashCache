@@ -27,7 +27,7 @@ import org.junit.Test;
 
 
 /**
- * Test class for AppHome. All the UI tests are written here. Robotium test framework is
+ * Test class for Display Monster activity. All the UI tests are written here. Robotium test framework is
  used
  */
 public class PrivateDisplayMonsterActivityTest {
@@ -68,6 +68,7 @@ public class PrivateDisplayMonsterActivityTest {
         solo.waitForText(TEST_OTHER_USER_MONSTER_SCORE);
         solo.waitForView(solo.getView(R.id.view_comments_button));
         solo.waitForView(solo.getView(R.id.delete_button));
+        solo.waitForView(solo.getView(R.id.view_photos_button));
         logout();
     }
 }
