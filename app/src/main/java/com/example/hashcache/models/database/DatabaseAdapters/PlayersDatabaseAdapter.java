@@ -657,21 +657,20 @@ public class PlayersDatabaseAdapter {
      */
     public CompletableFuture<ArrayList<Triple<String, Long, String>>> getTopUsers(String filter) {
         ArrayList<Triple<String, Long, String>> list = new ArrayList<>();
-        CollectionReference collectionReference = db.collection(CollectionNames.PLAYERS.collectionName);
+        //CollectionReference collectionRe ference = db.collection(CollectionNames.PLAYERS.collectionName);
         CompletableFuture<ArrayList<Triple<String, Long, String>>> cf = new CompletableFuture<>();
 
         collectionReference.orderBy(filter, Query.Direction.DESCENDING).get()
                 .addOnSuccessListener(result -> {
-                    for (QueryDocumentSnapshot document : result) {
-                        Triple<String, Long, String> tripple = new Triple<>((String) document.get(FieldNames.USERNAME.fieldName),
-                                (Long) document.get(filter), (String) document.getId());
+                    List<DocumentSnapshot> docs = result.getDocuments();
+                    for (int i = 0; i < docs.size(); i++) {
+                        Triple<String, Long, String> tripple = new Triple<>((String) docs.get(i).get(FieldNames.USERNAME.fieldName),
+                                (Long) docs.get(i).get(filter), (String) docs.get(i).getId());
                         list.add(tripple);
                     }
                     cf.complete(list);
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("DATABASE", "Error getting top k users");
                 });
+
         return cf;
     }
 
