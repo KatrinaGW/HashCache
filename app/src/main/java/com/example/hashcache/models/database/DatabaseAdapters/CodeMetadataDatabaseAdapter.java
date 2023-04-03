@@ -246,9 +246,8 @@ public class CodeMetadataDatabaseAdapter {
         CompletableFuture<CodeMetadata> cf = new CompletableFuture<>();
         CompletableFuture.runAsync(() -> {
             CollectionReference colRef = collectionReference;
-            Query query = colRef.
-                    whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId).
-                    whereEqualTo(FieldNames.USER_ID.name, userId);
+            Query query = colRef.whereEqualTo(FieldNames.ScannableCodeId.name, scannableCodeId);
+            query = query.whereEqualTo(FieldNames.USER_ID.name, userId);
             query.get().addOnCompleteListener(task -> {
                 try {
                     if (task.isSuccessful()) {

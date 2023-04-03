@@ -1,5 +1,6 @@
 package com.example.hashcache.tests;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
@@ -44,6 +45,45 @@ public class CodeMetadataDatabaseAdaptersTest {
     private CodeMetadataDatabaseAdapter getCodeMetaDatabaseAdapter(){
         CodeMetadataDatabaseAdapter.resetInstance();
         return CodeMetadataDatabaseAdapter.makeOrGetInstance(mockFireStoreHelper, mockDb);
+    }
+
+    @Test
+    void getPlayerCodeMetadataByIdTest(){
+        String testUserId = "userId";
+        String testScannableCodeId = "scananbleCodeId";
+        Query mockQuery = Mockito.mock(Query.class);
+        CollectionReference mockCollectionReference = Mockito.mock(CollectionReference.class);
+        Task<QuerySnapshot> mockTaskQS = Mockito.mock(Task.class);
+        QuerySnapshot mockQS = Mockito.mock(QuerySnapshot.class);
+        DocumentSnapshot mockDS = Mockito.mock(DocumentSnapshot.class);
+        List<DocumentSnapshot> testResult = new ArrayList<>();
+        testResult.add(mockDS);
+
+        when(mockDb.collection(anyString())).thenReturn(mockCollectionReference);
+        when(mockCollectionReference.whereEqualTo(FieldNames.ScannableCodeId.fieldName, testScannableCodeId))
+                .thenReturn(mockQuery);
+        when(mockQuery.whereEqualTo(FieldNames.USER_ID.fieldName, testUserId))
+                .thenReturn(mockQuery);
+        when(mockQuery.get()).thenReturn(mockTaskQS);
+        when(mockTaskQS.isSuccessful()).thenReturn(true);
+        when(mockTaskQS.getResult()).thenReturn(mockQS);
+        when(mockQS.getDocuments()).thenReturn(testResult);
+        when(mockDS.getString(FieldNames.ScannableCodeId.name)).thenReturn(testScannableCodeId);
+        when(mockDS.getString(FieldNames.USER_ID.name)).thenReturn(testUserId);
+        when(mockDS.contains(FieldNames.ImageBase64.name)).thenReturn(false);
+        when(mockDS.getBoolean(FieldNames.HasLocation.name)).thenReturn(false);
+
+        doAnswer(invocation -> {
+            OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
+            onCompleteListener.onComplete(mockTaskQS);
+            return null;
+        }).when(mockTaskQS).addOnCompleteListener(any(OnCompleteListener.class));
+
+        CodeMetadata result = getCodeMetaDatabaseAdapter().getPlayerCodeMetadataById(testUserId,
+                testScannableCodeId).join();
+
+        assertEquals(result.getScannableCodeId(), testScannableCodeId);
+        assertEquals(result.getUserId(), testUserId);
     }
 
     @Test
