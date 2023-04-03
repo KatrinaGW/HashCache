@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.ArrayRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
@@ -32,8 +33,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.util.Assert;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -191,6 +194,9 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             Database.getInstance().getScannableCodesWithinRadiusSorted(location).thenAccept(data -> {
+                                ArrayList<String> firstUsernames = new ArrayList<>();
+                                ArrayList<String> secondUsernames = new ArrayList<>();
+                                ArrayList<String> thirdUsernames = new ArrayList<>();
 
                                 int count = 0;
                                 for(TextView view: monsterNames) {
@@ -206,20 +212,35 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                                     }
                                 }
 
-                                String playerUserId = AppContext.get().getCurrentPlayer().getUserId();
+                                ArrayList<String> playerScannedCodeIds = AppContext.get().getCurrentPlayer()
+                                        .getPlayerWallet().getScannedCodeIds();
                                 // Use to make sure there rank is correct. And not associated with lowest scoring
                                 boolean got_rank = false;
                                 ArrayList<String> userIds = new ArrayList<>();
+                                HashMap<Integer, ArrayList<String>> userIdRanking = new HashMap<>();
                                 TextView rankView = findViewById(R.id.region_value_textview);
                                 // Set the score of the player
                                 TextView scoreView = findViewById(R.id.score_value_textview);
+
+                                if(data.size()>0){
+                                    userIdRanking.put(1, new ArrayList<>());
+                                }
+                                if(data.size()>1){
+                                    userIdRanking.put(2, new ArrayList<>());
+                                }
+                                if(data.size()>2){
+                                    userIdRanking.put(3, new ArrayList<>());
+                                }
 
                                 int j = 1;
                                 // Fetch the data base for user ids while also getting the players ranking
                                 // and score
                                 for(Pair<String, ScannableCode> pair: data) {
                                     userIds.add(pair.first);
-                                    if(Objects.equals(pair.first, playerUserId) && !got_rank) {
+                                    if(j<4){
+                                        userIdRanking.get(j).add(pair.first);
+                                    }
+                                    if(playerScannedCodeIds.contains(pair.second.getScannableCodeId()) && !got_rank) {
                                         rankView.setText(String.valueOf(j));
                                         long userScore = pair.second.getHashInfo().getGeneratedScore();
                                         Log.i("UserScore: ", String.valueOf(userScore));
@@ -229,14 +250,40 @@ public class LeaderboardRegionActivity extends AppCompatActivity {
                                     j += 1;
                                 }
 
+                                Database.getInstance().getUsernamesByIds(userIds)
+                                        .thenAccept(userIdsNames -> {
+                                            for(Pair<String, String> idName : userIdsNames){
+                                                if(userIdRanking.containsKey(1) && userIdRanking.get(1).contains(idName.first)){
+                                                    firstUsernames.add(idName.second);
 
-                                for(int i = 0; i < min(userIds.size(), 3); i++){
-                                    int finalI = i;
-                                    Database.getInstance().getUsernameById(userIds.get(i)).thenAccept(userPair -> {
-                                        String username = userPair.second;
-                                        userNames.get(finalI).setText(username);
-                                    });
-                                }
+                                                }
+                                                if(userIdRanking.containsKey(2) && userIdRanking.get(2).contains(idName.first)){
+                                                    secondUsernames.add(idName.second);
+                                                }
+                                                if(userIdRanking.containsKey(3) && userIdRanking.get(3).contains(idName.first)){
+                                                    thirdUsernames.add(idName.second);
+                                                }
+                                            }
+
+                                            if(firstUsernames.size()>0){
+                                                userNames.get(0).setText(
+                                                        String.join(",", firstUsernames)
+                                                );
+                                            }
+                                            if(secondUsernames.size()>0){
+                                                userNames.get(1).setText(
+                                                        String.join(",", secondUsernames)
+                                                );
+
+
+                                            }
+                                            if(thirdUsernames.size()>0) {
+                                                userNames.get(2).setText(
+                                                        String.join(",", thirdUsernames)
+                                                );
+                                            }
+
+                                        });
 
                             }).exceptionally(new Function<Throwable, Void>() {
                                 @Override
