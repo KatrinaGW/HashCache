@@ -66,7 +66,7 @@ public class LoginsAdapter {
             INSTANCE = new LoginsAdapter(fireStoreHelper, firebaseFirestore);
             return INSTANCE;
         }else{
-            throw new IllegalArgumentException("The LoginsAdapter already exists!");
+            return INSTANCE;
         }
     }
 
