@@ -45,8 +45,6 @@ public class CodeMetadata {
      * @param location        The location of the scannable code.
      * @param base64Image     The base64-encoded image of the scannable code (if
      *                        available).
-     * @throws NoSuchAlgorithmException If the SHA-256 algorithm is not available on
-     *                                  the current platform.
      */
     public CodeMetadata(String scannableCodeId, String userId, GeoLocation location, String base64Image) {
         this.image = base64Image;

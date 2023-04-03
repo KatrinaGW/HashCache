@@ -35,8 +35,6 @@ public class SettingsActivityTest {
 
     /**
      * Runs before all tests and creates solo instance.
-     *
-     * @throws Exception
      */
     @Before
     public void setUp() throws Exception {
