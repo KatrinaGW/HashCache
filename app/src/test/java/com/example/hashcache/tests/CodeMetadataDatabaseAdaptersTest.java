@@ -1,13 +1,16 @@
 package com.example.hashcache.tests;
 
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
+import com.example.hashcache.models.CodeMetadata;
 import com.example.hashcache.models.database.DatabaseAdapters.CodeMetadataDatabaseAdapter;
 import com.example.hashcache.models.database.DatabaseAdapters.FireStoreHelper;
 import com.example.hashcache.models.database.values.FieldNames;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -18,19 +21,21 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class CodeMetadataDatabaseAdaptersTest {
     FireStoreHelper mockFireStoreHelper;
     FirebaseFirestore mockDb;
 
     @BeforeEach
-    private void initializeMocks(){
+    void initializeMocks(){
         mockDb = Mockito.mock(FirebaseFirestore.class);
         mockFireStoreHelper = Mockito.mock(FireStoreHelper.class);
     }
@@ -82,5 +87,33 @@ public class CodeMetadataDatabaseAdaptersTest {
                 testUsername).join();
 
         assert(result);
+    }
+
+    @Test
+    void createScannableCodeMetadataTest(){
+        String testScannableCodeId = "Fake Id";
+        String testUserid = "Fake User";
+        String testBase64Image = "base???";
+        CodeMetadata testCodeMetadata = new CodeMetadata(testScannableCodeId, testUserid,
+                testBase64Image);
+        CollectionReference mockCollectionReference = Mockito.mock(CollectionReference.class);
+        Task<Void> mockVoidTask = Mockito.mock(Task.class);
+        DocumentReference mockDocRef = Mockito.mock(DocumentReference.class);
+
+
+        when(mockDb.collection(anyString())).thenReturn(mockCollectionReference);
+        when(mockCollectionReference.document(testCodeMetadata.getDocumentId())).thenReturn(mockDocRef);
+        when(mockDocRef.set(any())).thenReturn(mockVoidTask);
+        when(mockVoidTask.isSuccessful()).thenReturn(true);
+
+        doAnswer(invocation -> {
+            OnCompleteListener onCompleteListener = invocation.getArgumentAt(0, OnCompleteListener.class);
+            onCompleteListener.onComplete(mockVoidTask);
+            return null;
+        }).when(mockVoidTask).addOnCompleteListener(any(OnCompleteListener.class));
+
+        CompletableFuture<Void> result = getCodeMetaDatabaseAdapter().createScannableCodeMetadata(testCodeMetadata);
+
+        assertNull(result.join());
     }
 }

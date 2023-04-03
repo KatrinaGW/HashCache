@@ -108,30 +108,6 @@ public class CodeMetadataDatabaseAdapter {
         INSTANCE = null;
     }
 
-    /**
-     * Updates the image for a specific scannableCode
-     * @param codeMetadataId the id of the document to update the image on
-     * @param base64Image the base64 version of the image
-     * @return cf the CompletableFuture that completes successful if the operation was successful
-     */
-    public CompletableFuture<Void> updateLocationImage(String codeMetadataId, String base64Image) {
-        CompletableFuture<Void> cf = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
-            Map<String, Object> objMap = new HashMap<>();
-            objMap.put(FieldNames.ImageBase64.name, base64Image);
-            DocumentReference docRef = collectionReference.document(codeMetadataId);
-            docRef.update(objMap).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    cf.complete(null);
-                } else {
-                    Log.d(TAG, "Failed with: " + task.getException());
-                    cf.completeExceptionally(task.getException());
-                }
-            });
-        });
-        return cf;
-    }
-
     // Based on:
     // https://firebase.google.com/docs/firestore/solutions/geoqueries#java
 
