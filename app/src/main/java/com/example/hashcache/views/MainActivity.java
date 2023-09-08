@@ -102,12 +102,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(!hasBeenInitialized) FirebaseApp.initializeApp(this, new FirebaseOptions.Builder()
-                .setApplicationId("1:867369236696:android:66b025b68d73cf62b23fad")
-                .setApiKey("AIzaSyDZ-92CsgRrFuuvcyZpJAesFg4xdfeBuDw")
-                .setDatabaseUrl("https://hashcachefinal-default-rtdb.firebaseio.com")
-                .setGcmSenderId("867369236696")
-                .setStorageBucket("hashcachefinal.appspot.com")
-                .setProjectId("hashcachefinal")
+                .setApplicationId("1:91449694037:android:9e3b06fe5c82f1fab8c1dc")
+                .setApiKey("AIzaSyBrW6bNnRL-QV6-IvbpJmxIvaycRjvmg44")
+                .setDatabaseUrl("https://hashcache-c6eb4.firebaseio.com")
+                .setGcmSenderId("91449694037")
+                .setStorageBucket("hashcache-c6eb4.appspot.com")
+                .setProjectId("hashcache-c6eb4")
                 .build());
 
         AppContext.get();
